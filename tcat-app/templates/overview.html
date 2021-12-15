@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+    <div class="flex flex-col">
+        <div class="flex-grow flex flex-col gap-2">
+            <p class="flex-grow-0 p-4 font-sans font-semibold text-black dark:text-gray-300">Active optimizations:</p>
+            <div class="flex-grow max-h-96 overflow-auto">
+                {% for active_config_run in active_config_runs %}
+                        <div class="flex-grow flex flex-row gap-4 m-4">
+                            <div class="flex-grow flex flex-row gap-4 text-black font-medium bg-purple-200 dark:bg-purple-900 dark:text-gray-300 align-middle rounded-lg">
+                                <div class="align-middle p-4">
+                                    Scenario id: {{ active_config_run.configuration.scenario_id }}
+                                </div>
+                                <div class="align-middle p-4">
+                                    Status: {{ active_config_run.status }}
+                                </div>
+                                <div class="align-middle p-4">
+                                    Started: {{ active_config_run.started_date.strftime("%m/%d/%Y, %H:%M:%S") }}
+                                </div>
+                            </div>
+                            <a class="flex-grow-0 p-4 text-center dark:text-gray-300 text-white bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold" href="{{ url_for('status', config_run_id=active_config_run.id) }}">View</a>
+                        </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="flex-grow">
+            <p class="flex-grow-0 p-4 font-sans font-semibold text-black dark:text-gray-300">History:</p>
+            <div class="flex-grow max-h-96 overflow-auto">
+                {% for config_run in config_runs %}
+                    <div class="flex-grow flex flex-row gap-4 m-4">
+                        {% set back_color = 'bg-green-200 dark:bg-green-900' if config_run.finished_date != None else 'bg-red-200 dark:bg-red-900' %}
+                        <div class="flex-grow flex flex-row gap-4 font-medium text-black dark:text-gray-300 align-middle rounded-lg {{ back_color }}">
+                            <div class="align-middle p-4">
+                                Scenario id: {{ config_run.configuration.scenario_id }}
+                            </div>
+                            <div class="align-middle p-4">
+                                Status: {{ config_run.status }}
+                            </div>
+                            <div class="align-middle p-4">
+                                Started: {{ config_run.started_date.strftime("%m/%d/%Y, %H:%M:%S") }}
+                            </div>
+                            {% if config_run.failed_date != None %}
+                                <div class="align-middle p-4">
+                                    Failed: {{ config_run.failed_date.strftime("%m/%d/%Y, %H:%M:%S") }}
+                                </div>
+                            {% endif %}
+                            {% if config_run.finished_date != None %}
+                                <div class="align-middle p-4">
+                                    Finished: {{ config_run.finished_date.strftime("%m/%d/%Y, %H:%M:%S") }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a class="flex-grow-0 p-4 text-center dark:text-gray-300 text-white bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold" href="{{ url_for('status', config_run_id=config_run.id) }}">View</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

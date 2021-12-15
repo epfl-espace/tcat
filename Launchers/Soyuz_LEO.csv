@@ -1,0 +1,11 @@
+#Soyuz 2.1 performance figures for LEO. Reference: ST-GTD-SUM-01 - ISSUE 3 - REVISION 0 - APRIL 2001
+Altitude (km);Inclination (deg);Performance (kg)
+270;65.0;6700
+400;64.9;6840
+400;51.6;7290
+455;67.1;6500
+475;97.3;6570
+570;64.9;6328.8
+# 572;97.7;4000
+723;98.3;7000
+905;67.2;6000

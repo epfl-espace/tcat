@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}Configure{% endblock %}
+{% block content %}
+    <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
+        <form id="config-form" method="post" enctype="multipart/form-data" class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2">
+            <div class="flex-grow bg-blue-200 dark:bg-gray-700 rounded-lg">
+            {% for key in inputparams.keys() %}
+                <div class="group flex flex-col p-2 lg:p-6">
+                    <p class="flex-grow-0 text-black dark:text-gray-300 text-base lg:text-lg">{{ key[1] }}</p>
+                    <div class="flex flex-col gap-2">
+                        {% for input in inputparams[key] %}
+                        <div class="flex-grow md:flex-grow-0 flex flex-row m-2 gap-2">
+                            {% set fs = 'italic font-light' if (input[4] == None) else 'font-semibold' %}
+                            {% set required = '' if (input[4] == None) else 'required' %}
+                            {% set last_value = None if last_configuration == None else last_configuration[input[2]] %}
+                            {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
+                            <label for="{{ input[2] }}" class="flex-grow text-black dark:text-gray-300 {{ fs }}">{{ input[3] }}</label>
+                            {% if input[0] == 'input' %}
+                                {% if input[1] == 'number' %}
+                                    <input class="flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ input[1] }}" name="{{ input[2] }}" min="{{ input[5][0] }}" max="{{ input[5][1] }}" value="{{ value }}" {{ required }}>
+                                {% else %}
+                                    <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ input[1] }}" name="{{ input[2] }}" value="{{ value }}" data-validation="{{ input[5] }}" {{ required }}>
+                                {% endif %}
+                            {% elif input[0] == 'select' %}
+                                <select class="select-input-value bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" name="{{ input[2] }}" data-selected="{{ value }}">
+                                {% for val in input[5] %}
+                                    <option value="{{ val }}">{{ val }}</option>
+                                {% endfor %}
+                                </select>
+                            {% elif input[0] == 'checkbox' %}
+                                {% set checked = 'checked' if value == True else '' %}
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="{{ input[2] }}" {{ checked }} class="checkboxes opacity-0 absolute h-8 w-8" />
+                                    <div class="bg-white dark:bg-gray-900 border-2 rounded-lg border-blue-400 dark:border-blue-200 h-8 w-8 flex flex-shrink-0 justify-center items-center">
+                                        <svg class="fill-current hidden w-4 h-4 pointer-events-none" viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg">
+                                            <g fill="none" fill-rule="evenodd">
+                                                <g transform="translate(-9 -11)" fill="#1F73F1" fill-rule="nonzero">
+                                                    <path d="m25.576 11.414c0.56558 0.55188 0.56558 1.4439 0 1.9961l-9.404 9.176c-0.28213 0.27529-0.65247 0.41385-1.0228 0.41385-0.37034 0-0.74068-0.13855-1.0228-0.41385l-4.7019-4.588c-0.56584-0.55188-0.56584-1.4442 0-1.9961 0.56558-0.55214 1.4798-0.55214 2.0456 0l3.679 3.5899 8.3812-8.1779c0.56558-0.55214 1.4798-0.55214 2.0456 0z" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            <div class="flex-grow md:flex-grow-0 selected-files">
+            </div>
+            <div class="flex-grow-0 flex flex-col md:flex-row justify-between gap-4 md:gap-8">
+                <div class="flex-grow-0 md:flex-grow-0 p-3 bg-blue-400 dark:bg-blue-800 rounded-lg">
+                  <input class="hidden file-input cursor-pointer" type="file" id="file" name="file" multiple>
+                  <label for="file" class="text-center text-white dark:text-gray-300 font-semibold cursor-pointer">Select file</label>
+                </div>
+                <button id="upload-data" type="button" class="flex-grow-0 md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold disabled:opacity-50 disabled:bg-red-400 dark:disabled:bg-red-700 disabled:hover:bg-red-400 dark:disabled:hover:bg-red-700 disabled:cursor-not-allowed">Upload</button>
+            </div>
+        </form>
+        <div class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2">
+            <div class="flex-grow flex bg-blue-200 dark:bg-gray-700 rounded-lg">
+                <div id="image-container" class="hidden flex-grow flex flex-col gap-4 p-4"></div>
+                <div id="loading-spinner" class="hidden mx-auto my-auto flex-grow-1 flex content-center">
+                    <div class="border-2 border-blue-900 dark:border-blue-200 rounded-full h-20 w-20">
+                        <div class="animate-spin-slow flex content-center rounded-full h-20 w-20">
+                            <div class="flex-grow-1 rounded-full bg-blue-200 dark:bg-gray-700 h-10 w-10"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-grow md:flex-grow-0 flex flex-row gap-2 justify-center md:justify-end">
+                {% set enabled = 'disabled' if last_configuration == None else '' %}
+                <button id="run-config" type="button" class="flex-grow md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold disabled:opacity-50 disabled:bg-red-400 dark:disabled:bg-red-700 disabled:hover:bg-red-400 dark:disabled:hover:bg-red-700 disabled:cursor-not-allowed" {{ enabled }}>Run</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="{{url_for('static',filename='js/imageloader.js')}}"></script>
+    <script>
+        const fileInput = document.querySelector('.file-input');
+        const selectedFiles = document.querySelector('.selected-files');
+        const validatedTextInputs = document.querySelectorAll('.text-input-validated');
+        const selectInputValue = document.querySelectorAll('.select-input-value');
+        const uploadData = document.querySelector('#upload-data');
+        const configForm = document.querySelector('#config-form');
+        const checkboxes = document.querySelectorAll('.checkboxes');
+        const loadingSpinner = document.querySelector('#loading-spinner');
+        const runConfig = document.querySelector('#run-config');
+        const inputs = document.querySelectorAll('input, select');
+        const alreadyRunConfig = {{ 'true' if last_run_for_configuration != None else 'false' }};
+
+        let changed = false;
+        uploadData.disabled = true;
+
+          if (location.hash === '#runconfig') {
+                location.hash = '';
+                confirmRerunConfig(undefined);
+          }
+
+        for(let i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('change', enableUpload);
+        }
+
+        if(selectInputValue && selectInputValue.length > 0) {
+            for(let i = 0; i < selectInputValue.length; i++) {
+                selectInputValue[i].value = selectInputValue[i].dataset.selected;
+            }
+        }
+
+        if(validatedTextInputs && validatedTextInputs.length > 0) {
+            for(let i = 0; i < validatedTextInputs.length; i++) {
+                validatedTextInputs[i].addEventListener('input', (e => {
+                    let regex = new RegExp(e.target.dataset.validation, 'g');
+                    let validInput = regex.test(e.target.value);
+                    if(validInput) e.target.classList.remove('text-red-700', 'dark:text-red-300');
+                    else e.target.classList.add('text-red-700', 'dark:text-red-300');
+                }));
+            }
+        }
+
+        fileInput.addEventListener('change', (e => {
+            for(let i = 0; i < e.target.files.length; i++) {
+                selectedFiles.innerHTML = `${selectedFiles.innerHTML}<br>${e.target.files[i].name}`;
+            }
+        }));
+
+        uploadData.addEventListener('click', (e => {
+            uploadConfiguration();
+            e.preventDefault();
+        }));
+
+        runConfig.addEventListener('click', (e => {
+            if(alreadyRunConfig && !changed){
+                openModal('Rerun configuration?', 'You already executed the entered configuration. If you want to execute it again, please confirm.', confirmRerunConfig)
+            } else if (changed) {
+                openModal('Upload configuration first', 'You made changes to the configuration. In order to apply these changes upload the configuration. Please confirm to upload the configuration.', (e) => {
+                    location.hash = '#runconfig';
+                    uploadConfiguration();
+                })
+            } else {
+                confirmRerunConfig(undefined)
+            }
+            e.preventDefault();
+        }));
+
+        function uploadConfiguration() {
+            let data = new FormData(configForm);
+            if(checkboxes && checkboxes.length > 0) {
+                for(let i = 0; i < checkboxes.length; i++) {
+                    let isChecked = checkboxes[i].checked;
+                    data.set(checkboxes[i].name, isChecked);
+                }
+            }
+            let request = new XMLHttpRequest();
+            request.addEventListener('load', transferComplete);
+            request.open('POST', '{{ url_for('configure') }}');
+            request.send(data);
+        }
+
+        function confirmRerunConfig(e) {
+            //imageContainer comes from imageloader.js!
+            imageContainer.innerHTML = '';
+            imageContainer.classList.add('hidden');
+            clearInterval(checkForPlotImagesInterval);
+            let request = new XMLHttpRequest();
+            request.addEventListener('load', (e) => {
+                let response = JSON.parse(e.currentTarget.response);
+                loadingSpinner.classList.remove('hidden');
+                //checkForPlotImagesInterval comes from imageloader.js
+                checkForPlotImagesInterval = setInterval(() => checkForPlotImages(response.scenario_id, response.config_run_id, () => {
+                    runConfig.disabled = false;
+                    loadingSpinner.classList.add('hidden');
+                }), 1000);
+            });
+            request.open('GET', '{{ url_for('run_configuration') }}');
+            request.send();
+            runConfig.disabled = true;
+        }
+
+        function enableUpload(e) {
+            console.log(e, 'enabled upload');
+            changed = true;
+            uploadData.disabled = false;
+            for(let i = 0; i < inputs.length; i++) {
+                inputs[i].removeEventListener('change', enableUpload);
+            }
+        }
+
+        function transferComplete(e) {
+            location.reload();
+        }
+    </script>
+{% endblock %}

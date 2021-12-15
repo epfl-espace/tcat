@@ -1,0 +1,2928 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Code Documentation &mdash; TCAT 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="TCAT 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Misc" href="misc.html"/>
+        <link rel="prev" title="Active Debris Removal Use Case" href="adr_use_case.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> TCAT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Support, Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.html">General concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moon_use_case.html">Moon Cargo Use Case</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adr_use_case.html">Active Debris Removal Use Case</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-architecture">Main Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-Fleet_module">Fleet Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Plan_module">Plan Class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#client-classes">Client Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-ADRClient_module">ADR Client Class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.GenericModule">Generic Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.DataHandlingModule">Data Handling Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#communication-module">Communication Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#electrical-power-system-module">Electrical Power System Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.StructureModule">Structure Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.ThermalModule">Thermal Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#attitude-and-orbit-control-system-module">Attitude and Orbit Control System Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.PropulsionModule">Propulsion Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.CaptureModule">Capture Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Modules.ApproachSuiteModule">Approach Suite Module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#phases">Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.GenericPhase">Generic Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.Insertion">Insertion Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.OrbitChange">Orbit Change Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#orbit-maintenance-phase">Orbit Maintenance Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.Refueling">Refueling Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.Approach">Approach Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.Capture">Capture Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.Release">Release Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Release Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Phases.Common_functions">Common Functions used in phases</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TCAT</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Code Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/documentation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="code-documentation">
+<h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="main-architecture">
+<h2>Main Architecture<a class="headerlink" href="#main-architecture" title="Permalink to this headline">¶</a></h2>
+<p>These classes and methods gather all major concept used in TCAT.</p>
+<div class="section" id="module-Fleet_module">
+<span id="fleet-class"></span><h3>Fleet Class<a class="headerlink" href="#module-Fleet_module" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Fleet_module.Fleet">
+<em class="property">class </em><code class="sig-prename descclassname">Fleet_module.</code><code class="sig-name descname">Fleet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fleet_id</span></em>, <em class="sig-param"><span class="n">architecture</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Fleet consists of a dictionary of servicers.
+The class is initialized with an emtpy dictionary of servicers.
+It contains methods used during simulation and convergence of the servicers design.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fleet_id (str): Standard id. Needs to be unique.
+architecture (str): descriptor for the overall architecture of the fleet, used to identify scenarios</p>
+</dd>
+<dt>Attributes:</dt><dd><p>ID (str): Standard id. Needs to be unique.
+architecture (str): descriptor for the overall architecture of the fleet, used to identify scenarios
+servicers (dict): Dictionary of servicers.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Fleet_module.Fleet.add_servicer">
+<code class="sig-name descname">add_servicer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">servicer</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.add_servicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a servicer to the Fleet class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>servicer (Servicer): servicer to add to the fleet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.converge">
+<code class="sig-name descname">converge</code><span class="sig-paren">(</span><em class="sig-param">plan</em>, <em class="sig-param">clients</em>, <em class="sig-param">convergence_margin=&lt;Quantity 0.5 kg&gt;</em>, <em class="sig-param">limit=200</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">design_loop=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.converge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iteratively runs the assigned plan and varies initial propellant mass of the fleet until convergence.
+At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
+Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
+within the convergence_margin specified as argument or until the iteration limit specified is reached.</p>
+<p>The first iteration simply adds or remove 1kg of propellant for non converged modules.
+Subsequent iterations use Newton Search with first order finite difference to find the gradient.
+TODO: Implement more advanced convergence algorithm than Newton Search</p>
+<dl>
+<dt>Note:</dt><dd><p>The convergence is dependent on good initial guesses for initial propellant masses.</p>
+</dd>
+<dt>Args:</dt><dd><p>plan (Plan): Dictionary of phases that need to be performed by the fleet.
+clients (&lt;Client module&gt;): Class representing the clients of the service
+convergence_margin (u.kg): accuracy required on propellant mass for convergence
+limit (int): maximal number of iterations before the function quits
+verbose (bool): If True, print information relative to convergence
+design_loop (bool): True if sub-systems dry masses are changed during iterations.</p>
+<blockquote>
+<div><p>False if only the propellant mass is changed.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param">plan</em>, <em class="sig-param">clients</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">convergence_margin=&lt;Quantity 0.5 kg&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calls all appropriate methods to design the fleet to perform a particular plan.
+This is done by first designing each servicer in the fleet to perform its assigned phases in the plan.
+This first convergence determines the design of each module in each servicer, including propellant mass.
+Then, the fleet is homogenized by using the heaviest modules throughout the fleet as basis for the design of
+all servicers. A second convergence is done, this time changing only the propellant mass in each servicer.
+By the end of the method, the fleet is designed so that all servicers are identical and can fulfill their
+assigned plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan): plan for which the fleet needs to be designed
+clients (&lt;Client module&gt;): class representing the clients of the service
+verbose (boolean): if True, print convergence information
+convergence_margin (u.kg): accuracy required on propellant mass for convergence</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_development_cost">
+<code class="sig-name descname">get_development_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_development_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute development cost, taking into account rough order of magnitude estimates.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): keep this as argument, this is done to homogenize the “<a href="#id5"><span class="problematic" id="id6">get_</span></a>” methods</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_ground_segment_cost">
+<code class="sig-name descname">get_ground_segment_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_ground_segment_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute cost of ground segment based on flight segment cost.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): Dictionary of phases that need to be performed by the fleet.</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_launch_cost">
+<code class="sig-name descname">get_launch_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_launch_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute launch cost for all servicers of the fleet based on cost prorate of the mass.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): keep this as argument, this is done to homogenize the “<a href="#id7"><span class="problematic" id="id8">get_</span></a>” methods</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_mass_summary">
+<code class="sig-name descname">get_mass_summary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rm_duplicates</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_mass_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns information in a convenient way for plotting purposes. 
+What is returned depends on the module_names list (currently hard coded).</p>
+<p>TODO: Check if applicable to generic.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>rm_duplicates (boolean): if True, the output will be returned only once for each servicer design</p>
+</dd>
+<dt>Return:</dt><dd><p>([str]): list of modules or module names
+([[float]]): list that contains, for each element of module name, and for each servicer, its mass
+([str]): list of small string that, for each servicer, summarises the servicer dry and wet masses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_moc_development_cost">
+<code class="sig-name descname">get_moc_development_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_moc_development_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute cost of mission operational center development cost.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): keep this as argument, this is done to homogenize the “<a href="#id9"><span class="problematic" id="id10">get_</span></a>” methods</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_recurring_cost_summary">
+<code class="sig-name descname">get_recurring_cost_summary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rm_duplicates</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_recurring_cost_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns information in a convenient way for plotting purposes.
+What is returned depends on the module_names list (currently hard coded).</p>
+<p>TODO: Check if applicable to generic.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>rm_duplicates (boolean): if True, the output will be returned only once for each servicer design</p>
+</dd>
+<dt>Return:</dt><dd><p>([str]): list of modules or module names
+([[float]]): list that contains, for each element of module name, and for each servicer, its mass
+([str]): list of small string that, for each servicer, summarises the servicer dry and wet masses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_servicer_groups">
+<code class="sig-name descname">get_servicer_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_servicer_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of servicer_group names present in the fleet.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>([str]): list of string identifier for each servicer_group found in the fleet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_servicers_ait_recurring_cost">
+<code class="sig-name descname">get_servicers_ait_recurring_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_servicers_ait_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute recurring cost of AIT.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): Dictionary of phases that need to be performed by the fleet.</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_servicers_from_group">
+<code class="sig-name descname">get_servicers_from_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">servicer_group</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_servicers_from_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return servicers from the fleet that share a servicer_group.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>servicer_group (str): string identifier for every group in the fleet (group types: servicer, tanker, etc.)</p>
+</dd>
+<dt>Return:</dt><dd><p>(dict(Servicer)): Dictionary of servicers of the given group</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_servicers_hardware_recurring_cost">
+<code class="sig-name descname">get_servicers_hardware_recurring_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_servicers_hardware_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute recurring cost of flight segment hardware (without AIT).</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): keep this as argument, this is done to homogenize the “<a href="#id11"><span class="problematic" id="id12">get_</span></a>” methods</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_servicers_launch_mass">
+<code class="sig-name descname">get_servicers_launch_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_servicers_launch_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and return a list of the servicer IDs and a list of their launch masses, including contingencies.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>([u.kg]): list of masses
+([str]): list of servicer IDs corresponding to listed masses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.get_total_cost">
+<code class="sig-name descname">get_total_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em>, <em class="sig-param"><span class="n">with_development</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.get_total_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute total cost for the program.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>plan (Plan): Dictionary of phases that need to be performed by the fleet.
+with_development (boolean): if True, include cost of servicers development</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.homogenize">
+<code class="sig-name descname">homogenize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em>, <em class="sig-param"><span class="n">servicer_group</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.homogenize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method finds the heaviest modules within a group of servicers and redesigns every servicer to match
+these modules. The group of servicers are made based on the group type they are assigned (for instance,
+all motherships will have the same design, all tanks will have the same design, all kits will have the same
+design, etc).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan): Dictionary of phases that need to be performed by the fleet.
+servicer_group (str): string identifier for every group in the fleet (group types: servicer, tanker, etc.)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.print_assignments">
+<code class="sig-name descname">print_assignments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.print_assignments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a quick summary of which servicer is assigned to which targets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.print_report">
+<code class="sig-name descname">print_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.print_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a quick summary of fleet information for debugging purposes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Fleet.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">plan</em>, <em class="sig-param">design_loop=True</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">convergence_margin=&lt;Quantity 0.5 kg&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Fleet.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the reset function for each servicer in the fleet. If design_loop is True, this include a redesign
+of the servicer.</p>
+<dl>
+<dt>Args:</dt><dd><p>plan (Plan): plan that might be used as reference to reset the fleet
+design_loop (bool): True if sub-systems dry masses are changed during iterations.</p>
+<blockquote>
+<div><p>False if only the propellant mass is changed.</p>
+</div></blockquote>
+<p>verbose (bool): if True, print information on design convergence
+convergence_margin (u.kg): accuracy required on propellant mass for convergence during servicer redesign</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Fleet_module.Servicer">
+<em class="property">class </em><code class="sig-prename descclassname">Fleet_module.</code><code class="sig-name descname">Servicer</code><span class="sig-paren">(</span><em class="sig-param">servicer_id</em>, <em class="sig-param">group</em>, <em class="sig-param">expected_number_of_targets=3</em>, <em class="sig-param">additional_dry_mass=&lt;Quantity 0. kg&gt;</em>, <em class="sig-param">mass_contingency=0.2</em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Servicer is an object that performs phases in the plan using its modules.
+A servicer can have any number of modules of any type. A servicer can also host other servicers as in the
+case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
+mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
+It is added to the fleet specified as argument.</p>
+<p>TODO: remove expected_number_of_targets</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>servicer_id (str): Standard id. Needs to be unique.
+group (str): describes what the servicer does (servicing, refueling, …)
+expected_number_of_targets (int): expected number of targets assigned to the servicer
+additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass</p>
+</dd>
+<dt>Attributes:</dt><dd><p>id (str): Standard id. Needs to be unique.
+expected_number_of_targets (int): expected number of targets assigned to the servicer
+additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
+current_orbit (poliastro.twobody.Orbit): Orbit of the servicer at current time.
+modules (dict): Dictionary of modules contained in the servicer.
+main_propulsion_module_ID (str): id of the default module to be used for phasing on this servicer
+rcs_propulsion_module_ID (str): id of the default module to be used for rendezvous on this servicer
+capture_module_ID (str): id of the default module to be used for capture on this servicer
+initial_kits (dict): Dictionary of other servicers contained in the servicer at time 0.
+current_kits (dict): Dictionary of other servicers contained in the servicer at current time.
+assigned_tanker (Servicer): in case of refueling architecture, assigned_tanker assigned to refuel the servicer
+assigned_targets (list): List of targets in the order of servicing (used during planning)
+mothership (Servicer): Mothership hosting the servicer if the servicer is a kit
+mass_contingency (float): contingency to apply at system level on the dry mass</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Fleet_module.Servicer.add_module">
+<code class="sig-name descname">add_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.add_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a module to the Servicer class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>module (GenericModule): module to be added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.assign_kit">
+<code class="sig-name descname">assign_kit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.assign_kit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a kit to the servicer as kit. The servicer becomes the kit’s mothership.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>kit (Servicer): servicer to be added as kit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.assign_tanker">
+<code class="sig-name descname">assign_tanker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tanker</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.assign_tanker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds another servicer to the Servicer class as assigned_tanker.
+TODO: get into scenario</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tanker (Servicer): servicer to be added as assigned_tanker</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.change_orbit">
+<code class="sig-name descname">change_orbit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.change_orbit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the current_orbit of the servicer and linked objects.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param">plan</em>, <em class="sig-param">convergence_margin=&lt;Quantity 0.5 kg&gt;</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop on the modules computations until the dry mass is stable.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan): plan for which the fleet needs to be designed
+convergence_margin (u.kg): accuracy required on propellant mass for convergence
+verbose (boolean): if True, print convergence_margin information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_attribute_history">
+<code class="sig-name descname">get_attribute_history</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attribute_name</span></em>, <em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_attribute_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the time evolution of an attribute of the servicer over the phases of a plan.
+The information must be returned in a method of a servicer or phase or an attribute of an orbit.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>attribute_name (str): name of an attribute of “<a href="#id13"><span class="problematic" id="id14">get_</span></a>” method
+plan (Plan): plan for which the fleet needs to be designed</p>
+</dd>
+<dt>Return:</dt><dd><p>([&lt;&gt;]): List of values for the queried data
+([epoch]): list of epochs for each data point
+([str]): list of phases id for each data point</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_capture_module">
+<code class="sig-name descname">get_capture_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_capture_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns default capture module of servicer. Used to simplify scenario creation.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(Module): module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_capture_modules">
+<code class="sig-name descname">get_capture_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_capture_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns only modules that can capture targets of simulation at current time.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(dict(Module)): dictionary of the modules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_current_mass">
+<code class="sig-name descname">get_current_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_current_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total mass of the servicer, including all modules and kits at the current time in the simulation.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): current mass, including kits</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_development_cost">
+<code class="sig-name descname">get_development_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_development_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the servicer development, including all modules and the development
+cost among kits for each groups present among kits (this assumes).</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_dry_mass">
+<code class="sig-name descname">get_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total dry mass of the servicer. Does not include kits.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>contingency (boolean): if True, apply contingencies</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.kg): total dry mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_hardware_recurring_cost">
+<code class="sig-name descname">get_hardware_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_hardware_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the servicer, including all modules and current_kits.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_initial_prop_mass">
+<code class="sig-name descname">get_initial_prop_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_initial_prop_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): initial propellant mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_main_propulsion_module">
+<code class="sig-name descname">get_main_propulsion_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_main_propulsion_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns default main propulsion module of servicer. Used to simplify scenario creation.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(Module): module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_module_mass">
+<code class="sig-name descname">get_module_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span></em>, <em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_module_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dry mass of a particular module based on the name of its class.</p>
+<p>TODO: remove
+Args:</p>
+<blockquote>
+<div><p>module_name (str): name of the module class, must be linked to a class as such: &lt;module_name&gt;Module
+contingency (boolean): if True, apply contingencies</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): mass of the module for the servicer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_module_non_recurring_cost">
+<code class="sig-name descname">get_module_non_recurring_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_module_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dry mass of a particular module based on the name of its class.</p>
+<p>TODO: remove</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>module_name (str): name of the module class, must be linked to a class as such: &lt;module_name&gt;Module</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_module_recurring_cost">
+<code class="sig-name descname">get_module_recurring_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_module_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dry mass of a particular module based on the name of its class.</p>
+<p>TODO: remove</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>module_name (str): name of the module class, must be linked to a class as such: &lt;module_name&gt;Module</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_phases">
+<code class="sig-name descname">get_phases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_phases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all phases from the plan the servicer is assigned to.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan): plan for which the fleet needs to be designed</p>
+</dd>
+<dt>Return:</dt><dd><p>([Phase]): list of phases</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_propulsion_modules">
+<code class="sig-name descname">get_propulsion_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_propulsion_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all modules that contain propellant. This is used for fleet convergence.</p>
+<p>Note: This includes propulsion modules that belong to kits assigned to the servicer. Kits are converged with
+their mothership.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(dict(Module)): dictionary of the modules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_rcs_propulsion_module">
+<code class="sig-name descname">get_rcs_propulsion_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_rcs_propulsion_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns default rcs propulsion module of servicer. Used to simplify scenario creation.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(Module): module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_reference_inertia">
+<code class="sig-name descname">get_reference_inertia</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_reference_inertia" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns estimated inertia of the servicer along its main axis based on a generic box and wings shape.
+Used for estimations of required mass for aocs systems.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg*u.m*u.m): servicer inertia</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_reference_manoeuvres">
+<code class="sig-name descname">get_reference_manoeuvres</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em>, <em class="sig-param"><span class="n">module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_reference_manoeuvres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns representative values for the servicer corresponding to:
+- maximum delta v among maneuvers (used to dimension the main propulsion system
+- total mass of propellant used during approaches (used to dimension the rcs propulsion system)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan): plan for which the fleet needs to be designed
+module (GenericModule): module to be added</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.m/u.s): delta v
+(u.kg): rcs propellant mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_reference_power">
+<code class="sig-name descname">get_reference_power</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a reference power used as input for different models. This reference represents the mean power
+conditioned by the servicer during nominal operations.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.W): mean servicer power drawn</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_refueling_modules">
+<code class="sig-name descname">get_refueling_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_refueling_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns only modules that can offer refueling to other servicers.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(dict(Module)): dictionary of the modules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.get_wet_mass">
+<code class="sig-name descname">get_wet_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.get_wet_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the wet mass of the servicer at launch. Does not include kits.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>contingency (boolean): if True, apply contingencies</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.kg): total wet mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.print_report">
+<code class="sig-name descname">print_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.print_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print quick summary for debugging purposes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">plan</em>, <em class="sig-param">design_loop=True</em>, <em class="sig-param">convergence_margin=&lt;Quantity 1. kg&gt;</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the servicer current orbit and mass to the parameters given during initialization.
+This function is used to reset the state of all modules after a simulation.
+If this is specified as a design loop, the sub-systems can be updated based on different inputs.
+It also resets the current_kits and the servicer orbits.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan): plan for which the servicer is used and designed
+design_loop (boolean): if True, redesign modules after resetting them
+convergence_margin (u.kg): accuracy required on propellant mass for convergence_margin
+verbose (boolean): if True, print convergence_margin information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Fleet_module.Servicer.separate_kit">
+<code class="sig-name descname">separate_kit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fleet_module.Servicer.separate_kit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Separate a kit from the servicer. This is used during simulation.
+The kit is still assigned to the servicer and will be linked if the servicer is reset.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>kit (Servicer): kit to be removed from servicer</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Plan_module">
+<span id="plan-class"></span><h3>Plan Class<a class="headerlink" href="#module-Plan_module" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Plan_module.Plan">
+<em class="property">class </em><code class="sig-prename descclassname">Plan_module.</code><code class="sig-name descname">Plan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan_id</span></em>, <em class="sig-param"><span class="n">starting_epoch</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Plan consists of a list of phases. The list is ordered in terms of the chronology of the phases.
+The class is initialized with an emtpy list of phases.
+It contains methods used during simulation to apply changes to the fleet according to the phases.
+It contains methods to optimize the assignment of phases based on various assumptions.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan_id (str): Standard id. Needs to be unique.
+starting_epoch (astropy.Time): reference epoch corresponding to first launch</p>
+</dd>
+<dt>Attributes:</dt><dd><p>id (str): Standard id. Needs to be unique.
+starting_epoch (astropy.Time): reference epoch corresponding to first launch
+phases (list): List of phases (Ordered)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Plan_module.Plan.add_phase">
+<code class="sig-name descname">add_phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.add_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a phase to the Plan class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase (Phase): phase to add to the plan (sequential)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the apply function of each phase of the plan in their respective order.
+This function is used to execute the plan. The phases are reset at the start.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>verbose (boolean): if True, print message during phase execution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_baseline_operations_cost">
+<code class="sig-name descname">get_baseline_operations_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fleet</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_baseline_operations_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns baseline of operators labour costs. The simulation must have run to compute this. This cost is
+linked to the duration of the program, not particular operations.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>fleet (Fleet): fleet of servicers, introduced to homogenize “<a href="#id15"><span class="problematic" id="id16">get_</span></a>” methods implementation</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_gnd_stations_cost">
+<code class="sig-name descname">get_gnd_stations_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fleet</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_gnd_stations_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ground stations location cost.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>fleet (Fleet): fleet of servicers that performed the plan</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_labour_operations_cost">
+<code class="sig-name descname">get_labour_operations_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fleet</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_labour_operations_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns direct labour cost for operation. This cost is linked to particular operations that require
+exceptional labour.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>fleet (Fleet): fleet of servicers, introduced to homogenize “<a href="#id17"><span class="problematic" id="id18">get_</span></a>” methods implementation</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_moc_location_cost">
+<code class="sig-name descname">get_moc_location_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fleet</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_moc_location_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns moc location cost.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>fleet (Fleet): fleet of servicers, introduced to homogenize “<a href="#id19"><span class="problematic" id="id20">get_</span></a>” methods implementation</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_phases_from_type">
+<code class="sig-name descname">get_phases_from_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase_type</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_phases_from_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all phases of a certain type as a list.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>phase_type (Class): class of phases for which to return instances found in the plan</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_program_duration">
+<code class="sig-name descname">get_program_duration</code><span class="sig-paren">(</span><em class="sig-param">additional_schedule_margin=&lt;Quantity 1. yr&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_program_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return total duration of program based on operations duration and a margin (1 year by default).
+The simulation must have run to compute this.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>additional_schedule_margin (u.&lt;time unit&gt;): time to add to the duration computation for margin</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.&lt;time unit&gt;): total duration of the program</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.get_total_cost">
+<code class="sig-name descname">get_total_cost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fleet</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.get_total_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns total operation costs. The simulation must have run to compute this.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>fleet (Fleet): fleet of servicers that performed the plan</p>
+</dd>
+<dt>Return:</dt><dd><p>(float): cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.print_report">
+<code class="sig-name descname">print_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.print_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print quick summary for debugging purposes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Plan_module.Plan.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Plan_module.Plan.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the plan (mainly clear the orbits logged during the plan).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="client-classes">
+<h2>Client Classes<a class="headerlink" href="#client-classes" title="Permalink to this headline">¶</a></h2>
+<p>This section will contain the different client classes. For now it only contains the client class dedicated to Active
+Debris Removal.</p>
+<div class="section" id="module-ADRClient_module">
+<span id="adr-client-class"></span><h3>ADR Client Class<a class="headerlink" href="#module-ADRClient_module" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="ADRClient_module.ADRClients">
+<em class="property">class </em><code class="sig-prename descclassname">ADRClient_module.</code><code class="sig-name descname">ADRClients</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">clients_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients" title="Permalink to this definition">¶</a></dt>
+<dd><p>ADR Clients consist of a dictionary of potential targets for servicers to remove from orbit.
+The class is initialized with an emtpy dictionary of potential targets.</p>
+<dl class="simple">
+<dt>Note:</dt><dd><p>This class contains methods for automatic creation of constellations.
+This class could be expended to interface with a market analysis module in the future.</p>
+</dd>
+<dt>Args:</dt><dd><p>clients_id (str): Standard id. Needs to be unique.</p>
+</dd>
+<dt>Attributes:</dt><dd><p>ID (str): Standard id. Needs to be unique.
+targets (dict): Dictionary of targets that are potential recipients for servicing.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.add_target">
+<code class="sig-name descname">add_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.add_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a target to the Clients class.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>target (Target): target to be added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.get_failed_satellites">
+<code class="sig-name descname">get_failed_satellites</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.get_failed_satellites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionary of clients satellites that have a failed state.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(dict(Target)): dictionary containing all failed satellites</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.get_global_precession_rotation">
+<code class="sig-name descname">get_global_precession_rotation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.get_global_precession_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return global nodal precession direction of the client failed satellites.
+If more targets rotate clockwise, return -1, otherwise returns 1</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(int): 1 if counter clockwise, -1 if clockwise (right hand convention)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.plot_distribution">
+<code class="sig-name descname">plot_distribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save_folder</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.plot_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the distribution of the constellation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>save (str): if given, the plot will be saved under that name
+save_folder (str): if given and save is true, the plot will be saved in the specified folder</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.populate_constellation">
+<code class="sig-name descname">populate_constellation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constellation_id</span></em>, <em class="sig-param"><span class="n">reference_target</span></em>, <em class="sig-param"><span class="n">number_of_planes</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">sat_per_plane</span><span class="o">=</span><span class="default_value">43</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.populate_constellation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds targets to form a complete constellation with equiphased planes based on inputs.
+The reference target is duplicated to fill the planes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>constellation_id (str): reference id for the constellation
+reference_target (Target): target that is duplicated to create constellation members
+number_of_planes (int): number of planes for the constellation, equiphased along 180° of raan
+sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.populate_plane">
+<code class="sig-name descname">populate_plane</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plane_id</span></em>, <em class="sig-param"><span class="n">reference_target</span></em>, <em class="sig-param"><span class="n">sat_per_plane</span></em>, <em class="sig-param"><span class="n">insertion_orbit</span></em>, <em class="sig-param"><span class="n">operational_orbit</span></em>, <em class="sig-param"><span class="n">disposal_orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.populate_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds targets to form a complete plane with equiphased population based on inputs.
+Args:</p>
+<blockquote>
+<div><p>plane_id (str): plane id
+reference_target (Target): target that is duplicated to create constellation members
+sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly
+insertion_orbit (poliastro.twobody.Orbit): insertion orbit for the satellites
+operational_orbit (poliastro.twobody.Orbit): operational orbit for the plane, where the capture will occur
+disposal_orbit (poliastro.twobody.Orbit): disposal orbit for the plane, where the servicer will release</p>
+<blockquote>
+<div><p>the target in case of servicing</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.randomly_fail_satellites">
+<code class="sig-name descname">randomly_fail_satellites</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reliability</span><span class="o">=</span><span class="default_value">0.95</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.randomly_fail_satellites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly set some targets as failed based on reliability. This includes putting some satellites
+in transition orbits to represent failure during orbit raising or lowering.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>reliability (float): (optional) satellite reliability at end of life</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.ADRClients.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.ADRClients.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the reset function for each target.
+This function is used to reset the mass and orbits of targets after a simulation.
+This does not reset the failure state of the satellite.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ADRClient_module.Target">
+<em class="property">class </em><code class="sig-prename descclassname">ADRClient_module.</code><code class="sig-name descname">Target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_id</span></em>, <em class="sig-param"><span class="n">initial_mass</span></em>, <em class="sig-param"><span class="n">insertion_orbit</span></em>, <em class="sig-param"><span class="n">operational_orbit</span></em>, <em class="sig-param"><span class="n">disposal_orbit</span></em>, <em class="sig-param"><span class="n">state</span><span class="o">=</span><span class="default_value">'nominal'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.Target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target consist of an object in an initial orbit that can be moved by servicers.
+The class is initialized by giving the current object mass and orbit at time 0.
+It is added to the Clients class taken as argument during initialization.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>target_id (str): Standard id. Needs to be unique.
+initial_mass (u.kg): Object mass at time 0.
+insertion_orbit (poliastro.twobody.Orbit): Object orbit after insertion
+operational_orbit (poliastro.twobody.Orbit): Object orbit after orbit raising
+disposal_orbit (poliastro.twobody.Orbit): Object orbit after post servicer_group disposal
+state (str): descriptor of the satellite state, used to identify different possible failures and states</p>
+</dd>
+<dt>Attributes:</dt><dd><p>ID (str): Standard id. Needs to be unique.
+initial_mass (u.kg): Object mass at time 0.
+initial_orbit (poliastro.twobody.Orbit): Initial orbit of the satellite
+insertion_orbit (poliastro.twobody.Orbit): Object orbit after insertion
+operational_orbit (poliastro.twobody.Orbit): Object orbit after orbit raising
+disposal_orbit (poliastro.twobody.Orbit): Object orbit after post servicer_group disposal
+current_orbit (poliastro.twobody.Orbit): Object orbit at current time.
+current_mass (u.kg): Object mass at current time.
+state (str): descriptor of the satellite state, used to identify different possible failures and states</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ADRClient_module.Target.get_current_mass">
+<code class="sig-name descname">get_current_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.Target.get_current_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current target mass.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>(u.kg): current mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.Target.get_relative_raan_drift">
+<code class="sig-name descname">get_relative_raan_drift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">duration</span></em>, <em class="sig-param"><span class="n">own_orbit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">other_object_orbit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.Target.get_relative_raan_drift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the relative raan drift between the target and an hypothetical servicer.
+Used for planning purposes, to make sure phasing is feasible with current raan.</p>
+<dl>
+<dt>Args:</dt><dd><p>duration (u.&lt;time unit&gt;): duration after which to compute relative raan drift
+own_orbit (poliastro.twobody.Orbit): orbit of the target,</p>
+<blockquote>
+<div><p>by default the target operational orbit</p>
+</div></blockquote>
+<dl class="simple">
+<dt>other_object_orbit (poliastro.twobody.Orbit): orbit of the other object,</dt><dd><p>by default the target insertion orbit</p>
+</dd>
+</dl>
+</dd>
+<dt>Return:</dt><dd><p>(u.deg): relative raan drift after duration from current orbits</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ADRClient_module.Target.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ADRClient_module.Target.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the current target orbit and mass to the parameters given during initialization.
+This function is used to reset the state and orbits of the target after a simulation.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<p>These classes and methods describe the different types of modules used. They host mass and power models and behavioral
+models. All modules inherit from the generic module.</p>
+<div class="section" id="module-Modules.GenericModule">
+<span id="generic-module"></span><h3>Generic Module<a class="headerlink" href="#module-Modules.GenericModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.GenericModule.GenericModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.GenericModule.</code><code class="sig-name descname">GenericModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_id</span></em>, <em class="sig-param"><span class="n">servicer</span></em>, <em class="sig-param"><span class="n">dry_mass_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_power_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass_contingency</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">non_recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Module is an entity belonging to a servicer acting on other objects in the simulation.</p>
+<p>Different other module classes inherit from this class. Generic attributes are shared between all phases.
+When a module is initialized, it is added to the plan specified as argument. Inheriting modules may be either:
+- static: the module does not impact other objects in the simulation but is only modelled in terms of mass and power
+- dynamic: the module impacts other objects in the simulation (propulsion system that change orbits, etc)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>module_id (str): Standard id. Needs to be unique.
+servicer (Fleet_module.Servicer): servicer the module belongs to
+dry_mass_override (u.kg): module dry mass (no contingency), overrides possible underlying models
+reference_power_override (u.W): module mean power over designing phase, overrides possible underlying models
+recurring_cost_override (float): recurring cost of module in Euros, overrides possible underlying models
+non_recurring_cost_override (float): non recurring cost of module in Euros, overrides possible underlying models
+mass_contingency (float): mass_contingency on the module dry mass</p>
+</dd>
+<dt>Attributes:</dt><dd><p>module_id (str): Standard id. Needs to be unique.
+servicer (Fleet_module.Servicer): servicer the module belongs to
+dry_mass_override (u.kg): module dry mass (no contingency), overrides possible underlying models
+reference_power_override (u.W): module mean power over designing phase, overrides possible underlying models
+recurring_cost_override (float): recurring cost of module in Euros, overrides possible underlying models
+non_recurring_cost_override (float): non recurring cost of module in Euros, overrides possible underlying models
+dry_mass (u.kg): module dry mass (no contingency)
+reference_power (u.W): module mean power over designing phase
+recurring_cost (float): recurring cost of module in Euros
+non_recurring_cost (float): non recurring cost of module in Euros
+mass_contingency (float): mass_contingency on the module dry mass</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.add_module_to_servicer">
+<code class="sig-name descname">add_module_to_servicer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">servicer</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.add_module_to_servicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the module to the servicer given in argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence to design the module given the current plan.
+This method usually computes the module dry mass and reference power based on the attributed plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.get_dry_mass">
+<code class="sig-name descname">get_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.get_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dry mass of the module (including contingencies by default).</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): dry mass with contingency</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.get_phases">
+<code class="sig-name descname">get_phases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.get_phases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all phases from the plan the module is assigned to.
+Args:</p>
+<blockquote>
+<div><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.get_reference_power">
+<code class="sig-name descname">get_reference_power</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.get_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reference power of the module.
+The reference power is a parameter used in the design of most modules and usually represents the mean power
+draw of the module.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.W): reference power</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.get_wet_mass">
+<code class="sig-name descname">get_wet_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.get_wet_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial wet mass of the module at launch (including contingencies by default).</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): initial wet mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.GenericModule.GenericModule.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.GenericModule.GenericModule.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the module to a state equivalent to simulation start. Used in simulation and mass_convergence.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Modules.DataHandlingModule">
+<span id="data-handling-module"></span><h3>Data Handling Module<a class="headerlink" href="#module-Modules.DataHandlingModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.DataHandlingModule.DataHandlingModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.DataHandlingModule.</code><code class="sig-name descname">DataHandlingModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_id</span></em>, <em class="sig-param"><span class="n">servicer</span></em>, <em class="sig-param"><span class="n">dry_mass_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_power_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass_contingency</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">non_recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.DataHandlingModule.DataHandlingModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data handling module is a static module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.DataHandlingModule.DataHandlingModule.compute_dry_mass">
+<code class="sig-name descname">compute_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.DataHandlingModule.DataHandlingModule.compute_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the dry mass of the module depending gon the servicer group.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.DataHandlingModule.DataHandlingModule.compute_reference_power">
+<code class="sig-name descname">compute_reference_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.DataHandlingModule.DataHandlingModule.compute_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the reference or “as designed” power for the module depending on the servicer group.
+Used in different models (mass, cost, etc.)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.DataHandlingModule.DataHandlingModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.DataHandlingModule.DataHandlingModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence to design the module given the current plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.DataHandlingModule.DataHandlingModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.DataHandlingModule.DataHandlingModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): non recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.DataHandlingModule.DataHandlingModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.DataHandlingModule.DataHandlingModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="communication-module">
+<h3>Communication Module<a class="headerlink" href="#communication-module" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="electrical-power-system-module">
+<h3>Electrical Power System Module<a class="headerlink" href="#electrical-power-system-module" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-Modules.EPSModule"></span><dl class="py class">
+<dt id="Modules.EPSModule.EPSModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.EPSModule.</code><code class="sig-name descname">EPSModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_id</span></em>, <em class="sig-param"><span class="n">servicer</span></em>, <em class="sig-param"><span class="n">dry_mass_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_power_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass_contingency</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">non_recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.EPSModule.EPSModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>EPS module is a static module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.EPSModule.EPSModule.compute_dry_mass">
+<code class="sig-name descname">compute_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.EPSModule.EPSModule.compute_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the dry mass of the module depending gon the servicer group.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.EPSModule.EPSModule.compute_reference_power">
+<code class="sig-name descname">compute_reference_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.EPSModule.EPSModule.compute_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the reference or “as designed” power for the module depending on the servicer group.
+Used in different models (mass, cost, etc.)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.EPSModule.EPSModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.EPSModule.EPSModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence to design the module given the current plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.EPSModule.EPSModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.EPSModule.EPSModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): non recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.EPSModule.EPSModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.EPSModule.EPSModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Modules.StructureModule">
+<span id="structure-module"></span><h3>Structure Module<a class="headerlink" href="#module-Modules.StructureModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.StructureModule.StructureModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.StructureModule.</code><code class="sig-name descname">StructureModule</code><span class="sig-paren">(</span><em class="sig-param">module_id</em>, <em class="sig-param">servicer</em>, <em class="sig-param">dry_mass_override=None</em>, <em class="sig-param">reference_power_override=&lt;Quantity 0. W&gt;</em>, <em class="sig-param">mass_contingency=0.1</em>, <em class="sig-param">recurring_cost_override=None</em>, <em class="sig-param">non_recurring_cost_override=None</em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.StructureModule.StructureModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure module is a static module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.StructureModule.StructureModule.compute_dry_mass">
+<code class="sig-name descname">compute_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.StructureModule.StructureModule.compute_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the dry mass of the module depending gon the servicer group.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.StructureModule.StructureModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.StructureModule.StructureModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence to design the module given the current plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.StructureModule.StructureModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.StructureModule.StructureModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): non recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.StructureModule.StructureModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.StructureModule.StructureModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Modules.ThermalModule">
+<span id="thermal-module"></span><h3>Thermal Module<a class="headerlink" href="#module-Modules.ThermalModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.ThermalModule.ThermalModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.ThermalModule.</code><code class="sig-name descname">ThermalModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_id</span></em>, <em class="sig-param"><span class="n">servicer</span></em>, <em class="sig-param"><span class="n">dry_mass_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_power_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass_contingency</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">non_recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ThermalModule.ThermalModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thermal module is a static module.
+Args:</p>
+<blockquote>
+<div><p>module_id (str): Standard id. Needs to be unique.
+servicer (Fleet_module.Servicer): servicer the module belongs to
+mass_contingency (float): mass_contingency on the module dry mass</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>module_id (str): Standard id. Needs to be unique.
+servicer (Fleet_module.Servicer): servicer the module belongs to
+dry_mass (u.kg): module dry mass (no mass_contingency)
+mass_contingency (float): mass_contingency on the module dry mass
+reference_power (u.W): module mean power over designing phase (used as reference for power module phasing)
+recurring_cost (float): recurring cost of module in Euros
+non_recurring_cost (float): non recurring cost of module in Euros</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.ThermalModule.ThermalModule.compute_dry_mass">
+<code class="sig-name descname">compute_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ThermalModule.ThermalModule.compute_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the dry mass of the module depending gon the servicer group.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.ThermalModule.ThermalModule.compute_reference_power">
+<code class="sig-name descname">compute_reference_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ThermalModule.ThermalModule.compute_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the reference or “as designed” power for the module depending on the servicer group.
+Used in different models (mass, cost, etc.)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.ThermalModule.ThermalModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ThermalModule.ThermalModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence to design the module given the current plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.ThermalModule.ThermalModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ThermalModule.ThermalModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): non recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.ThermalModule.ThermalModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ThermalModule.ThermalModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="attitude-and-orbit-control-system-module">
+<h3>Attitude and Orbit Control System Module<a class="headerlink" href="#attitude-and-orbit-control-system-module" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-Modules.AOCSModule"></span><dl class="py class">
+<dt id="Modules.AOCSModule.AOCSModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.AOCSModule.</code><code class="sig-name descname">AOCSModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_id</span></em>, <em class="sig-param"><span class="n">servicer</span></em>, <em class="sig-param"><span class="n">dry_mass_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_power_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass_contingency</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">non_recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.AOCSModule.AOCSModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>AOCS (Attitude and orbit Control) module is a static module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.AOCSModule.AOCSModule.compute_dry_mass">
+<code class="sig-name descname">compute_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.AOCSModule.AOCSModule.compute_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the dry mass of the module depending gon the servicer group.
+Args:</p>
+<blockquote>
+<div><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.AOCSModule.AOCSModule.compute_reference_power">
+<code class="sig-name descname">compute_reference_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.AOCSModule.AOCSModule.compute_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the reference or “as designed” power for the module depending on the servicer group.
+Used in different models (mass, cost, etc.)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.AOCSModule.AOCSModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.AOCSModule.AOCSModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence to design the module given the current plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.AOCSModule.AOCSModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.AOCSModule.AOCSModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the non recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): non recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.AOCSModule.AOCSModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.AOCSModule.AOCSModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Modules.PropulsionModule">
+<span id="propulsion-module"></span><h3>Propulsion Module<a class="headerlink" href="#module-Modules.PropulsionModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.PropulsionModule.PropulsionModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.PropulsionModule.</code><code class="sig-name descname">PropulsionModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_id</span></em>, <em class="sig-param"><span class="n">servicer</span></em>, <em class="sig-param"><span class="n">prop_type</span></em>, <em class="sig-param"><span class="n">max_thrust</span></em>, <em class="sig-param"><span class="n">min_thrust</span></em>, <em class="sig-param"><span class="n">isp</span></em>, <em class="sig-param"><span class="n">initial_propellant_mass</span></em>, <em class="sig-param"><span class="n">max_tank_capacity</span></em>, <em class="sig-param"><span class="n">dry_mass_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_power_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass_contingency</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">non_recurring_cost_override</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_refueler</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">propellant_contingency</span><span class="o">=</span><span class="default_value">0.15</span></em>, <em class="sig-param"><span class="n">assumed_duty_cycle</span><span class="o">=</span><span class="default_value">0.25</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propulsion module is a module that can change the orbit of its servicer and/or transfer duel to other modules.</p>
+<dl>
+<dt>Args:</dt><dd><p>c.f. GenericModule
+prop_type (str): Either “mono-propellant”, “solid”, “electrical”, “water”
+max_thrust (u.N): maximum thrust of thruster
+min_thrust (u.N): minimal thrust of thruster
+isp (u.s): thruster specific impulse
+initial_propellant_mass (u.kg): initial guess for propellant mass required for the module
+max_tank_capacity (u.kg): maximum capacity of a single tank, tanks will be duplicated if too much propellant
+is_refueler (boolean): True if the module has a refueling valve and can transfer fuel to
+propellant_contingency (u.kg): ratio of fuel mass left at the end of the servicer_group to the initial mass
+assumed_duty_cycle (float): amount of time over one period where electrical thrust is assumed to be possible</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule
+prop_type (str): Either “mono-propellant”, “solid”, “electrical”, “water”
+max_thrust (u.N): maximum thrust of thruster
+min_thrust (u.N): minimal thrust of thruster
+isp (u.s): thruster specific impulse
+initial_propellant_mass (u.kg): initial guess for propellant mass required for the module
+max_tank_capacity (u.kg): maximum capacity of a single tank, tanks will be duplicated if too much propellant
+is_refueler (boolean): True if the module has a refueling valve and can transfer fuel to
+propellant_contingency (u.kg): ratio of fuel mass left at the end of the servicer_group to the initial mass
+assumed_duty_cycle (float): amount of time over one period where electrical thrust is assumed to be possible
+reference_thrust (u.N): reference thrust used for dimensioning purposes
+current_propellant_mass (u.kg): current propellant mass remaining in the module
+previous_initial_propellant_mass (u.kg): initial prop. mass from the previous convergence_margin iteration
+previous_minimal_propellant_mass (u.kg): min remaining prop. mass in the previous convergence_margin iteration
+previous_final_propellant_mass (u.kg); final prop. mass from the previous convergence_margin iteration
+rendezvous_throughput (u.kg): total amount of propellant used through rcs thrusters
+phasing_throughput (u.kg): total amount of propellant used through main thrusters
+previous_rendezvous_throughput (u.kg): phasing throughput from previous convergence_margin iteration
+previous_phasing_throughput (u.kg): rendezvous throughput from previous convergence_margin iteration
+last_refuel_amount (u.kg): amount of fuel taken by the module on the last refuel, implemented to avoid taking</p>
+<blockquote>
+<div><p>unnecessary fuel and used during convergence_margin</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.add_propellant">
+<code class="sig-name descname">add_propellant</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">propellant_mass</span></em>, <em class="sig-param"><span class="n">phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.add_propellant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a propellant to the module (usually through refueling).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>propellant_mass (u.kg): propellant mass to be added from the current propellant
+phase (str): used to track throughput of thruster (“refueling” most likely)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.apply_delta_v">
+<code class="sig-name descname">apply_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta_v</span></em>, <em class="sig-param"><span class="n">phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.apply_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and consume the appropriate propellant to perform delta_v.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>delta_v (u.m/u.s): delta v to be performed
+phase (str): used to track throughput of thruster (“main_thrusters” or “rcs_thrusters” respectively)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.compute_dry_mass">
+<code class="sig-name descname">compute_dry_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em>, <em class="sig-param"><span class="n">n_of_rdv_thrusters</span></em>, <em class="sig-param"><span class="n">n_of_rdv_sets</span></em>, <em class="sig-param"><span class="n">n_of_ph_thrusters</span></em>, <em class="sig-param"><span class="n">n_of_ph_sets</span></em>, <em class="sig-param"><span class="n">n_of_tanks</span></em>, <em class="sig-param"><span class="n">phasing_delta_v</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.compute_dry_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute module dry mass based on number of elements and other parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.compute_propellant_mass">
+<code class="sig-name descname">compute_propellant_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta_v</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.compute_propellant_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute amount of propellant to produce delta v.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): propellant mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.compute_reference_manoeuvers">
+<code class="sig-name descname">compute_reference_manoeuvers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.compute_reference_manoeuvers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the reference thrust and delta v for phasing and rendezvous maneuvers.
+For phasing thrust, based on desired delta v and burn durations.
+For rendezvous thrust, based on servicer inertia.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the thruster is designed, used to retrieve reference delta v</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.N): reference thrust, phasing_thrust</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.compute_reference_power">
+<code class="sig-name descname">compute_reference_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em>, <em class="sig-param"><span class="n">reference_thrust</span></em>, <em class="sig-param"><span class="n">number_of_thrusters</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.compute_reference_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the reference or “as designed” power for the module.
+Used in different models (mass, cost, etc.)</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.W): reference power</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.compute_tanks_number">
+<code class="sig-name descname">compute_tanks_number</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.compute_tanks_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of tanks needed for the initial propellant mass given a single tank maximum capacity.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.compute_thrusters_number">
+<code class="sig-name descname">compute_thrusters_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desired_thrust</span></em>, <em class="sig-param"><span class="n">propellant_throughput</span></em>, <em class="sig-param"><span class="n">max_thrusters_throughput</span></em>, <em class="sig-param"><span class="n">override_number</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.compute_thrusters_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of thrusters in the design based on desired thrust and total propellant throughput.
+If the throughput exceeds the thruster capabilities, the thruster set is duplicated.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>desired_thrust (u.N): desired overall thrust output of the thrusters
+propellant_throughput (u.kg): actual throughput experienced by the thrusters during servicer_group
+max_thrusters_throughput (u.kg): total_throughput the thrusters are designed to withstand
+override_number (int): if given, overrides the computation based on desired thrust, only checks throughput</p>
+</dd>
+<dt>Returns:</dt><dd><p>(int): number of thrusters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.consume_propellant">
+<code class="sig-name descname">consume_propellant</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">propellant_mass</span></em>, <em class="sig-param"><span class="n">phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.consume_propellant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduce the current propellant mass of the module by the argument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>propellant_mass (u.kg): consumed propellant
+phase (str): used to track throughput of thruster (“main_thrusters” or “rcs_thrusters” respectively)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.define_as_main_propulsion">
+<code class="sig-name descname">define_as_main_propulsion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.define_as_main_propulsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make module default phasing module for its servicer.
+Used in automatic generation of planning and servicers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.define_as_rcs_propulsion">
+<code class="sig-name descname">define_as_rcs_propulsion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.define_as_rcs_propulsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make module rendezvous capture module for its servicer.
+Used in automatic generation of planning and servicers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.design">
+<code class="sig-name descname">design</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called during convergence_margin to design the module given the current plan.
+This method usually computes the module dry mass and reference power based on the attributed plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan for which the module is designed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.get_current_prop_mass">
+<code class="sig-name descname">get_current_prop_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.get_current_prop_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current mass of propellant at launch in the module.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): mass of the current propellant in the module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.get_initial_prop_mass">
+<code class="sig-name descname">get_initial_prop_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.get_initial_prop_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial mass of propellant at launch in the module.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): mass of the initial propellant</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.get_minimal_propellant_mass">
+<code class="sig-name descname">get_minimal_propellant_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.get_minimal_propellant_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lowest fuel state of the module over a plan. Used for convergence of fleet.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>plan (Plan_module.Plan): plan in which the module is used</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.kg): lowest fuel state of the module over the plan</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.get_non_recurring_cost">
+<code class="sig-name descname">get_non_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.get_non_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): non recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.get_recurring_cost">
+<code class="sig-name descname">get_recurring_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.get_recurring_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the recurring cost of the module in Euros.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): recurring module cost in Euro</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.get_wet_mass">
+<code class="sig-name descname">get_wet_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.get_wet_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial wet mass of the module at launch (including contingencies by default).</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.kg): initial wet mass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.is_main_propulsion">
+<code class="sig-name descname">is_main_propulsion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.is_main_propulsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if module is default phasing for its servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.is_rcs_propulsion">
+<code class="sig-name descname">is_rcs_propulsion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.is_rcs_propulsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if module is default phasing for its servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.log_propellant_consumption">
+<code class="sig-name descname">log_propellant_consumption</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta_mass</span></em>, <em class="sig-param"><span class="n">phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.log_propellant_consumption" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log propellant mass consumed by the module. This is done independently for rendezvous and phasing thrusters.
+Used to check if thrusters max throughput are not exceeded.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>delta_mass (u.kg): propellant mass to log
+phase (str): used to track throughput of thruster (“main_thrusters”, “rcs_thrusters”, etc)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>” Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence_margin.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.PropulsionModule.PropulsionModule.update_initial_propellant_mass">
+<code class="sig-name descname">update_initial_propellant_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_propellant_mass</span></em>, <em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.PropulsionModule.PropulsionModule.update_initial_propellant_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the module after a change of initial propellant mass during convergence_margin.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>new_propellant_mass (u.kg): new best guess for propellant mass needed for module
+plan (Plan_module.Plan): plan in which the module is used</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Modules.CaptureModule">
+<span id="capture-module"></span><h3>Capture Module<a class="headerlink" href="#module-Modules.CaptureModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.CaptureModule.CaptureModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.CaptureModule.</code><code class="sig-name descname">CaptureModule</code><span class="sig-paren">(</span><em class="sig-param">module_id</em>, <em class="sig-param">servicer</em>, <em class="sig-param">dry_mass_override=&lt;Quantity 43.1 kg&gt;</em>, <em class="sig-param">reference_power_override=&lt;Quantity 0. W&gt;</em>, <em class="sig-param">mass_contingency=0.25</em>, <em class="sig-param">recurring_cost_override=250000.0</em>, <em class="sig-param">non_recurring_cost_override=3825000</em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.CaptureModule.CaptureModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture module is a dynamic module that can link or unlink targets to the servicer.</p>
+<p>The captured target will be linked to the module’s servicer and orbit changes will apply to the target as well.
+While the target is captured, it’s mass is accounted for when computing servicer manoeuvres.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule
+captured_object(&lt;&gt;): object linked to the module after capture</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Modules.CaptureModule.CaptureModule.define_as_capture_default">
+<code class="sig-name descname">define_as_capture_default</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.CaptureModule.CaptureModule.define_as_capture_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make module default capture module for its servicer.
+Used in automatic generation of planning and servicers in case of multiple capture modules per servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.CaptureModule.CaptureModule.is_capture_default">
+<code class="sig-name descname">is_capture_default</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.CaptureModule.CaptureModule.is_capture_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if module is default capture module for its servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Modules.CaptureModule.CaptureModule.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Modules.CaptureModule.CaptureModule.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Modules.ApproachSuiteModule">
+<span id="approach-suite-module"></span><h3>Approach Suite Module<a class="headerlink" href="#module-Modules.ApproachSuiteModule" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Modules.ApproachSuiteModule.ApproachSuiteModule">
+<em class="property">class </em><code class="sig-prename descclassname">Modules.ApproachSuiteModule.</code><code class="sig-name descname">ApproachSuiteModule</code><span class="sig-paren">(</span><em class="sig-param">module_id</em>, <em class="sig-param">servicer</em>, <em class="sig-param">dry_mass_override=&lt;Quantity 13.9 kg&gt;</em>, <em class="sig-param">reference_power_override=&lt;Quantity 45. W&gt;</em>, <em class="sig-param">mass_contingency=0.25</em>, <em class="sig-param">recurring_cost_override=100000.0</em>, <em class="sig-param">non_recurring_cost_override=4500000</em><span class="sig-paren">)</span><a class="headerlink" href="#Modules.ApproachSuiteModule.ApproachSuiteModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approach suite module is a static module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+<dt>Attributes:</dt><dd><p>c.f. GenericModule</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="phases">
+<h2>Phases<a class="headerlink" href="#phases" title="Permalink to this headline">¶</a></h2>
+<p>These classes and methods describe the different types of phases used. They host astrodynamic models and behavioral
+models. All phases inherit from the generic module.</p>
+<div class="section" id="module-Phases.GenericPhase">
+<span id="generic-phase"></span><h3>Generic Phase<a class="headerlink" href="#module-Phases.GenericPhase" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.GenericPhase.GenericPhase">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.GenericPhase.</code><code class="sig-name descname">GenericPhase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase_id</span></em>, <em class="sig-param"><span class="n">plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase is performed by an assigned module and changes the state of the fleet and clients it applies to.</p>
+<p>When the class is initialized, it is added to the plan specified as argument.
+Phases in a plan will be executed in the order of their initialization.</p>
+<p>Multiple classes inherit from this class. Generic attributes are shared between all phases:</p>
+<dl>
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase is added to (the phase is automatically added to the plan)</p>
+</dd>
+<dt>Attributes:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+assigned_module (Fleet_module.PropulsionModule or CaptureModule): module responsible for phase
+duration (u.second): duration of the phase
+servicer_snapshot (Fleet_module.Servicer): copy of the servicer, in its state at the completion of the phase</p>
+<blockquote>
+<div><p>(for reference and post-processing purposes)</p>
+</div></blockquote>
+<p>starting_date (astropy.time.Time): beginning date of the phase (computed during simulation)
+end_date (astropy.time.Time): finish date of the phase (computed during simulation)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the servicer and clients impacted by the phase when called during simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase.
+Args:</p>
+<blockquote>
+<div><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.get_assigned_module">
+<code class="sig-name descname">get_assigned_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_assigned_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the module assigned to the phase.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(Fleet_module.&lt;Module_class&gt;): assigned module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.get_assigned_servicer">
+<code class="sig-name descname">get_assigned_servicer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_assigned_servicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the servicer that hosts the module assigned to the phase.
+Return:</p>
+<blockquote>
+<div><p>(Fleet_module.Servicer): assigned servicer</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.get_delta_v">
+<code class="sig-name descname">get_delta_v</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns delta v for the phase. Returns 0 m/s if delta v does not apply to the phase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.get_duration">
+<code class="sig-name descname">get_duration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns duration for the phase, as currently computed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on operation labour.</p>
+<p>This function is usually redefined within specific phases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the phase to its pre-simulation state. This function may be redefined within inheriting phases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.take_servicer_snapshot">
+<code class="sig-name descname">take_servicer_snapshot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.take_servicer_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save current assigned servicer as a snapshot for future references and post-processing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.GenericPhase.GenericPhase.update_servicer">
+<code class="sig-name descname">update_servicer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">servicer</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.update_servicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform changes on a servicer to represent its state at the end of the phase.</p>
+<p>If no specific servicer is given as attribute, the servicer assigned to the phase is taken.
+Changes are the orbit raan and epoch according to the specified duration and the servicer orbit at time of
+execution. This function may be redefined within inheriting phases.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>servicer (Servicer):  (optional) servicer to be updated</dt><dd><p>This optional attributes is used to update servicers connected to the servicer assigned
+to the phase, for instance to update the whole mothership if a module of a kit is
+assigned to the phase.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.Insertion">
+<span id="insertion-phase"></span><h3>Insertion Phase<a class="headerlink" href="#module-Phases.Insertion" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.Insertion.Insertion">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Insertion.</code><code class="sig-name descname">Insertion</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">orbit</em>, <em class="sig-param">propellant=&lt;Quantity 0. kg&gt;</em>, <em class="sig-param">duration=&lt;Quantity 30. d&gt;</em>, <em class="sig-param">propellant_contingency=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Insertion.Insertion" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that places a servicer in its initial orbit as well as represents commissioning duration.
+Needs to be assigned to a propulsion module.</p>
+<p>There is a possibility to assign some delta v to this phase to represent initial propulsion commissioning.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+orbit (poliastro.twobody.Orbit): insertion orbit
+propellant (u.&lt;Mass_unit&gt;): consumed propellant for the phase
+duration (u.&lt;Time_unit&gt;): duration of the phase
+propellant_contingency (float): mass_contingency to be applied to the delta_v</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>orbit (poliastro.twobody.Orbit): insertion orbit
+propellant (u.&lt;Mass_unit&gt;): consumed propellant for the phase
+duration (u.&lt;Time_unit&gt;): duration of the phase
+mass_contingency (float): mass_contingency to be applied to the delta_v</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.Insertion.Insertion.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Insertion.Insertion.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the servicer to the insertion orbit.
+Asks the propulsion module to consume propellant according to predefined value.
+Calls generic function to update orbit raan and epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Insertion.Insertion.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Insertion.Insertion.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Insertion.Insertion.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Insertion.Insertion.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.OrbitChange">
+<span id="orbit-change-phase"></span><h3>Orbit Change Phase<a class="headerlink" href="#module-Phases.OrbitChange" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.OrbitChange.OrbitChange">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.OrbitChange.</code><code class="sig-name descname">OrbitChange</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">final_orbit</em>, <em class="sig-param">initial_orbit=None</em>, <em class="sig-param">delta_v_contingency=0.1</em>, <em class="sig-param">raan_specified=False</em>, <em class="sig-param">raan_cutoff=&lt;Quantity 0.5 deg&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that represents changes made by a servicer to change orbit.
+The method in Common_functions are used and the assumptions are detailed in their documentation.
+Needs to be assigned to a propulsion module.</p>
+<dl>
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+final_orbit (poliastro.twobody.Orbit or object with current_orbit attribute): orbit to be reached</p>
+<blockquote>
+<div><p>or object with current_orbit</p>
+</div></blockquote>
+<dl class="simple">
+<dt>initial_orbit (poliastro.twobody.Orbit): (optional) orbit of the servicer before the phase</dt><dd><p>(specified for possible reference during planning)</p>
+</dd>
+</dl>
+<p>delta_v_contingency (float): mass_contingency to be applied to the delta_v
+raan_specified (bool): denotes if the orbit change is made to a specific raan,</p>
+<blockquote>
+<div><p>if True, the raan of the target is matched, either via manoeuver or nodal precession</p>
+</div></blockquote>
+<p>raan_cutoff (u.&lt;Angle_unit&gt;): cutoff over which drift phasing is used rather than manoeuvres to correct raan</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>final_orbit (poliastro.twobody.Orbit or any object with current_orbit attribute): orbit to be reached
+planned_final_orbit (poliastro.twobody.Orbit): orbit to be reached after maneuvers</p>
+<blockquote>
+<div><p>as specified in plan (typically used for phase reset)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>initial_orbit (poliastro.twobody.Orbit): optional, orbit of the servicer before the phase</dt><dd><p>(possibly specified for reference during planning)</p>
+</dd>
+<dt>planned_initial_orbit (poliastro.twobody.Orbit): optional, orbit of the servicer before the phase</dt><dd><p>as specified in plan (typically used for phase reset)</p>
+</dd>
+<dt>delta_v_contingency (float): mass_contingency to be applied to the delta_v</dt><dd><dl class="simple">
+<dt>raan_specified (bool): denotes if the orbit change is made to a specific raan,</dt><dd><p>if True, the raan of the target is matched, either via manoeuver or nodal precession</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>raan_cutoff (u.&lt;Angle_unit&gt;): cutoff over which drift phasing is used rather than manoeuvres to correct raan
+raan_drift (u.&lt;Angle_unit&gt;): delta raan completed by the servicer during the orbit change
+manoeuvres ([Common_functions.Manoeuvre]): List of manoeuvres to reach the final orbit</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the servicer to the final orbit.
+Asks the propulsion module to consume propellant according to computed manoeuvres.
+Calls generic function to update orbit raan and epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.apply_delta_v">
+<code class="sig-name descname">apply_delta_v</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.apply_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the delta v for the maneuver and possible orbit maintenance during phasing.
+Apply this delta v according to assigned module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.apply_manoeuvres">
+<code class="sig-name descname">apply_manoeuvres</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thrust</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">isp</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.apply_manoeuvres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and apply the delta v for the maneuver and possible orbit maintenance during phasing.
+Specific arguments can be given to overwrite the current attributes.
+This methods calls compute_manoeuvres and compute_phasing.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>mass (u.kg): (optional) servicer mass at the start of the maneuver
+thrust (u.N): (optional) servicer thrust capability at the start of the maneuver
+isp (u.s): (optional) servicer isp capability</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.
+Also computes first estimates of manoeuvres required to help convergence_margin of propulsion module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.PropulsionModule or CaptureModule): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.compute_main_manoeuvres">
+<code class="sig-name descname">compute_main_manoeuvres</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_orbit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_orbit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thrust</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">isp</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.compute_main_manoeuvres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the manoeuvres necessary to perform the orbit change, without raan changes.
+This methods applies either low thrust assumptions or high thrust assumption depending on assigned module
+propulsion type. For low thrust manoeuvres, the duty_cycle is assumed to be 1/4, which might be conservative
+for circular orbits. Specific arguments can be given to overwrite the current attributes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_orbit (astropy.time.Time): (optional) initial orbit
+final_orbit (astropy.time.Time): (optional) final orbit
+mass (u.kg): (optional) servicer mass at the start of the maneuver
+thrust (u.N): (optional) servicer thrust capability at the start of the maneuver
+isp (u.s): (optional) servicer isp capability</p>
+</dd>
+<dt>Return:</dt><dd><p>manoeuvres ([Common_functions.Manoeuvre]): list of manoeuvres to perform orbit change without raan change
+transfer_duration(u.&lt;Time_unit&gt;): duration of transfer (from first burn to last)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.compute_maneuver">
+<code class="sig-name descname">compute_maneuver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orbit1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">orbit2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thrust</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.compute_maneuver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the delta v necessary to perform the phase.
+Particular orbits, masses and thrusts can be specified to make some quick comparisons or optimizations.
+The default orbits used are those defined as initial and final for the phase.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>orbit1 (astropy.time.Time): (optional) initial orbit
+orbit2 (astropy.time.Time): (optional) final orbit
+mass (u.kg): (optional) servicer mass at the start of the maneuver
+thrust (u.N): (optional) servicer thrust capability at the start of the maneuver</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.m / u.s) : required delta v
+(u.&lt;time unit&gt;): duration of the maneuver (without phasing durations)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.compute_precession">
+<code class="sig-name descname">compute_precession</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">manoeuvre_duration</span></em>, <em class="sig-param"><span class="n">initial_orbit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_orbit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">raan_phasing</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thrust</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">isp</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.compute_precession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute raan drift and phasing duration according to either of these two cases:</p>
+<dl class="simple">
+<dt>Case 1:</dt><dd><p>raan_phasing is true, therefore phasing will be computed based on the specified raan
+for the initial and final orbit.</p>
+</dd>
+<dt>Case 2:</dt><dd><p>raan_phasing is False. In this case, the final orbit raan is disregarded and instead the
+raan drift is computed based on manoeuvre_duration only.</p>
+</dd>
+</dl>
+<p>These computations take into account the raan drift during maneuvers (significant for low-thrust) using
+a simplified linear model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>manoeuvre_duration (u.&lt;time unit&gt;): duration of the maneuver without phasing
+initial_orbit (astropy.twobody.Orbit): (optional) initial orbit (serve as raan reference)
+final_orbit (astropy.twobody.Orbit): (optional) final orbit (serve as raan reference)
+raan_phasing (bool): (optional) if True, final raan the orbit change is designed to target the final raan
+mass (u.kg): (optional) servicer mass at the start of the maneuver
+thrust (u.N): (optional) servicer thrust capability at the start of the maneuver
+isp (u.s): (optional) servicer isp capability</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.day): total duration
+(u.deg): raan drift
+(Common_functions.Manoeuvre): possible manoeuvre for the raan change if under cutoff</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.get_delta_v">
+<code class="sig-name descname">get_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contingency</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.get_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return total delta v for all manoeuvres in orbit change.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.m / u.s): delta v for total</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the orbits, duration, delta v, raan drift and epochs based on parameters defined during planning.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitChange.OrbitChange.update_servicer">
+<code class="sig-name descname">update_servicer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">servicer</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitChange.OrbitChange.update_servicer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Update the orbits of the servicer and attached targets after phase has ended.</dt><dd><p>If no specific servicer is given as attribute, the servicer assigned to the phase is taken.</p>
+</dd>
+</dl>
+<p>Changes are the orbit raan and epoch according to the specified duration and the servicer orbit at time of
+execution. This function may be redefined within inheriting phases.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>servicer (Servicer):  (optional) servicer to be updated</dt><dd><p>This optional attributes is used to update servicers connected to the servicer assigned
+to the phase, for instance to update the whole mothership if a module of a kit is
+assigned to the phase.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="orbit-maintenance-phase">
+<h3>Orbit Maintenance Phase<a class="headerlink" href="#orbit-maintenance-phase" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-Phases.OrbitMaintenance"></span><dl class="py class">
+<dt id="Phases.OrbitMaintenance.OrbitMaintenance">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.OrbitMaintenance.</code><code class="sig-name descname">OrbitMaintenance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase_id</span></em>, <em class="sig-param"><span class="n">plan</span></em>, <em class="sig-param"><span class="n">orbit</span></em>, <em class="sig-param"><span class="n">duration</span></em>, <em class="sig-param"><span class="n">delta_v_contingency</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitMaintenance.OrbitMaintenance" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that represents all manoeuvres made by the servicer to maintain its orbit in time.
+Needs to be assigned to a propulsion module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+orbit (poliastro.twobody.Orbit): orbit of the servicer
+duration (u.second): duration of the phase
+delta_v_contingency (float): mass_contingency to be applied to the delta_v</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>orbit (poliastro.twobody.Orbit): orbit of the servicer
+duration (u.second): duration of the phase
+delta_v (u.meter / u.second): total delta v associated with the phase
+delta_v_contingency (float): mass_contingency to be applied to the delta_v</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.OrbitMaintenance.OrbitMaintenance.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitMaintenance.OrbitMaintenance.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asks the propulsion module to consume propellant according to delta v.
+Calls generic function to update orbit raan and epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitMaintenance.OrbitMaintenance.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitMaintenance.OrbitMaintenance.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.OrbitMaintenance.OrbitMaintenance.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.OrbitMaintenance.OrbitMaintenance.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.Refueling">
+<span id="refueling-phase"></span><h3>Refueling Phase<a class="headerlink" href="#module-Phases.Refueling" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.Refueling.Refueling">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Refueling.</code><code class="sig-name descname">Refueling</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">duration=&lt;Quantity 3. d&gt;</em>, <em class="sig-param">refuel_mass=None</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Refueling.Refueling" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that exchanges fuel between two servicers. One servicer needs to capture the other.
+Needs to be assigned to a propulsion module.</p>
+<dl>
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+duration (u.second): duration of the phase
+refuel_mass (u.kg): (optional) desired amount to be refueled, if not specified, fill recipient until full</p>
+<blockquote>
+<div><p>or assigned_tanker is empty</p>
+</div></blockquote>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>duration (u.second): duration of the phase
+refuel_mass (u.kg): (optional) desired amount to be refueled, if not specified, fill recipient or empty tanker
+last_refuel_for_recipient (bool): if True, this is the last refuel for the recipient, only fill what is required</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.Refueling.Refueling.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Refueling.Refueling.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs refueling and update servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Refueling.Refueling.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Refueling.Refueling.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Refueling.Refueling.find_tank">
+<code class="sig-name descname">find_tank</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Refueling.Refueling.find_tank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a tank within the captured targets to get the propellant from.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(Modules.PropulsionModule): Propulsion module used for refueling</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Refueling.Refueling.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Refueling.Refueling.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Refueling.Refueling.refuel">
+<code class="sig-name descname">refuel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tank</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Refueling.Refueling.refuel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update propellant masses of appropriate modules to represent refueling.</p>
+<dl class="simple">
+<dt>Arg:</dt><dd><p>tank (Modules.PropulsionModule): Propulsion module used for refueling</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.Approach">
+<span id="approach-phase"></span><h3>Approach Phase<a class="headerlink" href="#module-Phases.Approach" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.Approach.Approach">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Approach.</code><code class="sig-name descname">Approach</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">target</em>, <em class="sig-param">propellant</em>, <em class="sig-param">duration=&lt;Quantity 10. d&gt;</em>, <em class="sig-param">propellant_contingency=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Approach.Approach" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that represents maneuvers made by the servicer to reach proximity with a target from far rendezvous.
+Needs to be assigned to a propulsion module.</p>
+<p>The phase consumes a predefined amount of propellant given as attribute.
+# TODO: override get_delta_v method to return an estimate of delta_v based on consumed propellant and servicer mass</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+target (ADRClient_module.Target): approached target
+propellant (u.&lt;Mass_unit&gt;): consumed propellant for the phase
+duration (u.&lt;Time_unit&gt;): (optional) duration of the phase
+propellant_contingency (float): (optional) mass_contingency to be applied to the delta_v</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>target (Client_module.Target): approached target
+propellant (u.&lt;Mass_unit&gt;): consumed propellant for the phase
+duration (u.&lt;Time_unit&gt;&gt;): duration of the phase
+mass_contingency (float): mass_contingency to be applied to the delta_v</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.Approach.Approach.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Approach.Approach.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asks the propulsion module to consume propellant according to predefined value.
+Calls generic methods to update orbit raan and epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Approach.Approach.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Approach.Approach.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Approach.Approach.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Approach.Approach.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.Capture">
+<span id="capture-phase"></span><h3>Capture Phase<a class="headerlink" href="#module-Phases.Capture" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.Capture.Capture">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Capture.</code><code class="sig-name descname">Capture</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">captured_object</em>, <em class="sig-param">duration=&lt;Quantity 2. wk&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Capture.Capture" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that represents capture and links an object given in argument to the servicer for subsequent phases.
+Needs to be assigned to a capture module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+captured_object (ADRClient_module.Target or Fleet_module.Servicer): captured object
+duration (u.&lt;Time_unit&gt;): duration of the phase</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>captured_object (Client_module.Target): captured object
+duration (u.&lt;Time_unit&gt;): duration of the phase</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.Capture.Capture.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Capture.Capture.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns target to the capture module. The target and servicer or kit will now share orbit changes.
+Calls generic function to update orbit raan and epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Capture.Capture.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Capture.Capture.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Capture.Capture.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Capture.Capture.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.Release">
+<span id="release-phase"></span><h3>Release Phase<a class="headerlink" href="#module-Phases.Release" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.Release.Release">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Release.</code><code class="sig-name descname">Release</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">target</em>, <em class="sig-param">duration=&lt;Quantity 3. d&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Release.Release" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that represents release and separates the target given in argument from the servicer.
+Needs to be assigned to the capture module that captured the target.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+target (poliastro.Client_module.Target): captured target to be releases
+duration (u.second): duration of the phase</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>target (poliastro.Client_module.Target): approached target
+duration (u.second): duration of the phase</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Phases.Release.Release.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Release.Release.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Separate target from the capture module. The target will now be independent of the servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Release.Release.assign_module">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Release.Release.assign_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Phases.Release.Release.get_operational_cost">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Release.Release.get_operational_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>Release Phase<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-0"></span><dl class="py class">
+<dt id="id0">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Release.</code><code class="sig-name descname">Release</code><span class="sig-paren">(</span><em class="sig-param">phase_id</em>, <em class="sig-param">plan</em>, <em class="sig-param">target</em>, <em class="sig-param">duration=&lt;Quantity 3. d&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Phase that represents release and separates the target given in argument from the servicer.
+Needs to be assigned to the capture module that captured the target.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
+plan (Plan_module.Plan): plan the phase belongs to
+target (poliastro.Client_module.Target): captured target to be releases
+duration (u.second): duration of the phase</p>
+</dd>
+<dt>Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)</dt><dd><p>target (poliastro.Client_module.Target): approached target
+duration (u.second): duration of the phase</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="id2">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Separate target from the capture module. The target will now be independent of the servicer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id3">
+<code class="sig-name descname">assign_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assigned_module</span></em><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a module of a servicer to the phase. Checks for appropriate module type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assigned_module (Fleet_module.&lt;Module_class&gt;): Added module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id4">
+<code class="sig-name descname">get_operational_cost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the operational cost of the phase based on assumed FTE and associated costs.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(float): operational cost in Euros</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Phases.Common_functions">
+<span id="common-functions-used-in-phases"></span><h3>Common Functions used in phases<a class="headerlink" href="#module-Phases.Common_functions" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="Phases.Common_functions.Manoeuvre">
+<em class="property">class </em><code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">Manoeuvre</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta_v</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.Manoeuvre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class representing a manoeuvre. This is used to simplify computations of thrust, mass and durations.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>delta_v (u.&lt;speed unit&gt;): delta v for the manoeuvre</p>
+</dd>
+<dt>Attributes:</dt><dd><p>delta_v (u.&lt;speed unit&gt;): delta v for the manoeuvre
+burn_duration (u.&lt;time unit&gt;): duration of the burn for the manoeuvre</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.compute_altitude_maintenance_delta_v">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">compute_altitude_maintenance_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">duration</span></em>, <em class="sig-param"><span class="n">orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.compute_altitude_maintenance_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an estimation of delta v required to maintain an orbit in altitude for a duration.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>duration (u.&lt;time unit&gt;): total time spent on orbit
+orbit (poliastro.twobody.Orbit): orbit to maintain</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.m / u.s): required delta v</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.compute_translunar_injection">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">compute_translunar_injection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_orbit</span></em>, <em class="sig-param"><span class="n">final_orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.compute_translunar_injection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the delta v and duration necessary to perform a translunar injection, assuming impulsive maneuvers.
+This takes into account the following assumptions:
+(1) the Earth planet is fixed in space;
+(2) the Moon orbit around the Earth is circular;
+(3) the flight of the space vehicle lies in the orbital plane of the Moon;
+(4) the gravitational field of the Earth and the Moon is central and obeys the inverse square</p>
+<blockquote>
+<div><p>law;</p>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>the transfer trajectory has two distinct phases: the geocentric phase, which it starts immediately
+after the first velocity increment; and the selenocentric phase, which begins when
+the vehicle reaches the sphere of influence of the Moon;</p></li>
+<li><p>the two-impulse model is considered. Each velocity increment is applied tangentially to
+the initial orbit (LEO) and the final (LMO) orbit.</p></li>
+</ol>
+<p>REF: “Optimal round trip lunar missions based on the patched-conic approximation” DOI 10.1007/s40314-015-0247-y
+:param initial_orbit (poliastro.twobody.Orbit): initial orbit
+:param final_orbit (poliastro.twobody.Orbit): final orbit
+:return:</p>
+<blockquote>
+<div><p>(u.m / u.s): total delta v to reach final orbit around the Moon
+(u.m / u.s): first impulse
+(u.m / u.s): second impulse
+(u.day): total time of flight
+(u.day): time of flight in the geocentric phase
+(u.day): time of flight in the selenocentric phase
+(u.deg): initial phase angle between the space vehicle and the Moon at the moment of the first impulse</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.get_reentry_parameters">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">get_reentry_parameters</code><span class="sig-paren">(</span><em class="sig-param">orbit</em>, <em class="sig-param">altitude=&lt;Quantity 100. km&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.get_reentry_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><p>orbit (poliastro.twobody.Orbit): orbit to be updated
+altitude (u.&lt;length unit&gt;): reentry altitude at which the parameters are computed</p>
+</dd>
+<dt>Return:</dt><dd><p>reentry_true_anomaly (u.&lt;angle unit&gt;): true anomaly at time of reentry
+reentry_velocity (u.&lt;speed unit&gt;): object velocity at time of reentry
+reentry_angle (u.&lt;angle unit&gt;): angle between object trajectory and local horizontal at time of reentry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.high_thrust_delta_v">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">high_thrust_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_orbit</span></em>, <em class="sig-param"><span class="n">final_orbit</span></em>, <em class="sig-param"><span class="n">initial_mass</span></em>, <em class="sig-param"><span class="n">mean_thrust</span></em>, <em class="sig-param"><span class="n">isp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.high_thrust_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the delta v necessary to perform an orbit change, assuming impulsive maneuvers.
+This takes into account the transfer from one elliptical orbit to another.
+This takes into account possible inclination changes, performed during the adequate impulse.
+This neglects argument of periapsis changes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_orbit (poliastro.twobody.Orbit): initial orbit
+final_orbit (poliastro.twobody.Orbit): final orbit
+initial_mass (u.kg) assumed servicer mass at start of maneuver
+mean_thrust (u.N): assumed thrust at start of maneuver
+isp (u.s): assumed isp, used to estimate manoeuvre duration</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.m / u.s): total delta v to reach final orbit
+(poliastro.twobody.Orbit): transfer orbit if applicable
+(u.m / u.s): first impulse
+(u.m / u.s): second impulse
+(u.day): first impulse duration
+(u.day): second impulse duration
+(u.day): total orbit change duration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.high_thrust_raan_change_delta_v">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">high_thrust_raan_change_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta_raan</span></em>, <em class="sig-param"><span class="n">initial_orbit</span></em>, <em class="sig-param"><span class="n">final_orbit</span></em>, <em class="sig-param"><span class="n">initial_mass</span></em>, <em class="sig-param"><span class="n">mean_thrust</span></em>, <em class="sig-param"><span class="n">isp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.high_thrust_raan_change_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a rough estimation of delta_v needed to perform a small change in raan.
+This is not valid for large maneuvers, only maintenance or corrections.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.inclination_change_delta_v">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">inclination_change_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_orbit</span></em>, <em class="sig-param"><span class="n">final_orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.inclination_change_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns delta_v necessary to change inclination from initial to final orbital plane.
+This only includes inclination change.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_orbit (poliastro.twobody.Orbit): initial orbit
+final_orbit (poliastro.twobody.Orbit): final orbit</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.m / u.s): delta v necessary for inclination change</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.inclination_from_precession">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">inclination_from_precession</code><span class="sig-paren">(</span><em class="sig-param">orbit</em>, <em class="sig-param">nodal_precession_period=&lt;Quantity 1. yr&gt;</em>, <em class="sig-param">direction='eastward'</em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.inclination_from_precession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns inclination of orbit necessary to match a desired precession.
+The default precession period and direction corresponds to an SSO orbit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>orbit (poliastro.twobody.Orbit): initial orbit; to compute the inclination, its other orbital elements are used
+nodal_precession_period (u.&lt;time unit&gt;): desired precession period for one revolution
+direction (string): eastward or westward, gives the direction of the precession desired</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.deg): required inclination</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.instant_orbital_velocity">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">instant_orbital_velocity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orbit</span></em>, <em class="sig-param"><span class="n">radius</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.instant_orbital_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns instantaneous orbital velocity at a particular distance from attractor.
+Used during delta v calculations.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>orbit (poliastro.twobody.Orbit): orbit
+radius (u.&lt;distance unit&gt;): distance to the center of the attractor</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Return:</dt><dd><p>(u.deg): orbital speed at distance given in argument</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.julian_day">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">julian_day</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datetime</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.julian_day" title="Permalink to this definition">¶</a></dt>
+<dd><p>from epoch give JDE</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.low_thrust_delta_v">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">low_thrust_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_orbit</span></em>, <em class="sig-param"><span class="n">final_orbit</span></em>, <em class="sig-param"><span class="n">initial_mass</span></em>, <em class="sig-param"><span class="n">mean_thrust</span></em>, <em class="sig-param"><span class="n">isp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.low_thrust_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the delta v necessary to perform the phase, assuming low thrust maneuvers (Edelbaum).
+Edelbaum’s main assumptions are:
+1) propulsive thrust is continuous during the transfer,
+2) thrust acceleration is constant during the transfer,
+3) the transfer is quasi circular (eccentricity remains zero),
+4) the magnitude of the out-of-plane (yaw) steering angle is held constant during an orbital revolution.</p>
+<p>This does not take into account the transfer from one elliptical orbit to another, only circular orbits are valid.
+This takes into account possible inclination changes.
+This neglects argument of periapsis changes.
+Based on initial thrust and mass, the acceleration is supposed constant throughout the maneuver.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_orbit (poliastro.twobody.Orbit): initial orbit
+final_orbit (poliastro.twobody.Orbit): final orbit
+initial_mass (u.kg) assumed servicer mass at start of maneuver
+mean_thrust (u.N): assumed thrust at start of maneuver
+isp (u.s): assumed isp, used to estimate manoeuvre duration</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.m / u.s): required total delta v
+(u.day): maneuver duration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.low_thrust_raan_change_delta_v">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">low_thrust_raan_change_delta_v</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delta_raan</span></em>, <em class="sig-param"><span class="n">initial_orbit</span></em>, <em class="sig-param"><span class="n">final_orbit</span></em>, <em class="sig-param"><span class="n">initial_mass</span></em>, <em class="sig-param"><span class="n">mean_thrust</span></em>, <em class="sig-param"><span class="n">isp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.low_thrust_raan_change_delta_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a rough estimation of delta_v needed to perform a small change in raan.
+This is not valid for large maneuvers, only maintenance or corrections.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.mean_sun_long">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">mean_sun_long</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jde</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.mean_sun_long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return mean sun longitude for reference</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.nodal_precession">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">nodal_precession</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.nodal_precession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the nodal precession period and speed of an object orbiting a body.
+Based on J2 perturbations only. Positive is eastward.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>orbit (poliastro.twobody.Orbit): orbit we want to know the precession of</p>
+</dd>
+<dt>Return:</dt><dd><p>(u.day): period of precession
+(u.deg / u.day): angular speed of precession</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.orbit_string">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">orbit_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orbit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.orbit_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to display orbit altitudes over ground.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Phases.Common_functions.update_orbit">
+<code class="sig-prename descclassname">Phases.Common_functions.</code><code class="sig-name descname">update_orbit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orbit</span></em>, <em class="sig-param"><span class="n">reference_epoch</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Phases.Common_functions.update_orbit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an orbit to a further reference epoch by adding raan drift, only if the main body is Earth.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>orbit (poliastro.twobody.Orbit): orbit to be updated
+reference_epoch (astropy.time.Time): epoch to which the orbit needs to be updated</p>
+</dd>
+<dt>Return:</dt><dd><p>(poliastro.twobody.Orbit): orbit at reference epoch</p>
+</dd>
+</dl>
+<p>TODO: implement more complex things like altitude loses or lack of orbit maintenance</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="misc.html" class="btn btn-neutral float-right" title="Misc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="adr_use_case.html" class="btn btn-neutral" title="Active Debris Removal Use Case" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, B. Gorret, F. Brancato, R. Joye.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

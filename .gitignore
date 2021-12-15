@@ -1,0 +1,15 @@
+# Don't track these folders
+VESPUP Analysis/
+.idea/
+.ipynb_checkpoints/
+__pycache__/
+Figures/
+Results/
+Snapshots/
+node_modules/
+venv/
+
+# Don't track these files
+*-lock.json
+static/css/main.css
+.env
