@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-
-=======
 # TCAT
 
 ## TCAT - Project setup
@@ -344,4 +341,3 @@ When there are no erros, restart the Nginx process (_to load the new configurati
 ```shell
 sudo systemctl restart nginx
 ```
->>>>>>> 3da94db (Merged tcat and tcat-app into one repository)
