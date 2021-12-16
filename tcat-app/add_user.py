@@ -10,6 +10,13 @@ from dotenv import load_dotenv
 
 load_dotenv()  # sets values from .env file as environment vars
 
+
+def add_user(username, password, email):
+    user = User(username=username, password_hash=generate_password_hash(password), email=email)
+    db.session.add(user)
+    db.session.commit()
+
+
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('APP_SECRET')
@@ -26,9 +33,5 @@ def create_app():
 
     return app, Session
 
-def add_user(username, password, email):
-    user = User(username=username, password_hash=generate_password_hash(password), email=email)
-    db.session.add(user)
-    db.session.commit()
 
 app, Session = create_app()

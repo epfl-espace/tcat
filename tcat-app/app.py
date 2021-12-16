@@ -59,8 +59,6 @@ def create_app():
         session_factory = sessionmaker(bind=db.engine)
         Session = scoped_session(session_factory)
 
-        # add_user('username', 'password', 'email@address.com')
-
     return app, Session
 
 
