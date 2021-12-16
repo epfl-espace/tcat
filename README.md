@@ -17,14 +17,21 @@
 ## TCAT-APP Project setup
 
 ### Requirements:
-  - [NodeJS](https://nodejs.org/)(_v14 or higher is required for tailwindcss_)
+  - [NodeJS](https://nodejs.org/) (_v14 or higher is required for tailwindcss_)
   - [npm](https://www.npmjs.com/)
   - [tailwindcss](https://tailwindcss.com/)
     - Install with npm -> `npm install tailwindcss`
+  
+> The following package installations can be skipped when installing the packages from the requirements.txt
+
   - [Flask](https://flask.palletsprojects.com/en/2.0.x/)
     - Install with pip -> `pip install Flask`
+  - [SQLAlchemy](https://www.sqlalchemy.org)
+    - Install with pip -> `pip install SQLAlchemy`
   - [Flask SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
-    - Install with pip -> ` pip install Flask-SQLAlchemy`
+    - Install with pip -> `pip install Flask-SQLAlchemy`
+  - [python-dotenv](https://pypi.org/project/python-dotenv/)
+    - Install with pip -> `pip install python-dotenv`
 
 ### Setup:
 #### Python requirements
@@ -151,9 +158,9 @@ You can replace `Nginx HTTPS` with any of the [rules](#nginx-provides-three-fire
 ```shell
 sudo apt-get install git
 ```
-📁 Create a directory for your project (_ie: tcat-root_).
+📁 Create a directory for your project (_ie: tcat_).
 ```shell
-sudo mkdir tcat-root
+sudo mkdir /var/www/tcat
 ```
 Change the ownership of the folder to the docker user and the docker group.
 ```shell
@@ -179,21 +186,25 @@ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 ```
 📦 Install all the necessary packages.
 ```shell
-sudo apt install nodejs npm python3.9 python3-pip python3.9-dev build-essential libssl-dev libffi-dev python3-setuptools python3.9-venv 
+sudo apt install nodejs npm
+sudo apt install python3.9 python3-pip python3.9-dev build-essential libssl-dev libffi-dev python3-setuptools python3.9-venv 
 ```
 Create a folder with a virual environment for python (_3.9_).
+Clone the repository with ssh.
+```shell
+git clone git@github.com:epfl-espace/tcat.git
+```
+Now you have your repository on your server. Change into the directory for the cloned project.
+```shell
+cd tcat/
+```
+Create a virtual environment for python. The required modules will be installed in this environment.
+> When the virtual environment is created with python3.9 then we can use only the python command when it is active because python will point to python3.9
 ```shell
 python3.9 -m venv venv
 ```
-Clone the repository with ssh.
-```shell
-git clone git@github.com:[username/company]/tcat-app.git
-```
-Now you have your repositor on your server. Change into the directory for the cloned project.
-```shell
-cd tcat-app/
-```
 [Configure the paths and directories for the tcat-app](#configure-paths-and-directories)❗
+
 [Run npm install and build the css](#npm)❗
 
 Now we need to install all the required python modules. To do this, activate the created virtual environment for python.
@@ -202,13 +213,15 @@ source ../venv/bin/activate
 ```
 Now we install the requirements defined in `requirements.txt` for the virtual environment.
 ```shell
-pip3 install wheel
-pip3 install -r requirements.txt
-pip3 install uwsgi
+pip install wheel
+pip install poliastro #when poliastro is in the requirements file a conflict occures when installing
+pip install -r requirements.txt
+pip install -r tcat-app/requirements.txt
+pip install uwsgi
 ```
 To test if everything worked run the app and check if it starts without any errors.
 ```shell
-python3.9 app.py
+python tcat-app/app.py
 ```
 This should generate the following output.
 ```
@@ -297,9 +310,9 @@ After=network.target
 [Service]
 User=docker
 Group=www-data
-WorkingDirectory=/var/www/tcat-root/tcat-app
-Environment="PATH=/var/www/tcat-root/venv/bin"
-ExecStart=/var/www/tcat-root/venv/bin/uwsgi --ini /var/www/tcat-root/tcat-app/tcat-app.ini
+WorkingDirectory=/var/www/tcat/tcat-app
+Environment="PATH=/var/www/tcat/venv/bin"
+ExecStart=/var/www/tcat/venv/bin/uwsgi --ini /var/www/tcat/tcat-app/tcat-app.ini
 
 [Install]
 WantedBy=multi-user.target
@@ -325,7 +338,7 @@ server {
 
     location / {
         include uwsgi_params;
-        uwsgi_pass unix:/var/www/tcat-root/tcat-app/tcat-app.sock;
+        uwsgi_pass unix:/var/www/tcat/tcat-app/tcat-app.sock;
     }
 }
 ```

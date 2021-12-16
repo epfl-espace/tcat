@@ -3,6 +3,4 @@ astropy
 scipy
 numpy<=1.20.3
 TLE_tools==0.2.3
-poliastro=>0.15
 kaleido
-python=>3.8

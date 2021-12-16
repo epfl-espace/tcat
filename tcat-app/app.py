@@ -40,6 +40,13 @@ LOG_FILENAME = os.getenv('LOG_FILENAME')
 RESULT_FILENAME = os.getenv('RESULT_FILENAME')
 MAX_FILE_LOAD_DURATION_IN_SEC = int(os.getenv('MAX_FILE_LOAD_DURATION_IN_SEC'))
 
+
+def add_user(username, password, email):
+    user = User(username=username, password_hash=generate_password_hash(password), email=email)
+    db.session.add(user)
+    db.session.commit()
+
+
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('APP_SECRET')
@@ -96,12 +103,6 @@ def failed_config_run(config_run_id):
     db_session.commit()
     Session.remove()
     return
-
-
-def add_user(username, password, email):
-    user = User(username=username, password_hash=generate_password_hash(password), email=email)
-    db.session.add(user)
-    db.session.commit()
 
 
 def get_current_user():
