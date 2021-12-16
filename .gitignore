@@ -8,8 +8,10 @@ Results/
 Snapshots/
 node_modules/
 venv/
+DATA/
 
 # Don't track these files
 *-lock.json
 static/css/main.css
 .env
+tcat-app/tcat-test.db
