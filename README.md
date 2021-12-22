@@ -213,11 +213,9 @@ source ../venv/bin/activate
 ```
 Now we install the requirements defined in `requirements.txt` for the virtual environment.
 ```shell
-pip install wheel
+pip install wheel #needed for poliastro - otherwise it could be in the requirements.txt
 pip install poliastro #when poliastro is in the requirements file a conflict occures when installing
 pip install -r requirements.txt
-pip install -r tcat-app/requirements.txt
-pip install uwsgi
 ```
 To test if everything worked run the app and check if it starts without any errors.
 ```shell
@@ -234,19 +232,6 @@ This should generate the following output.
 ```
 
 #### Configure uWSGI
-
-Create an entry point for WSGI.
-```shell
-nano tcat-app/wsgi.py
-```
-In the file you need to import your flask app from your main project file.
-```python
-from app import app as application
-
-if __name__ == "__main__":
-    application.run()
-```
-> Don't forget to save the file. `ctrl + x`, `y` and `enter`
 
 Before continuing, you can deactivate the virtual environment.
 ```shell
