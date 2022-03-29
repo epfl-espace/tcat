@@ -804,7 +804,8 @@ class Scenario:
                                 #                                      target.insertion_orbit.nu,
                                 #                                      target.insertion_orbit.epoch)
                                 print(launcher.assigned_targets[i + j + 1], launcher.assigned_targets[i + j + 1].insertion_orbit.a, target, target.insertion_orbit.a)
-                                phasing_orbit = target.insertion_orbit
+                                # Correction
+                                phasing_orbit = copy.deepcopy(target.insertion_orbit)
                                 phasing_orbit.a -=100 * u.km
 
                                 phasing = OrbitChange('Orbit_phasing_' + launcher.id + '_' + target.ID, self.plan,
