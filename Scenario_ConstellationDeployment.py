@@ -514,151 +514,159 @@ class Scenario:
             fleet (Fleet_module.Fleet): servicers available to perform plan
         """
         # Determine if precession is turning counter-clockwise (1) or clockwise (-1)
-        precession_direction = clients.get_global_precession_rotation()
+        global_precession_direction = clients.get_global_precession_rotation()
+
+        # Extract launcher and satellite precession speeds
+        targets_J2_speed = nodal_precession(fleet.launchers['launch_vehicle0000'].insertion_orbit)[1]
+        launchers_J2_speed = nodal_precession(clients.targets['OneWeb_plane0000_sat0000'].insertion_orbit)[1]
+
+        # Compute precession direction based on knowledge from Launcher and Servicers
+        relative_precession_direction = np.sign(launchers_J2_speed-targets_J2_speed)
 
         # Order targets by their current raan following precession direction, then by true anomaly
-        ordered_targets_id = sorted(clients.get_standby_satellites(), key=lambda satellite_id: (precession_direction *
+        ordered_targets_id = sorted(clients.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
                                                                                                 clients.get_standby_satellites()[
                                                                                                     satellite_id].operational_orbit.raan.value,
                                                                                                 clients.get_standby_satellites()[
                                                                                                     satellite_id].operational_orbit.nu.value))
         logging.info("Finding 'optimal' sequence of target deployment...")
+
         # For each launcher, find optimal sequence of targets' deployment
         for launcher_id, launcher in fleet.get_launchers_from_group('launcher').items():
-            # Perform if ordered_targets_id are defined
-            if ordered_targets_id:
-                # Initialize ideal sequence numpy array
-                sequence_list = np.full((len(ordered_targets_id),min(launcher.sats_number, len(ordered_targets_id))),-1)
+            # Initialize ideal sequence numpy array
+            sequence_list = np.full((len(ordered_targets_id),min(launcher.sats_number, len(ordered_targets_id))),-1)
 
-                # For the launchers, explore which target should be deployed first for optimal sequence
-                for first_tgt_index in range(0, len(sequence_list)):
-                    # set first target of sequence
-                    sequence_list[first_tgt_index, 0] = first_tgt_index
-                    #first_tgt_id = ordered_targets_id[first_tgt_index]
-                    #first_tgt = clients.targets[first_tgt_id]
+            # For the launchers, explore which target should be deployed first for optimal sequence
+            for first_tgt_index in range(0, len(sequence_list)):
+                # set first target of sequence
+                sequence_list[first_tgt_index, 0] = first_tgt_index
+                #first_tgt_id = ordered_targets_id[first_tgt_index]
+                #first_tgt = clients.targets[first_tgt_id]
 
-                    # for the first target, explore which next targets are achievable in terms of raan phasing
-                    # first, initialize to the closest target and find which plane it is in
-                    next_tgt_index = first_tgt_index
-                    next_tgt_id = ordered_targets_id[next_tgt_index]
-                    next_tgt = clients.targets[next_tgt_id]
-                    reference_plane_id = next_tgt.ID.split('_')[1]
-                    reference_plane_index = int(reference_plane_id[-2:])
+                # for the first target, explore which next targets are achievable in terms of raan phasing
+                # first, initialize to the closest target and find which plane it is in
+                next_tgt_index = first_tgt_index
+                next_tgt_id = ordered_targets_id[next_tgt_index]
+                next_tgt = clients.targets[next_tgt_id]
+                reference_plane_id = next_tgt.ID.split('_')[1]
+                reference_plane_index = int(reference_plane_id[-2:])
 
-                    # then, for each target slot available in the servicer after the first, check validity
-                    for target_assigned_to_servicer in range(1, min(launcher.sats_number,len(ordered_targets_id))):
-                        if architecture in ['launch_vehicle', 'upper_stage']:
-                            skip = 0
-                            # if imposed by drift, introduce the need to skip to another plane between each servicing
-                            if architecture in ['launch_vehicle'] and prop_type in ['electrical']:
-                                skip = 1
-                            if architecture in ['upper_stage'] and prop_type in ['chemical', 'water']:
-                                skip = 1
-                            if architecture in ['upper_stage'] and prop_type in ['electrical']:
-                                skip = 2
-                            # if architecture in ['launch_vehicle'] and deployment_strategy in ['one_plane_at_a_time_sequential']:
-                            #     skip = number_of_planes-1
-                            # find next valid target from previous target depending on number of skipped planes
-                            counter = 0
-                            valid_sequencing = False
-                            while not valid_sequencing:
-                                counter += 1
-                                next_tgt_index = int((next_tgt_index + 1) % len(ordered_targets_id))
-                                next_tgt_id = ordered_targets_id[next_tgt_index]
-                                next_tgt = clients.targets[next_tgt_id]
-                                current_plane_index = int(next_tgt.ID.split('_')[1][-2:])
+                # then, for each target slot available in the servicer after the first, check validity
+                for target_assigned_to_servicer in range(1, min(launcher.sats_number,len(ordered_targets_id))):
+                    if architecture in ['launch_vehicle', 'upper_stage']:
+                        skip = 0
+                        # if imposed by drift, introduce the need to skip to another plane between each servicing
+                        if architecture in ['launch_vehicle'] and prop_type in ['electrical']:
+                            skip = 1
+                        if architecture in ['upper_stage'] and prop_type in ['chemical', 'water']:
+                            skip = 1
+                        if architecture in ['upper_stage'] and prop_type in ['electrical']:
+                            skip = 2
+                        # if architecture in ['launch_vehicle'] and deployment_strategy in ['one_plane_at_a_time_sequential']:
+                        #     skip = number_of_planes-1
+                        # find next valid target from previous target depending on number of skipped planes
+                        counter = 0
+                        valid_sequencing = False
+                        while not valid_sequencing:
+                            counter += 1
+                            next_tgt_index = int((next_tgt_index + 1) % len(ordered_targets_id))
+                            next_tgt_id = ordered_targets_id[next_tgt_index]
+                            next_tgt = clients.targets[next_tgt_id]
+                            current_plane_index = int(next_tgt.ID.split('_')[1][-2:])
 
-                                if deployment_strategy in ['one_plane_at_a_time_sequential']:
-                                    valid_planes = [current_plane_index]
+                            if deployment_strategy in ['one_plane_at_a_time_sequential']:
+                                valid_planes = [current_plane_index]
 
-                                # TODO: add a distribution one plane at a time with a fixed plane shift
+                            # TODO: add a distribution one plane at a time with a fixed plane shift
 
-                                else:
-                                    valid_planes = [
-                                        (reference_plane_index + precession_direction * step) % number_of_planes
-                                        for step in list(range(skip, number_of_planes))]
-                                logging.log(21,f"Valid planes: {valid_planes}")
-                                # if the target is not already assigned, check validity
-                                logging.log(21,f"Next target index: {next_tgt_index}; Sequence list: {sequence_list[first_tgt_index, :]}")
-                                if next_tgt_index not in sequence_list[first_tgt_index, :]:
+                            else:
+                                valid_planes = [
+                                    (reference_plane_index + global_precession_direction * step) % number_of_planes
+                                    for step in list(range(skip, number_of_planes))]
+                            logging.log(21,f"Valid planes: {valid_planes}")
+                            # if the target is not already assigned, check validity
+                            logging.log(21,f"Next target index: {next_tgt_index}; Sequence list: {sequence_list[first_tgt_index, :]}")
+                            if next_tgt_index not in sequence_list[first_tgt_index, :]:
 
-                                    # if no plane skip, the target is valid
-                                    if skip == 0:
-                                        logging.log(21, "No plane to skip")
-                                        valid_sequencing = True
-                                    # otherwise, we check if plane is adequate
-                                    elif current_plane_index in valid_planes:
-                                        logging.log(21, "The plane is valid")
-                                        valid_sequencing = True
-                                    # if no target could be found, then the first next target is chosen
-                                    if counter > len(ordered_targets_id):
-                                        logging.log(21, "Counter > number of targets")
-                                        valid_sequencing = True
-                            reference_plane_id = next_tgt.ID.split('_')[1]
-                            reference_plane_index = int(reference_plane_id[-2:])
+                                # if no plane skip, the target is valid
+                                if skip == 0:
+                                    logging.log(21, "No plane to skip")
+                                    valid_sequencing = True
+                                # otherwise, we check if plane is adequate
+                                elif current_plane_index in valid_planes:
+                                    logging.log(21, "The plane is valid")
+                                    valid_sequencing = True
+                                # if no target could be found, then the first next target is chosen
+                                if counter > len(ordered_targets_id):
+                                    logging.log(21, "Counter > number of targets")
+                                    valid_sequencing = True
+                        reference_plane_id = next_tgt.ID.split('_')[1]
+                        reference_plane_index = int(reference_plane_id[-2:])
 
-                        else:
-                            raise Exception('Unknown architecture {}'.format(architecture))
-
-                        if architecture != 'picker':
-                            # when a valid target is found, update sequence
-                            sequence_list[first_tgt_index, target_assigned_to_servicer] = next_tgt_index
-                            # print(sequence_list)
-
-                # after establishing feasible options, compute criterium to prioritize between them
-                raan_spread = []
-                altitude = []
-                for i in range(0, len(ordered_targets_id)):
-                    # get targets id
-                    target_id_list = [ordered_targets_id[i] for i in sequence_list[i, :]]
-                    logging.log(21, f"List of targets' ID: {target_id_list}")
-                    # find RAAN spread between each couple of adjacent targets in sequence
-                    temp_raan_spread = 0 * u.deg
-                    for j in range(0, len(target_id_list)):
-                        temp_raan_spread = temp_raan_spread + (clients.targets[target_id_list[j-1]].operational_orbit.raan
-                                            - clients.targets[target_id_list[0]].operational_orbit.raan)
-                    logging.log(21,
-                                f"RAAN difference between first and last target in the sequence: {temp_raan_spread}")
-                    # make sure angles are all expressed correctly and adapt to precession direction
-                    if temp_raan_spread == 0. * u.deg:
-                        raan_spread.append(temp_raan_spread.to(u.deg).value)
-                    elif np.sign(temp_raan_spread) == precession_direction:
-                        raan_spread.append((precession_direction * temp_raan_spread).to(u.deg).value)
                     else:
-                        temp_raan_spread = temp_raan_spread + precession_direction * 365 * u.deg
-                        raan_spread.append((precession_direction * temp_raan_spread).to(u.deg).value)
-                    logging.log(21, f"RAAN distance, adapted to precession direction: {raan_spread}")
+                        raise Exception('Unknown architecture {}'.format(architecture))
 
-                    # find sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-                    temp_altitude = sum([clients.targets[tgt_ID].operational_orbit.a.to(u.km).value
-                                         for tgt_ID in target_id_list])
-                    altitude.append(temp_altitude)
-                    logging.log(21, f"Sum of altitudes of all targets, for all sequences: {altitude}")
+                    if architecture != 'picker':
+                        # when a valid target is found, update sequence
+                        sequence_list[first_tgt_index, target_assigned_to_servicer] = next_tgt_index
+                        # print(sequence_list)
 
-                # find ideal sequence by merging raan and alt. in a table and ranking, first by raan, then by altitude
-                ranking = [list(range(0, len(ordered_targets_id))), raan_spread, altitude]
-                ranking = np.array(ranking).T.tolist()
-                ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
-                best_first_target_index = int(ranking[0][0])
+            # After establishing feasible options, compute criterium to prioritize between them
+            raan_spread = []
+            altitude = []
+            for i in range(0, len(ordered_targets_id)):
+                # get targets id
+                target_id_list = [ordered_targets_id[i] for i in sequence_list[i, :]]
+                logging.log(21,f"List of targets' ID: {target_id_list}")
+                # find RAAN spread between each couple of adjacent targets in sequence
+                temp_raan_spread = 0 * u.deg
 
-                # TODO implement further sequencing rules (e.g. TSP optimization or other)
+                for j in range(1, len(target_id_list)):
+                    # Extract initial target RAAN
+                    initial_RAAN = clients.targets[target_id_list[j]].insertion_orbit.raan
 
-                # assign targets
-                targets_assigned_to_servicer = [clients.targets[ordered_targets_id[int(tgt_id_in_list)]]
-                                                for tgt_id_in_list in sequence_list[best_first_target_index, :]]
-                for tgt in targets_assigned_to_servicer:
-                    ordered_targets_id.remove(tgt.ID)
+                    # Extract next target RAAN
+                    final_RAAN = clients.targets[target_id_list[j-1]].insertion_orbit.raan
 
-                tmp = []
-                tmp.append(targets_assigned_to_servicer[2])
-                tmp.append(targets_assigned_to_servicer[3])
-                tmp.append(targets_assigned_to_servicer[0])
-                tmp.append(targets_assigned_to_servicer[1])
-                tmp.append(targets_assigned_to_servicer[4])
-                tmp.append(targets_assigned_to_servicer[5])
+                    # Check for opposite precession movement (Has a larger cost)
+                    logging.log(21,f"1: RAAN {initial_RAAN}°")
+                    logging.log(21,f"2: RAAN {final_RAAN}°")
 
-                launcher.assign_sats(tmp)
-                targets_assigned_to_servicer.clear()
+                    delta_RAAN = final_RAAN-initial_RAAN
+
+                    if np.sign(delta_RAAN) != np.sign(global_precession_direction):
+                        # Need to circle around globe to reach final RAAN
+                        delta_RAAN = -np.sign(delta_RAAN)*(360*u.deg-abs(delta_RAAN))
+                    
+                    # Compute RAAN spread
+                    temp_raan_spread += delta_RAAN
+                
+                logging.log(21,f"RAAN difference between first and last target in the sequence: {temp_raan_spread}")
+
+                # Update raan_spread with current value
+                raan_spread.append(abs(temp_raan_spread.value))
+                logging.log(21,f"RAAN distance, adapted to precession direction: {raan_spread}")
+
+                # find sum of altitudes of all targets, this is used to prioritize sequences with lower targets
+                temp_altitude = sum([clients.targets[tgt_ID].operational_orbit.a.to(u.km).value
+                                        for tgt_ID in target_id_list])
+                altitude.append(temp_altitude)
+                logging.log(21,f"Sum of altitudes of all targets, for all sequences: {altitude}")
+
+            # find ideal sequence by merging raan and alt. in a table and ranking, first by raan, then by altitude
+            ranking = [list(range(0, len(ordered_targets_id))), raan_spread, altitude]
+            ranking = np.array(ranking).T.tolist()
+            ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
+            best_first_target_index = int(ranking[0][0])
+
+            # assign targets
+            targets_assigned_to_servicer = [clients.targets[ordered_targets_id[int(tgt_id_in_list)]]
+                                            for tgt_id_in_list in sequence_list[best_first_target_index, :]]
+            for tgt in targets_assigned_to_servicer:
+                ordered_targets_id.remove(tgt.ID)
+
+            launcher.assign_sats(targets_assigned_to_servicer)
+            targets_assigned_to_servicer.clear()
 
     def define_fleet_mission_profile(self, architecture, fleet, clients):
         """ Call the appropriate servicer servicer_group profile definer for the whole fleet
