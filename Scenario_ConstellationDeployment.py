@@ -525,18 +525,17 @@ class Scenario:
         logging.info("Finding 'optimal' sequence of target deployment...")
         # For each launcher, find optimal sequence of targets' deployment
         for launcher_id, launcher in fleet.get_launchers_from_group('launcher').items():
+            # Perform if ordered_targets_id are defined
             if ordered_targets_id:
-                # initialize list which will contain the ideal sequence for each first target
-                # initialized with -1 to avoid confusion with positive indexes
-                sequence_list = np.full((len(ordered_targets_id),
-                                         min(launcher.sats_number, len(ordered_targets_id))), -1)
+                # Initialize ideal sequence numpy array
+                sequence_list = np.full((len(ordered_targets_id),min(launcher.sats_number, len(ordered_targets_id))),-1)
 
-                # for the launchers, explore which target should be deployed first for optimal sequence
+                # For the launchers, explore which target should be deployed first for optimal sequence
                 for first_tgt_index in range(0, len(sequence_list)):
                     # set first target of sequence
                     sequence_list[first_tgt_index, 0] = first_tgt_index
-                    first_tgt_id = ordered_targets_id[first_tgt_index]
-                    first_tgt = clients.targets[first_tgt_id]
+                    #first_tgt_id = ordered_targets_id[first_tgt_index]
+                    #first_tgt = clients.targets[first_tgt_id]
 
                     # for the first target, explore which next targets are achievable in terms of raan phasing
                     # first, initialize to the closest target and find which plane it is in
@@ -547,8 +546,7 @@ class Scenario:
                     reference_plane_index = int(reference_plane_id[-2:])
 
                     # then, for each target slot available in the servicer after the first, check validity
-                    for target_assigned_to_servicer in range(1, min(launcher.sats_number,
-                                                                    len(ordered_targets_id))):
+                    for target_assigned_to_servicer in range(1, min(launcher.sats_number,len(ordered_targets_id))):
                         if architecture in ['launch_vehicle', 'upper_stage']:
                             skip = 0
                             # if imposed by drift, introduce the need to skip to another plane between each servicing
@@ -579,10 +577,9 @@ class Scenario:
                                     valid_planes = [
                                         (reference_plane_index + precession_direction * step) % number_of_planes
                                         for step in list(range(skip, number_of_planes))]
-                                logging.log(21, f"Valid planes: {valid_planes}")
+                                logging.log(21,f"Valid planes: {valid_planes}")
                                 # if the target is not already assigned, check validity
-                                logging.log(21,
-                                            f"Next target index: {next_tgt_index}; Sequence list: {sequence_list[first_tgt_index, :]}")
+                                logging.log(21,f"Next target index: {next_tgt_index}; Sequence list: {sequence_list[first_tgt_index, :]}")
                                 if next_tgt_index not in sequence_list[first_tgt_index, :]:
 
                                     # if no plane skip, the target is valid
@@ -617,8 +614,8 @@ class Scenario:
                     logging.log(21, f"List of targets' ID: {target_id_list}")
                     # find RAAN spread between each couple of adjacent targets in sequence
                     temp_raan_spread = 0 * u.deg
-                    for i in range(0, len(target_id_list)):
-                        temp_raan_spread = temp_raan_spread + (clients.targets[target_id_list[i-1]].operational_orbit.raan
+                    for j in range(0, len(target_id_list)):
+                        temp_raan_spread = temp_raan_spread + (clients.targets[target_id_list[j-1]].operational_orbit.raan
                                             - clients.targets[target_id_list[0]].operational_orbit.raan)
                     logging.log(21,
                                 f"RAAN difference between first and last target in the sequence: {temp_raan_spread}")
@@ -651,7 +648,16 @@ class Scenario:
                                                 for tgt_id_in_list in sequence_list[best_first_target_index, :]]
                 for tgt in targets_assigned_to_servicer:
                     ordered_targets_id.remove(tgt.ID)
-                launcher.assign_sats(targets_assigned_to_servicer)
+
+                tmp = []
+                tmp.append(targets_assigned_to_servicer[2])
+                tmp.append(targets_assigned_to_servicer[3])
+                tmp.append(targets_assigned_to_servicer[0])
+                tmp.append(targets_assigned_to_servicer[1])
+                tmp.append(targets_assigned_to_servicer[4])
+                tmp.append(targets_assigned_to_servicer[5])
+
+                launcher.assign_sats(tmp)
                 targets_assigned_to_servicer.clear()
 
     def define_fleet_mission_profile(self, architecture, fleet, clients):
