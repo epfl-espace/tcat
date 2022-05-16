@@ -161,6 +161,7 @@ class OrbitChange(GenericPhase):
         current_raan = (self.initial_orbit.raan + self.raan_drift) % (360. * u.deg)
         if current_raan > 180. * u.deg:
             current_raan = current_raan - 360. * u.deg
+            
         # compute new orbit
         new_orbit = Orbit.from_classical(self.final_orbit.attractor, self.final_orbit.a, self.final_orbit.ecc,
                                          self.final_orbit.inc, current_raan,
@@ -193,6 +194,7 @@ class OrbitChange(GenericPhase):
         current_raan = (self.initial_orbit.raan + self.raan_drift) % (360. * u.deg)
         if current_raan > 180. * u.deg:
             current_raan = current_raan - 360. * u.deg
+
         # compute new orbit
         new_orbit = Orbit.from_classical(self.final_orbit.attractor, self.final_orbit.a, self.final_orbit.ecc,
                                          self.final_orbit.inc, current_raan,
@@ -383,6 +385,10 @@ class OrbitChange(GenericPhase):
             delta_raan = (final_orbit.raan - initial_orbit.raan - maneuver_delta_raan).to(u.deg) % (360 * u.deg)
             if delta_raan > 180. * u.deg:
                 delta_raan = delta_raan - 360. * u.deg
+            
+            if delta_raan < -180. * u.deg:
+                delta_raan = delta_raan + 360. * u.deg
+
             logging.log(21, f"Orbit_change delta RAAN: {delta_raan}; final orbit RAAN: {final_orbit.raan}; initial orbit RAAN: {initial_orbit.raan}; maneuver delta RAAN: {maneuver_delta_raan}")
             # check if within cut off for maneuver, if so, compute required delta_v and set phasing duration to zero
             if abs(delta_raan) < self.raan_cutoff:
