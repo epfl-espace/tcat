@@ -87,27 +87,38 @@ class ConstellationClients:
             number_of_planes (int): number of planes for the constellation, equiphased along 180° of raan
             sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly
         """
-        # retrieve reference orbits from reference target
+        
+        # Extract reference satellite orbits
         insertion_orbit = reference_target.insertion_orbit
         operational_orbit = reference_target.operational_orbit
         disposal_orbit = reference_target.disposal_orbit
-        # for each plane, create the reference orbits by raan offset and populate the plane
+        
+        # For each plane, create the reference orbits by raan offset and populate the plane
         for i in range(0, number_of_planes):
+            # Set plane id
             temp_plane_id = constellation_id + '_plane' + '{:04d}'.format(i)
+            
+            # Create insertion orbit relative to the plane
             temp_insertion_plane_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
                                                               insertion_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
                                                               insertion_orbit.argp, 0. * u.deg,
                                                               insertion_orbit.epoch)
+            
+            # Create operational orbit relative to the plane
             temp_operational_plane_orbit = Orbit.from_classical(Earth, operational_orbit.a + altitude_offset * (i-int((number_of_planes+1)/2)),
                                                                 operational_orbit.ecc,
                                                                 operational_orbit.inc,
                                                                 i * plane_distribution_angle * u.deg / number_of_planes,
                                                                 operational_orbit.argp, 0. * u.deg,
                                                                 operational_orbit.epoch)
+            
+            # Create disposal orbit relative to the plane
             temp_disposal_plane_orbit = Orbit.from_classical(Earth, disposal_orbit.a, disposal_orbit.ecc,
                                                              disposal_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
                                                              disposal_orbit.argp, 0. * u.deg,
                                                              disposal_orbit.epoch)
+            
+            # Populate the plane with its own reference satellite
             self.populate_plane(temp_plane_id, reference_target, sat_per_plane, temp_insertion_plane_orbit,
                                 temp_operational_plane_orbit, temp_disposal_plane_orbit)
 
@@ -123,24 +134,33 @@ class ConstellationClients:
             disposal_orbit (poliastro.twobody.Orbit): disposal orbit for the plane, where the servicer will release
                                                       the target in case of servicing
         """
-        # for each sat in the plane, create the reference orbit by anomaly offset and add the target to clients
+        # For each satellite in the plane, create the reference orbit by anomaly offset and add the target to clients
         for i in range(0, sat_per_plane):
+            # Set target id
             temp_tgt_id = plane_id + '_sat' + '{:04d}'.format(i)
+            
+            # Create insertion orbit relative to the satellite ref
             temp_insertion_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
                                                         insertion_orbit.inc, insertion_orbit.raan,
                                                         insertion_orbit.argp, i * 360 * u.deg / sat_per_plane,
                                                         insertion_orbit.epoch)
+            
+            # Create operational orbit relative to the satellite ref
             temp_operational_orbit = Orbit.from_classical(Earth, operational_orbit.a, operational_orbit.ecc,
                                                           operational_orbit.inc, operational_orbit.raan,
                                                           operational_orbit.argp, i * 360 * u.deg / sat_per_plane,
                                                           operational_orbit.epoch)
+            
+            # Create disposal orbit relative to the satellite ref
             temp_disposal_orbit = Orbit.from_classical(Earth, disposal_orbit.a, disposal_orbit.ecc,
                                                        disposal_orbit.inc, disposal_orbit.raan,
                                                        disposal_orbit.argp, i * 360 * u.deg / sat_per_plane,
                                                        disposal_orbit.epoch)
-            # make a copy of reference target to become new target
+            
+            # Make a copy of reference target to become new target
             temp_tgt = copy.deepcopy(reference_target)
-            # update new target and add it to clients
+            
+            # Update new target and add it to clients
             temp_tgt.ID = temp_tgt_id
             temp_tgt.insertion_orbit = temp_insertion_orbit
             temp_tgt.operational_orbit = temp_operational_orbit
