@@ -701,21 +701,25 @@ class Scenario:
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation
         # TODO : implement a launch optimizer
         
-        # Set insertion orbit margin
+        # Insertion orbit margin
         insertion_raan_margin = 10 * u.deg
+        insertion_raan_window = 5 * u.deg
         insertion_a_margin = 0 * u.km
 
-        # Set contingencies and cutoff
+        # Contingencies and cutoff
         delta_v_contingency = 0.1
         raan_cutoff = 11 * u.deg
 
-        # Get first target for RAAN extraction
+        # Extract first target
         first_target = launcher.assigned_targets[0]
 
+        ##########
+        # Step 1: Insertion Phase
+        ##########
         # Logging
-        logging.log(21,f"Launcher insertion orbit's RAAN is corrected with {insertion_raan_margin} margin. The new RAAN is: {first_target.operational_orbit.raan - precession_direction * insertion_raan_margin}, with a precession direction of {precession_direction}")
+        logging.log(21,f"Launcher insertion orbit's RAAN corrected with {insertion_raan_margin} margin. New RAAN is: {first_target.operational_orbit.raan - precession_direction * insertion_raan_margin}, with a precession direction of {precession_direction}")
         
-        # Compute initial orbit based on launcher insertion orbit and corrected RAAN
+        # Compute insertion orbit
         insertion_orbit = Orbit.from_classical(Earth,
                                                self.define_launchers_orbits().a - insertion_a_margin,
                                                self.define_launchers_orbits().ecc,
@@ -725,130 +729,94 @@ class Scenario:
                                                self.define_launchers_orbits().nu,
                                                self.define_launchers_orbits().epoch)
 
-        # Instanciate Insertion object (Add to plan)
-        insertion = Insertion('Insertion_' + launcher.id, self.plan, insertion_orbit, duration=1 * u.h)
+        # Add Insertion phase to the plan
+        insertion = Insertion(f"({launcher.id}) Goes to insertion orbit", self.plan, insertion_orbit, duration=1 * u.h)
 
-        # Assign propulsion module to the phase
+        # Assign propulsion module to insertion phase
         insertion.assign_module(launcher.get_main_propulsion_module())
 
-        # Reference insertion_orbit into initial_phasing_orbit
-        initial_phasing_orbit = insertion_orbit
-        
-        # Iterate through all (organized) assigned targets
-        nb_target = len(launcher.assigned_targets)
-        for i, target in enumerate(launcher.assigned_targets):
-            # Print target info
-            print(i, target, target.insertion_orbit, target.current_orbit)
+        ##########
+        # Step 2: Raise from insertion to constellation orbit
+        ##########
+        # Logging
+        logging.log(21,"Launcher will raise its orbit")
 
-            # Raise orbit for first target (move out of loop?)
-            if i == 0:
-                logging.log(21,"Launcher will raise its orbit")
-                logging.log(21,f"Target RAAN is: {target.insertion_orbit.raan}; Launcher RAAN is: {initial_phasing_orbit.raan}")
-
-                # Instanciate OrbitChange object (Add to plan)
-                raising = OrbitChange('First_orbit_raise_' + launcher.id + '_to_' + target.ID,
+        # Add Raising phase to plan
+        raising = OrbitChange(f"({launcher.id}) goes to first target orbit ({first_target.ID})",
                                       self.plan,
-                                      target.insertion_orbit,
+                                      first_target.insertion_orbit,
                                       raan_specified=True,
-                                      initial_orbit=initial_phasing_orbit,
+                                      initial_orbit=insertion_orbit,
                                       raan_cutoff=raan_cutoff,
                                       raan_phasing_absolute=True,
                                       delta_v_contingency=delta_v_contingency)
 
-                # Assign propulsion module to the phase
+        # Assign propulsion module to raising phase
+        raising.assign_module(launcher.get_main_propulsion_module())
+
+        ##########
+        # Step 3: Iterate through organised assigned targets
+        ##########
+        # Initialise current orbit object
+        current_orbit = first_target.insertion_orbit
+
+        # Loop over assigned targets
+        for i, current_target in enumerate(launcher.assigned_targets):
+            # Print target info
+            print(i, current_target, current_target.insertion_orbit, current_target.current_orbit)
+
+            # Check for RAAN drift
+            if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
+                # TODO Compute ideal phasing orgit
+                phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
+                phasing_orbit.a +=100 * u.km
+
+                # Reach phasing orbit and add to plan
+                phasing = OrbitChange(f"({launcher.id}) goes to ideal phasing orbit", self.plan,
+                                      phasing_orbit,
+                                      raan_specified=False, delta_v_contingency=delta_v_contingency)
+
+                # Assign propulsion module to OrbitChange phase
+                phasing.assign_module(launcher.get_main_propulsion_module())
+
+                # Change orbit back to target orbit and add to plan
+                raising = OrbitChange(f"({launcher.id}) goes to next target ({current_target.ID})", self.plan,
+                                      current_target.insertion_orbit,
+                                      raan_specified=True, initial_orbit=phasing_orbit,
+                                      delta_v_contingency=delta_v_contingency,
+                                      raan_cutoff=raan_cutoff)
+
+                # Assign propulsion module to OrbitChange phase
                 raising.assign_module(launcher.get_main_propulsion_module())
+            
+            # Add Release phase to the plan
+            deploy = Release(f"Servicer assigned to target ({current_target.ID}) is released",
+                             self.plan,
+                             current_target,
+                             duration=20 * u.min)
 
-            if target.state != "Deployed":
-                logging.log(21,f"Launcher will start deployment")
+            # Assign capture module to the Release phase
+            deploy.assign_module(launcher.get_capture_module())
 
-                # Instanciate Release object (Add to plan)
-                deploy = Release('Deploy_' + launcher.id + '_' + target.ID,
-                                 self.plan,
-                                 target,
-                                 duration=20 * u.min)
-                
-                # Assign capture module to the phase
-                deploy.assign_module(launcher.get_capture_module())
+            # Set current_target to deployed
+            current_target.state = "Deployed"
+            logging.log(21, f"'{current_target}' state is: {current_target.state}")
 
-                # Set target state to deployed
-                target.state = "Deployed"
-                logging.log(21, f"'{launcher.assigned_targets[i]}' state is: {launcher.assigned_targets[i].state}")
+            # Update current orbit
+            current_orbit = current_target.insertion_orbit
 
-                # Update current phasing orbit with latest target insertion_orbit
-                initial_phasing_orbit = target.insertion_orbit
+        ##########
+        # Step 4: De-orbit the launcher
+        ##########
+        # Logging
+        logging.log(21, f"Launcher will deorbit itself")
 
-                # Dispose of launcher after last target (move out of loop?)
-                if i == nb_target - 1:
-                    logging.log(21, f"Launcher will deorbit itself")
-                    removal = OrbitChange('Removal_' + launcher.id, self.plan, target.disposal_orbit,
-                                          delta_v_contingency=delta_v_contingency)
-                    removal.assign_module(launcher.get_main_propulsion_module())
-                else:
-                    logging.log(21,f"Subsequent target will be: {launcher.assigned_targets[i + 1]}")
+        # Add OrbitChange to the plan
+        removal = OrbitChange(f"({launcher.id}) goes to disposal orbit", self.plan, first_target.disposal_orbit,
+                              delta_v_contingency=delta_v_contingency)
 
-                    # Extract next target RAAN
-                    next_raan = launcher.assigned_targets[i + 1].insertion_orbit.raan
-                    logging.log(21,f"Actual target is: {target}. Absolute RAAN difference between the two targets is: {abs(next_raan - target.insertion_orbit.raan)}")
-
-                    # Iterate through simultaneously deployable satellites
-                    for j in list(range(1, self.n_sats_simultaneously_deployed)):
-                        # check if there are other sats to be deployed
-                        # check if the sats have the same raan and lie in the same orbital plane
-
-                        # Check that next target and following
-                        if i + j < nb_target and abs(next_raan - launcher.assigned_targets[i + j - 1].insertion_orbit.raan) == 0 * u.deg:
-                            logging.log(21,f"Launcher will deploy simultaneously also: {launcher.assigned_targets[i + j]}")
-                            deploy = Release('Deploy_' + launcher.id + '_' + launcher.assigned_targets[i + j].ID,
-                                             self.plan,
-                                             launcher.assigned_targets[i + j],
-                                             duration=0 * u.min)
-
-                            deploy.assign_module(launcher.get_capture_module())
-                            launcher.assigned_targets[i + j].state = "Deployed"
-                            if i + j + 1 < nb_target:
-                                next_raan = launcher.assigned_targets[i + j + 1].insertion_orbit.raan
-                            else:
-                                # next_raan = first_target.insertion_orbit.raan
-                                # next_raan = launcher.assigned_targets[0].insertion_orbit.raan
-                                logging.log(21, f"Launcher will deorbit itself")
-                                removal = OrbitChange('Removal_' + launcher.id, self.plan, target.disposal_orbit,
-                                                      delta_v_contingency=delta_v_contingency)
-                                removal.assign_module(launcher.get_main_propulsion_module())
-
-                        else:
-
-                            # check if there needs to be some phasing to next plane
-                            # (launcher.assigned_targets[i + 1])
-                            # # next_raan = launcher.assigned_targets[i + 1].current_orbit.raan
-                            # print(target, abs(next_raan - target.current_orbit.raan))
-                            if abs(next_raan - target.insertion_orbit.raan) > 1 * u.deg:
-                                logging.log(21, f"Launcher will perform orbit phasing to reach the new plane")
-                                # phasing_orbit = Orbit.from_classical(Earth, target.insertion_orbit.a - 100 * u.km,
-                                #                                      target.insertion_orbit.ecc,
-                                #                                      target.insertion_orbit.inc,
-                                #                                      target.insertion_orbit.raan,
-                                #                                      target.insertion_orbit.argp,
-                                #                                      target.insertion_orbit.nu,
-                                #                                      target.insertion_orbit.epoch)
-                                print(launcher.assigned_targets[i + j + 1], launcher.assigned_targets[i + j + 1].insertion_orbit.a, target, target.insertion_orbit.a)
-                                # Correction
-                                phasing_orbit = copy.deepcopy(target.insertion_orbit)
-                                phasing_orbit.a -=100 * u.km
-
-                                phasing = OrbitChange('Orbit_phasing_' + launcher.id + '_' + target.ID, self.plan,
-                                                      phasing_orbit,
-                                                      raan_specified=False, delta_v_contingency=delta_v_contingency)
-                                phasing.assign_module(launcher.get_main_propulsion_module())
-
-                                raising = OrbitChange('Orbit_raise_' + launcher.id + '_' + target.ID, self.plan,
-                                                      launcher.assigned_targets[i + 1].insertion_orbit,
-                                                      raan_specified=True, initial_orbit=phasing_orbit,
-                                                      delta_v_contingency=delta_v_contingency,
-                                                      raan_cutoff=raan_cutoff)
-                                raising.assign_module(launcher.get_main_propulsion_module())
-            initial_phasing_orbit = insertion_orbit
-        # for i, targets in enumerate(launcher.assigned_targets):
-        #     print(f"{launcher.assigned_targets[i]} state is {launcher.assigned_targets[i].state}")
+        # Assign propulsion module to OrbitChange phase
+        removal.assign_module(launcher.get_main_propulsion_module())
 
     def define_shuttle_mission_profile(self, servicer, precession_direction):
         """ Define shuttle servicer_group profile by creating and assigning adequate phases for a typical servicer_group profile.
