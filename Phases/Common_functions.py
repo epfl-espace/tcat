@@ -360,6 +360,8 @@ def update_orbit(orbit, reference_epoch):
     current_raan = (orbit.raan + raan_drift_since_epoch).to(u.deg) % (360 * u.deg)
     if current_raan > 180. * u.deg:
         current_raan = current_raan - 360. * u.deg
+    if current_raan <= -180. * u.deg:
+        current_raan = current_raan + 360. * u.deg
 
     new_orbit = Orbit.from_classical(orbit.attractor, orbit.a, orbit.ecc,
                                      orbit.inc, current_raan,
