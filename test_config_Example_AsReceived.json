@@ -2,7 +2,7 @@
   "architecture": "launch_vehicle",
   "prop_type": "electrical",
   "deployment_strategy":"one_plane_at_a_time_sequential",
-  "verbose": true,
+  "verbose": false,
   "constellation_name": "OneWeb",
   "target_mass": 147.0,
   "target_volume": 1.3,
