@@ -11,7 +11,7 @@ from poliastro.plotting import OrbitPlotter3D
 from Phases.Common_functions import nodal_precession
 
 
-class ConstellationClients:
+class ConstellationSatellites:
     """ ConstellationClients consist of a dictionary of potential targets for launch servicers to place into orbit.
     The class is initialized with an emtpy dictionary of potential targets.
 
