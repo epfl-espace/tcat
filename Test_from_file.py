@@ -9,7 +9,7 @@ import os
 warnings.filterwarnings("ignore")
 
 # Set configuration file as input or manually inserted
-config_file = "test_config.json" #= sys.argv[1]
+config_file = "test_config_Example_AsReceived.json" #= sys.argv[1]
 
 # Open .json and read mission description
 with open(config_file) as file:
