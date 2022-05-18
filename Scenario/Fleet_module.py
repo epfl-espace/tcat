@@ -1,3 +1,10 @@
+"""
+Created:        ?
+Last Revision:  18.05.2022
+Author:         ?,Emilien Mingard
+Description:    Fleet,Spacecraft,Servicer and LaunchVehicle Classes definition
+"""
+
 import logging
 import warnings
 
@@ -643,7 +650,7 @@ class Fleet:
             temp = temp + '\n\t' + servicer.__str__()
         return temp
 
-class Spacecraft():
+class Spacecraft:
     """
     General Attributs
     """
@@ -968,7 +975,7 @@ class Servicer(Spacecraft):
     """
 
     def __init__(self, servicer_id, group, expected_number_of_targets=3, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super.__init__(servicer_id,group,additional_dry_mass=0. * u.kg,mass_contingency=0.2)
+        super(Servicer, self).__init__(servicer_id,group,additional_dry_mass,mass_contingency)
         self.expected_number_of_targets = expected_number_of_targets
 
 
@@ -1215,7 +1222,6 @@ class Servicer(Spacecraft):
         for _, kit in self.current_kits.items():
             kit.print_report()
 
-
 class LaunchVehicle(Spacecraft):
     """LaunchVehicle is an object that performs phases in the plan using its modules.
     A LaunchVehicle can have any number of modules of any type. A servicer can also host other servicers as in the
@@ -1248,8 +1254,8 @@ class LaunchVehicle(Spacecraft):
         mass_contingency (float): contingency to apply at system level on the dry mass
     """
 
-    def __init__(self, launch_vehicle_id, launcher, insertion_orbit, rideshare=True,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super.__init__(launch_vehicle_id,"launcher",additional_dry_mass=0. * u.kg,mass_contingency=0.2)
+    def __init__(self, launch_vehicle_id, launcher, insertion_orbit, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+        super(LaunchVehicle, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
         self.launcher_name = launcher
         self.volume_available = None
         self.mass_available = None
@@ -1257,7 +1263,6 @@ class LaunchVehicle(Spacecraft):
         self.assigned_upper_stage = None
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
-        self.rideshare = rideshare
         self.disp_mass = 0. * u.kg
         self.disp_volume = 0. * u.m ** 3
         self.max_sats_number = 0
@@ -1445,6 +1450,18 @@ class LaunchVehicle(Spacecraft):
         """
         capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
         return capture_modules
+
+    def set_mass_available(self,mass_available):
+        """ Set available mass
+
+        """
+        self.mass_available = mass_available
+
+    def set_volume_available(self,volume_available):
+        """ Set available mass
+
+        """
+        self.volume_available = volume_available
 
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
