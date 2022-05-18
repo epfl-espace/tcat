@@ -1,6 +1,4 @@
-from fcntl import DN_MODIFY
 import logging
-from unittest.case import DIFF_OMITTED
 import warnings
 
 import numpy as np
