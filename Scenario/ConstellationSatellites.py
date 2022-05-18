@@ -2,7 +2,7 @@
 Created:        ?
 Last Revision:  18.05.2022
 Author:         ?,Emilien Mingard
-Description:    Constellation + Satellite Class
+Description:    Constellation,Satellite Classes definitions
 """
 # Import Classes
 from Phases.Common_functions import nodal_precession
@@ -66,6 +66,14 @@ class Constellation:
             if satellite.state == 'standby':
                 standby_satellites[satellite_ID] = satellite
         return standby_satellites
+
+    def get_number_satellites(self):
+        """ Compute and return number of satellites
+
+        Return:
+            (int): number of satellites
+        """
+        return len(self.satellites.keys())
 
     def get_global_precession_rotation(self):
         """ Return global nodal precession direction of the client failed satellites.
