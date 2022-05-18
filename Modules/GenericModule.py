@@ -30,10 +30,10 @@ class GenericModule:
         non_recurring_cost (float): non recurring cost of module in Euros
         mass_contingency (float): mass_contingency on the module dry mass
     """
-    def __init__(self, module_id, servicer, dry_mass_override=None, reference_power_override=None, mass_contingency=0.0,
+    def __init__(self, module_id, spacecraft, dry_mass_override=None, reference_power_override=None, mass_contingency=0.0,
                  recurring_cost_override=None, non_recurring_cost_override=None):
         self.id = module_id
-        self.servicer = servicer
+        self.spacecraft = spacecraft
         self.dry_mass_override = dry_mass_override
         self.dry_mass = dry_mass_override
         self.reference_power_override = reference_power_override
@@ -43,8 +43,7 @@ class GenericModule:
         self.recurring_cost = recurring_cost_override
         self.non_recurring_cost_override = non_recurring_cost_override
         self.non_recurring_cost = non_recurring_cost_override
-        self.add_module_to_servicer(servicer)
-        # TODO: check reference power
+        self.add_module_to_servicer(spacecraft)
 
     def add_module_to_servicer(self, servicer):
         """ Add the module to the servicer given in argument. """
