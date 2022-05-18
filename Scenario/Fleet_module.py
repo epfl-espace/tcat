@@ -1,4 +1,6 @@
+from fcntl import DN_MODIFY
 import logging
+from unittest.case import DIFF_OMITTED
 import warnings
 
 import numpy as np
@@ -26,7 +28,7 @@ class Fleet:
     """
 
     def __init__(self, fleet_id, architecture):
-        self.ID = fleet_id
+        self.id = fleet_id
         self.architecture = architecture
         self.servicers = dict()
         self.launchers = dict()
@@ -48,7 +50,7 @@ class Fleet:
             servicer (Servicer): servicer to add to the fleet
         """
         if servicer in self.servicers:
-            warnings.warn('Servicer ', servicer.ID, ' already in fleet ', self.ID, '.', UserWarning)
+            warnings.warn('Servicer ', servicer.ID, ' already in fleet ', self.id, '.', UserWarning)
         else:
             self.servicers[servicer.ID] = servicer
 
@@ -59,7 +61,7 @@ class Fleet:
             launcher (LaunchVehicle): launcher to add to the fleet
         """
         if launcher in self.launchers:
-            warnings.warn('Launcher ', launcher.id, ' already in fleet ', self.ID, '.', UserWarning)
+            warnings.warn('Launcher ', launcher.id, ' already in fleet ', self.id, '.', UserWarning)
         else:
             self.launchers[launcher.id] = launcher
 
@@ -631,58 +633,31 @@ class Fleet:
 
     def print_report(self):
         """ Print a quick summary of fleet information for debugging purposes."""
-        print(self.ID)
+        print(self.id)
         for _, servicer in self.servicers.items():
             servicer.print_report()
         for _, launcher in self.launchers.items():
             launcher.print_report()
 
     def __str__(self):
-        temp = self.ID
+        temp = self.id
         for _, servicer in self.servicers.items():
             temp = temp + '\n\t' + servicer.__str__()
         return temp
 
-
-class Servicer:
-    """Servicer is an object that performs phases in the plan using its modules.
-    A servicer can have any number of modules of any type. A servicer can also host other servicers as in the
-    case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
-    mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
-    It is added to the fleet specified as argument.
-
-    TODO: remove expected_number_of_targets
-
-    Args:
-        servicer_id (str): Standard id. Needs to be unique.
-        group (str): describes what the servicer does (servicing, refueling, ...)
-        expected_number_of_targets (int): expected number of targets assigned to the servicer
-        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
-
-    Attributes:
-        ID (str): Standard id. Needs to be unique.
-        expected_number_of_targets (int): expected number of targets assigned to the servicer
-        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
-        current_orbit (poliastro.twobody.Orbit): Orbit of the servicer at current time.
-        modules (dict): Dictionary of modules contained in the servicer.
-        main_propulsion_module_ID (str): id of the default module to be used for phasing on this servicer
-        rcs_propulsion_module_ID (str): id of the default module to be used for rendezvous on this servicer
-        capture_module_ID (str): id of the default module to be used for capture on this servicer
-        initial_kits (dict): Dictionary of other servicers contained in the servicer at time 0.
-        current_kits (dict): Dictionary of other servicers contained in the servicer at current time.
-        assigned_tanker (Servicer): in case of refueling architecture, assigned_tanker assigned to refuel the servicer
-        assigned_targets (list): List of targets in the order of servicing (used during planning)
-        mothership (Servicer): Mothership hosting the servicer if the servicer is a kit
-        mass_contingency (float): contingency to apply at system level on the dry mass
+class Spacecraft():
+    """
+    General Attributs
     """
 
-    def __init__(self, servicer_id, group, expected_number_of_targets=3, additional_dry_mass=0. * u.kg,
-                 mass_contingency=0.2):
-        self.ID = servicer_id
+    """
+    Init
+    """
+    def __init__(self,id,group,additional_dry_mass,mass_contingency):
+        self.id = id
         self.group = group
-        self.expected_number_of_targets = expected_number_of_targets
-        self.additional_dry_mass = additional_dry_mass
         self.current_orbit = None
+        self.additional_dry_mass = additional_dry_mass
         self.modules = dict()
         self.main_propulsion_module_ID = ''
         self.rcs_propulsion_module_ID = ''
@@ -696,139 +671,37 @@ class Servicer:
         self.mothership = None
         self.mass_contingency = mass_contingency
 
+    """
+    Methods
+    """
     def add_module(self, module):
         """Adds a module to the Servicer class.
+            TODO: change description
+
 
         Args:
             module (GenericModule): module to be added
         """
         if module in self.modules:
-            warnings.warn('Module ', module.ID, ' already in servicer ', self.ID, '.', UserWarning)
+            warnings.warn('Module ', module.id, ' already in servicer ', self.id, '.', UserWarning)
         else:
             self.modules[module.id] = module
 
-    def assign_targets(self, targets_assigned_to_servicer):
-        # TODO: check if can be put into scenario
-        # update initial propellant guess if less targets than expected
-        initial_propellant_mass = self.get_main_propulsion_module().initial_propellant_mass
-        corrected_propellant_mass = (initial_propellant_mass
-                                     * len(targets_assigned_to_servicer) / self.expected_number_of_targets)
-        self.get_main_propulsion_module().initial_propellant_mass = corrected_propellant_mass
-        for target in targets_assigned_to_servicer:
-            self.assigned_targets.append(target)
-
-    def assign_tanker(self, tanker):
-        """ Adds another servicer to the Servicer class as assigned_tanker.
-        TODO: get into scenario
+    def get_dry_mass(self, contingency=True):
+        """Returns the total dry mass of the servicer. Does not include kits.
 
         Args:
-            tanker (Servicer): servicer to be added as assigned_tanker
-        """
-        self.assigned_tanker = tanker
-
-    def get_module_mass(self, module_name, contingency=True):
-        """ Returns the dry mass of a particular module based on the name of its class.
-
-        TODO: remove
-        Args:
-            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
             contingency (boolean): if True, apply contingencies
 
         Return:
-            (u.kg): mass of the module for the servicer
+            (u.kg): total dry mass
         """
-        dry_mass = 0. * u.kg
+        temp_mass = self.additional_dry_mass
         for _, module in self.modules.items():
-            if module.__class__.__name__ == module_name + 'Module':
-                dry_mass += module.get_current_dry_mass(contingency=contingency)
-        return dry_mass
-
-    def get_module_recurring_cost(self, module_name):
-        """ Returns the dry mass of a particular module based on the name of its class.
-
-        TODO: remove
-
-        Args:
-            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
-
-        Return:
-            (float): cost in Euros
-        """
-        recurring = 0.
-        for _, module in self.modules.items():
-            if module.__class__.__name__ == module_name + 'Module':
-                recurring += module.get_hardware_recurring_cost()
-        return recurring
-
-    def get_module_non_recurring_cost(self, module_name):
-        """ Returns the dry mass of a particular module based on the name of its class.
-
-        TODO: remove
-
-        Args:
-            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
-
-        Return:
-            (float): cost in Euros
-        """
-        non_recurring = 0.
-        for _, module in self.modules.items():
-            if module.__class__.__name__ == module_name + 'Module':
-                non_recurring += module.get_development_cost()
-        return non_recurring
-
-    def assign_kit(self, kit):
-        """Adds a kit to the servicer as kit. The servicer becomes the kit's mothership.
-
-        Args:
-            kit (Servicer): servicer to be added as kit
-        """
-        if kit in self.current_kits:
-            warnings.warn('Kit ', kit.ID, ' already in servicer ', self.ID, '.', UserWarning)
-        else:
-            self.initial_kits[kit.ID] = kit
-            self.current_kits[kit.ID] = kit
-            kit.mothership = self
-
-    def separate_kit(self, kit):
-        """ Separate a kit from the servicer. This is used during simulation.
-        The kit is still assigned to the servicer and will be linked if the servicer is reset.
-
-        Args:
-            kit (Servicer): kit to be removed from servicer
-        """
-        if kit.ID in self.current_kits:
-            del self.current_kits[kit.ID]
-        else:
-            warnings.warn('No kit ', kit.ID, ' in servicer ', self.ID, '.', UserWarning)
-
-    def separate_sat(self, sat):
-        """ Separate a sat from the servicer. This is used during simulation.
-        The sat is still assigned to the servicer and will be linked if the servicer is reset.
-
-        Args:
-            sat (Client): sat to be removed from launcher
-        """
-        if sat.ID in self.current_sats:
-            del self.current_sats[sat.ID]
-        else:
-            warnings.warn('No sat ', sat.ID, ' in servicer ', self.ID, '.', UserWarning)
-
-    def assign_sats(self, targets_assigned_to_servicer):
-        """Adds sats to the Servicer as Target. The Servicer becomes the sat's mothership.
-
-        Args:
-            targets_assigned_to_servicer:
-        """
-        # TODO: check if can be put into scenario
-        for target in targets_assigned_to_servicer:
-            if target in self.current_sats:
-                warnings.warn('Satellite ', target.ID, ' already in Servicer ', self.ID, '.', UserWarning)
-            else:
-                self.initial_sats[target.ID] = target
-                self.current_sats[target.ID] = target
-                target.mothership = self
-            self.assigned_targets.append(target)
+            temp_mass = temp_mass + module.get_dry_mass(contingency=contingency)
+        if contingency:
+            temp_mass = temp_mass * (1 + self.mass_contingency)
+        return temp_mass
 
     def design(self, plan, convergence_margin=0.5 * u.kg, verbose=False):
         """ Loop on the modules computations until the dry mass is stable.
@@ -851,28 +724,12 @@ class Servicer:
                     module.design(plan)
                 delta = abs(self.get_wet_mass() - iteration_mass)
                 if verbose:
-                    print('Sub-systems design ', self.ID, ' - Delta: ', delta, iteration_mass, self.get_dry_mass(),
+                    print('Sub-systems design ', self.id, ' - Delta: ', delta, iteration_mass, self.get_dry_mass(),
                           self.get_wet_mass())
                 if delta <= convergence_margin:
                     unconverged = False
         except RecursionError:
             warnings.warn('No convergence_margin in sub-systems design.', UserWarning)
-
-    def get_dry_mass(self, contingency=True):
-        """Returns the total dry mass of the servicer. Does not include kits.
-
-        Args:
-            contingency (boolean): if True, apply contingencies
-
-        Return:
-            (u.kg): total dry mass
-        """
-        temp_mass = self.additional_dry_mass
-        for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass(contingency=contingency)
-        if contingency:
-            temp_mass = temp_mass * (1 + self.mass_contingency)
-        return temp_mass
 
     def get_initial_prop_mass(self):
         """Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
@@ -896,29 +753,6 @@ class Servicer:
               (u.kg): total wet mass
         """
         return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
-
-    def get_current_mass(self):
-        """Returns the total mass of the servicer, including all modules and kits at the current time in the simulation.
-
-        Return:
-            (u.kg): current mass, including kits
-        """
-        # servicer dry mass (with contingency)
-        temp_mass = self.additional_dry_mass
-        for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass()
-        temp_mass = temp_mass * (1 + self.mass_contingency)
-        # servicer prop mass and captured target mass
-        for _, module in self.modules.items():
-            if isinstance(module, PropulsionModule):
-                temp_mass = temp_mass + module.get_current_prop_mass()
-            if isinstance(module, CaptureModule):
-                if module.captured_object:
-                    temp_mass = temp_mass + module.captured_object.get_current_mass()
-        # kits mass
-        for _, kit in self.current_kits.items():
-            temp_mass = temp_mass + kit.get_current_mass()
-        return temp_mass
 
     def get_hardware_recurring_cost(self):
         """Returns the recurring cost of the servicer, including all modules and current_kits.
@@ -1063,6 +897,229 @@ class Servicer:
                 return False
         return data, time, phase_id
 
+    def get_capture_module(self):
+        """ Returns default capture module of servicer. Used to simplify scenario creation.
+
+        Return:
+            (Module): module
+        """
+        try:
+            return self.modules[self.capture_module_ID]
+        except KeyError:
+            return False
+
+    def get_main_propulsion_module(self):
+        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
+
+        Return:
+            (Module): module
+        """
+        try:
+            return self.modules[self.main_propulsion_module_ID]
+        except KeyError:
+            return None
+
+    def get_rcs_propulsion_module(self):
+        """ Returns default rcs propulsion module of servicer. Used to simplify scenario creation.
+
+        Return:
+            (Module): module
+        """
+        try:
+            return self.modules[self.rcs_propulsion_module_ID]
+        except KeyError:
+            return None
+
+    def print_report(self):
+        print(f"Built-in function print report not defined for Class: {type(self)}")
+
+    def __str__(self):
+        return (self.id
+                + "\n\t  dry mass: " + '{:.01f}'.format(self.get_dry_mass()))    
+
+class Servicer(Spacecraft):
+    """Servicer is an object that performs phases in the plan using its modules.
+    A servicer can have any number of modules of any type. A servicer can also host other servicers as in the
+    case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
+    mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
+    It is added to the fleet specified as argument.
+
+    TODO: remove expected_number_of_targets
+
+    Args:
+        servicer_id (str): Standard id. Needs to be unique.
+        group (str): describes what the servicer does (servicing, refueling, ...)
+        expected_number_of_targets (int): expected number of targets assigned to the servicer
+        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
+
+    Attributes:
+        ID (str): Standard id. Needs to be unique.
+        expected_number_of_targets (int): expected number of targets assigned to the servicer
+        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
+        current_orbit (poliastro.twobody.Orbit): Orbit of the servicer at current time.
+        modules (dict): Dictionary of modules contained in the servicer.
+        main_propulsion_module_ID (str): id of the default module to be used for phasing on this servicer
+        rcs_propulsion_module_ID (str): id of the default module to be used for rendezvous on this servicer
+        capture_module_ID (str): id of the default module to be used for capture on this servicer
+        initial_kits (dict): Dictionary of other servicers contained in the servicer at time 0.
+        current_kits (dict): Dictionary of other servicers contained in the servicer at current time.
+        assigned_tanker (Servicer): in case of refueling architecture, assigned_tanker assigned to refuel the servicer
+        assigned_targets (list): List of targets in the order of servicing (used during planning)
+        mothership (Servicer): Mothership hosting the servicer if the servicer is a kit
+        mass_contingency (float): contingency to apply at system level on the dry mass
+    """
+
+    def __init__(self, servicer_id, group, expected_number_of_targets=3, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+        super.__init__(servicer_id,group,additional_dry_mass=0. * u.kg,mass_contingency=0.2)
+        self.expected_number_of_targets = expected_number_of_targets
+
+
+    def assign_targets(self, targets_assigned_to_servicer):
+        # TODO: check if can be put into scenario
+        # update initial propellant guess if less targets than expected
+        initial_propellant_mass = self.get_main_propulsion_module().initial_propellant_mass
+        corrected_propellant_mass = (initial_propellant_mass
+                                     * len(targets_assigned_to_servicer) / self.expected_number_of_targets)
+        self.get_main_propulsion_module().initial_propellant_mass = corrected_propellant_mass
+        for target in targets_assigned_to_servicer:
+            self.assigned_targets.append(target)
+
+    def assign_tanker(self, tanker):
+        """ Adds another servicer to the Servicer class as assigned_tanker.
+        TODO: get into scenario
+
+        Args:
+            tanker (Servicer): servicer to be added as assigned_tanker
+        """
+        self.assigned_tanker = tanker
+
+    def get_module_mass(self, module_name, contingency=True):
+        """ Returns the dry mass of a particular module based on the name of its class.
+
+        TODO: remove
+        Args:
+            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
+            contingency (boolean): if True, apply contingencies
+
+        Return:
+            (u.kg): mass of the module for the servicer
+        """
+        dry_mass = 0. * u.kg
+        for _, module in self.modules.items():
+            if module.__class__.__name__ == module_name + 'Module':
+                dry_mass += module.get_current_dry_mass(contingency=contingency)
+        return dry_mass
+
+    def get_module_recurring_cost(self, module_name):
+        """ Returns the dry mass of a particular module based on the name of its class.
+
+        TODO: remove
+
+        Args:
+            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
+
+        Return:
+            (float): cost in Euros
+        """
+        recurring = 0.
+        for _, module in self.modules.items():
+            if module.__class__.__name__ == module_name + 'Module':
+                recurring += module.get_hardware_recurring_cost()
+        return recurring
+
+    def get_module_non_recurring_cost(self, module_name):
+        """ Returns the dry mass of a particular module based on the name of its class.
+
+        TODO: remove
+
+        Args:
+            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
+
+        Return:
+            (float): cost in Euros
+        """
+        non_recurring = 0.
+        for _, module in self.modules.items():
+            if module.__class__.__name__ == module_name + 'Module':
+                non_recurring += module.get_development_cost()
+        return non_recurring
+
+    def assign_kit(self, kit):
+        """Adds a kit to the servicer as kit. The servicer becomes the kit's mothership.
+
+        Args:
+            kit (Servicer): servicer to be added as kit
+        """
+        if kit in self.current_kits:
+            warnings.warn('Kit ', kit.ID, ' already in servicer ', self.id, '.', UserWarning)
+        else:
+            self.initial_kits[kit.ID] = kit
+            self.current_kits[kit.ID] = kit
+            kit.mothership = self
+
+    def separate_kit(self, kit):
+        """ Separate a kit from the servicer. This is used during simulation.
+        The kit is still assigned to the servicer and will be linked if the servicer is reset.
+
+        Args:
+            kit (Servicer): kit to be removed from servicer
+        """
+        if kit.ID in self.current_kits:
+            del self.current_kits[kit.ID]
+        else:
+            warnings.warn('No kit ', kit.ID, ' in servicer ', self.id, '.', UserWarning)
+
+    def separate_sat(self, sat):
+        """ Separate a sat from the servicer. This is used during simulation.
+        The sat is still assigned to the servicer and will be linked if the servicer is reset.
+
+        Args:
+            sat (Client): sat to be removed from launcher
+        """
+        if sat.ID in self.current_sats:
+            del self.current_sats[sat.ID]
+        else:
+            warnings.warn('No sat ', sat.ID, ' in servicer ', self.id, '.', UserWarning)
+
+    def assign_sats(self, targets_assigned_to_servicer):
+        """Adds sats to the Servicer as Target. The Servicer becomes the sat's mothership.
+
+        Args:
+            targets_assigned_to_servicer:
+        """
+        # TODO: check if can be put into scenario
+        for target in targets_assigned_to_servicer:
+            if target in self.current_sats:
+                warnings.warn('Satellite ', target.ID, ' already in Servicer ', self.id, '.', UserWarning)
+            else:
+                self.initial_sats[target.ID] = target
+                self.current_sats[target.ID] = target
+                target.mothership = self
+            self.assigned_targets.append(target)
+
+    def get_current_mass(self):
+        """Returns the total mass of the servicer, including all modules and kits at the current time in the simulation.
+
+        Return:
+            (u.kg): current mass, including kits
+        """
+        # servicer dry mass (with contingency)
+        temp_mass = self.additional_dry_mass
+        for _, module in self.modules.items():
+            temp_mass = temp_mass + module.get_dry_mass()
+        temp_mass = temp_mass * (1 + self.mass_contingency)
+        # servicer prop mass and captured target mass
+        for _, module in self.modules.items():
+            if isinstance(module, PropulsionModule):
+                temp_mass = temp_mass + module.get_current_prop_mass()
+            if isinstance(module, CaptureModule):
+                if module.captured_object:
+                    temp_mass = temp_mass + module.captured_object.get_current_mass()
+        # kits mass
+        for _, kit in self.current_kits.items():
+            temp_mass = temp_mass + kit.get_current_mass()
+        return temp_mass
+
     def reset(self, plan, design_loop=True, convergence_margin=1. * u.kg, verbose=False):
         """Reset the servicer current orbit and mass to the parameters given during initialization.
         This function is used to reset the state of all modules after a simulation.
@@ -1127,39 +1184,6 @@ class Servicer:
             capture_modules.update(kit.get_capture_modules())
         return capture_modules
 
-    def get_main_propulsion_module(self):
-        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.main_propulsion_module_ID]
-        except KeyError:
-            return None
-
-    def get_rcs_propulsion_module(self):
-        """ Returns default rcs propulsion module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.rcs_propulsion_module_ID]
-        except KeyError:
-            return None
-
-    def get_capture_module(self):
-        """ Returns default capture module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.capture_module_ID]
-        except KeyError:
-            return False
-
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
 
@@ -1179,7 +1203,7 @@ class Servicer:
     def print_report(self):
         """ Print quick summary for debugging purposes."""
         print('----------------------------------------------------------------')
-        print(self.ID)
+        print(self.id)
         print('Dry mass : ' + '{:.01f}'.format(self.get_dry_mass()))
         print('Wet mass : ' + '{:.01f}'.format(self.get_wet_mass()))
         print('Modules : ')
@@ -1193,12 +1217,8 @@ class Servicer:
         for _, kit in self.current_kits.items():
             kit.print_report()
 
-    def __str__(self):
-        return (self.ID
-                + "\n\t  dry mass: " + '{:.01f}'.format(self.get_dry_mass()))
 
-
-class LaunchVehicle:
+class LaunchVehicle(Spacecraft):
     """LaunchVehicle is an object that performs phases in the plan using its modules.
     A LaunchVehicle can have any number of modules of any type. A servicer can also host other servicers as in the
     case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
@@ -1230,48 +1250,20 @@ class LaunchVehicle:
         mass_contingency (float): contingency to apply at system level on the dry mass
     """
 
-    def __init__(self, launch_vehicle_id, launcher, insertion_orbit, rideshare=True, additional_dry_mass=0. * u.kg,
-                 mass_contingency=0.2):
-        self.id = launch_vehicle_id
+    def __init__(self, launch_vehicle_id, launcher, insertion_orbit, rideshare=True,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+        super.__init__(launch_vehicle_id,"launcher",additional_dry_mass=0. * u.kg,mass_contingency=0.2)
         self.launcher_name = launcher
         self.volume_available = None
         self.mass_available = None
-        self.additional_dry_mass = additional_dry_mass
         self.insertion_orbit = insertion_orbit
-        self.current_orbit = None
-        self.modules = dict()
-        self.main_propulsion_module_ID = ''
-        self.rcs_propulsion_module_ID = ''
-        self.capture_module_ID = ""
-        self.initial_kits = dict()
-        self.current_kits = dict()
-        self.initial_sats = dict()
-        self.current_sats = dict()
         self.assigned_upper_stage = None
-        self.assigned_tanker = None
-        self.assigned_targets = []
-        self.mothership = None
-        self.mass_contingency = mass_contingency
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
         self.rideshare = rideshare
         self.disp_mass = 0. * u.kg
         self.disp_volume = 0. * u.m ** 3
-        self.group = "launcher"
         self.max_sats_number = 0
 
-    def add_module(self, module):
-        """Adds a module to the Servicer class.
-            TODO: change description
-
-
-        Args:
-            module (GenericModule): module to be added
-        """
-        if module in self.modules:
-            warnings.warn('Module ', module.id, ' already in servicer ', self.id, '.', UserWarning)
-        else:
-            self.modules[module.id] = module
 
     def assign_upper_stage(self, upper_stage):
         """ Adds another servicer to the Servicer class as assigned_upper_stage.
@@ -1385,76 +1377,6 @@ class LaunchVehicle:
 
         return self.sats_number, total_sats_mass, self.disp_mass, self.disp_volume
 
-    def design(self, plan, convergence_margin=0.5 * u.kg, verbose=False):
-        """ Loop on the modules computations until the dry mass is stable.
-
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-            convergence_margin (u.kg): accuracy required on propellant mass for convergence
-            verbose (boolean): if True, print convergence_margin information
-        """
-        unconverged = True
-        try:
-            while unconverged:
-                # design kits
-                for _, kit in self.initial_kits.items():
-                    kit.design(plan)
-                # design modules based on current wet mass and compare with last iteration wet mass
-                # TODO: replace this very crude convergence_margin with a better solution
-                iteration_mass = self.get_wet_mass()
-                for _, module in self.modules.items():
-                    module.design(plan)
-                delta = abs(self.get_wet_mass() - iteration_mass)
-                if verbose:
-                    print('Sub-systems design ', self.id, ' - Delta: ', delta, iteration_mass, self.get_dry_mass(),
-                          self.get_wet_mass())
-                if delta <= convergence_margin:
-                    unconverged = False
-        except RecursionError:
-            warnings.warn('No convergence_margin in sub-systems design.', UserWarning)
-
-    def get_dry_mass(self, contingency=False):
-        """Returns the total dry mass of the servicer. Does not include kits.
-
-        Args:
-            contingency (boolean): if True, apply contingencies
-
-        Return:
-            (u.kg): total dry mass
-        """
-        temp_mass = self.additional_dry_mass
-        for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass(contingency=contingency)
-        # for sat in self.assigned_targets:
-        #     temp_mass = temp_mass + sat.get_current_mass()
-        # TODO: add upper stage dry mass
-        if contingency:
-            temp_mass = temp_mass * (1 + self.mass_contingency)
-        return temp_mass
-
-    def get_initial_prop_mass(self):
-        """Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
-
-        Return:
-            (u.kg): initial propellant mass
-        """
-        temp_mass = 0. * u.kg
-        for _, module in self.modules.items():
-            if isinstance(module, PropulsionModule):
-                temp_mass = temp_mass + module.get_initial_prop_mass()
-        return temp_mass
-
-    def get_wet_mass(self, contingency=False):
-        """Returns the wet mass of the servicer at launch. Does not include kits.
-
-        Args:
-            contingency (boolean): if True, apply contingencies
-
-        Return:
-              (u.kg): total wet mass
-        """
-        return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
-
     def get_current_mass(self):
         """Returns the total mass of the launcher, including all modules and kits at the current time in the simulation.
 
@@ -1477,149 +1399,6 @@ class LaunchVehicle:
         for _, sats in self.current_sats.items():
             temp_mass = temp_mass + sats.get_current_mass()
         return temp_mass
-
-    def get_hardware_recurring_cost(self):
-        """Returns the recurring cost of the servicer, including all modules and current_kits.
-
-        Return:
-            (float): cost in Euros
-        """
-        recurring_cost = 0.
-        # modules cost
-        for _, module in self.modules.items():
-            recurring_cost = recurring_cost + module.get_recurring_cost()
-        # kits modules cost
-        for _, kit in self.initial_kits.items():
-            recurring_cost = recurring_cost + kit.get_hardware_recurring_cost()
-        return recurring_cost
-
-    def get_development_cost(self):
-        """Returns the non recurring cost of the servicer development, including all modules and the development
-        cost among kits for each groups present among kits (this assumes).
-
-        Return:
-            (float): cost in Euros
-        """
-        non_recurring_cost = 0.
-        # modules non recurring cost
-        for _, module in self.modules.items():
-            non_recurring_cost = non_recurring_cost + module.get_non_recurring_cost()
-        # find all groups in kits
-        kit_groups = []
-        for _, kit in self.initial_kits.items():
-            if kit.group not in kit_groups:
-                kit_groups.append(kit.group)
-        # for each kit group, find maximum development cost
-        for group in kit_groups:
-            max_kit_development_cost = 0.
-            for _, kit in self.initial_kits.items():
-                if kit.group == group:
-                    kit_development_cost = kit.get_development_cost()
-                    if max_kit_development_cost < kit_development_cost:
-                        max_kit_development_cost = kit_development_cost
-            non_recurring_cost = non_recurring_cost + max_kit_development_cost
-        return non_recurring_cost
-
-    def get_phases(self, plan):
-        """ Returns all phases from the plan the servicer is assigned to.
-
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-
-        Return:
-            ([Phase]): list of phases
-        """
-        servicer_phases = []
-        for phase in plan.phases:
-            if phase.get_assigned_servicer() == self:
-                servicer_phases.append(phase)
-        return servicer_phases
-
-    def get_reference_manoeuvres(self, plan, module):
-        """ Returns representative values for the servicer corresponding to:
-        - maximum delta v among maneuvers (used to dimension the main propulsion system
-        - total mass of propellant used during approaches (used to dimension the rcs propulsion system)
-
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-            module (GenericModule): module to be added
-
-        Return:
-            (u.m/u.s): delta v
-            (u.kg): rcs propellant mass
-        """
-        reference_delta_v = 0. * u.m / u.s
-        rcs_prop_mass = 0. * u.kg
-        for phase in self.get_phases(plan):
-            if phase.assigned_module == module:
-                if isinstance(phase, OrbitChange):
-                    phase_delta_v = phase.get_delta_v()
-                    if phase_delta_v > reference_delta_v:
-                        reference_delta_v = phase_delta_v
-                if isinstance(phase, Approach):
-                    rcs_prop_mass += phase.propellant
-        return reference_delta_v.to(u.m / u.s), rcs_prop_mass
-
-    def get_reference_power(self):
-        """Returns a reference power used as input for different models. This reference represents the mean power
-        conditioned by the servicer during nominal operations.
-
-        Return:
-            (u.W): mean servicer power drawn
-        """
-        nominal_power_draw = 0. * u.W
-        for _, module in self.modules.items():
-            nominal_power_draw = nominal_power_draw + module.get_reference_power()
-        return nominal_power_draw
-
-    def get_reference_inertia(self):
-        """ Returns estimated inertia of the servicer along its main axis based on a generic box and wings shape.
-        Used for estimations of required mass for aocs systems.
-
-        Return:
-            (u.kg*u.m*u.m): servicer inertia
-        """
-        # TODO: check this models
-        # compute inertia of spacecraft without solar arrays (simple scaling from a reference point of 100kg)
-        box_inertia = 100. * u.kg * u.m * u.m * (self.get_wet_mass(contingency=False).to(u.kg).value / 200.) ** (5 / 3)
-        # compute inertia of solar arrays (simple scaling from a reference of 600W)
-        solar_array_inertia = 50. * u.kg * u.m * u.m * (self.get_reference_power().to(u.W).value / 600.)
-        return (box_inertia + solar_array_inertia).to(u.kg * u.m * u.m)
-
-    def get_attribute_history(self, attribute_name, plan):
-        """ Get the time evolution of an attribute of the servicer over the phases of a plan.
-        The information must be returned in a method of a servicer or phase or an attribute of an orbit.
-
-        Arg:
-            attribute_name (str): name of an attribute of "get_" method
-            plan (Plan): plan for which the fleet needs to be designed
-
-        Return:
-              ([<>]): List of values for the queried data
-              ([epoch]): list of epochs for each data point
-              ([str]): list of phases id for each data point
-        """
-        # get class method name
-        data = []
-        time = []
-        phase_id = []
-        for phase in self.get_phases(plan):
-            # check if this is available in the Scenario class
-            if hasattr(phase, attribute_name):
-                data.append(getattr(phase, attribute_name))
-                time.append(phase.servicer_snapshot.current_orbit.epoch)
-                phase_id.append(phase.ID)
-            elif hasattr(phase.servicer_snapshot, attribute_name):
-                data.append(getattr(phase.servicer_snapshot, attribute_name)())
-                time.append(phase.servicer_snapshot.current_orbit.epoch)
-                phase_id.append(phase.ID)
-            elif hasattr(phase.servicer_snapshot.current_orbit, attribute_name):
-                data.append(getattr(phase.servicer_snapshot.current_orbit, attribute_name))
-                time.append(phase.servicer_snapshot.current_orbit.epoch)
-                phase_id.append(phase.ID)
-            else:
-                return False
-        return data, time, phase_id
 
     def reset(self, plan, design_loop=True, convergence_margin=1. * u.kg, verbose=False):
         """Reset the servicer current orbit and mass to the parameters given during initialization.
@@ -1669,39 +1448,6 @@ class LaunchVehicle:
         capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
         return capture_modules
 
-    def get_capture_module(self):
-        """ Returns default capture module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.capture_module_ID]
-        except KeyError:
-            return False
-
-    def get_main_propulsion_module(self):
-        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.main_propulsion_module_ID]
-        except KeyError:
-            return None
-
-    def get_rcs_propulsion_module(self):
-        """ Returns default rcs propulsion module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.rcs_propulsion_module_ID]
-        except KeyError:
-            return None
-
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
 
@@ -1741,7 +1487,3 @@ class LaunchVehicle:
         print('Phasing Module ID: ' + self.main_propulsion_module_ID)
         print('RDV module ID: ' + self.rcs_propulsion_module_ID)
         print('Capture module ID : ' + self.capture_module_ID)
-
-    def __str__(self):
-        return (self.id
-                + "\n\t  Dry mass: " + '{:.01f}'.format(self.get_dry_mass()))
