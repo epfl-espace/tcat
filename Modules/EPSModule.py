@@ -40,12 +40,12 @@ class EPSModule(GenericModule):
         if self.reference_power_override is not None:
             self.reference_power = self.reference_power_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             self.reference_power = 0.12 * u.W
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             self.reference_power = 40. * u.W
         else:
-            raise TypeError('Missing EPS power model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing EPS power model for group ' + self.spacecraft.group + ' .')
 
     def compute_dry_mass(self, plan):
         """Compute the dry mass of the module depending gon the servicer group.
@@ -57,7 +57,7 @@ class EPSModule(GenericModule):
         if self.dry_mass_override is not None:
             self.dry_mass = self.dry_mass_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             # TODO: consolidate inputs to model
             ref_mass = 100. * u.kg
             ref_eps = 100. * u.kg
@@ -66,19 +66,19 @@ class EPSModule(GenericModule):
             servicer_default_mass = ref_mass
             eps_default_mass = ref_eps
             servicer_default_power = ref_power
-            self.dry_mass = (harness_default_mass * (self.servicer.get_dry_mass(contingency=False)
+            self.dry_mass = (harness_default_mass * (self.spacecraft.get_dry_mass(contingency=False)
                                                      / servicer_default_mass) ** (1/3)
                              + eps_default_mass * self.get_reference_power() / servicer_default_power)
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             harness_default_mass = 8. * u.kg
             servicer_default_mass = 225. * u.kg
             eps_default_mass = 44. * u.kg
             servicer_default_power = 610. * u.W
-            self.dry_mass = (harness_default_mass * (self.servicer.get_dry_mass(contingency=False)
+            self.dry_mass = (harness_default_mass * (self.spacecraft.get_dry_mass(contingency=False)
                                                      / servicer_default_mass) ** (1/3)
                              + eps_default_mass * self.get_reference_power() / servicer_default_power)
         else:
-            raise TypeError('Missing EPS mass model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing EPS mass model for group ' + self.spacecraft.group + ' .')
 
     def get_recurring_cost(self):
         """ Returns the recurring cost of the module in Euros.
@@ -88,18 +88,18 @@ class EPSModule(GenericModule):
         """
         if self.recurring_cost_override is not None:
             self.recurring_cost = self.recurring_cost_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             eps_default_recurring_cost = 500. * 1000  # EUR
             eps_default_mass = 52. * u.kg
             self.recurring_cost = eps_default_recurring_cost * (
                         self.get_dry_mass(contingency=False) / eps_default_mass) ** 0.72
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             eps_default_recurring_cost = 500. * 1000  # EUR
             eps_default_mass = 52. * u.kg
             self.recurring_cost = eps_default_recurring_cost * (
                         self.get_dry_mass(contingency=False) / eps_default_mass) ** 0.72
         else:
-            raise TypeError('Missing EPS recurring cost model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing EPS recurring cost model for group ' + self.spacecraft.group + ' .')
         return self.recurring_cost
 
     def get_non_recurring_cost(self):
@@ -110,18 +110,18 @@ class EPSModule(GenericModule):
         """
         if self.non_recurring_cost_override is not None:
             self.non_recurring_cost = self.non_recurring_cost_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             engineering_non_recurring_cost = 1135. * 1000  # EUR
             eps_default_non_recurring_cost = 487. * 1000  # EUR
             eps_default_mass = 52. * u.kg
             self.non_recurring_cost = (engineering_non_recurring_cost + eps_default_non_recurring_cost
                                        * (self.get_dry_mass(contingency=False) / eps_default_mass) ** 0.72)
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             engineering_non_recurring_cost = 1135. * 1000  # EUR
             eps_default_non_recurring_cost = 487. * 1000  # EUR
             eps_default_mass = 52. * u.kg
             self.non_recurring_cost = (engineering_non_recurring_cost + eps_default_non_recurring_cost
                                        * (self.get_dry_mass(contingency=False) / eps_default_mass) ** 0.72)
         else:
-            raise TypeError('Missing EPS non recurring cost model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing EPS non recurring cost model for group ' + self.spacecraft.group + ' .')
         return self.non_recurring_cost

@@ -29,11 +29,11 @@ class CaptureModule(GenericModule):
         Used in automatic generation of planning and servicers in case of multiple capture modules per servicer.
         """
         # if
-        self.servicer.capture_module_ID = self.id
+        self.spacecraft.capture_module_ID = self.id
 
     def is_capture_default(self):
         """ Check if module is default capture module for its servicer."""
-        return self.servicer.capture_module_ID == self.id
+        return self.spacecraft.capture_module_ID == self.id
 
     def reset(self):
         """ Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence."""
