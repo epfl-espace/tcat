@@ -12,6 +12,7 @@ from Scenario.Plan_module import *
 
 # Import Libraries
 from json import load as load_json
+from Interpolation import get_launcher_performance, get_launcher_fairing
 
 # Set logging
 logging.getLogger('numba').setLevel(logging.WARNING)
@@ -69,13 +70,6 @@ class ScenarioConstellation():
         self.fleet = None
         self.plan = None
 
-        # TO BE REMOVED
-        # Instanciate reference values
-        #self.ref_disp_volume = 0. * u.m ** 3
-        #self.ref_disp_mass = 0. * u.kg
-        #self.number_of_servicers = 0
-        # TO BE REMOVED
-
         # Load json configuration file
         with open(config_file) as file:
             json = load_json(file)
@@ -103,15 +97,6 @@ class ScenarioConstellation():
         # Enabling logging. Set level >21 to display INFO only
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-        # TO BE REMOVED
-        # Compute launcher orbits
-        #self.define_servicers_orbits()
-        #semimajor_axis = self.define_servicers_orbits().a.value
-        #self.apogee_h = (1 + self.define_servicers_orbits().ecc.value) * semimajor_axis - Earth.R.to(u.km).value
-        #self.perigee_h = 2 * semimajor_axis - self.apogee_h - 2 * Earth.R.to(u.km).value
-        #self.inclination = self.define_servicers_orbits().inc.value
-        # TO BE REMOVED
-
     """
     Methods
     """
@@ -136,7 +121,7 @@ class ScenarioConstellation():
 
         # Define fleet based on attributes
         logging.info("Start defining Fleet...")
-        #self.define_fleet()
+        self.define_fleet()
         logging.info("Finish defining Fleet...")
 
         # Define plan based on attributes
@@ -148,14 +133,11 @@ class ScenarioConstellation():
         print("TODO")
 
     def define_constellation(self):
-        """ Define clients object.
-        Given arguments can specify the reliability to use as input for reliability model.
+        """ Define constellation object.
 
-        Args:
-            reliability (float): (optional) satellite reliability at end of life
-
-        Return:
-            (ADRClient_module.ADRClients): created clients
+        Self:
+            (ConstellationSatellites.Satellite): reference_satellite
+            (ConstellationSatellites.Constellation): constellation
         """
 
         # Define relevant orbits
@@ -199,21 +181,162 @@ class ScenarioConstellation():
             self.satellites.plot_3D_distribution(save="3D_plot", save_folder=self.data_path)
             self.satellites.plot_distribution(save="2D_plot", save_folder=self.data_path)
             logging.info("Finish plotting Clients...")
-        
+
+    def define_fleet(self):
+        """ Define fleet object.
+
+        Self:
+            (Fleet_module.Fleet): fleet
+        """
+
+        # Compute total number of satellites
+        satellites_left = self.constellation.get_number_satellites()
+
+        # Define launcher relevant orbit
+        logging.info("Gathering launchers orbits...")
+        self.define_launchers_orbits()
+
+        # Define launch vehicle based on specified launcher
+        if self.custom_launcher_name is None:
+            self.launcher_name = self.launcher
+        else:
+            self.launcher_name = self.custom_launcher_name
+
+        # Define fleet
+        self.fleet = Fleet('Servicers and Launchers', self.architecture)
+
+        # Assign satellite to launcher as long as satellite are left without launch vehicle
+        index = 0
+        while satellites_left > 0:
+            # Check for architecture compatibility
+            if self.architecture == 'launch_vehicle':
+                # Create launcher id based on index
+                launcher_id = 'launch_vehicle' + '{:04d}'.format(index)
+                logging.info(f"Creating {launcher_id}...")
+
+                # Create a new launch vehicle
+                temp_launcher, serviced_sats = self.create_launch_vehicle(launcher_id,satellites_left)
+
+                # Update number of left satellite
+                satellites_left -= serviced_sats
+
+                # Add latest LaunchVehicle to the fleet
+                self.fleet.add_launcher(temp_launcher)
+                index += 1
+
+                # Update the number of servicers during convergence
+                self.number_of_servicers = len(self.fleet.launchers)
+
+            else:
+                raise Exception('Unknown architecture {}'.format(self.architecture))
+
+    def create_launch_vehicle(self,launch_vehicle_id,serviceable_sats_left):
+        """ Create a launcher based on the shuttle architecture.
+
+        Args:
+            launch_vehicle_id (str): id of the launcher to be created
+            launcher (str):
+            insertion_orbit (poliastro.twobody.Orbit): insertion orbit of the launcher to be created
+            rideshare (bool):
+
+        Return:
+            (Fleet_module.LaunchVehicle): created launcher
+        """
+
+        # Compute launcher performance
+        self.compute_launcher_performance()
+
+        # Compute launcher fairing volume
+        self.compute_launcher_fairing()
+
+        # Instanciate a reference launch vehicle
+        reference_launch_vehicle = LaunchVehicle(launch_vehicle_id,self.launcher_name,self.launcher_insertion_orbit,mass_contingency=0.0)
+
+        # Set launcher mass and volume available
+        reference_launch_vehicle.set_mass_available(self.launcher_performance)
+        reference_launch_vehicle.set_volume_available(self.launcher_volume_available)
+
+        logging.info(f"Converging the number of satellites manifested in the Launch Vehicle...")
+        serviced_sats, _, self.ref_disp_mass, self.ref_disp_volume = reference_launch_vehicle.converge_launch_vehicle(self.reference_satellite,serviceable_sats_left,tech_level=self.dispenser_tech_level)
+
+        # Instanciate Capture and Propulsion modules
+        reference_dispenser = CaptureModule(launch_vehicle_id + '_dispenser',
+                                            reference_launch_vehicle,
+                                            mass_contingency=0.0,
+                                            dry_mass_override=self.ref_disp_mass)
+
+        reference_phasing_propulsion = PropulsionModule(launch_vehicle_id + '_phasing_propulsion',
+                                                        reference_launch_vehicle, 'bi-propellant', 294000 * u.N, ### FLAG ATTENTION ###
+                                                        294000 * u.N, 330 * u.s, 0. * u.kg,
+                                                        5000 * u.kg, reference_power_override=0 * u.W,
+                                                        propellant_contingency=0.05, dry_mass_override=0 * u.kg,
+                                                        mass_contingency=0.2)
+
+        # Define modules
+        reference_dispenser.define_as_capture_default() ### FLAG ATTENTION ###
+        reference_phasing_propulsion.define_as_main_propulsion()
+
+        # Return LaunchVehicle and number of serviced sats
+        return reference_launch_vehicle, serviced_sats
+
+    def compute_launcher_performance(self):
+        """ Compute the satellite performance
+
+        Self:
+            (u.m**3): launcher_volume_available
+        """
+        # Check for custom launcher_name values
+        if self.custom_launcher_name is None:
+            logging.info(f"Gathering Launch Vehicle performance from database...")
+            self.launcher_performance = get_launcher_performance(self.fleet,
+                                                            self.launcher_name,
+                                                            self.launch_site,
+                                                            self.launcher_insertion_orbit.inc.value,
+                                                            self.launcher_apogee_h,
+                                                            self.launcher_perigee_h,
+                                                            self.orbit_type,
+                                                            method=self.interpolation_method,
+                                                            verbose=self.verbose,
+                                                            save="InterpolationGraph",
+                                                            save_folder=self.data_path)
+        else:
+            logging.info(f"Using custom Launch Vehicle performance...")
+            self.launcher_performance = self.custom_launcher_performance 
+
+    def compute_launcher_fairing(self):
+        """ Estimate the satellite volume based on mass
+
+        Self:
+            (u.m**3): launcher_volume_available
+        """
+        # Check for custom launcher_name values
+        if self.fairing_diameter is None and self.fairing_cylinder_height is None and self.fairing_total_height is None:
+            if self.custom_launcher_name is not None or self.custom_launcher_performance is not None:
+                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
+            else:
+                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
+                self.launcher_volume_available = get_launcher_fairing(self.launcher_name)
+        else:
+            logging.info(f"Using custom Launch Vehicle's fairing size...")
+            cylinder_volume = np.pi * (self.fairing_diameter * u.m / 2) ** 2 * self.fairing_cylinder_height * u.m
+            cone_volume = np.pi * (self.fairing_diameter * u.m / 2) ** 2 * (self.fairing_total_height * u.m - self.fairing_cylinder_height * u.m)
+            self.launcher_volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+
     def estimate_satellite_volume(self):
         """ Estimate the satellite volume based on mass
 
-        Return:
-            (u.m3): Satellite volume
+        Self:
+            (u.m**3): sat_volume
         """
         # Estimate volume based on satellite mass
         self.sat_volume = 9 * 10 ** -9 * self.sat_mass ** 3 - 10 ** -6 * self.sat_mass ** 2 + 0.0028 * self.sat_mass
 
     def define_constellation_orbits(self):
-        """ Define orbits needed for satellites definition.
+        """ Define orbits needed for constellation and satellites definition.
 
-        Return:
-            (poliastro.twobody.Orbit): target operational orbit
+        Self:
+            (poliastro.twobody.Orbit): sat_insertion_orbit
+            (poliastro.twobody.Orbit): sat_operational_orbit
         """
         # Satellites insertion orbit
         self.sat_insertion_orbit = Orbit.from_classical(Earth, self.a_sats_insertion + Earth.R,
@@ -235,12 +358,19 @@ class ScenarioConstellation():
     def define_launchers_orbits(self):
         """ Define orbits needed for launchers definition.
 
-        Return:
-            (poliastro.twobody.Orbit): launchers insertion orbit
+        Self:
+            (poliastro.twobody.Orbit): launchers_insertion_orbit
         """
         # launcher insertion orbit
-        launcher_insertion_orbit = Orbit.from_classical(Earth, self.a_launcher_insertion + Earth.R, self.ecc_launcher_insertion,
-                                                        self.inc_launcher_insertion, 0. * u.deg, 90. * u.deg,
-                                                        0. * u.deg,
-                                                        self.starting_epoch)
-        return launcher_insertion_orbit
+        self.launcher_insertion_orbit = Orbit.from_classical(Earth,
+                                                             self.a_launcher_insertion + Earth.R,
+                                                             self.ecc_launcher_insertion,
+                                                             self.inc_launcher_insertion,
+                                                             0. * u.deg,
+                                                             90. * u.deg,
+                                                             0. * u.deg,
+                                                             self.starting_epoch)
+
+        # Compute few unavailable values such as apogee/perigee
+        self.launcher_apogee_h = (1 + self.launcher_insertion_orbit.ecc.value) * self.launcher_insertion_orbit.a.value - Earth.R.to(u.km).value
+        self.launcher_perigee_h = 2 * self.launcher_insertion_orbit.a.value - self.launcher_apogee_h - 2 * Earth.R.to(u.km).value
