@@ -6,7 +6,7 @@ import time
 import astropy.units as u
 from matplotlib import pyplot, animation
 import logging
-from Fleet_module import Fleet
+from Scenario.Fleet_module import Fleet
 
 """Input data"""
 
