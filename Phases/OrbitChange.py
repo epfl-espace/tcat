@@ -1,6 +1,6 @@
 from astropy.time import Time
 
-import Fleet_module
+import Scenario.Fleet_module
 from Modules.PropulsionModule import *
 from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
