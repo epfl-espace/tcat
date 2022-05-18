@@ -1,5 +1,12 @@
+"""
+Created:        17.05.2022
+Last Revision:  18.05.2022
+Author:         Emilien Mingard
+Description:    Run python script to test and debug Constellation Deployement TCAT
+"""
+
 # Import class
-from Scenario_ConstellationDeployment import Scenario
+from Scenario.ScenarioConstellation import ScenarioConstellation
 
 # Import libraries
 import warnings
@@ -9,7 +16,7 @@ import os
 warnings.filterwarnings("ignore")
 
 # Set configuration file as input or manually inserted
-config_file = "test_config_Example_AsReceived.json" #= sys.argv[1]
+config_file = "Constellation_new_v1.json" #= sys.argv[1]
 
 # Open .json and read mission description
 with open(config_file) as file:
@@ -42,17 +49,17 @@ if print_to_files:
     sys.stderr = log  # Change the standard error to the file log.txt
 
     # Instanciate scenario object
-    scenario = Scenario("test_from_file", config_file)
+    scenario = ScenarioConstellation("test_from_file", config_file)
     
     # Set-up scenario
     scenario.setup()
     
     # Execute scenario
-    results = scenario.execute()
+    #results = scenario.execute()
     
     # Print scenario reports
-    scenario.plan.print_report()
-    scenario.fleet.print_report()
+    #scenario.plan.print_report()
+    #scenario.fleet.print_report()
     
     # Close .txt file
     result.close()
@@ -65,7 +72,7 @@ if print_to_files:
     
 else:
     # Instanciate scenario object
-    scenario = Scenario("test_from_file", config_file)
+    scenario = ScenarioConstellation("test_from_file", config_file)
     
     # Set-up scenario
     scenario.setup()
