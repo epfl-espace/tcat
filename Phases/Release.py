@@ -1,4 +1,4 @@
-import Fleet_module
+import Scenario.Fleet_module
 from Modules.CaptureModule import *
 from Phases.GenericPhase import GenericPhase
 import logging
