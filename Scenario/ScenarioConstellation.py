@@ -264,7 +264,7 @@ class ScenarioConstellation():
         self.compute_launcher_fairing()
 
         # Instanciate a reference launch vehicle
-        reference_launch_vehicle = LaunchVehicle(launch_vehicle_id,self.launcher_name,self.launcher_insertion_orbit,mass_contingency=0.0)
+        reference_launch_vehicle = LaunchVehicle(launch_vehicle_id,self,mass_contingency=0.0)
 
         # Set launcher mass and volume available
         reference_launch_vehicle.set_mass_available(self.launcher_performance)

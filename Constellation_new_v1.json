@@ -29,6 +29,9 @@
   "a_launcher_insertion": 400.0,
   "ecc_launcher_insertion": 0.0,
   "inc_launcher_insertion": 87.0,
+  "a_launcher_disposal": 400.0,
+  "ecc_launcher_disposal": 0.6,
+  "inc_launcher_disposal": 87.0,
   "starting_epoch":"2025-01-01 12:00:00",
   "data_path": "./Results"
 }

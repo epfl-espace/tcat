@@ -1259,12 +1259,13 @@ class LaunchVehicle(Spacecraft):
         mass_contingency (float): contingency to apply at system level on the dry mass
     """
 
-    def __init__(self, launch_vehicle_id, launcher, insertion_orbit, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+    def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         super(LaunchVehicle, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
-        self.launcher_name = launcher
+        self.launcher_name = scenario.launcher_name
         self.volume_available = None
         self.mass_available = None
-        self.insertion_orbit = insertion_orbit
+        self.insertion_orbit = scenario.launcher_insertion_orbit
+        self.disposal_orbit = scenario.launcher_disposal_orbit
         self.assigned_upper_stage = None
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
@@ -1605,7 +1606,7 @@ class LaunchVehicle(Spacecraft):
         logging.log(21, f"Launcher will deorbit itself")
 
         # Add OrbitChange to the plan
-        removal = OrbitChange(f"({self.id}) goes to disposal orbit", plan, first_target.disposal_orbit,delta_v_contingency=delta_v_contingency)
+        removal = OrbitChange(f"({self.id}) goes to disposal orbit", plan, self.disposal_orbit,delta_v_contingency=delta_v_contingency)
 
         # Assign propulsion module to OrbitChange phase
         removal.assign_module(self.get_main_propulsion_module())
