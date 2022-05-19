@@ -1,6 +1,6 @@
 """
 Created:        17.05.2022
-Last Revision:  -
+Last Revision:  19.05.2022
 Author:         Emilien Mingard
 Description:    Constellation dedicated Scenario Class
 """
@@ -247,8 +247,11 @@ class ScenarioConstellation:
         # Instanciate Plan object
         self.plan = Plan('Plan', self.starting_epoch)
 
+        # Assign targets to LaunchVehicle
+        self.assign_satellites()
+
         # Check for available satellite to deploy
-        self.fleet.define_fleet_mission_profile()
+        self.fleet.define_fleet_mission_profile(self)
 
     def create_launch_vehicle(self,launch_vehicle_id,serviceable_sats_left):
         """ Create a launcher based on the shuttle architecture.
@@ -355,7 +358,7 @@ class ScenarioConstellation:
         self.launcher_apogee_h = (1 + self.launcher_insertion_orbit.ecc.value) * self.launcher_insertion_orbit.a.value - Earth.R.to(u.km).value
         self.launcher_perigee_h = 2 * self.launcher_insertion_orbit.a.value - self.launcher_apogee_h - 2 * Earth.R.to(u.km).value
 
-    def assign_targets(self):
+    def assign_satellites(self):
         """Function that creates a plan based on an architecture, clients and fleet.
 
         Args:
@@ -377,146 +380,79 @@ class ScenarioConstellation:
         relative_precession_direction = np.sign(launchers_J2_speed-targets_J2_speed)
 
         # Order targets by their current raan following precession direction, then by true anomaly
-        ordered_targets_id = sorted(self.constellation.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
-                                                                                                self.constellation.get_standby_satellites()[
-                                                                                                    satellite_id].operational_orbit.raan.value,
-                                                                                                self.constellation.get_standby_satellites()[
-                                                                                                    satellite_id].operational_orbit.nu.value))
-        logging.info("Finding 'optimal' sequence of target deployment...")
+        ordered_satellites_id = sorted(self.constellation.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
+                                    self.constellation.get_standby_satellites()[satellite_id].operational_orbit.raan.value,
+                                    self.constellation.get_standby_satellites()[satellite_id].operational_orbit.nu.value))
 
+        logging.info("Finding 'optimal' sequence of target deployment...")
         # For each launcher, find optimal sequence of targets' deployment
         for _, launcher in self.fleet.get_launchers_from_group('launcher').items():
-            # Initialize ideal sequence numpy array
-            sequence_list = np.full((len(ordered_targets_id),min(launcher.sats_number, len(ordered_targets_id))),-1)
+            # Extract number of satellites
+            number_satellites = self.constellation.get_number_satellites()
 
-            # For the launchers, explore which target should be deployed first for optimal sequence
-            for first_tgt_index in range(0, len(sequence_list)):
-                # set first target of sequence
-                sequence_list[first_tgt_index, 0] = first_tgt_index
-                #first_tgt_id = ordered_targets_id[first_tgt_index]
-                #first_tgt = clients.targets[first_tgt_id]
+            # Instanciate ideal sequence numpy array
+            sequence_list = np.full((number_satellites,min(launcher.sats_number,number_satellites)),-1)
 
-                # for the first target, explore which next targets are achievable in terms of raan phasing
-                # first, initialize to the closest target and find which plane it is in
-                next_tgt_index = first_tgt_index
-                next_tgt_id = ordered_targets_id[next_tgt_index]
-                next_tgt = self.constellation.satellites[next_tgt_id]
-                reference_plane_id = next_tgt.ID.split('_')[1]
-                reference_plane_index = int(reference_plane_id[-2:])
-
-                # then, for each target slot available in the servicer after the first, check validity
-                for target_assigned_to_servicer in range(1, min(launcher.sats_number,len(ordered_targets_id))):
-                    if self.architecture in ['launch_vehicle', 'upper_stage']:
-                        skip = 0
-                        # if imposed by drift, introduce the need to skip to another plane between each servicing
-                        if self.architecture in ['launch_vehicle'] and self.propulsion_type in ['electrical']:
-                            skip = 1
-                        if self.architecture in ['upper_stage'] and self.propulsion_type in ['chemical', 'water']:
-                            skip = 1
-                        if self.architecture in ['upper_stage'] and self.propulsion_type in ['electrical']:
-                            skip = 2
-                        # if architecture in ['launch_vehicle'] and deployment_strategy in ['one_plane_at_a_time_sequential']:
-                        #     skip = number_of_planes-1
-                        # find next valid target from previous target depending on number of skipped planes
-                        counter = 0
-                        valid_sequencing = False
-                        while not valid_sequencing:
-                            counter += 1
-                            next_tgt_index = int((next_tgt_index + 1) % len(ordered_targets_id))
-                            next_tgt_id = ordered_targets_id[next_tgt_index]
-                            next_tgt = self.constellation.satellites[next_tgt_id]
-                            current_plane_index = int(next_tgt.ID.split('_')[1][-2:])
-
-                            if self.deployment_strategy in ['one_plane_at_a_time_sequential']:
-                                valid_planes = [current_plane_index]
-
-                            # TODO: add a distribution one plane at a time with a fixed plane shift
-
-                            else:
-                                valid_planes = [
-                                    (reference_plane_index + global_precession_direction * step) % self.n_planes
-                                    for step in list(range(skip, self.n_planes))]
-                            logging.log(21,f"Valid planes: {valid_planes}")
-                            # if the target is not already assigned, check validity
-                            logging.log(21,f"Next target index: {next_tgt_index}; Sequence list: {sequence_list[first_tgt_index, :]}")
-                            if next_tgt_index not in sequence_list[first_tgt_index, :]:
-
-                                # if no plane skip, the target is valid
-                                if skip == 0:
-                                    logging.log(21, "No plane to skip")
-                                    valid_sequencing = True
-                                # otherwise, we check if plane is adequate
-                                elif current_plane_index in valid_planes:
-                                    logging.log(21, "The plane is valid")
-                                    valid_sequencing = True
-                                # if no target could be found, then the first next target is chosen
-                                if counter > len(ordered_targets_id):
-                                    logging.log(21, "Counter > number of targets")
-                                    valid_sequencing = True
-                        reference_plane_id = next_tgt.ID.split('_')[1]
-                        reference_plane_index = int(reference_plane_id[-2:])
-
-                    else:
-                        raise Exception('Unknown architecture {}'.format(self.architecture))
-
-                    if self.architecture != 'picker':
-                        # when a valid target is found, update sequence
-                        sequence_list[first_tgt_index, target_assigned_to_servicer] = next_tgt_index
-                        # print(sequence_list)
+            # Built the ideal sequence array
+            for sequence_row in range(0,number_satellites):
+                sequence_list[sequence_row,:] = np.mod(np.arange(sequence_row,sequence_row+launcher.sats_number,1),launcher.sats_number)
 
             # After establishing feasible options, compute criterium to prioritize between them
-            raan_spread = []
-            altitude = []
-            for i in range(0, len(ordered_targets_id)):
-                # get targets id
-                target_id_list = [ordered_targets_id[i] for i in sequence_list[i, :]]
-                logging.log(21,f"List of targets' ID: {target_id_list}")
-                # find RAAN spread between each couple of adjacent targets in sequence
-                temp_raan_spread = 0 * u.deg
+            criteria_raan_spread = []
+            criteria_altitude = []
+            for i in range(0, len(ordered_satellites_id)):
+                # Get targets id
+                satellite_id_list = [ordered_satellites_id[i] for i in sequence_list[i, :]]
+                logging.log(21,f"List of targets' ID: {satellite_id_list}")
 
-                for j in range(1, len(target_id_list)):
+                # Instanciate raan spread over current sequence
+                sequence_raan_spread = 0 * u.deg
+
+                # Iterate through sequence's satellites
+                for j in range(1, len(satellite_id_list)):
                     # Extract initial target RAAN
-                    initial_RAAN = self.constellation.satellites[target_id_list[j]].insertion_orbit.raan
+                    initial_RAAN = self.constellation.satellites[satellite_id_list[j]].insertion_orbit.raan
+                    logging.log(21,f"1: RAAN {initial_RAAN}°")
 
                     # Extract next target RAAN
-                    final_RAAN = self.constellation.satellites[target_id_list[j-1]].insertion_orbit.raan
-
-                    # Check for opposite precession movement (Has a larger cost)
-                    logging.log(21,f"1: RAAN {initial_RAAN}°")
+                    final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].insertion_orbit.raan
                     logging.log(21,f"2: RAAN {final_RAAN}°")
 
+                    # Check for opposite precession movement (Has a larger cost)
                     delta_RAAN = final_RAAN-initial_RAAN
-
                     if np.sign(delta_RAAN) != np.sign(global_precession_direction):
                         # Need to circle around globe to reach final RAAN
                         delta_RAAN = -np.sign(delta_RAAN)*(360*u.deg-abs(delta_RAAN))
                     
-                    # Compute RAAN spread
-                    temp_raan_spread += delta_RAAN
-                
-                logging.log(21,f"RAAN difference between first and last target in the sequence: {temp_raan_spread}")
+                    # Add RAAN spread to sequence's total RAAN spread
+                    sequence_raan_spread += delta_RAAN
 
-                # Update raan_spread with current value
-                raan_spread.append(abs(temp_raan_spread.value))
-                logging.log(21,f"RAAN distance, adapted to precession direction: {raan_spread}")
+                logging.log(21,f"Total RAAN spread over sequence {i}: {sequence_raan_spread}°")
 
-                # find sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-                temp_altitude = sum([self.constellation.satellites[tgt_ID].operational_orbit.a.to(u.km).value
-                                        for tgt_ID in target_id_list])
-                altitude.append(temp_altitude)
-                logging.log(21,f"Sum of altitudes of all targets, for all sequences: {altitude}")
+                # Append sequence_raan_spread to global array
+                criteria_raan_spread.append(abs(sequence_raan_spread.value))
 
-            # find ideal sequence by merging raan and alt. in a table and ranking, first by raan, then by altitude
-            ranking = [list(range(0, len(ordered_targets_id))), raan_spread, altitude]
+                # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
+                satellites_altitude = sum([self.constellation.satellites[sat_id].operational_orbit.a.to(u.km).value for sat_id in satellite_id_list])
+                criteria_altitude.append(satellites_altitude)
+                logging.log(21,f"Total altitude over sequence {i}: {satellites_altitude}")
+
+            # Find ideal sequence by merging RAAN and altitude in a table
+            ranking = [list(range(0, len(ordered_satellites_id))), criteria_raan_spread, criteria_altitude]
             ranking = np.array(ranking).T.tolist()
+
+            # Sort by RAAN spread (primary) and alitude (secondary)
             ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
-            best_first_target_index = int(ranking[0][0])
 
-            # assign targets
-            targets_assigned_to_servicer = [self.constellation.satellites[ordered_targets_id[int(tgt_id_in_list)]]
-                                            for tgt_id_in_list in sequence_list[best_first_target_index, :]]
-            for tgt in targets_assigned_to_servicer:
-                ordered_targets_id.remove(tgt.ID)
+            # Extract best sequence
+            best_sequence = int(ranking[0][0])
 
-            launcher.assign_sats(targets_assigned_to_servicer)
-            targets_assigned_to_servicer.clear()
+            # Extract and assign satellite to this launcher
+            satellites_assigned_to_launcher = [self.constellation.satellites[ordered_satellites_id[int(sat_id_in_list)]] for sat_id_in_list in sequence_list[best_sequence, :]]
+            launcher.assign_sats(satellites_assigned_to_launcher)
+
+            # Remove from ordered targets
+            for satellite in satellites_assigned_to_launcher: ### FLAG USELESS? ###
+                ordered_satellites_id.remove(satellite.ID)
+
+            satellites_assigned_to_launcher.clear() ### FLAG USELESS? ###
