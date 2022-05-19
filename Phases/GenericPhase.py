@@ -21,7 +21,7 @@ class GenericPhase:
         phase_id (str): Standard id. Needs to be unique.
         assigned_module (Fleet_module.PropulsionModule or CaptureModule): module responsible for phase
         duration (u.second): duration of the phase
-        servicer_snapshot (Fleet_module.Servicer): copy of the servicer, in its state at the completion of the phase
+        servicer_snapshot (Scenario.Fleet_module.Servicer): copy of the servicer, in its state at the completion of the phase
                                                  (for reference and post-processing purposes)
         starting_date (astropy.time.Time): beginning date of the phase (computed during simulation)
         end_date (astropy.time.Time): finish date of the phase (computed during simulation)
@@ -40,7 +40,7 @@ class GenericPhase:
     def apply(self):
         """ Change the servicer and clients impacted by the phase when called during simulation. """
         # In inheriting phases, this method holds the method to perform the phase, then calls the update_servicer method
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             self.update_servicer()
             self.take_servicer_snapshot()
         else:
@@ -66,16 +66,16 @@ class GenericPhase:
     def get_assigned_servicer(self):
         """ Returns the servicer that hosts the module assigned to the phase.
         Return:
-            (Fleet_module.Servicer): assigned servicer
+            (Scenario.Fleet_module.Servicer): assigned servicer
         """
-        return self.assigned_module.servicer
+        return self.assigned_module.spacecraft
 
     def get_assigned_launcher(self):
         """ Returns the launcher that hosts the module assigned to the phase.
         Return:
             (Fleet_module.LaunchVehicle): assigned launcher
         """
-        return self.assigned_module.servicer
+        return self.assigned_module.spacecraft
 
     def update_servicer(self, servicer=None):
         """ Perform changes on a servicer to represent its state at the end of the phase.
@@ -92,7 +92,7 @@ class GenericPhase:
         """
         # if no servicer is given, take the servicer assigned to the phase
         if servicer is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
                 servicer = self.get_assigned_servicer()
             else:
                 servicer = self.get_assigned_launcher()
@@ -193,7 +193,7 @@ class GenericPhase:
                     + "\n\tLauncher Current Mass: {0:.1f}".format(self.launcher_snapshot.get_current_mass())
                     + "\n\tLauncher Wet Mass: {0:.1f}".format(self.launcher_snapshot.get_wet_mass()))
         else:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
                 return (str(self.ID)
                         + "\n\tServicer: " + str(self.get_assigned_servicer().ID)
                         + "\n\tModule: " + str(self.get_assigned_module().ID)

@@ -12,7 +12,7 @@ class Capture(GenericPhase):
     Args:
         phase_id (str): Standard id. Needs to be unique.
         plan (Plan_module.Plan): plan the phase belongs to
-        captured_object (ADRClient_module.Target or Fleet_module.Servicer): captured object
+        captured_object (ADRClient_module.Target or Scenario.Fleet_module.Servicer): captured object
         duration (u.<Time_unit>): duration of the phase
 
     Attributes: (plus attributes from GenericPhase, some might be overridden by new definitions in this module)
@@ -52,7 +52,7 @@ class Capture(GenericPhase):
             self.take_servicer_snapshot()
 
         # if not, then simply update the servicer
-        elif isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+        elif isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             self.update_servicer()
             self.take_servicer_snapshot()
         # or the launcher

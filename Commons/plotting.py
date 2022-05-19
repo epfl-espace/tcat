@@ -33,7 +33,7 @@ def plot_single_timeline(servicer, quantity, plan, starting_epoch, fig=None, ax=
     This method is reused to plot multiple servicers in plot_multiple_timeline
 
      Args:
-        servicer (Fleet_Module.Servicer): servicer object containing the information to be plotted
+        servicer (Scenario.Fleet_module.Servicer): servicer object containing the information to be plotted
         quantity (str): string representing the quantity to be plotted (linked to phase methods and attr.)
         plan (Plan_module.Plan): plan object containing the information to be plotted
         starting_epoch (Datetime.datetime): starting epoch (represented as 0 in the plot)

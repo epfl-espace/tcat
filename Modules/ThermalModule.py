@@ -7,12 +7,12 @@ class ThermalModule(GenericModule):
     """Thermal module is a static module.
     Args:
         module_id (str): Standard id. Needs to be unique.
-        servicer (Fleet_module.Servicer): servicer the module belongs to
+        servicer (Scenario.Fleet_module.Servicer): servicer the module belongs to
         mass_contingency (float): mass_contingency on the module dry mass
 
     Attributes:
         module_id (str): Standard id. Needs to be unique.
-        servicer (Fleet_module.Servicer): servicer the module belongs to
+        servicer (Scenario.Fleet_module.Servicer): servicer the module belongs to
         dry_mass (u.kg): module dry mass (no mass_contingency)
         mass_contingency (float): mass_contingency on the module dry mass
         reference_power (u.W): module mean power over designing phase (used as reference for power module phasing)

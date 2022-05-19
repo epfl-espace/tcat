@@ -47,7 +47,7 @@ class Insertion(GenericPhase):
         Calls generic function to update orbit raan and epoch.
         """
 
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             self.get_assigned_servicer().change_orbit(self.orbit)
             self.get_assigned_module().consume_propellant(self.propellant * (1 + self.contingency), 'rcs_thrusters')
             self.update_servicer()
@@ -55,7 +55,7 @@ class Insertion(GenericPhase):
 
         else:
 
-            # isinstance(self.assigned_module.servicer, Fleet_module.LaunchVehicle)
+            # isinstance(self.assigned_module.spacecraft, Fleet_module.LaunchVehicle)
             self.get_assigned_launcher().change_orbit(self.orbit)
             # These two lines avoid propellant consumption for propulsion modules not yet modeled (e.g. launchers ones)
             if isinstance(self.assigned_module, PropulsionModule):

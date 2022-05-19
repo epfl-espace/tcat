@@ -37,7 +37,7 @@ class Release(GenericPhase):
         """ Separate target from the capture module. The target will now be independent of the servicer."""
         # TODO: check if commented code needs to be used
         self.get_assigned_module().captured_object = None
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             self.update_servicer()
             self.take_servicer_snapshot()
         else:
@@ -56,7 +56,7 @@ class Release(GenericPhase):
             self.take_launcher_snapshot()
 
         # if not, then simply update the launcher
-        elif isinstance(self.assigned_module.servicer, Fleet_module.LaunchVehicle):
+        elif isinstance(self.assigned_module.spacecraft, Fleet_module.LaunchVehicle):
             logging.log(21, f"NOT using Launcher mothership architecture")
             self.update_launcher()
             self.take_launcher_snapshot()

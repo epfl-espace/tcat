@@ -94,7 +94,7 @@ class OrbitChange(GenericPhase):
         # In case the final orbit is given as a servicer or target, retrieve the object's orbit
         if not isinstance(self.final_orbit, Orbit):
             self.final_orbit = self.final_orbit.current_orbit
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             # update the final orbit by adding raan drift to match servicer epoch
             self.final_orbit = update_orbit(self.final_orbit, self.get_assigned_servicer().current_orbit.epoch)
 
@@ -219,7 +219,7 @@ class OrbitChange(GenericPhase):
         """
         # retrieve required module attributes
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
                 mass = self.get_assigned_servicer().get_current_mass()
             else:
                 mass = self.get_assigned_launcher().get_current_mass()
@@ -272,7 +272,7 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
                 mass = self.get_assigned_servicer().get_current_mass()
             else:
                 mass = self.get_assigned_launcher().get_current_mass()
@@ -310,7 +310,7 @@ class OrbitChange(GenericPhase):
         if orbit2 is None:
             orbit2 = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
                 mass = self.get_assigned_servicer().get_current_mass()
             else:
                 mass = self.get_assigned_launcher().get_current_mass()
@@ -362,7 +362,7 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
                 mass = self.get_assigned_servicer().get_current_mass()
             else:
                 mass = self.get_assigned_launcher().get_current_mass()
@@ -472,7 +472,7 @@ class OrbitChange(GenericPhase):
         manoeuvres_string = ""
         for manoeuvre in self.manoeuvres:
             manoeuvres_string += ("\t\t" + str(manoeuvre) + " \n")
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
+        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             return ('--- \nOrbit change: ' + super().__str__()
                     + '\n\tDelta-v: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
                     + "\n\tServicer Propellant Mass: "
