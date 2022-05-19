@@ -295,49 +295,6 @@ class ScenarioConstellation:
         # Return LaunchVehicle and number of serviced sats
         return reference_launch_vehicle, serviced_sats
 
-    def compute_launcher_performance(self):
-        """ Compute the satellite performance
-
-        Self:
-            (u.m**3): launcher_volume_available
-        """
-        # Check for custom launcher_name values
-        if self.custom_launcher_name is None:
-            logging.info(f"Gathering Launch Vehicle performance from database...")
-            self.launcher_performance = get_launcher_performance(self.fleet,
-                                                            self.launcher_name,
-                                                            self.launch_site,
-                                                            self.launcher_insertion_orbit.inc.value,
-                                                            self.launcher_apogee_h,
-                                                            self.launcher_perigee_h,
-                                                            self.orbit_type,
-                                                            method=self.interpolation_method,
-                                                            verbose=self.verbose,
-                                                            save="InterpolationGraph",
-                                                            save_folder=self.data_path)
-        else:
-            logging.info(f"Using custom Launch Vehicle performance...")
-            self.launcher_performance = self.custom_launcher_performance
-
-    def compute_launcher_fairing(self):
-        """ Estimate the satellite volume based on mass
-
-        Self:
-            (u.m**3): launcher_volume_available
-        """
-        # Check for custom launcher_name values
-        if self.fairing_diameter is None and self.fairing_cylinder_height is None and self.fairing_total_height is None:
-            if self.custom_launcher_name is not None or self.custom_launcher_performance is not None:
-                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
-            else:
-                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
-                self.launcher_volume_available = get_launcher_fairing(self.launcher_name)
-        else:
-            logging.info(f"Using custom Launch Vehicle's fairing size...")
-            cylinder_volume = np.pi * (self.fairing_diameter * u.m / 2) ** 2 * self.fairing_cylinder_height * u.m
-            cone_volume = np.pi * (self.fairing_diameter * u.m / 2) ** 2 * (self.fairing_total_height * u.m - self.fairing_cylinder_height * u.m)
-            self.launcher_volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
-
     def estimate_satellite_volume(self):
         """ Estimate the satellite volume based on mass
 
