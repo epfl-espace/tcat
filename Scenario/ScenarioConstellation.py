@@ -56,7 +56,10 @@ class ScenarioConstellation():
                       ('inc_sats_operational', u.deg),
                       ('a_launcher_insertion', u.km),
                       ('ecc_launcher_insertion', u.one),
-                      ('inc_launcher_insertion', u.deg)]
+                      ('inc_launcher_insertion', u.deg),
+                      ('a_launcher_disposal', u.km),
+                      ('ecc_launcher_disposal', u.one),
+                      ('inc_launcher_disposal', u.deg)]
 
     """
     Init
@@ -242,7 +245,7 @@ class ScenarioConstellation():
             self.assign_targets()
             
             # Build the mission profile based on the Fleet.LaunchVehicles
-            self.define_fleet_mission_profile(self.architecture, self.fleet, self.clients)
+            self.define_fleet_mission_profile()
 
     def create_launch_vehicle(self,launch_vehicle_id,serviceable_sats_left):
         """ Create a launcher based on the shuttle architecture.
@@ -258,17 +261,17 @@ class ScenarioConstellation():
         """
 
         # Compute launcher performance
-        self.compute_launcher_performance()
+        self.compute_launcher_performance() ### FLAG Add this to LaunchVehicle class ###
 
         # Compute launcher fairing volume
-        self.compute_launcher_fairing()
+        self.compute_launcher_fairing() ### FLAG Add this to LaunchVehicle class ###
 
         # Instanciate a reference launch vehicle
         reference_launch_vehicle = LaunchVehicle(launch_vehicle_id,self,mass_contingency=0.0)
 
         # Set launcher mass and volume available
-        reference_launch_vehicle.set_mass_available(self.launcher_performance)
-        reference_launch_vehicle.set_volume_available(self.launcher_volume_available)
+        reference_launch_vehicle.set_mass_available(self.launcher_performance) ### FLAG Add this to LaunchVehicle class ###
+        reference_launch_vehicle.set_volume_available(self.launcher_volume_available) ### FLAG Add this to LaunchVehicle class ###
 
         logging.info(f"Converging the number of satellites manifested in the Launch Vehicle...")
         serviced_sats, _, self.ref_disp_mass, self.ref_disp_volume = reference_launch_vehicle.converge_launch_vehicle(self.reference_satellite,serviceable_sats_left,tech_level=self.dispenser_tech_level)
@@ -315,7 +318,7 @@ class ScenarioConstellation():
                                                             save_folder=self.data_path)
         else:
             logging.info(f"Using custom Launch Vehicle performance...")
-            self.launcher_performance = self.custom_launcher_performance 
+            self.launcher_performance = self.custom_launcher_performance
 
     def compute_launcher_fairing(self):
         """ Estimate the satellite volume based on mass
@@ -386,6 +389,16 @@ class ScenarioConstellation():
                                                              90. * u.deg,
                                                              0. * u.deg,
                                                              self.starting_epoch)
+
+        # launcher disposal orbit
+        self.launcher_disposal_orbit = Orbit.from_classical(Earth,
+                                                            self.a_launcher_disposal + Earth.R,
+                                                            self.ecc_launcher_disposal,
+                                                            self.inc_launcher_disposal,
+                                                            0. * u.deg,
+                                                            90. * u.deg,
+                                                            0. * u.deg,
+                                                            self.starting_epoch)
 
         # Compute few unavailable values such as apogee/perigee
         self.launcher_apogee_h = (1 + self.launcher_insertion_orbit.ecc.value) * self.launcher_insertion_orbit.a.value - Earth.R.to(u.km).value
