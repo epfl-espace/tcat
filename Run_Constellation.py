@@ -55,11 +55,11 @@ if print_to_files:
     scenario.setup()
     
     # Execute scenario
-    #results = scenario.execute()
+    results = scenario.execute()
     
     # Print scenario reports
-    #scenario.plan.print_report()
-    #scenario.fleet.print_report()
+    scenario.plan.print_report()
+    scenario.fleet.print_report()
     
     # Close .txt file
     result.close()
@@ -68,7 +68,7 @@ if print_to_files:
     # Reset output to initial value
     sys.stdout = original_stdout  # Reset the standard output to its original value
     sys.stderr = original_stderr  # Reset the standard error to its original value
-    
+
     
 else:
     # Instanciate scenario object

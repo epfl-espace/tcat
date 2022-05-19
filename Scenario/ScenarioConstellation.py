@@ -20,7 +20,7 @@ logging.getLogger('matplotlib').setLevel(logging.WARNING)
 logging.addLevelName(21, "DEBUGGING")
 
 # Class definition
-class ScenarioConstellation():
+class ScenarioConstellation:
     """
     General Attributs
     """
@@ -133,7 +133,16 @@ class ScenarioConstellation():
         logging.info("Finish defining Plan...")
 
     def execute(self):
-        print("TODO")
+        """ Execute the scenario until the fleet converges using a method from the fleet class.
+        """
+        # self.fleet.design(self.plan, self.clients, verbose=verbose)
+        logging.info("Start executing...")
+        try:
+            self.fleet.design(self.plan, self.clients, verbose=False)
+            logging.info("Finish executing...")
+            return True
+        except RuntimeWarning as warning:
+            return warning
 
     def define_constellation(self):
         """ Define constellation object.
