@@ -12,7 +12,6 @@ from Scenario.Plan_module import *
 
 # Import Libraries
 from json import load as load_json
-from Interpolation import get_launcher_performance, get_launcher_fairing
 
 # Set logging
 logging.getLogger('numba').setLevel(logging.WARNING)
@@ -269,18 +268,9 @@ class ScenarioConstellation:
             (Fleet_module.LaunchVehicle): created launcher
         """
 
-        # Compute launcher performance
-        self.compute_launcher_performance() ### FLAG Add this to LaunchVehicle class ###
-
-        # Compute launcher fairing volume
-        self.compute_launcher_fairing() ### FLAG Add this to LaunchVehicle class ###
-
-        # Instanciate a reference launch vehicle
+        # Instanciate a reference launch vehicle and set it up
         reference_launch_vehicle = LaunchVehicle(launch_vehicle_id,self,mass_contingency=0.0)
-
-        # Set launcher mass and volume available
-        reference_launch_vehicle.set_mass_available(self.launcher_performance) ### FLAG Add this to LaunchVehicle class ###
-        reference_launch_vehicle.set_volume_available(self.launcher_volume_available) ### FLAG Add this to LaunchVehicle class ###
+        reference_launch_vehicle.setup(self)
 
         logging.info(f"Converging the number of satellites manifested in the Launch Vehicle...")
         serviced_sats, _, self.ref_disp_mass, self.ref_disp_volume = reference_launch_vehicle.converge_launch_vehicle(self.reference_satellite,serviceable_sats_left,tech_level=self.dispenser_tech_level)

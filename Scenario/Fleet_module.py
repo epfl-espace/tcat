@@ -20,6 +20,7 @@ from Phases.Release import Release
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 import copy
+from Interpolation import get_launcher_performance, get_launcher_fairing
 
 
 class Fleet:
@@ -1273,6 +1274,58 @@ class LaunchVehicle(Spacecraft):
         self.disp_volume = 0. * u.m ** 3
         self.max_sats_number = 0
 
+    def setup(self,scenario):
+        """ setup the launcher separately from __init__()
+        """
+        # Interpolate launcher performance
+        self.compute_launcher_performance(scenario)
+
+        # Interpolate launcher fairing capacity
+        self.compute_launcher_fairing(scenario)
+
+    def compute_launcher_performance(self,scenario):
+        """ Compute the satellite performance
+
+        Self:
+            (u.m**3): launcher_volume_available
+        """
+        # Check for custom launcher_name values
+        if scenario.custom_launcher_name is None:
+            logging.info(f"Gathering Launch Vehicle performance from database...")
+            self.mass_available = get_launcher_performance(scenario.fleet,
+                                                                 scenario.launcher_name,
+                                                                 scenario.launch_site,
+                                                                 self.insertion_orbit.inc.value,
+                                                                 scenario.launcher_apogee_h,
+                                                                 scenario.launcher_perigee_h,
+                                                                 scenario.orbit_type,
+                                                                 method=scenario.interpolation_method,
+                                                                 verbose=scenario.verbose,
+                                                                 save="InterpolationGraph",
+                                                                 save_folder=scenario.data_path)
+        else:
+            logging.info(f"Using custom Launch Vehicle performance...")
+            self.mass_available = scenario.custom_launcher_performance
+
+    def compute_launcher_fairing(self,scenario):
+        """ Estimate the satellite volume based on mass
+
+        Self:
+            (u.m**3): launcher_volume_available
+        """
+        # Check for custom launcher_name values
+        if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
+            if scenario.custom_launcher_name is not None or scenario.custom_launcher_performance is not None:
+                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
+            else:
+                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
+                self.volume_available = get_launcher_fairing(self.launcher_name)
+        else:
+            logging.info(f"Using custom Launch Vehicle's fairing size...")
+            cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
+            cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
+            self.olume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+
     def assign_upper_stage(self, upper_stage):
         """ Adds another servicer to the Servicer class as assigned_upper_stage.
         TODO: get into scenario
@@ -1455,18 +1508,6 @@ class LaunchVehicle(Spacecraft):
         """
         capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
         return capture_modules
-
-    def set_mass_available(self,mass_available):
-        """ Set available mass
-
-        """
-        self.mass_available = mass_available
-
-    def set_volume_available(self,volume_available):
-        """ Set available mass
-
-        """
-        self.volume_available = volume_available
 
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
