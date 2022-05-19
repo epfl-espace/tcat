@@ -358,7 +358,7 @@ class ScenarioConstellation:
         self.launcher_apogee_h = (1 + self.launcher_insertion_orbit.ecc.value) * self.launcher_insertion_orbit.a.value - Earth.R.to(u.km).value
         self.launcher_perigee_h = 2 * self.launcher_insertion_orbit.a.value - self.launcher_apogee_h - 2 * Earth.R.to(u.km).value
 
-    def assign_satellites(self):
+    def assign_targets(self):
         """Function that creates a plan based on an architecture, clients and fleet.
 
         Args:
