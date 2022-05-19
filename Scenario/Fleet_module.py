@@ -45,6 +45,28 @@ class Fleet:
         self.launchers = dict()
         self.is_performance_graph_already_generated = False
 
+    def define_fleet_mission_profile(self,scenario):
+        """ Call the appropriate servicer servicer_group profile definer for the whole fleet
+        based on architecture and expected precession direction of the constellation.
+
+        Args:
+            architecture (str): 'shuttle', 'current_kits' or 'picker',
+                                for shuttle, the servicer raise its orbit back after each servicing
+                                for current_kits, the servicer only visits each target and a kit performs deobriting
+                                for picker, the servicer only services one target
+            fleet (Fleet_module.Fleet): fleet of servicers to assign the plan to
+            clients (Constellation_Client_module.ConstellationClients): population to be serviced
+        """
+
+        # Extract global precession direction
+        global_precession_direction = scenario.constellation.get_global_precession_rotation()
+
+        # Define launchers mission profile
+        logging.info("Defining Fleet mission profile...")
+        for launcher_id, launcher in self.launchers.items():
+            logging.log(21, f"Defining launcher: {launcher_id}")
+            launcher.define_mission_profile(scenario.plan,global_precession_direction)
+
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:
             return True
