@@ -1677,7 +1677,7 @@ class LaunchVehicle(Spacecraft):
     def print_report(self):
         """ Print quick summary for debugging purposes."""
         print(f"""_____________________________________
-\033[1mLaunch Vehicles: \033[0m
+Launch Vehicles:
     Internal ID: {self.id}
     Launch vehicle name: {self.launcher_name}
     Dry mass: {self.get_dry_mass():.01f}
@@ -1694,7 +1694,7 @@ class LaunchVehicle(Spacecraft):
 
         print("-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-")
 
-        print('\033[1mModules: \033[0m')
+        print('Modules:')
         for _, module in self.modules.items():
             print(f"Module ID: {module}")
         print('Phasing Module ID: ' + self.main_propulsion_module_ID)
