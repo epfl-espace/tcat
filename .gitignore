@@ -15,3 +15,4 @@ DATA/
 static/css/main.css
 .env
 tcat-app/tcat-test.db
+raan_analysis/
