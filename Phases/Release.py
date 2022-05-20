@@ -40,28 +40,21 @@ class Release(GenericPhase):
         # TOFIX: update_launcher() is called 3x time in this apply() 
         # upate_laucnher() updates the end_epoch of the phase by adding the duration.
         # since it is called 3x, the end epoch coresponds to 3x the duration.
-        self.get_assigned_module().captured_object = None
-        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-            self.update_servicer()
-            self.take_servicer_snapshot()
-        else:
-            self.update_launcher()
-            self.take_launcher_snapshot()
 
+        self.get_assigned_module().captured_object = None
+        
         # in case the architecture is launcher and sats, separate sats
         logging.log(21, f"Sat deployed is {self.target}, sats in the dispenser are {self.target.mothership.current_sats}")
         if self.target.mothership:
             logging.log(21, f"Using Launcher mothership architecture")
-            # the launcher's orbit is updated (not just the sat's)
-            self.update_launcher(launcher=self.target.mothership)
             # the sat is separated and updated
             self.get_assigned_launcher().separate_sat(self.target)
-            self.update_launcher()
-            self.take_launcher_snapshot()
 
-        # if not, then simply update the launcher
-        elif isinstance(self.assigned_module.spacecraft, Fleet_module.LaunchVehicle):
-            logging.log(21, f"NOT using Launcher mothership architecture")
+        # TOFIX: why not use heritage here with method having the same name in both classes?
+        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
+            self.update_servicer()
+            self.take_servicer_snapshot()
+        else:
             self.update_launcher()
             self.take_launcher_snapshot()
 
