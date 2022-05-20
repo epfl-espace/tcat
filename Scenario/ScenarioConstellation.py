@@ -248,7 +248,7 @@ class ScenarioConstellation:
         self.plan = Plan('Plan', self.starting_epoch)
 
         # Assign targets to LaunchVehicle
-        self.assign_satellites()
+        self.assign_targets()
 
         # Check for available satellite to deploy
         self.fleet.define_fleet_mission_profile(self)
