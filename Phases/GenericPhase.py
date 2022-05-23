@@ -137,7 +137,6 @@ class GenericPhase:
         """ Save current assigned launcher as a snapshot for future references and post-processing. """
 
         self.launcher_snapshot = copy.deepcopy(self.get_assigned_launcher())
-        print(self.launcher_snapshot.current_orbit.a -self.launcher_snapshot.current_orbit.attractor.R)
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on operation labour.
