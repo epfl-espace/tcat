@@ -1,61 +1,53 @@
 """
 Created:        ?
-Last Revision:  18.05.2022
+Last Revision:  23.05.2022
 Author:         ?,Emilien Mingard
 Description:    Fleet,Spacecraft,Servicer and LaunchVehicle Classes definition
 """
 
-import logging
-import warnings
-
-import numpy as np
-from astropy import units as u
-
+# Import Classes
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
+from Interpolation import get_launcher_performance, get_launcher_fairing
+
+# Import libraries
+import logging
+import warnings
+import numpy as np
+from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 import copy
-from Interpolation import get_launcher_performance, get_launcher_fairing
-
 
 class Fleet:
     """ A Fleet consists of a dictionary of servicers.
-    The class is initialized with an emtpy dictionary of servicers.
-    It contains methods used during simulation and convergence of the servicers design.
-
-    Args:
-        fleet_id (str): Standard id. Needs to be unique.
-        architecture (str): descriptor for the overall architecture of the fleet, used to identify scenarios
-
-    Attributes:
-        ID (str): Standard id. Needs to be unique.
-        architecture (str): descriptor for the overall architecture of the fleet, used to identify scenarios
-        servicers (dict): Dictionary of servicers.
+        The class is initialized with an emtpy dictionary of servicers.
+        It contains methods used during simulation and convergence of the servicers design.
     """
 
+    """
+    Init
+    """
     def __init__(self, fleet_id, architecture):
         self.id = fleet_id
         self.architecture = architecture
         self.servicers = dict()
         self.launchers = dict()
         self.is_performance_graph_already_generated = False
-
+    
+    """
+    Methods
+    """
     def define_fleet_mission_profile(self,scenario):
         """ Call the appropriate servicer servicer_group profile definer for the whole fleet
-        based on architecture and expected precession direction of the constellation.
+            based on architecture and expected precession direction of the constellation.
 
         Args:
-            architecture (str): 'shuttle', 'current_kits' or 'picker',
-                                for shuttle, the servicer raise its orbit back after each servicing
-                                for current_kits, the servicer only visits each target and a kit performs deobriting
-                                for picker, the servicer only services one target
-            fleet (Fleet_module.Fleet): fleet of servicers to assign the plan to
-            clients (Constellation_Client_module.ConstellationClients): population to be serviced
+            scenario (Scenario.ScenarioConstellation): scenario encapsulating global problem
         """
 
         # Extract global precession direction
@@ -100,12 +92,12 @@ class Fleet:
 
     def design(self, plan, clients, verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
-        This is done by first designing each servicer in the fleet to perform its assigned phases in the plan.
-        This first convergence determines the design of each module in each servicer, including propellant mass.
-        Then, the fleet is homogenized by using the heaviest modules throughout the fleet as basis for the design of
-        all servicers. A second convergence is done, this time changing only the propellant mass in each servicer.
-        By the end of the method, the fleet is designed so that all servicers are identical and can fulfill their
-        assigned plan.
+            This is done by first designing each servicer in the fleet to perform its assigned phases in the plan.
+            This first convergence determines the design of each module in each servicer, including propellant mass.
+            Then, the fleet is homogenized by using the heaviest modules throughout the fleet as basis for the design of
+            all servicers. A second convergence is done, this time changing only the propellant mass in each servicer.
+            By the end of the method, the fleet is designed so that all servicers are identical and can fulfill their
+            assigned plan.
 
         Args:
             plan (Plan): plan for which the fleet needs to be designed
@@ -129,14 +121,14 @@ class Fleet:
 
     def converge(self, plan, clients, convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
         """ Iteratively runs the assigned plan and varies initial propellant mass of the fleet until convergence.
-        At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
-        Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
-        within the convergence_margin specified as argument or until the iteration limit specified is reached.
+            At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
+            Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
+            within the convergence_margin specified as argument or until the iteration limit specified is reached.
 
-        The first iteration simply adds or remove 1kg of propellant for non converged modules.
-        Subsequent iterations use Newton Search with first order finite difference to find the gradient.
-        TODO: Implement more advanced convergence algorithm than Newton Search
-        
+            The first iteration simply adds or remove 1kg of propellant for non converged modules.
+            Subsequent iterations use Newton Search with first order finite difference to find the gradient.
+            TODO: Implement more advanced convergence algorithm than Newton Search
+            
         Note:
             The convergence is dependent on good initial guesses for initial propellant masses.
         
@@ -146,8 +138,7 @@ class Fleet:
             convergence_margin (u.kg): accuracy required on propellant mass for convergence
             limit (int): maximal number of iterations before the function quits
             verbose (bool): If True, print information relative to convergence
-            design_loop (bool): True if sub-systems dry masses are changed during iterations.
-                                False if only the propellant mass is changed.
+            design_loop (bool): True if sub-systems dry masses are changed during iterations. False if only the propellant mass is changed.
         """
         # Setup a counter to stop infinite loops and set a convergence flag
         counter = 0
@@ -219,9 +210,9 @@ class Fleet:
 
     def homogenize(self, plan, servicer_group):
         """ This method finds the heaviest modules within a group of servicers and redesigns every servicer to match
-        these modules. The group of servicers are made based on the group type they are assigned (for instance,
-        all motherships will have the same design, all tanks will have the same design, all kits will have the same
-        design, etc).
+            these modules. The group of servicers are made based on the group type they are assigned (for instance,
+            all motherships will have the same design, all tanks will have the same design, all kits will have the same
+            design, etc).
 
         Args:
             plan (Plan): Dictionary of phases that need to be performed by the fleet.
@@ -279,7 +270,7 @@ class Fleet:
 
     def reset(self, plan, design_loop=True, verbose=False, convergence_margin=0.5 * u.kg):
         """ Calls the reset function for each servicer in the fleet. If design_loop is True, this include a redesign
-        of the servicer.
+            of the servicer.
 
         Args:
             plan (Plan): plan that might be used as reference to reset the fleet
@@ -454,7 +445,7 @@ class Fleet:
 
     def get_mass_summary(self, rm_duplicates=False):
         """ Returns information in a convenient way for plotting purposes. 
-        What is returned depends on the module_names list (currently hard coded).
+            What is returned depends on the module_names list (currently hard coded).
 
         TODO: Check if applicable to generic.
 
@@ -566,7 +557,7 @@ class Fleet:
 
     def get_recurring_cost_summary(self, rm_duplicates=False):
         """ Returns information in a convenient way for plotting purposes.
-        What is returned depends on the module_names list (currently hard coded).
+            What is returned depends on the module_names list (currently hard coded).
 
         TODO: Check if applicable to generic.
 
@@ -655,7 +646,8 @@ class Fleet:
         return module_names, output, servicer_str
 
     def print_assignments(self):
-        """ Print a quick summary of which servicer is assigned to which targets. """
+        """ Print a quick summary of which servicer is assigned to which targets. 
+        """
         # TODO: deprecate
         temp_string = ''
         for servicer_ID, servicer in self.servicers.items():
@@ -665,7 +657,8 @@ class Fleet:
         print(temp_string)
 
     def print_report(self):
-        """ Print a quick summary of fleet information for debugging purposes."""
+        """ Print a quick summary of fleet information for debugging purposes.
+        """
         print(self.id)
         for _, servicer in self.servicers.items():
             servicer.print_report()
@@ -708,9 +701,8 @@ class Spacecraft:
     Methods
     """
     def add_module(self, module):
-        """Adds a module to the Servicer class.
+        """ Adds a module to the Servicer class.
             TODO: change description
-
 
         Args:
             module (GenericModule): module to be added
@@ -765,7 +757,7 @@ class Spacecraft:
             warnings.warn('No convergence_margin in sub-systems design.', UserWarning)
 
     def get_initial_prop_mass(self):
-        """Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
+        """ Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
 
         Return:
             (u.kg): initial propellant mass
@@ -777,7 +769,7 @@ class Spacecraft:
         return temp_mass
 
     def get_wet_mass(self, contingency=True):
-        """Returns the wet mass of the servicer at launch. Does not include kits.
+        """ Returns the wet mass of the servicer at launch. Does not include kits.
 
         Args:
             contingency (boolean): if True, apply contingencies
@@ -788,7 +780,7 @@ class Spacecraft:
         return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
 
     def get_hardware_recurring_cost(self):
-        """Returns the recurring cost of the servicer, including all modules and current_kits.
+        """ Returns the recurring cost of the servicer, including all modules and current_kits.
 
         Return:
             (float): cost in Euros
@@ -803,8 +795,8 @@ class Spacecraft:
         return recurring_cost
 
     def get_development_cost(self):
-        """Returns the non recurring cost of the servicer development, including all modules and the development
-        cost among kits for each groups present among kits (this assumes).
+        """ Returns the non recurring cost of the servicer development, including all modules and the development
+            cost among kits for each groups present among kits (this assumes).
 
         Return:
             (float): cost in Euros
@@ -846,8 +838,8 @@ class Spacecraft:
 
     def get_reference_manoeuvres(self, plan, module):
         """ Returns representative values for the servicer corresponding to:
-        - maximum delta v among maneuvers (used to dimension the main propulsion system
-        - total mass of propellant used during approaches (used to dimension the rcs propulsion system)
+            - maximum delta v among maneuvers (used to dimension the main propulsion system
+            - total mass of propellant used during approaches (used to dimension the rcs propulsion system)
 
         Args:
             plan (Plan): plan for which the fleet needs to be designed
@@ -870,8 +862,8 @@ class Spacecraft:
         return reference_delta_v.to(u.m / u.s), rcs_prop_mass
 
     def get_reference_power(self):
-        """Returns a reference power used as input for different models. This reference represents the mean power
-        conditioned by the servicer during nominal operations.
+        """ Returns a reference power used as input for different models. This reference represents the mean power
+            conditioned by the servicer during nominal operations.
 
         Return:
             (u.W): mean servicer power drawn
@@ -883,7 +875,7 @@ class Spacecraft:
 
     def get_reference_inertia(self):
         """ Returns estimated inertia of the servicer along its main axis based on a generic box and wings shape.
-        Used for estimations of required mass for aocs systems.
+            Used for estimations of required mass for aocs systems.
 
         Return:
             (u.kg*u.m*u.m): servicer inertia
@@ -897,7 +889,7 @@ class Spacecraft:
 
     def get_attribute_history(self, attribute_name, plan):
         """ Get the time evolution of an attribute of the servicer over the phases of a plan.
-        The information must be returned in a method of a servicer or phase or an attribute of an orbit.
+            The information must be returned in a method of a servicer or phase or an attribute of an orbit.
 
         Arg:
             attribute_name (str): name of an attribute of "get_" method
@@ -1002,11 +994,16 @@ class Servicer(Spacecraft):
         mass_contingency (float): contingency to apply at system level on the dry mass
     """
 
+    """
+    Init
+    """
     def __init__(self, servicer_id, group, expected_number_of_targets=3, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         super(Servicer, self).__init__(servicer_id,group,additional_dry_mass,mass_contingency)
         self.expected_number_of_targets = expected_number_of_targets
 
-
+    """
+    Methods
+    """
     def assign_targets(self, targets_assigned_to_servicer):
         # TODO: check if can be put into scenario
         # update initial propellant guess if less targets than expected
@@ -1282,6 +1279,10 @@ class LaunchVehicle(Spacecraft):
         mass_contingency (float): contingency to apply at system level on the dry mass
     """
 
+
+    """
+    Init
+    """
     def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         super(LaunchVehicle, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
         self.launcher_name = scenario.launcher_name
@@ -1296,6 +1297,9 @@ class LaunchVehicle(Spacecraft):
         self.disp_volume = 0. * u.m ** 3
         self.max_sats_number = 0
 
+    """
+    Methods
+    """
     def setup(self,scenario):
         """ setup the launcher separately from __init__()
         """
@@ -1307,9 +1311,6 @@ class LaunchVehicle(Spacecraft):
 
     def compute_launcher_performance(self,scenario):
         """ Compute the satellite performance
-
-        Self:
-            (u.m**3): launcher_volume_available
         """
         # Check for custom launcher_name values
         if scenario.custom_launcher_name is None:
@@ -1331,9 +1332,6 @@ class LaunchVehicle(Spacecraft):
 
     def compute_launcher_fairing(self,scenario):
         """ Estimate the satellite volume based on mass
-
-        Self:
-            (u.m**3): launcher_volume_available
         """
         # Check for custom launcher_name values
         if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
@@ -1350,6 +1348,7 @@ class LaunchVehicle(Spacecraft):
 
     def assign_upper_stage(self, upper_stage):
         """ Adds another servicer to the Servicer class as assigned_upper_stage.
+
         TODO: get into scenario
 
         Args:
@@ -1359,7 +1358,7 @@ class LaunchVehicle(Spacecraft):
 
     def separate_sat(self, sat):
         """ Separate a sat from the launcher. This is used during simulation.
-        The sat is still assigned to the launcher and will be linked if the launcher is reset.
+            The sat is still assigned to the launcher and will be linked if the launcher is reset.
 
         Args:
             sat (Client): sat to be removed from launcher
@@ -1387,12 +1386,13 @@ class LaunchVehicle(Spacecraft):
 
     def converge_launch_vehicle(self, satellite, serviceable_sats_left, dispenser="Auto", tech_level=1):
         """Converges the number of satellites that can be hosted within the launcher. Takes into account the
-        volume and mass of the dispenser. A value can be specified for the technology level to vary the mass
-        and volume of the dispenser proportionally. Technology level values greater than 1 make the dispenser heavier
-        and bulkier, vice versa with values less than 1.
+            volume and mass of the dispenser. A value can be specified for the technology level to vary the mass
+            and volume of the dispenser proportionally. Technology level values greater than 1 make the dispenser heavier
+            and bulkier, vice versa with values less than 1.
 
         Args:
             satellite (Client): Target object, represent a reference satellite inside the fairing of the launcher
+            serviceable_sats_left (int): number of sat left to be assigned to launcher
             dispenser (str): dispenser to be used
             tech_level (float): technology level is 1 by default, it can be increased or decreased
 
@@ -1460,7 +1460,7 @@ class LaunchVehicle(Spacecraft):
         return self.sats_number, total_sats_mass, self.disp_mass, self.disp_volume
 
     def get_current_mass(self):
-        """Returns the total mass of the launcher, including all modules and kits at the current time in the simulation.
+        """ Returns the total mass of the launcher, including all modules and kits at the current time in the simulation.
 
         Return:
             (u.kg): current mass, including kits
@@ -1483,10 +1483,10 @@ class LaunchVehicle(Spacecraft):
         return temp_mass
 
     def reset(self, plan, design_loop=True, convergence_margin=1. * u.kg, verbose=False):
-        """Reset the servicer current orbit and mass to the parameters given during initialization.
-        This function is used to reset the state of all modules after a simulation.
-        If this is specified as a design loop, the sub-systems can be updated based on different inputs.
-        It also resets the current_kits and the servicer orbits.
+        """ Reset the servicer current orbit and mass to the parameters given during initialization.
+            This function is used to reset the state of all modules after a simulation.
+            If this is specified as a design loop, the sub-systems can be updated based on different inputs.
+            It also resets the current_kits and the servicer orbits.
 
         Args:
             plan (Plan): plan for which the servicer is used and designed
