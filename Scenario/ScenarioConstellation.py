@@ -248,7 +248,7 @@ class ScenarioConstellation:
         self.plan = Plan('Plan', self.starting_epoch)
 
         # Assign targets to LaunchVehicle
-        self.assign_satellites()
+        self.assign_targets()
 
         # Check for available satellite to deploy
         self.fleet.define_fleet_mission_profile(self)
@@ -279,6 +279,11 @@ class ScenarioConstellation:
                                             mass_contingency=0.0,
                                             dry_mass_override=self.ref_disp_mass)
 
+        # TOFIX: the initial mass of propellant in Propulsion Module is set to 0 kg. 
+        # It is further used to compute the wet mass of launcher.
+        # Therefore, the mission the launcher's mass becomes negative while it burns propellant.
+        # Remark: in execute() method, it seems like the converge() method should take care of estimating 
+        # required prop. mass. Looks like it doesn't do the job....
         reference_phasing_propulsion = PropulsionModule(launch_vehicle_id + '_phasing_propulsion',
                                                         reference_launch_vehicle, 'bi-propellant', 294000 * u.N, ### FLAG ATTENTION ###
                                                         294000 * u.N, 330 * u.s, 0. * u.kg,
