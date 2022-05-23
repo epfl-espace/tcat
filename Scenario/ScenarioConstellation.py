@@ -1,8 +1,8 @@
 """
 Created:        17.05.2022
-Last Revision:  19.05.2022
+Last Revision:  23.05.2022
 Author:         Emilien Mingard
-Description:    Constellation dedicated Scenario Class
+Description:    Constellation dedicated Scenario Class definition
 """
 
 # Import Class
@@ -110,7 +110,6 @@ class ScenarioConstellation:
         Args:
             existing_constellation (Constellation_Client_Module.ConstellationClients): (optional) clients that serve as input; re-generated if not given
         """
-
         # Check if existing_clients are provided
         if not existing_constellation:
             logging.info("Start defining Clients...")
@@ -145,12 +144,7 @@ class ScenarioConstellation:
 
     def define_constellation(self):
         """ Define constellation object.
-
-        Self:
-            (ConstellationSatellites.Satellite): reference_satellite
-            (ConstellationSatellites.Constellation): constellation
         """
-
         # Define relevant orbits
         logging.info("Gathering satellite orbits...")
         self.define_constellation_orbits()
@@ -195,11 +189,7 @@ class ScenarioConstellation:
 
     def define_fleet(self):
         """ Define fleet object.
-
-        Self:
-            (Fleet_module.Fleet): fleet
         """
-
         # Compute total number of satellites
         satellites_left = self.constellation.get_number_satellites()
 
@@ -254,13 +244,11 @@ class ScenarioConstellation:
         self.fleet.define_fleet_mission_profile(self)
 
     def create_launch_vehicle(self,launch_vehicle_id,serviceable_sats_left):
-        """ Create a launcher based on the shuttle architecture.
+        """ Create a launcher.
 
         Args:
             launch_vehicle_id (str): id of the launcher to be created
-            launcher (str):
-            insertion_orbit (poliastro.twobody.Orbit): insertion orbit of the launcher to be created
-            rideshare (bool):
+            serviceable_sats_left (int): remaining satellites to be serviced
 
         Return:
             (Fleet_module.LaunchVehicle): created launcher
@@ -299,20 +287,13 @@ class ScenarioConstellation:
         return reference_launch_vehicle, serviced_sats
 
     def estimate_satellite_volume(self):
-        """ Estimate the satellite volume based on mass
-
-        Self:
-            (u.m**3): sat_volume
+        """ Estimate the reference satellite volume based on mass
         """
         # Estimate volume based on satellite mass
         self.sat_volume = 9 * 10 ** -9 * self.sat_mass ** 3 - 10 ** -6 * self.sat_mass ** 2 + 0.0028 * self.sat_mass
 
     def define_constellation_orbits(self):
         """ Define orbits needed for constellation and satellites definition.
-
-        Self:
-            (poliastro.twobody.Orbit): sat_insertion_orbit
-            (poliastro.twobody.Orbit): sat_operational_orbit
         """
         # Satellites insertion orbit
         self.sat_insertion_orbit = Orbit.from_classical(Earth, self.a_sats_insertion + Earth.R,
@@ -332,12 +313,7 @@ class ScenarioConstellation:
                                                           self.starting_epoch)
 
     def define_launchers_orbits(self):
-
-
         """ Define orbits needed for launchers definition.
-
-        Self:
-            (poliastro.twobody.Orbit): launchers_insertion_orbit
         """
         # launcher insertion orbit
         self.launcher_insertion_orbit = Orbit.from_classical(Earth,
@@ -365,14 +341,6 @@ class ScenarioConstellation:
 
     def assign_satellites(self):
         """Function that creates a plan based on an architecture, clients and fleet.
-
-        Args:
-            architecture (str): 'shuttle', 'current_kits' or 'picker',
-                                for shuttle, the servicer raise its orbit back after each servicing
-                                for current_kits, the servicer only visits each target and a kit performs deobriting
-                                for picker, the servicer only services one target
-            clients (Constellation_Client_Module.ConstellationClients): population to be serviced
-            fleet (Fleet_module.Fleet): servicers available to perform plan
         """
         # Determine if precession is turning counter-clockwise (1) or clockwise (-1)
         global_precession_direction = self.constellation.get_global_precession_rotation()
