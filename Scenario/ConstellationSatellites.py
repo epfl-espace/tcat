@@ -1,6 +1,6 @@
 """
 Created:        ?
-Last Revision:  18.05.2022
+Last Revision:  23.05.2022
 Author:         ?,Emilien Mingard
 Description:    Constellation,Satellite Classes definitions
 """
@@ -15,26 +15,17 @@ from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 from poliastro.plotting import OrbitPlotter3D
-
 import warnings
 warnings.filterwarnings("error")
 
 class Constellation:
     """ Constellation consists of a dictionary of potential satellites for launch servicers to place into orbit.
-    The class is initialized with an empty dictionary of potential satellites.
-
-    Note:
-        This class contains methods for automatic creation of constellations.
-        This class could be expended to interface with a market analysis module in the future.
-
-    Args:
-        constellation_id (str): Standard id. Needs to be unique.
-
-    Attributes:
-        ID (str): Standard id. Needs to be unique.
-        satellites (dict): Dictionary of satellites constituing the constellation
+        The class is initialized with an empty dictionary of potential satellites.
     """
 
+    """
+    Init
+    """
     def __init__(self, constellation_id):
         # Set id
         self.ID = constellation_id
@@ -42,6 +33,9 @@ class Constellation:
         # Instanciate dictionnary containing all satellites
         self.satellites = dict()
 
+    """
+    Methods
+    """
     def add_satellite(self, satellite):
         """ Adds a satellite to the Constellation class.
 
@@ -89,14 +83,14 @@ class Constellation:
 
     def reset(self):
         """ Calls the reset function for each satellite.
-        This function is used to reset the mass and orbits of targets after a simulation.
+            This function is used to reset the mass and orbits of targets after a simulation.
         """
         for _, satellite in self.satellites.items():
             satellite.reset()
 
     def populate_standard_constellation(self, constellation_name, reference_satellite, number_of_planes=2, sat_per_plane=10, plane_distribution_angle=180, altitude_offset = 10*u.km):
         """ Adds satellites to form a complete constellation with equi-phased planes based on inputs.
-        The reference satellite is duplicated to fill the planes.
+            The reference satellite is duplicated to fill the planes.
 
         Args:
             plane_distribution_angle (int): Angle over which to distribute the RAAN of the orbital planes. Generally
@@ -104,6 +98,7 @@ class Constellation:
             constellation_name (str): constellation name as provided by input json
             reference_satellite (ConstellationSatellites.Satellite): target that is duplicated to create constellation members
             number_of_planes (int): number of planes for the constellation, equiphased along 180° of raan
+            altitude_offset (u.km): ?
             sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly
         """
         
@@ -137,6 +132,7 @@ class Constellation:
 
     def populate_plane(self, plane_id, reference_satellite, sat_per_plane, insertion_orbit, operational_orbit):
         """ Adds satellites to form a complete plane with equiphased population based on inputs.
+
         Args:
             plane_id (str): plane id
             reference_satellite (ConstellationSatellites.Satellite): target that is duplicated to create constellation members
@@ -174,7 +170,7 @@ class Constellation:
 
     def plot_distribution(self, save=None, save_folder=None):
         """ Plot the distribution of the constellation. If a save location is provided, the plot is directly saved,
-        otherwise it is displayed.
+            otherwise it is displayed.
 
         Args:
             save (str): if given, the plot will be saved under that name
@@ -221,9 +217,8 @@ class Constellation:
             plt.show()
 
     def plot_3D_distribution(self, save=None, save_folder=None):
-        """
-        Plot the distribution of the constellation in 3D graph. If a save location is provided, the plot is directly
-        saved, otherwise it is displayed.
+        """ Plot the distribution of the constellation in 3D graph. If a save location is provided, the plot is directly
+            saved, otherwise it is displayed.
 
         Args:
             save (str): if given, the plot will be saved under that name
@@ -301,7 +296,7 @@ class Satellite:
         """ Get the satellite volume.
 
         Returns:
-             (u.m^3): volume
+             (u.m**3): volume
         """
         return self.volume
 
@@ -323,7 +318,7 @@ class Satellite:
 
     def get_relative_raan_drift(self, duration, own_orbit=None, other_object_orbit=None):
         """ Returns the relative raan drift between the target and an hypothetical servicer.
-        Used for planning purposes, to make sure phasing is feasible with current raan.
+            Used for planning purposes, to make sure phasing is feasible with current raan.
 
         Args:
             duration (u.<time unit>): duration after which to compute relative raan drift
@@ -343,7 +338,7 @@ class Satellite:
 
     def reset(self):
         """ Reset the current satellite orbit and mass to the parameters given during initialization.
-        This function is used to reset the state and orbits of the target after a simulation.
+            This function is used to reset the state and orbits of the target after a simulation.
         """
         self.current_mass = self.initial_mass
         self.current_orbit = self.initial_orbit
