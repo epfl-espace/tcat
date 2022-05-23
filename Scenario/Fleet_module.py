@@ -1377,7 +1377,6 @@ class LaunchVehicle(Spacecraft):
         """
         # TODO: check if can be put into scenario
         for target in targets_assigned_to_servicer:
-            print(target.insertion_orbit)
             if target in self.current_sats:
                 logging.warning('Satellite '+ target.ID+ ' already in LaunchVehicle '+ self.id+ '.')
             else:
@@ -1616,7 +1615,7 @@ class LaunchVehicle(Spacecraft):
         # Loop over assigned targets
         for i, current_target in enumerate(self.assigned_targets):
             # Print target info
-            print(i,current_target,current_target.insertion_orbit,current_target.current_orbit)
+            #print(i,current_target,current_target.insertion_orbit,current_target.current_orbit)
 
             # Check for RAAN drift
             if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
