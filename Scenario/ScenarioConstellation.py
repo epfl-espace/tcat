@@ -104,8 +104,8 @@ class ScenarioConstellation:
     """
     def setup(self,existing_constellation=None):
         """ Create the clients, fleet and plan based on json inputs files (Provided through Class attributs).
-        Off the capability of re-using pre-set constellation in case multiple scenario are used. The existing client can be
-        provided by another scenario
+            Off the capability of re-using pre-set constellation in case multiple scenario are used. The existing client can be
+            provided by another scenario
 
         Args:
             existing_constellation (Constellation_Client_Module.ConstellationClients): (optional) clients that serve as input; re-generated if not given
