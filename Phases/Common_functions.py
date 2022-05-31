@@ -32,8 +32,8 @@ class Manoeuvre:
         return self.burn_duration / duty_cycle
 
     def __str__(self):
-        return ('{0:.1f}'.format(self.delta_v.to(u.m/u.s)) + " in "
-                + '{0:.1f}'.format(self.get_burn_duration().to(u.minute)))
+        #return ('\u0394m: {0:.1f}'.format(self.delta_v.to(u.m/u.s)) + " in " + '{0:.1f}'.format(self.get_burn_duration().to(u.minute)))
+        return (f"\u0394m: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {self.get_burn_duration().to(u.minute):.1f}")
 
 
 def orbit_string(orbit):
@@ -45,7 +45,6 @@ def orbit_string(orbit):
             + ", raan: {0:.0f}".format(orbit.raan % (360 * u.deg))
             + ", ltan {0:.0f}".format((orbit.raan-mean_sun_long(julian_day(orbit.epoch.to_datetime()))) % (360 * u.deg))
             )
-
 
 def nodal_precession(orbit):
     """Returns the nodal precession period and speed of an object orbiting a body.
