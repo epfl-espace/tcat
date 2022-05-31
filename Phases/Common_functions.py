@@ -32,7 +32,7 @@ class Manoeuvre:
         return self.burn_duration / duty_cycle
 
     def __str__(self):
-        return (f"\u0394m: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {self.get_burn_duration().to(u.minute):.1f}")
+        return (f"\u0394V: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {self.get_burn_duration().to(u.minute):.1f}")
 
 
 def orbit_string(orbit):
