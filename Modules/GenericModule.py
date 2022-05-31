@@ -125,5 +125,5 @@ class GenericModule:
     
     def __str__(self):
         return (self.id
-                + "\n\t  Dry mass: " + '{:.01f}'.format(self.get_dry_mass())
-                + "\n\t  Reference power " + '{:.01f}'.format(self.get_reference_power()))
+                + "\n\t\tDry mass: " + '{:.01f}'.format(self.get_dry_mass())
+                + "\n\t\tReference power " + '{:.01f}'.format(self.get_reference_power()))

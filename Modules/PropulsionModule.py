@@ -466,4 +466,4 @@ class PropulsionModule(GenericModule):
 
     def __str__(self):
         return (super(PropulsionModule, self).__str__()
-                + "\n\t  Propellant mass: " + '{:01.1f}'.format(self.initial_propellant_mass))
+                + "\n\t\tPropellant mass: " + '{:01.1f}'.format(self.initial_propellant_mass))

@@ -769,7 +769,6 @@ class Fleet:
     def print_report(self):
         """ Print a quick summary of fleet information for debugging purposes.
         """
-        print(self.id)
         for _, servicer in self.servicers.items():
             servicer.print_report()
         for _, launcher in self.launchers.items():
@@ -1786,27 +1785,28 @@ class LaunchVehicle(Spacecraft):
 
     def print_report(self):
         """ Print quick summary for debugging purposes."""
-        print(f"""_____________________________________
+        print(f"""---\n---
 Launch Vehicles:
-    Internal ID: {self.id}
+    ID: {self.id}
     Launch vehicle name: {self.launcher_name}
     Dry mass: {self.get_dry_mass():.01f}
     Wet mass: {self.get_wet_mass():.01f}
     Payload mass available: {self.mass_available}
-    Number of sats in the fairing: {self.sats_number}
+    Number of satellites: {self.sats_number}
     Dispenser mass: {self.disp_mass:.1f}
     Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
     Dispenser volume: {self.disp_volume:.1f}
     Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
-    Targets assigned to the Launch Vehicle:""")
+    Targets assigned to the Launch vehicle:""")
+
         for x in range(len(self.assigned_targets)):
             print(f"\t\t{self.assigned_targets[x]}")
 
-        print("-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-")
+        print("---")
 
         print('Modules:')
         for _, module in self.modules.items():
-            print(f"Module ID: {module}")
-        print('Phasing Module ID: ' + self.main_propulsion_module_ID)
-        print('RDV module ID: ' + self.rcs_propulsion_module_ID)
-        print('Capture module ID : ' + self.capture_module_ID)
+            print(f"\tModule ID: {module}")
+        print('\tPhasing Module ID: ' + self.main_propulsion_module_ID)
+        print('\tRDV module ID: ' + self.rcs_propulsion_module_ID)
+        print('\tCapture module ID : ' + self.capture_module_ID)
