@@ -469,23 +469,23 @@ class OrbitChange(GenericPhase):
         self.initial_orbit = self.planned_initial_orbit
 
     def __str__(self):
+        # Combine all manoeuvres into a single string
         manoeuvres_string = ""
         for manoeuvre in self.manoeuvres:
             manoeuvres_string += ("\t\t" + str(manoeuvre) + " \n")
+
+        # Build return string
         if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
             return ('--- \nOrbit change: ' + super().__str__()
-                    + '\n\tDelta-v: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                    + "\n\tServicer Propellant Mass: "
-                    + "{0:.1f}".format(self.servicer_snapshot.get_main_propulsion_module().current_propellant_mass)
-                    + "\n\tInitial RAAN: " + "{0:.1f}".format(self.initial_orbit.raan % (360 * u.deg))
-                    + "\n\tManoeuvres: \n " + manoeuvres_string
+                    + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
+                    + "\n\t\u0394m: " + "{0:.1f}".format(self.launcher_snapshot.get_main_propulsion_module().delta_mass)
+                    + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
                     )
-        else:
+        elif isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.LaunchVehicle):
             return ('--- \nOrbit change: ' + super().__str__()
-                    + '\n\tDelta-v: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                    + "\n\tLauncher Propellant Mass: "
-                    + "{0:.1f}".format(self.launcher_snapshot.get_main_propulsion_module().current_propellant_mass)
+                    + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
+                    + "\n\t\u0394m: " + "{0:.1f}".format(self.launcher_snapshot.get_main_propulsion_module().delta_mass)
                     + "\n\tInitial raan: " + "{0:.1f}".format(self.initial_orbit.raan % (360 * u.deg))
-                    + "\n\tManoeuvres: \n " + manoeuvres_string
+                    + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
                     )
 

@@ -346,8 +346,8 @@ class PropulsionModule(GenericModule):
             delta_v (u.m/u.s): delta v to be performed
             phase (str): used to track throughput of thruster ("main_thrusters" or "rcs_thrusters" respectively)
         """
-        delta_mass = self.compute_propellant_mass(delta_v)
-        self.consume_propellant(delta_mass, phase=phase)
+        self.delta_mass = self.compute_propellant_mass(delta_v)
+        self.consume_propellant(self.delta_mass, phase=phase)
 
     def compute_propellant_mass(self, delta_v):
         """ Compute amount of propellant to produce delta v.
