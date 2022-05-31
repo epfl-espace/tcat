@@ -136,7 +136,7 @@ class ScenarioConstellation:
         # self.fleet.design(self.plan, self.clients, verbose=verbose)
         logging.info("Start executing...")
         try:
-            self.fleet.design(self.plan, self.clients, verbose=False)
+            self.fleet.design_constellation(self.plan, verbose=False)
             logging.info("Finish executing...")
             return True
         except RuntimeWarning as warning:

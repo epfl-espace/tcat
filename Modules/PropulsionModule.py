@@ -79,12 +79,17 @@ class PropulsionModule(GenericModule):
             plan (Plan_module.Plan): plan for which the module is designed
         """
         rcs_thrust, main_thrust, rcs_prop_mass, ref_delta_v = self.compute_reference_manoeuvers(plan)
+
+        # Here WTF?
         if self.prop_type in ['mono-propellant', 'water']:
             max_phasing_throughput = 150. * u.kg
         else:
             max_phasing_throughput = 1000. * u.kg
+
         max_rendezvous_throughput = 24. * u.kg
         reference_power = 0. * u.W
+
+        # Attitude change
         if rcs_thrust > 0. * u.N:
             n_of_rdv_thrusters, n_of_rdv_sets = self.compute_thrusters_number(rcs_thrust,
                                                                               self.previous_rendezvous_throughput,
@@ -95,6 +100,8 @@ class PropulsionModule(GenericModule):
         else:
             n_of_rdv_thrusters = 0
             n_of_rdv_sets = 0
+
+        # Orbital change
         if main_thrust > 0. * u.N:
             n_of_ph_thrusters, n_of_ph_sets = self.compute_thrusters_number(main_thrust,
                                                                             self.previous_phasing_throughput,
@@ -105,10 +112,15 @@ class PropulsionModule(GenericModule):
         else:
             n_of_ph_thrusters = 0
             n_of_ph_sets = 0
+
+        
         self.reference_power = reference_power
+
+        # Compute number of tanks
         n_of_tanks = self.compute_tanks_number()
-        self.dry_mass = self.compute_dry_mass(plan, n_of_rdv_thrusters, n_of_rdv_sets, n_of_ph_thrusters, n_of_ph_sets,
-                                              n_of_tanks, ref_delta_v)
+
+        # Compute dry mass based on estimated design stage
+        self.dry_mass = self.compute_dry_mass(plan, n_of_rdv_thrusters, n_of_rdv_sets, n_of_ph_thrusters, n_of_ph_sets,n_of_tanks, ref_delta_v)
 
     def compute_reference_manoeuvers(self, plan):
         """ Return the reference thrust and delta v for phasing and rendezvous maneuvers.
@@ -421,7 +433,7 @@ class PropulsionModule(GenericModule):
         """
         minimal_propellant_mass = self.initial_propellant_mass
         for i, phase in enumerate(self.get_phases(plan)):
-            phase_propellant_mass = phase.servicer_snapshot.modules[self.id].current_propellant_mass
+            phase_propellant_mass = phase.launcher_snapshot.modules[self.id].current_propellant_mass
             if phase_propellant_mass < minimal_propellant_mass:
                 minimal_propellant_mass = phase_propellant_mass
         return minimal_propellant_mass

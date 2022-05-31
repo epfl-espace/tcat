@@ -37,10 +37,6 @@ class Release(GenericPhase):
         """ Separate target from the capture module. The target will now be independent of the servicer."""
         # TODO: check if commented code needs to be used
 
-        # TOFIX: update_launcher() is called 3x time in this apply() 
-        # upate_laucnher() updates the end_epoch of the phase by adding the duration.
-        # since it is called 3x, the end epoch coresponds to 3x the duration.
-
         self.get_assigned_module().captured_object = None
         
         # in case the architecture is launcher and sats, separate sats
