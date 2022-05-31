@@ -68,4 +68,4 @@ class Release(GenericPhase):
 
     def __str__(self):
         return ('--- \nRelease: ' + super().__str__()
-                + '\n\tOf ' + str(self.target))
+                + '\n\tSatellite: ' + str(self.target))
