@@ -793,6 +793,7 @@ class Spacecraft:
         self.id = id
         self.group = group
         self.current_orbit = None
+        self.previous_orbit = None
         self.additional_dry_mass = additional_dry_mass
         self.modules = dict()
         self.main_propulsion_module_ID = ''
@@ -1646,6 +1647,7 @@ class LaunchVehicle(Spacecraft):
             orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
         """
         # servicer own orbit
+        self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
         # orbit of capture objects
         for _, capture_module in self.get_capture_modules().items():
