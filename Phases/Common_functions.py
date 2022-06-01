@@ -419,10 +419,6 @@ def compute_translunar_injection(initial_orbit, final_orbit):
         while epsilon + mu_E / r_1 < 0 * u.m ** 2 / u.s ** 2:
             v_0 = v_0 + 0.05 * u.km / u.s
             epsilon = 0.5 * v_0 ** 2 - mu_E / r_0
-            if counter2 > 100:
-                warnings.warn(
-                    'No convergence: try to modify the increment of v_0 in the while loop or to reduce lambda_1',
-                    RuntimeWarning)
         counter2 = 1
         h_1 = r_0 * v_0 * np.cos(phi_0)
         v_1 = np.sqrt(2 * (epsilon + mu_E / r_1))
@@ -458,9 +454,6 @@ def compute_translunar_injection(initial_orbit, final_orbit):
 
         v_0 = v_0 + (r_f - r_pM) / d_r_pMd_v_0
         tol = r_f - r_pM
-        if counter1 > 100:
-            warnings.warn('No convergence: try to modify the increment of v_0 in the while loop or to reduce lambda_1',
-                          RuntimeWarning)
 
     # delta-V
 
