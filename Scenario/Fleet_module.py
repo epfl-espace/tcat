@@ -1664,7 +1664,7 @@ class LaunchVehicle(Spacecraft):
                 raising.assign_module(self.get_main_propulsion_module())
             
             # Add Release phase to the plan
-            deploy = Release(f"Servicer assigned to target ({current_target.ID}) is released",
+            deploy = Release(f"Satellites ({current_target.ID}) released",
                              plan,
                              current_target,
                              duration=20 * u.min)
