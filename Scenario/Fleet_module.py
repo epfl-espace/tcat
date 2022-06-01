@@ -92,23 +92,14 @@ class Fleet:
 
     def design_constellation(self, plan,verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
-            This is done by first designing each servicer in the fleet to perform its assigned phases in the plan.
-            This first convergence determines the design of each module in each servicer, including propellant mass.
-            Then, the fleet is homogenized by using the heaviest modules throughout the fleet as basis for the design of
-            all servicers. A second convergence is done, this time changing only the propellant mass in each servicer.
-            By the end of the method, the fleet is designed so that all servicers are identical and can fulfill their
-            assigned plan.
 
         Args:
             plan (Plan): plan for which the fleet needs to be designed
-            clients (<Client module>): class representing the clients of the service
             verbose (boolean): if True, print convergence information
             convergence_margin (u.kg): accuracy required on propellant mass for convergence
         """
-        # First, converge fleet so that each servicer is designed for its plan
-        if verbose:
-            print('\nNon-homogeneous fleet convergence_margin:\n')
-        self.converge_constellation(plan,  convergence_margin=convergence_margin, verbose=verbose, design_loop=True)
+        # Converge
+        self.converge(plan,spacecraft_type='LaunchVehicle',convergence_margin=convergence_margin,verbose=verbose,design_loop=True)
 
     def design_ADR(self, plan, clients, verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
@@ -128,7 +119,7 @@ class Fleet:
         # First, converge fleet so that each servicer is designed for its plan
         if verbose:
             print('\nNon-homogeneous fleet convergence_margin:\n')
-        self.converge_ADR(plan, clients, convergence_margin=convergence_margin, verbose=verbose, design_loop=True)
+        self.converge(plan,spacecraft_type='Servicer', convergence_margin=convergence_margin, verbose=verbose, design_loop=True)
         # Make all servicers in fleet the same, based on worst case scenario
         if verbose:
             print('\nHomogenization of fleet:\n')
@@ -137,9 +128,9 @@ class Fleet:
         # Finally, converge fleet again but without redesigning the sub-systems, only changing the propellant masses
         if verbose:
             print('\nHomogeneous fleet convergence_margin:\n')
-        self.converge_ADR(plan, clients, convergence_margin=convergence_margin, verbose=verbose, design_loop=False)
+        self.converge(plan,spacecraft_type='Servicer', convergence_margin=convergence_margin, verbose=verbose, design_loop=False)
 
-    def converge_constellation(self, plan, convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
+    def converge(self, plan,spacecraft_type='LaunchVehicle',convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
         """ Iteratively runs the assigned plan and varies initial propellant mass of the fleet until convergence.
             At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
             Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
@@ -169,6 +160,12 @@ class Fleet:
         # Apply the plan a first time to compute mismatch in propellant
         plan.apply(verbose=False)
 
+        # Extract proper spacecraft type
+        if spacecraft_type == 'LaunchVehicle':
+            spacecraft = self.launchers
+        elif spacecraft_type == 'Servicer':
+            spacecraft = self.servicers
+
         # Enter optimization loop and iterate until limit is reached or all modules converge
         while (unconverged and counter <= limit) or counter < 2:
             if verbose:
@@ -179,7 +176,7 @@ class Fleet:
             # Initialize a dictionary to store unconverged modules
             unconverged = dict()
             # PROPELLANT: For each propulsion module in each servicer, check for remaining fuel at lowest fuel state
-            for _, servicer in self.launchers.items():
+            for _, servicer in spacecraft.items():
                 for _, module in servicer.get_propulsion_modules().items():
                     # The goal is to have minimal fuel in each tank corresponding to specified mass_contingency
                     min_prop_mass_goal = module.initial_propellant_mass * module.propellant_contingency
@@ -226,95 +223,6 @@ class Fleet:
             # Rerun the plan
             plan.apply(verbose=False)
 
-        if unconverged:
-            warnings.warn('No convergence in propellant mass.', RuntimeWarning)
-
-    def converge_ADR(self, plan, clients, convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
-        """ Iteratively runs the assigned plan and varies initial propellant mass of the fleet until convergence.
-            At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
-            Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
-            within the convergence_margin specified as argument or until the iteration limit specified is reached.
-
-            The first iteration simply adds or remove 1kg of propellant for non converged modules.
-            Subsequent iterations use Newton Search with first order finite difference to find the gradient.
-            TODO: Implement more advanced convergence algorithm than Newton Search
-            
-        Note:
-            The convergence is dependent on good initial guesses for initial propellant masses.
-        
-        Args:
-            plan (Plan): Dictionary of phases that need to be performed by the fleet.
-            clients (<Client module>): Class representing the clients of the service
-            convergence_margin (u.kg): accuracy required on propellant mass for convergence
-            limit (int): maximal number of iterations before the function quits
-            verbose (bool): If True, print information relative to convergence
-            design_loop (bool): True if sub-systems dry masses are changed during iterations. False if only the propellant mass is changed.
-        """
-        # Setup a counter to stop infinite loops and set a convergence flag
-        counter = 0
-        unconverged = True
-        # reset fleet and clients (reset orbits and propellant masses and recompute dry masses if necessary)
-        self.reset(plan, design_loop=design_loop, verbose=verbose, convergence_margin=convergence_margin)
-        if clients:
-            clients.reset()
-        # Apply the plan a first time to compute mismatch in propellant
-        plan.apply(verbose=False)
-        # Enter optimization loop and iterate until limit is reached or all modules converge
-        while (unconverged and counter <= limit) or counter < 2:
-            if verbose:
-                print('Iteration : ' + str(counter) + '/' + str(limit))
-            # increase counter
-            counter = counter + 1
-            # Initialize a dictionary to store unconverged modules
-            unconverged = dict()
-            # PROPELLANT: For each propulsion module in each servicer, check for remaining fuel at lowest fuel state
-            for _, servicer in self.servicers.items():
-                for _, module in servicer.get_propulsion_modules().items():
-                    # The goal is to have minimal fuel in each tank corresponding to specified mass_contingency
-                    min_prop_mass_goal = module.initial_propellant_mass * module.propellant_contingency
-                    min_prop_mass = module.get_minimal_propellant_mass(plan)
-                    # If the minimal fuel is outside the convergence margin, change initial propellant mass
-                    if abs(min_prop_mass.to(u.kg).value - min_prop_mass_goal.to(u.kg).value) > convergence_margin.value:
-                        unconverged[module.id] = module
-                        # If this is the first run (bo previous step initial propellant mass defined,
-                        # the code uses an arbitrary 1kg of propellant opposite the sign of the mismatch as first guess
-                        # If not, then this means a previously converged module is not converged anymore after another
-                        # module changed. The solution is to restart the convergence of this module with the 1kg guess.
-                        # This is not ideal, as it's possible to get stuck in a recursive loop.
-                        if (module.previous_initial_propellant_mass is None or
-                                module.initial_propellant_mass == module.previous_initial_propellant_mass):
-                            new_propellant_mass = (module.initial_propellant_mass
-                                                   - np.sign(min_prop_mass - min_prop_mass_goal) * 1. * u.kg)
-                        # If this is not the first run, compute gradient using first order finite difference and apply
-                        # Newton Search algorithm.
-                        else:
-                            new_propellant_mass = (module.initial_propellant_mass - (min_prop_mass - min_prop_mass_goal)
-                                                   / (((min_prop_mass - min_prop_mass_goal)
-                                                       - (module.previous_minimal_propellant_mass - min_prop_mass_goal))
-                                                      / (module.initial_propellant_mass
-                                                         - module.previous_initial_propellant_mass)))
-                        # Reset the module with the new propellant mass while ensuring this mass is positive.
-                        new_propellant_mass = max(0. * u.kg, new_propellant_mass)
-                        if verbose:
-                            print(module.id + " - remaining / initial / new mass : "
-                                  + str(min_prop_mass - min_prop_mass_goal)
-                                  + " / " + str(module.initial_propellant_mass)
-                                  + " / " + str(new_propellant_mass))
-                        module.update_initial_propellant_mass(new_propellant_mass, plan)
-                    # if by chance the module was already converged on declaration
-                    elif counter == 1:
-                        if verbose:
-                            print(module.id + " - remaining / initial / new mass : "
-                                  + str(min_prop_mass - min_prop_mass_goal)
-                                  + " / " + str(module.initial_propellant_mass))
-                        module.update_initial_propellant_mass(module.initial_propellant_mass, plan)
-            # Reset the fleet
-            self.reset(plan, design_loop=design_loop, verbose=verbose, convergence_margin=convergence_margin)
-            # Reset the clients
-            if clients:
-                clients.reset()
-            # Rerun the plan
-            plan.apply(verbose=False)
         if unconverged:
             warnings.warn('No convergence in propellant mass.', RuntimeWarning)
 
