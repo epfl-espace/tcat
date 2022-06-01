@@ -17,9 +17,9 @@ class Ascending(GenericPhase):
         """ Asks the propulsion module to consume propellant according to delta v.
         Calls generic function to update orbit raan and epoch.
         """
-        # self.get_assigned_servicer().change_orbit(self.orbit)
+        # self.get_assigned_spacecraft().change_orbit(self.orbit)
         self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.contingency), 'phasing')
-        self.update_servicer()
+        self.update_spacecraft()
 
 
     def __str__(self):

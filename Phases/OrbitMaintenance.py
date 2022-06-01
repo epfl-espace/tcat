@@ -45,8 +45,8 @@ class OrbitMaintenance(GenericPhase):
         manoeuvre = compute_altitude_maintenance_delta_v(self.duration, self.orbit)
         self.delta_v = manoeuvre.get_delta_v()
         self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.delta_v_contingency), 'main_thrusters')
-        self.update_servicer()
-        self.take_servicer_snapshot()
+        self.update_spacecraft()
+        self.take_spacecraft_snapshot()
         
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 

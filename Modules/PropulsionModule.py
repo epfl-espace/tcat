@@ -433,7 +433,7 @@ class PropulsionModule(GenericModule):
         """
         minimal_propellant_mass = self.initial_propellant_mass
         for i, phase in enumerate(self.get_phases(plan)):
-            phase_propellant_mass = phase.launcher_snapshot.modules[self.id].current_propellant_mass
+            phase_propellant_mass = phase.spacecraft_snapshot.modules[self.id].current_propellant_mass
             if phase_propellant_mass < minimal_propellant_mass:
                 minimal_propellant_mass = phase_propellant_mass
         return minimal_propellant_mass

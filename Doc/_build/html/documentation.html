@@ -1944,7 +1944,7 @@ plan (Plan_module.Plan): plan the phase is added to (the phase is automatically 
 <dt>Attributes:</dt><dd><p>phase_id (str): Standard id. Needs to be unique.
 assigned_module (Fleet_module.PropulsionModule or CaptureModule): module responsible for phase
 duration (u.second): duration of the phase
-servicer_snapshot (Fleet_module.Servicer): copy of the servicer, in its state at the completion of the phase</p>
+spacecraft_snapshot (Fleet_module.Servicer): copy of the servicer, in its state at the completion of the phase</p>
 <blockquote>
 <div><p>(for reference and post-processing purposes)</p>
 </div></blockquote>
@@ -1979,8 +1979,8 @@ Args:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="Phases.GenericPhase.GenericPhase.get_assigned_servicer">
-<code class="sig-name descname">get_assigned_servicer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_assigned_servicer" title="Permalink to this definition">¶</a></dt>
+<dt id="Phases.GenericPhase.GenericPhase.get_assigned_spacecraft">
+<code class="sig-name descname">get_assigned_spacecraft</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Phases.GenericPhase.GenericPhase.get_assigned_spacecraft" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the servicer that hosts the module assigned to the phase.
 Return:</p>
 <blockquote>

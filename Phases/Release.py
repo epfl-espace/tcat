@@ -44,15 +44,10 @@ class Release(GenericPhase):
         if self.target.mothership:
             logging.log(21, f"Using Launcher mothership architecture")
             # the sat is separated and updated
-            self.get_assigned_launcher().separate_sat(self.target)
+            self.get_assigned_spacecraft().separate_sat(self.target)
 
-        # TOFIX: why not use heritage here with method having the same name in both classes?
-        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-            self.update_servicer()
-            self.take_servicer_snapshot()
-        else:
-            self.update_launcher()
-            self.take_launcher_snapshot()
+        self.update_spacecraft()
+        self.take_spacecraft_snapshot()
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 

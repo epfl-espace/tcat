@@ -43,22 +43,17 @@ class Capture(GenericPhase):
         self.get_assigned_module().captured_object = self.captured_object
 
         # in case the architecture is mothership and current_kits, separate kit
-        if self.get_assigned_servicer().mothership:
+        if self.get_assigned_spacecraft().mothership:
             # the mothership's orbit is updated (not just the kit's)
-            self.update_servicer(servicer=self.get_assigned_servicer().mothership)
+            self.update_spacecraft(servicer=self.get_assigned_spacecraft().mothership)
             # the kit is separated and updated
-            self.get_assigned_servicer().mothership.separate_kit(self.get_assigned_servicer())
-            self.update_servicer()
-            self.take_servicer_snapshot()
+            self.get_assigned_spacecraft().mothership.separate_kit(self.get_assigned_spacecraft())
+            self.update_spacecraft()
+            self.take_spacecraft_snapshot()
 
         # if not, then simply update the servicer
-        elif isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-            self.update_servicer()
-            self.take_servicer_snapshot()
-        # or the launcher
-        else:
-            self.update_launcher()
-            self.take_launcher_snapshot()
+        self.update_spacecraft()
+        self.take_spacecraft_snapshot()
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 

@@ -48,20 +48,19 @@ class Insertion(GenericPhase):
         """
 
         if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-            self.get_assigned_servicer().change_orbit(self.orbit)
+            self.get_assigned_spacecraft().change_orbit(self.orbit)
             self.get_assigned_module().consume_propellant(self.propellant * (1 + self.contingency), 'rcs_thrusters')
-            self.update_servicer()
-            self.take_servicer_snapshot()
+            self.update_spacecraft()
+            self.take_spacecraft_snapshot()
 
         else:
-
             # isinstance(self.assigned_module.spacecraft, Fleet_module.LaunchVehicle)
-            self.get_assigned_launcher().change_orbit(self.orbit)
+            self.get_assigned_spacecraft().change_orbit(self.orbit)
             # These two lines avoid propellant consumption for propulsion modules not yet modeled (e.g. launchers ones)
             if isinstance(self.assigned_module, PropulsionModule):
                 self.get_assigned_module().consume_propellant(0 * u.kg, 'rcs_thrusters')
-            self.update_launcher()
-            self.take_launcher_snapshot()
+            self.update_spacecraft()
+            self.take_spacecraft_snapshot()
 
 
 

@@ -849,7 +849,7 @@ class Spacecraft:
         """
         servicer_phases = []
         for phase in plan.phases:
-            if phase.get_assigned_servicer() == self:
+            if phase.get_assigned_spacecraft() == self:
                 servicer_phases.append(phase)
         return servicer_phases
 
@@ -925,15 +925,15 @@ class Spacecraft:
             # check if this is available in the Scenario class
             if hasattr(phase, attribute_name):
                 data.append(getattr(phase, attribute_name))
-                time.append(phase.servicer_snapshot.current_orbit.epoch)
+                time.append(phase.spacecraft_snapshot.current_orbit.epoch)
                 phase_id.append(phase.ID)
-            elif hasattr(phase.servicer_snapshot, attribute_name):
-                data.append(getattr(phase.servicer_snapshot, attribute_name)())
-                time.append(phase.servicer_snapshot.current_orbit.epoch)
+            elif hasattr(phase.spacecraft_snapshot, attribute_name):
+                data.append(getattr(phase.spacecraft_snapshot, attribute_name)())
+                time.append(phase.spacecraft_snapshot.current_orbit.epoch)
                 phase_id.append(phase.ID)
-            elif hasattr(phase.servicer_snapshot.current_orbit, attribute_name):
-                data.append(getattr(phase.servicer_snapshot.current_orbit, attribute_name))
-                time.append(phase.servicer_snapshot.current_orbit.epoch)
+            elif hasattr(phase.spacecraft_snapshot.current_orbit, attribute_name):
+                data.append(getattr(phase.spacecraft_snapshot.current_orbit, attribute_name))
+                time.append(phase.spacecraft_snapshot.current_orbit.epoch)
                 phase_id.append(phase.ID)
             else:
                 return False

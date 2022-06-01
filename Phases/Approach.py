@@ -47,24 +47,24 @@ class Approach(GenericPhase):
         Calls generic methods to update orbit raan and epoch.
         """
         # check which epoch is later (servicer or target) and catch-up both objects to the later date
-        if self.get_assigned_servicer().current_orbit.epoch > self.target.current_orbit.epoch:
-            reference_time = self.get_assigned_servicer().current_orbit.epoch
+        if self.get_assigned_spacecraft().current_orbit.epoch > self.target.current_orbit.epoch:
+            reference_time = self.get_assigned_spacecraft().current_orbit.epoch
             self.target.current_orbit = update_orbit(self.target.current_orbit, reference_time)
         else:
             reference_time = self.target.current_orbit.epoch
-            self.get_assigned_servicer().current_orbit = update_orbit(self.get_assigned_servicer().current_orbit,
+            self.get_assigned_spacecraft().current_orbit = update_orbit(self.get_assigned_spacecraft().current_orbit,
                                                                       reference_time)
 
         # check if orbits are close enough, if not throw an exception
-        if abs(self.target.current_orbit.a - self.get_assigned_servicer().current_orbit.a) > 50. * u.km:
+        if abs(self.target.current_orbit.a - self.get_assigned_spacecraft().current_orbit.a) > 50. * u.km:
             raise ValueError('Attempted approach with non matching altitude in ' + self.ID + ' : '
-                             + str(self.target.current_orbit.a - self.get_assigned_servicer().current_orbit.a))
-        elif abs(self.target.current_orbit.inc - self.get_assigned_servicer().current_orbit.inc) > 5. * u.deg:
+                             + str(self.target.current_orbit.a - self.get_assigned_spacecraft().current_orbit.a))
+        elif abs(self.target.current_orbit.inc - self.get_assigned_spacecraft().current_orbit.inc) > 5. * u.deg:
             raise ValueError('Attempted approach with non matching inclination in ' + ' : ' + self.ID
-                             + str(self.target.current_orbit.inc - self.get_assigned_servicer().current_orbit.inc))
-        elif abs(self.target.current_orbit.raan - self.get_assigned_servicer().current_orbit.raan) > 5. * u.deg:
+                             + str(self.target.current_orbit.inc - self.get_assigned_spacecraft().current_orbit.inc))
+        elif abs(self.target.current_orbit.raan - self.get_assigned_spacecraft().current_orbit.raan) > 5. * u.deg:
             raise ValueError('Attempted approach with non matching raan in ' + self.ID + ' : '
-                             + str(self.target.current_orbit.raan - self.get_assigned_servicer().current_orbit.raan))
+                             + str(self.target.current_orbit.raan - self.get_assigned_spacecraft().current_orbit.raan))
 
         self.get_assigned_module().consume_propellant(self.propellant * (1 + self.contingency), 'rcs_thrusters')
         self.update_servicer()

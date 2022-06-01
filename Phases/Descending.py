@@ -20,12 +20,12 @@ class Descending(GenericPhase):
         """
         # When the servicer performs landing, its orbit is coincident with the Moon's
         solar_system_ephemeris.set('jpl')
-        EPOCH = self.get_assigned_servicer().current_orbit.epoch
+        EPOCH = self.get_assigned_spacecraft().current_orbit.epoch
         orbit = Orbit.from_body_ephem(Moon, EPOCH)
 
-        self.get_assigned_servicer().change_orbit(orbit)
+        self.get_assigned_spacecraft().change_orbit(orbit)
         self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.contingency), 'phasing')
-        self.update_servicer()
+        self.update_spacecraft()
 
     def __str__(self):
         return ('--- \nDescending: ' + super().__str__()
