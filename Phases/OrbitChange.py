@@ -485,7 +485,6 @@ class OrbitChange(GenericPhase):
             return ('--- \nOrbit change: ' + super().__str__()
                     + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
                     + "\n\t\u0394m: " + "{0:.1f}".format(self.launcher_snapshot.get_main_propulsion_module().delta_mass)
-                    + "\n\tInitial raan: " + "{0:.1f}".format(self.initial_orbit.raan % (360 * u.deg))
                     + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
                     )
 
