@@ -16,7 +16,7 @@ import os
 warnings.filterwarnings("ignore")
 
 # Set configuration file as input or manually inserted
-config_file = "Constellation_new_v1.json" #= sys.argv[1]
+config_file = sys.argv[1]
 
 # Open .json and read mission description
 with open(config_file) as file:
