@@ -1,10 +1,9 @@
 import numpy as np
-from astropy import constants as const
 from astropy import units as u
 from astropy.time import Time
 from poliastro.bodies import Earth, Moon
 from poliastro.twobody import Orbit
-from Manoeuvre import Manoeuvre
+from Phases.Manoeuvre import Manoeuvre
 
 def orbit_string(orbit):
     """Custom function to display orbit altitudes over ground. """

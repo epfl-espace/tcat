@@ -1,3 +1,7 @@
+import numpy as np
+from astropy import units as u
+from astropy import constants as const
+
 class Manoeuvre:
     """ Class representing a manoeuvre. This is used to simplify computations of thrust, mass and durations.
 
