@@ -425,16 +425,9 @@ class OrbitChange(GenericPhase):
             manoeuvres_string += ("\t\t" + str(manoeuvre) + " \n")
 
         # Build return string
-        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-            return ('--- \nOrbit change: ' + super().__str__()
-                    + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                    + "\n\t\u0394m: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().delta_mass)
-                    + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
-                    )
-        elif isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.LaunchVehicle):
-            return ('--- \nOrbit change: ' + super().__str__()
-                    + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                    + "\n\t\u0394m: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().delta_mass)
-                    + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
-                    )
+        return ('--- \nOrbit change: ' + super().__str__()
+                + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
+                + "\n\t\u0394m: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().delta_mass)
+                + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
+                )
 
