@@ -7,6 +7,7 @@ Description:    Run python script to test and debug Constellation Deployement TC
 
 # Import class
 from Scenario.ScenarioConstellation import ScenarioConstellation
+from Scenario.ScenarioParameters import SCENARIO_INPUT_JSON
 
 # Import libraries
 import warnings
@@ -16,7 +17,10 @@ import os
 warnings.filterwarnings("ignore")
 
 # Set configuration file as input or manually inserted
-config_file = sys.argv[1]
+try:
+    config_file = sys.argv[1]
+except IndexError:
+    config_file = SCENARIO_INPUT_JSON
 
 # Open .json and read mission description
 with open(config_file) as file:
