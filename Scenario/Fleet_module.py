@@ -13,6 +13,8 @@ from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
 from Scenario.Interpolation import get_launcher_performance, get_launcher_fairing
+from Scenario.SenarioParameters import *
+
 
 # Import libraries
 import logging
@@ -1572,13 +1574,13 @@ class LaunchVehicle(Spacecraft):
         # TODO : implement a launch optimizer
         
         # Insertion orbit margin
-        insertion_raan_margin = 10 * u.deg
-        insertion_raan_window = 5 * u.deg
-        insertion_a_margin = 0 * u.km
+        insertion_raan_margin = INSERTION_RAAN_MARGIN
+        insertion_raan_window = INSERTION_RAAN_WINDOW
+        insertion_a_margin = INSERTION_A_MARGIN
 
         # Contingencies and cutoff
-        delta_v_contingency = 0.1
-        raan_cutoff = 11 * u.deg
+        delta_v_contingency = CONTINGENCY_DELTA_V
+        raan_cutoff = MODEL_RAAN_DIRECT_LIMIT
 
         # Extract first target
         first_target = self.assigned_targets[0]

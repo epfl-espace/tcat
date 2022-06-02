@@ -274,10 +274,13 @@ def high_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, init
     delta_raan = delta_raan % (360 * u.deg)
     if delta_raan > 180. * u.deg:
         delta_raan -= 360. * u.deg
+
     mean_a = (final_orbit.a + initial_orbit.a) / 2
+    mean_inc = (final_orbit.inc + initial_orbit.inc) / 2
     vel = np.sqrt(initial_orbit.attractor.k / mean_a.to(u.m))
-    d_theta_ratio = np.sin(abs(delta_raan.to(u.rad))/2.)
-    delta_v = 2 * vel * d_theta_ratio
+    d_inc_ratio = np.sin(mean_inc.to(u.rad))
+    delta_v = np.pi / 2 * vel * d_inc_ratio * abs(delta_raan.to(u.rad).value)
+
     manoeuvre = Manoeuvre(delta_v)
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     transfer_duration = (final_orbit.period / 2).to(u.day)
