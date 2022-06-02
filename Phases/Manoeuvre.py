@@ -12,9 +12,10 @@ class Manoeuvre:
         delta_v (u.<speed unit>): delta v for the manoeuvre
         burn_duration (u.<time unit>): duration of the burn for the manoeuvre
     """
-    def __init__(self, delta_v):
+    def __init__(self, delta_v, id = ""):
         self.delta_v = delta_v
         self.burn_duration = 0. * u.minute
+        self.id = id
 
     def get_delta_v(self):
         return self.delta_v
@@ -30,5 +31,12 @@ class Manoeuvre:
         return self.burn_duration / duty_cycle
 
     def __str__(self):
-        return (f"\u0394V: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {self.get_burn_duration().to(u.minute):.1f}")
+        if self.burn_duration > 30. * u.day:
+            duration_print = self.burn_duration.to(u.year)
+        elif self.burn_duration > 1. * u.day:
+            duration_print = self.burn_duration.to(u.day)
+        else:
+            duration_print = self.burn_duration.to(u.minute)
+
+        return (f"\u0394V: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {duration_print:.1f}, {self.id}")
 
