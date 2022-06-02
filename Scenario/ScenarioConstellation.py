@@ -47,17 +47,17 @@ class ScenarioConstellation:
                       ('fairing_diameter', u.m),
                       ('fairing_cylinder_height', u.m),
                       ('fairing_total_height', u.m),
-                      ('a_sats_insertion', u.km),
-                      ('ecc_sats_insertion', u.one), 
+                      ('apogee_sats_insertion', u.km),
+                      ('perigee_sats_insertion', u.km), 
                       ('inc_sats_insertion', u.deg),
-                      ('a_sats_operational', u.km),
-                      ('ecc_sats_operational', u.one),
+                      ('apogee_sats_operational', u.km),
+                      ('perigee_sats_operational', u.km),
                       ('inc_sats_operational', u.deg),
-                      ('a_launcher_insertion', u.km),
-                      ('ecc_launcher_insertion', u.one),
+                      ('apogee_launcher_insertion', u.km),
+                      ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
-                      ('a_launcher_disposal', u.km),
-                      ('ecc_launcher_disposal', u.one),
+                      ('apogee_launcher_disposal', u.km),
+                      ('perigee_launcher_disposal', u.km),
                       ('inc_launcher_disposal', u.deg)]
 
     """
@@ -296,16 +296,23 @@ class ScenarioConstellation:
         """ Define orbits needed for constellation and satellites definition.
         """
         # Satellites insertion orbit
-        self.sat_insertion_orbit = Orbit.from_classical(Earth, self.a_sats_insertion + Earth.R,
-                                                        self.ecc_sats_insertion,
+        a_sats_insertion_orbit = (self.apogee_sats_insertion + self.perigee_sats_insertion)/2 + Earth.R
+        e_sats_insertion_orbit = ((self.apogee_sats_insertion + Earth.R)/a_sats_insertion_orbit - 1)*u.one
+        self.sat_insertion_orbit = Orbit.from_classical(Earth,
+                                                        a_sats_insertion_orbit,
+                                                        e_sats_insertion_orbit,
                                                         self.inc_sats_insertion,
                                                         0. * u.deg,
                                                         90. * u.deg,
                                                         0. * u.deg,
                                                         self.starting_epoch)
+
         # Satellites operational orbit
-        self.sat_operational_orbit = Orbit.from_classical(Earth, self.a_sats_operational + Earth.R,
-                                                          self.ecc_sats_operational,
+        a_sats_operational_orbit = (self.apogee_sats_operational + self.perigee_sats_operational)/2 + Earth.R
+        e_sats_operational_orbit = ((self.apogee_sats_operational + Earth.R)/a_sats_operational_orbit - 1)*u.one
+        self.sat_operational_orbit = Orbit.from_classical(Earth, 
+                                                          a_sats_operational_orbit,
+                                                          e_sats_operational_orbit,
                                                           self.inc_sats_operational,
                                                           0. * u.deg,
                                                           90. * u.deg,
@@ -316,9 +323,11 @@ class ScenarioConstellation:
         """ Define orbits needed for launchers definition.
         """
         # launcher insertion orbit
+        a_launcher_insertion_orbit = (self.apogee_launcher_insertion + self.perigee_launcher_insertion)/2 + Earth.R
+        e_launcher_insertion_orbit = ((self.apogee_launcher_insertion + Earth.R)/a_launcher_insertion_orbit - 1)*u.one
         self.launcher_insertion_orbit = Orbit.from_classical(Earth,
-                                                             self.a_launcher_insertion + Earth.R,
-                                                             self.ecc_launcher_insertion,
+                                                             a_launcher_insertion_orbit,
+                                                             e_launcher_insertion_orbit,
                                                              self.inc_launcher_insertion,
                                                              0. * u.deg,
                                                              90. * u.deg,
@@ -326,18 +335,16 @@ class ScenarioConstellation:
                                                              self.starting_epoch)
 
         # launcher disposal orbit
+        a_launcher_disposal_orbit = (self.apogee_launcher_disposal + self.perigee_launcher_disposal)/2 + Earth.R
+        e_launcher_disposal_orbit = ((self.apogee_launcher_disposal + Earth.R)/a_launcher_disposal_orbit - 1)*u.one
         self.launcher_disposal_orbit = Orbit.from_classical(Earth,
-                                                            self.a_launcher_disposal + Earth.R,
-                                                            self.ecc_launcher_disposal,
+                                                            a_launcher_disposal_orbit,
+                                                            e_launcher_disposal_orbit,
                                                             self.inc_launcher_disposal,
                                                             0. * u.deg,
                                                             90. * u.deg,
                                                             0. * u.deg,
                                                             self.starting_epoch)
-
-        # Compute few unavailable values such as apogee/perigee
-        self.launcher_apogee_h = (1 + self.launcher_insertion_orbit.ecc.value) * self.launcher_insertion_orbit.a.value - Earth.R.to(u.km).value
-        self.launcher_perigee_h = 2 * self.launcher_insertion_orbit.a.value - self.launcher_apogee_h - 2 * Earth.R.to(u.km).value
 
     def assign_satellites(self):
         """Function that creates a plan based on an architecture, clients and fleet.
