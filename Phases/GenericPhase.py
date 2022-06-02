@@ -3,6 +3,7 @@ import copy
 import Scenario.Fleet_module
 from Phases.Common_functions import *
 from astropy.time import Time
+from Phases.Common_functions import *
 
 
 class GenericPhase:
@@ -135,6 +136,7 @@ class GenericPhase:
                 + "\n\tTotal Duration: " + "{0:.1f}".format(duration_print)
                 + "\n\tInitial Orbit: " + orbit_string(self.spacecraft_snapshot.previous_orbit)
                 + "\n\tFinal Orbit: " + orbit_string(self.spacecraft_snapshot.current_orbit)
+                + "\n\tReference Satellite Orbit: " + orbit_string(update_orbit(self.spacecraft_snapshot.reference_satellite.insertion_orbit,self.spacecraft_snapshot.current_orbit.epoch))
                 + "\n\tLauncher Mass After Phase: {0:.1f}".format(self.spacecraft_snapshot.get_current_mass())
                 + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().current_propellant_mass)
                 #+ "\n\tLauncher Wet Mass: {0:.1f}".format(self.spacecraft_snapshot.get_wet_mass())

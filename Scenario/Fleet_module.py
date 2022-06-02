@@ -1305,6 +1305,7 @@ class LaunchVehicle(Spacecraft):
     def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         super(LaunchVehicle, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
         self.launcher_name = scenario.launcher_name
+        self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
         self.mass_available = None
         self.insertion_orbit = scenario.launcher_insertion_orbit
