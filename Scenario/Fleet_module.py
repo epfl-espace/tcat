@@ -13,7 +13,7 @@ from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
 from Scenario.Interpolation import get_launcher_performance, get_launcher_fairing
-from Scenario.SenarioParameters import *
+from Scenario.ScenarioParameters import *
 
 
 # Import libraries
