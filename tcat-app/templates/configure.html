@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'macros/forms.html' as forms %}
 {% block title %}Configure{% endblock %}
 {% block content %}
     <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
@@ -16,31 +17,12 @@
                             {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
                             <label for="{{ input[2] }}" class="flex-grow text-black dark:text-gray-300 {{ fs }}">{{ input[3] }}</label>
                             {% if input[0] == 'input' %}
-                                {% if input[1] == 'number' %}
-                                    <input class="flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ input[1] }}" name="{{ input[2] }}" min="{{ input[5][0] }}" max="{{ input[5][1] }}" value="{{ value }}" {{ required }}>
-                                {% else %}
-                                    <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ input[1] }}" name="{{ input[2] }}" value="{{ value }}" data-validation="{{ input[5] }}" {{ required }}>
-                                {% endif %}
+                                {{ forms.input(input[2], input[1], value, required, input[5]) }}
                             {% elif input[0] == 'select' %}
-                                <select class="select-input-value bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" name="{{ input[2] }}" data-selected="{{ value }}">
-                                {% for val in input[5] %}
-                                    <option value="{{ val }}">{{ val }}</option>
-                                {% endfor %}
-                                </select>
+                                {{ forms.select(input[2], value, input[5]) }}
                             {% elif input[0] == 'checkbox' %}
                                 {% set checked = 'checked' if value == True else '' %}
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="{{ input[2] }}" {{ checked }} class="checkboxes opacity-0 absolute h-8 w-8" />
-                                    <div class="bg-white dark:bg-gray-900 border-2 rounded-lg border-blue-400 dark:border-blue-200 h-8 w-8 flex flex-shrink-0 justify-center items-center">
-                                        <svg class="fill-current hidden w-4 h-4 pointer-events-none" viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg">
-                                            <g fill="none" fill-rule="evenodd">
-                                                <g transform="translate(-9 -11)" fill="#1F73F1" fill-rule="nonzero">
-                                                    <path d="m25.576 11.414c0.56558 0.55188 0.56558 1.4439 0 1.9961l-9.404 9.176c-0.28213 0.27529-0.65247 0.41385-1.0228 0.41385-0.37034 0-0.74068-0.13855-1.0228-0.41385l-4.7019-4.588c-0.56584-0.55188-0.56584-1.4442 0-1.9961 0.56558-0.55214 1.4798-0.55214 2.0456 0l3.679 3.5899 8.3812-8.1779c0.56558-0.55214 1.4798-0.55214 2.0456 0z" />
-                                                </g>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                </div>
+                                {{ forms.checkbox(input[2], checked) }}
                             {% endif %}
                         </div>
                         {% endfor %}
@@ -189,7 +171,9 @@
         }
 
         function transferComplete(e) {
-            location.reload();
+            document.open();
+            document.write(e.currentTarget.response);
+            document.close();
         }
     </script>
 {% endblock %}
