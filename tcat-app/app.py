@@ -77,6 +77,7 @@ def popen_and_call(on_exit, on_error, config_run_id, wd, popen_args):
             return on_error(config_run_id)
         else:
             return on_exit(config_run_id)
+
     thread = threading.Thread(target=run_in_thread, args=(on_exit, on_error, config_run_id, wd, popen_args))
     thread.start()
     # returns immediately after the thread starts
@@ -135,39 +136,62 @@ def allowed_file(filename):
 
 def valid_configuration(configuration):
     flat_validation_params = [item for sublist in inputparams.params.values() for item in sublist]
+    validation_errors = {}
+    valid = True
     for param in flat_validation_params:
         key = param[2]
-        if not (key in configuration):
-            return False
-        value = configuration[key]
         expected = param[5]
         required = param[4]
+        if not (key in configuration):
+            if isinstance(expected[0], bool):
+                configuration[key] = False  # default value for booleans is false
+            else:
+                valid = False
+                validation_errors[key] = 'Key is not in configuration!'
+            continue
+        value = configuration[key]
         if required is None and not value:
             configuration[key] = None
             continue
         if isinstance(expected, list):
             if isinstance(expected[0], str):
                 if not (value in expected):
-                    return False
+                    valid = False
+                    validation_errors[key] = 'Selected value is not in the list of valid values!'
+                    continue
             elif isinstance(expected[0], bool):
                 if value.lower() == 'true':
                     configuration[key] = True
                 elif value.lower() == 'false':
                     configuration[key] = False
                 else:
-                    return False
+                    valid = False
+                    validation_errors[key] = 'Boolean must be true or false!'
+                    continue
             elif isinstance(expected[0], float):
-                configuration[key] = float(value)
-                if float(value) > expected[1] or float(value) < expected[0]:
-                    return False
+                try:
+                    configuration[key] = float(value)
+                    if float(value) > expected[1] or float(value) < expected[0]:
+                        raise ValueError()
+                except ValueError:
+                    valid = False
+                    validation_errors[key] = f'Value is not in range from {expected[0]} to {expected[1]}!'
+                    continue
             elif isinstance(expected[0], int):
-                configuration[key] = int(float(value))
-                if int(float(value)) > expected[1] or int(float(value)) < expected[0]:
-                    return False
+                try:
+                    configuration[key] = int(float(value))
+                    if int(float(value)) > expected[1] or int(float(value)) < expected[0]:
+                        raise ValueError()
+                except ValueError:
+                    valid = False
+                    validation_errors[key] = f'Value is not in range from {expected[0]} to {expected[1]}!'
+                    continue
         elif isinstance(expected, str):
             if not (re.match(expected, value)):
-                return False
-    return True
+                valid = False
+                validation_errors[key] = 'Invalid input string!'
+                continue
+    return [valid, validation_errors]
 
 
 @app.route('/')
@@ -281,15 +305,17 @@ def configure():
 
     last_configuration = None
     last_run_for_configuration = None
-    scenario_id = None
+    validation = [None, None]
 
     if request.method == 'POST':
         configuration = Configuration(creator_id=get_current_user().id)
 
         uploaded_configuration = dict(request.form)
 
-        if not valid_configuration(uploaded_configuration):
-            flash('Invalid form data', 'error')
+        validation = valid_configuration(uploaded_configuration)
+
+        if not validation[0]:
+            flash(f'Invalid form data: {validation[1]}', 'error')
         else:
             scenario_id = str(uuid.uuid4())
             uploaded_configuration['scenario_id'] = scenario_id
@@ -316,12 +342,14 @@ def configure():
             db.session.commit()
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter_by(creator_id=get_current_user().id).order_by(desc(Configuration.created_date)).first()
+        last_config_item = Configuration.query.filter_by(creator_id=get_current_user().id).order_by(
+            desc(Configuration.created_date)).first()
         if last_config_item is not None:
             last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
             last_configuration = json.loads(last_config_item.configuration)
 
-    return render_template('configure.html', last_configuration=last_configuration, last_run_for_configuration=last_run_for_configuration)
+    return render_template('configure.html', last_configuration=last_configuration,
+                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
 
 
 @app.route('/configure/run', methods=['GET'])
