@@ -177,7 +177,7 @@ class Constellation:
             save_folder (str): if given and save is true, the plot will be saved in the specified folder
         """
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
-        for _, tgt in self.targets.items():
+        for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
                 axes.plot(tgt.operational_orbit.raan.to(u.deg).value, tgt.operational_orbit.nu.to(u.deg).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
@@ -195,7 +195,7 @@ class Constellation:
         else:
             plt.show()
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
-        for _, tgt in self.targets.items():
+        for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
                 axes.plot(tgt.operational_orbit.raan.to(u.deg).value,
                              (tgt.operational_orbit.a - tgt.operational_orbit.attractor.R).to(u.km).value, 'ok')
@@ -228,9 +228,9 @@ class Constellation:
         fig = OrbitPlotter3D(num_points=15)
 
         i = 0
-        for _, target in self.targets.items():
+        for _, target in self.satellites.items():
             i += 1
-            if i < len(self.targets):
+            if i < len(self.satellites):
                 fig.plot(target.operational_orbit)
             else:
                 if save_folder and save:
@@ -240,7 +240,7 @@ class Constellation:
 
     def __str__(self):
         temp = self.ID
-        for _, target in self.targets.items():
+        for _, target in self.satellites.items():
             temp = temp + '\n\t' + target.__str__()
         return temp
 
