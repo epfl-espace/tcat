@@ -160,14 +160,8 @@ def valid_configuration(configuration):
                     validation_errors[key] = 'Selected value is not in the list of valid values!'
                     continue
             elif isinstance(expected[0], bool):
-                if value.lower() == 'true':
-                    configuration[key] = True
-                elif value.lower() == 'false':
-                    configuration[key] = False
-                else:
-                    valid = False
-                    validation_errors[key] = 'Boolean must be true or false!'
-                    continue
+                configuration[key] = True # when value is present then true
+                continue
             elif isinstance(expected[0], float):
                 try:
                     configuration[key] = float(value)

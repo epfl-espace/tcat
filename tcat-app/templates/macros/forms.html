@@ -1,6 +1,6 @@
 {% macro checkbox(name, checked) -%}
     <div class="flex items-center">
-        <input type="checkbox" name="{{ name }}" value="{{ checked }}" data-val="{{ checked }}" class="checkboxes opacity-0 absolute h-8 w-8" />
+        <input type="checkbox" name="{{ name }}" {{ checked }} class="checkboxes opacity-0 absolute h-8 w-8" />
         <div class="bg-white dark:bg-gray-900 border-2 rounded-lg border-blue-400 dark:border-blue-200 h-8 w-8 flex flex-shrink-0 justify-center items-center">
             <svg class="fill-current hidden w-4 h-4 pointer-events-none" viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg">
                 <g fill="none" fill-rule="evenodd">

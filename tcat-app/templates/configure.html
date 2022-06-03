@@ -22,7 +22,7 @@
                             {% elif input[0] == 'select' %}
                                 {{ forms.select(input[2], value, input[5]) }}
                             {% elif input[0] == 'checkbox' %}
-                                {% set checked = 'true' if value == True else 'false' %}
+                                {% set checked = 'checked' if value == True else '' %}
                                 {{ forms.checkbox(input[2], checked) }}
                             {% endif %}
                         </div>
