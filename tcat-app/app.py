@@ -232,7 +232,8 @@ def overview():
 
     config_runs = ConfigurationRun.query.filter(and_(ConfigurationRun.executor_id == current_user.id, or_(
         ConfigurationRun.finished_date != None, ConfigurationRun.failed_date != None))).order_by(
-        desc(ConfigurationRun.started_date), desc(ConfigurationRun.finished_date), desc(ConfigurationRun.failed_date)).all()
+        desc(ConfigurationRun.started_date), desc(ConfigurationRun.finished_date),
+        desc(ConfigurationRun.failed_date)).all()
 
     return render_template('overview.html', active_config_runs=active_config_runs, config_runs=config_runs)
 
@@ -245,7 +246,8 @@ def status(config_run_id=None):
 
     if config_run_id is None:
         current_user = get_current_user()
-        config_run = ConfigurationRun.query.filter_by(executor_id=current_user.id).order_by(desc(ConfigurationRun.started_date)).first()
+        config_run = ConfigurationRun.query.filter_by(executor_id=current_user.id).order_by(
+            desc(ConfigurationRun.started_date)).first()
     else:
         config_run = ConfigurationRun.query.filter_by(id=config_run_id).first()
 
@@ -358,13 +360,15 @@ def run_configuration():
         return redirect('/login')
 
     current_user = get_current_user()
-    last_config_item = Configuration.query.filter_by(creator_id=current_user.id).order_by(desc(Configuration.created_date)).first()
+    last_config_item = Configuration.query.filter_by(creator_id=current_user.id).order_by(
+        desc(Configuration.created_date)).first()
     scenario_id = None
     config_run_id = None
 
     if last_config_item is not None:
         scenario_id = last_config_item.scenario_id
-        filename = os.path.join(CONFIG_FOLDER, str(current_user.id), datetime.today().strftime('%Y-%m-%d-%H-%M-%S-%f') + '_config_run.json')
+        filename = os.path.join(CONFIG_FOLDER, str(current_user.id),
+                                datetime.today().strftime('%Y-%m-%d-%H-%M-%S-%f') + '_config_run.json')
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         config_run = ConfigurationRun()
@@ -378,7 +382,6 @@ def run_configuration():
         config_run_id = config_run.id
 
         config = json.loads(last_config_item.configuration)
-        config['config_run_id'] = config_run_id
         config['data_path'] = get_data_path(scenario_id, config_run_id)
 
         with open(filename, "w") as f:
@@ -412,8 +415,8 @@ def get_plot_images(scenario_id='', config_run_id=-1):
     path = get_data_path(scenario_id, config_run_id)
 
     for f in PLOT_IMAGE_NAMES:
-            if os.path.isfile(os.path.join(path, f)):
-                plot_files.append(f)
+        if os.path.isfile(os.path.join(path, f)):
+            plot_files.append(f)
 
     response['plot_files'] = plot_files
     response['failed'] = failed
