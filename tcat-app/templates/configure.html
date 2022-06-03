@@ -3,7 +3,7 @@
 {% block title %}Configure{% endblock %}
 {% block content %}
     <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
-        <form id="config-form" method="post" enctype="multipart/form-data" class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2">
+        <form id="config-form" method="post" action="{{ url_for('configure') }}" enctype="multipart/form-data" class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2">
             <div class="flex-grow bg-blue-200 dark:bg-gray-700 rounded-lg">
             {% for key in inputparams.keys() %}
                 <div class="group flex flex-col p-2 lg:p-6">
@@ -15,13 +15,14 @@
                             {% set required = '' if (input[4] == None) else 'required' %}
                             {% set last_value = None if last_configuration == None else last_configuration[input[2]] %}
                             {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
+                            {% set error = None if (validation_errors == None or input[2] not in validation_errors) else validation_errors[input[2]] %}
                             <label for="{{ input[2] }}" class="flex-grow text-black dark:text-gray-300 {{ fs }}">{{ input[3] }}</label>
                             {% if input[0] == 'input' %}
-                                {{ forms.input(input[2], input[1], value, required, input[5]) }}
+                                {{ forms.input(input[2], input[1], value, required, input[5], error) }}
                             {% elif input[0] == 'select' %}
                                 {{ forms.select(input[2], value, input[5]) }}
                             {% elif input[0] == 'checkbox' %}
-                                {% set checked = 'checked' if value == True else '' %}
+                                {% set checked = 'true' if value == True else 'false' %}
                                 {{ forms.checkbox(input[2], checked) }}
                             {% endif %}
                         </div>
@@ -67,7 +68,6 @@
         const selectInputValue = document.querySelectorAll('.select-input-value');
         const uploadData = document.querySelector('#upload-data');
         const configForm = document.querySelector('#config-form');
-        const checkboxes = document.querySelectorAll('.checkboxes');
         const loadingSpinner = document.querySelector('#loading-spinner');
         const runConfig = document.querySelector('#run-config');
         const inputs = document.querySelectorAll('input, select');
@@ -128,17 +128,7 @@
         }));
 
         function uploadConfiguration() {
-            let data = new FormData(configForm);
-            if(checkboxes && checkboxes.length > 0) {
-                for(let i = 0; i < checkboxes.length; i++) {
-                    let isChecked = checkboxes[i].checked;
-                    data.set(checkboxes[i].name, isChecked);
-                }
-            }
-            let request = new XMLHttpRequest();
-            request.addEventListener('load', transferComplete);
-            request.open('POST', '{{ url_for('configure') }}');
-            request.send(data);
+            configForm.submit();
         }
 
         function confirmRerunConfig(e) {
@@ -162,18 +152,11 @@
         }
 
         function enableUpload(e) {
-            console.log(e, 'enabled upload');
             changed = true;
             uploadData.disabled = false;
             for(let i = 0; i < inputs.length; i++) {
                 inputs[i].removeEventListener('change', enableUpload);
             }
-        }
-
-        function transferComplete(e) {
-            document.open();
-            document.write(e.currentTarget.response);
-            document.close();
         }
     </script>
 {% endblock %}
