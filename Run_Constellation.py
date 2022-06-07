@@ -20,7 +20,9 @@ warnings.filterwarnings("ignore")
 try:
     config_file = sys.argv[1]
 except IndexError:
-    config_file = SCENARIO_INPUT_JSON
+    print("Please specify an input .json file in the argv: PATH/FILENAME.json")
+    exit()
+    #config_file = SCENARIO_INPUT_JSON
 
 # Open .json and read mission description
 with open(config_file) as file:
