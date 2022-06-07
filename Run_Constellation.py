@@ -7,7 +7,6 @@ Description:    Run python script to test and debug Constellation Deployement TC
 
 # Import class
 from Scenario.ScenarioConstellation import ScenarioConstellation
-from Scenario.ScenarioParameters import SCENARIO_INPUT_JSON
 
 # Import libraries
 import warnings
