@@ -684,6 +684,15 @@ class Fleet:
         for _, launcher in self.launchers.items():
             launcher.print_report()
 
+    def print_KPI(self):
+        """ Print KPI related to the fleet"""
+        # Number of launcher
+        Nb_LaunchVehicle = len(self.launchers)
+        if Nb_LaunchVehicle > 1:
+            print(f"LaunchVehicles: {Nb_LaunchVehicle}")
+        else:
+            print(f"LaunchVehicle: {Nb_LaunchVehicle}")
+
     def __str__(self):
         temp = self.id
         for _, servicer in self.servicers.items():
