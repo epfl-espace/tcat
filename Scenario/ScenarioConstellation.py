@@ -436,3 +436,18 @@ class ScenarioConstellation:
                 ordered_satellites_id.remove(satellite.ID)
 
             satellites_assigned_to_launcher.clear() ### FLAG USELESS? ###
+    
+    def print_report(self):
+        """ Print quick summary for debugging purposes."""
+        print("="*72)
+        print("REPORT")
+        print("="*72)
+        self.plan.print_report()
+        self.fleet.print_report()
+
+        print("\n"*3+"="*72)
+        print("KPI")
+        print("="*72)
+        self.plan.print_KPI()
+        self.fleet.print_KPI()
+        self.constellation.print_KPI()
