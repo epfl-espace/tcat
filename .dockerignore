@@ -1,0 +1,8 @@
+Doc/
+tmp/
+venv/
+README.md
+Constellation_new_v1.json
+.gitignore
+.git/
+*.db
