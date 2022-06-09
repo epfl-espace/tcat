@@ -13,13 +13,14 @@ import uuid
 import base64
 import mimetypes
 
-from flask import Flask, request, render_template, session, redirect, flash, make_response, send_file
+from flask import Flask, request, render_template, flash, make_response, send_file
+from flask_oidc import OpenIDConnect
+
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash
 
 import inputparams
-from models import db, User, Configuration, ConfigurationRun
-from sqlalchemy import asc, desc
+from models import db, Configuration, ConfigurationRun
+from sqlalchemy import desc
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
@@ -41,17 +42,24 @@ RESULT_FILENAME = os.getenv('RESULT_FILENAME')
 MAX_FILE_LOAD_DURATION_IN_SEC = int(os.getenv('MAX_FILE_LOAD_DURATION_IN_SEC'))
 
 
-def add_user(username, password, email):
-    user = User(username=username, password_hash=generate_password_hash(password), email=email)
-    db.session.add(user)
-    db.session.commit()
-
-
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('APP_SECRET')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.update({
+        'SECRET_KEY': os.getenv('SECRET_KEY'),
+        'TESTING': False,
+        'DEBUG': False,
+        'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+        'OIDC_ID_TOKEN_COOKIE_SECURE': False,
+        'OIDC_REQUIRE_VERIFIED_EMAIL': False,
+        'OIDC_USER_INFO_ENABLED': True,
+        'OIDC_OPENID_REALM': 'flask-demo',
+        'OIDC_SCOPES': ['openid', 'email', 'profile'],
+        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+    })
+    oidc = OpenIDConnect(app)
 
     with app.app_context():
         db.init_app(app)
@@ -59,10 +67,10 @@ def create_app():
         session_factory = sessionmaker(bind=db.engine)
         Session = scoped_session(session_factory)
 
-    return app, Session
+    return app, Session, oidc
 
 
-app, Session = create_app()
+app, Session, oidc = create_app()
 
 
 def get_data_path(scenario_id, config_run_id):
@@ -104,34 +112,13 @@ def failed_config_run(config_run_id):
     return
 
 
-def get_current_user():
-    if not logged_in():
-        return None
-    user = User.query.filter_by(username=session['username']).first()
-    return user
-
-
-def logged_in():
-    if 'username' in session:
-        return True
-    return False
-
-
-def log_the_user_in(username):
-    session['username'] = username
-    return redirect('index')
-
-
-def valid_login(username, password):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        return False
-    return user.verify_password(password)
-
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def get_user_info():
+    return oidc.user_getinfo(['email'])['email']
 
 
 def valid_configuration(configuration):
@@ -190,41 +177,20 @@ def valid_configuration(configuration):
 
 @app.route('/')
 @app.route('/index')
+@oidc.require_login
 def index():
-    if not logged_in():
-        return redirect('/login')
     return render_template('index.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        if valid_login(request.form['username'], request.form['password']):
-            return log_the_user_in(request.form['username'])
-        else:
-            error = 'Invalid username/password'
-
-    return render_template('login.html', error=error)
-
-
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    return redirect('/index')
-
-
 @app.route('/overview')
+@oidc.require_login
 def overview():
-    if not logged_in():
-        return redirect('/login')
+    current_user_email = get_user_info()
 
-    current_user = get_current_user()
-
-    active_config_runs = ConfigurationRun.query.filter(and_(ConfigurationRun.executor_id == current_user.id, and_(
+    active_config_runs = ConfigurationRun.query.filter(and_(ConfigurationRun.executor_email == current_user_email, and_(
         ConfigurationRun.finished_date == None, ConfigurationRun.failed_date == None))).all()
 
-    config_runs = ConfigurationRun.query.filter(and_(ConfigurationRun.executor_id == current_user.id, or_(
+    config_runs = ConfigurationRun.query.filter(and_(ConfigurationRun.executor_email == current_user_email, or_(
         ConfigurationRun.finished_date != None, ConfigurationRun.failed_date != None))).order_by(
         desc(ConfigurationRun.started_date), desc(ConfigurationRun.finished_date),
         desc(ConfigurationRun.failed_date)).all()
@@ -234,13 +200,11 @@ def overview():
 
 @app.route('/status')
 @app.route('/status/<int:config_run_id>')
+@oidc.require_login
 def status(config_run_id=None):
-    if not logged_in():
-        return redirect('/login')
-
     if config_run_id is None:
-        current_user = get_current_user()
-        config_run = ConfigurationRun.query.filter_by(executor_id=current_user.id).order_by(
+        current_user_email = get_user_info()
+        config_run = ConfigurationRun.query.filter_by(executor_email=current_user_email).order_by(
             desc(ConfigurationRun.started_date)).first()
     else:
         config_run = ConfigurationRun.query.filter_by(id=config_run_id).first()
@@ -248,63 +212,44 @@ def status(config_run_id=None):
     return render_template('status.html', config_run=config_run)
 
 
-@app.route('/status/stream/log/<int:config_run_id>')
-def log_stream(config_run_id):
-    if not logged_in():
-        return redirect('/login')
+def generate(config_run_id):
+    db_session = Session()
+    config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
+    scenario_id = config_run.configuration.scenario_id
+    Session.remove()
+    path = os.path.join(get_data_path(scenario_id, config_run_id), LOG_FILENAME)
 
-    def generate():
-        db_session = Session()
-        config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
-        scenario_id = config_run.configuration.scenario_id
-        Session.remove()
-        path = os.path.join(get_data_path(scenario_id, config_run_id), LOG_FILENAME)
+    while not os.path.isfile(path):
+        sleep(0.1)
 
-        while not os.path.isfile(path):
+    with open(path, 'rb', 1) as f:
+        while True:
+            yield f.read()
             sleep(0.1)
 
-        with open(path, 'rb', 1) as f:
-            while True:
-                yield f.read()
-                sleep(0.1)
 
-    return app.response_class(generate(), mimetype='text/plain')
+@app.route('/status/stream/log/<int:config_run_id>')
+@oidc.require_login
+def log_stream(config_run_id):
+    return app.response_class(generate(config_run_id), mimetype='text/plain')
 
 
 @app.route('/status/stream/result/<int:config_run_id>')
+@oidc.require_login
 def result_stream(config_run_id):
-    if not logged_in():
-        return redirect('/login')
-
-    def generate():
-        db_session = Session()
-        config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
-        scenario_id = config_run.configuration.scenario_id
-        Session.remove()
-        path = os.path.join(get_data_path(scenario_id, config_run_id), RESULT_FILENAME)
-
-        while not os.path.isfile(path):
-            sleep(0.1)
-
-        with open(path, 'rb', 1) as f:
-            while True:
-                yield f.read()
-                sleep(0.1)
-
-    return app.response_class(generate(), mimetype='text/plain')
+    return app.response_class(generate(config_run_id), mimetype='text/plain')
 
 
 @app.route('/configure', methods=['GET', 'POST'])
+@oidc.require_login
 def configure():
-    if not logged_in():
-        return redirect('/login')
-
+    current_user_email = get_user_info()
     last_configuration = None
     last_run_for_configuration = None
     validation = [None, None]
 
     if request.method == 'POST':
-        configuration = Configuration(creator_id=get_current_user().id)
+        configuration = Configuration(creator_email=current_user_email)
 
         uploaded_configuration = dict(request.form)
 
@@ -338,7 +283,7 @@ def configure():
             db.session.commit()
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter_by(creator_id=get_current_user().id).order_by(
+        last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
             desc(Configuration.created_date)).first()
         if last_config_item is not None:
             last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
@@ -349,25 +294,23 @@ def configure():
 
 
 @app.route('/configure/run', methods=['GET'])
+@oidc.require_login
 def run_configuration():
-    if not logged_in():
-        return redirect('/login')
-
-    current_user = get_current_user()
-    last_config_item = Configuration.query.filter_by(creator_id=current_user.id).order_by(
+    current_user_email = get_user_info()
+    last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
         desc(Configuration.created_date)).first()
     scenario_id = None
     config_run_id = None
 
     if last_config_item is not None:
         scenario_id = last_config_item.scenario_id
-        filename = os.path.join(CONFIG_FOLDER, str(current_user.id),
+        filename = os.path.join(CONFIG_FOLDER, current_user_email,
                                 datetime.today().strftime('%Y-%m-%d-%H-%M-%S-%f') + '_config_run.json')
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         config_run = ConfigurationRun()
         config_run.configuration_id = last_config_item.id
-        config_run.executor_id = current_user.id
+        config_run.executor_email = current_user_email
         config_run.configuration_file_path = filename
         config_run.status = 'STARTED'
 
@@ -394,10 +337,8 @@ def run_configuration():
 
 
 @app.route('/configure/run/plot/<string:scenario_id>/<int:config_run_id>', methods=['GET'])
+@oidc.require_login
 def get_plot_images(scenario_id='', config_run_id=-1):
-    if not logged_in():
-        return redirect('/login')
-
     config_run = ConfigurationRun.query.filter_by(id=config_run_id).first()
     response = dict()
     response['scenario_id'] = scenario_id
@@ -420,10 +361,8 @@ def get_plot_images(scenario_id='', config_run_id=-1):
 
 
 @app.route('/configure/run/plot/<string:scenario_id>/<int:config_run_id>/<string:filename>', methods=['GET'])
+@oidc.require_login
 def get_plot_image(scenario_id, config_run_id=-1, filename=''):
-    if not logged_in():
-        return redirect('/login')
-
     filename = os.path.join(get_data_path(scenario_id, config_run_id), filename)
     loading_time = 0
     while os.stat(filename).st_size == 0 and loading_time < MAX_FILE_LOAD_DURATION_IN_SEC:
@@ -440,10 +379,8 @@ def get_plot_image(scenario_id, config_run_id=-1, filename=''):
 
 
 @app.route('/download/run/<string:scenario_id>/<int:config_run_id>', methods=['GET'])
+@oidc.require_login
 def download_run_data(scenario_id, config_run_id):
-    if not logged_in():
-        return redirect('/login')
-
     config = Configuration.query.filter_by(scenario_id=scenario_id).first()
     config_run = ConfigurationRun.query.filter_by(id=config_run_id).first()
 
@@ -468,7 +405,8 @@ def download_run_data(scenario_id, config_run_id):
     return send_file(file_obj, attachment_filename=f'{scenario_id}.zip', as_attachment=True)
 
 
-app.jinja_env.globals.update(logged_in=logged_in, inputparams=inputparams.params)
+app.jinja_env.globals.update(inputparams=inputparams.params)
+
 
 if __name__ == '__main__':
     app.run()
