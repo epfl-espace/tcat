@@ -72,6 +72,9 @@ class ScenarioConstellation:
         self.fleet = None
         self.plan = None
 
+        # Flag
+        self.execution_success = False
+
         # Load json configuration file
         with open(config_file) as file:
             json = load_json(file)
@@ -138,8 +141,11 @@ class ScenarioConstellation:
         try:
             self.fleet.design_constellation(self.plan, verbose=False)
             logging.info("Finish executing...")
+            self.execution_success = True
             return True
         except RuntimeWarning as warning:
+            logging.info("Executing failed...")
+            self.execution_success = False
             return warning
 
     def define_constellation(self):
@@ -437,14 +443,21 @@ class ScenarioConstellation:
 
             satellites_assigned_to_launcher.clear() ### FLAG USELESS? ###
     
+    def print_results(self):
+        """ Print results summary in results medium"""
+        self.print_report()
+        self.print_KPI()
+
     def print_report(self):
-        """ Print quick summary for debugging purposes."""
+        """ Print report """
         print("="*72)
         print("REPORT")
         print("="*72)
         self.plan.print_report()
         self.fleet.print_report()
-
+    
+    def print_KPI(self):
+        """ Print mission KPI"""
         print("\n"*3+"="*72)
         print("KPI")
         print("="*72)

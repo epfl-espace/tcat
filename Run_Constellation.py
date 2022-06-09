@@ -63,7 +63,7 @@ if print_to_files:
     results = scenario.execute()
     
     # Print scenario reports
-    scenario.print_report()
+    scenario.print_results()
     
     # Close .txt file
     result.close()
@@ -85,6 +85,5 @@ else:
     results = scenario.execute()
 
     # Print scenario reports
-    scenario.plan.print_report()
-    scenario.fleet.print_report()
+    scenario.print_results()
 
