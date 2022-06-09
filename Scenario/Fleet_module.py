@@ -693,6 +693,10 @@ class Fleet:
         else:
             print(f"LaunchVehicle: {Nb_LaunchVehicle}")
 
+        # Print total launcher mass accros the fleet
+        launchers_mass = [self.launchers[key].get_initial_mass() for key in self.launchers.keys()]
+        print(F"Total mass launched in space: {sum(launchers_mass):.2f}")
+
     def __str__(self):
         temp = self.id
         for _, servicer in self.servicers.items():
@@ -1509,6 +1513,24 @@ class LaunchVehicle(Spacecraft):
         # kits mass
         for _, sats in self.current_sats.items():
             temp_mass = temp_mass + sats.get_current_mass()
+        return temp_mass
+
+    def get_initial_mass(self):
+        """ Returns the total mass of the launcher, including all modules and kits at the launch time in the simulation.
+
+        Return:
+            (u.kg): current mass, including kits
+        """
+        temp_mass = 0
+
+        prop_modules =  self.get_propulsion_modules()
+        temp_mass += sum([(prop_modules[key].get_initial_prop_mass()+prop_modules[key].get_dry_mass()) for key in prop_modules.keys()])
+
+        capt_modules =  self.get_capture_modules()
+        temp_mass += sum([capt_modules[key].get_dry_mass() for key in capt_modules.keys()])
+
+        temp_mass += sum([satellite.initial_mass for satellite in self.assigned_targets])
+
         return temp_mass
 
     def reset(self, plan, design_loop=True, convergence_margin=1. * u.kg, verbose=False):
