@@ -445,22 +445,43 @@ class ScenarioConstellation:
     
     def print_results(self):
         """ Print results summary in results medium"""
+        # Print general report
         self.print_report()
+
+        # Print general KPI
         self.print_KPI()
 
     def print_report(self):
+        # Print flag
         """ Print report """
         print("="*72)
         print("REPORT")
         print("="*72)
+
+        # Print Plan related report
         self.plan.print_report()
+
+        # Print Fleet related report
         self.fleet.print_report()
     
     def print_KPI(self):
         """ Print mission KPI"""
+        # Print flag
         print("\n"*3+"="*72)
         print("KPI")
         print("="*72)
+
+        # Print execution success
+        if self.execution_success:
+            print("Script succesfully executed: Yes")
+        else:
+            print("Script succesfully executed: No")
+        
+        # Print Plan related KPI
         self.plan.print_KPI()
+
+        # Print Fleet related KPI
         self.fleet.print_KPI()
+
+        # Print Constellation related KPI
         self.constellation.print_KPI()
