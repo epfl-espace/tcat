@@ -1711,6 +1711,7 @@ Launch Vehicles:
     Launch vehicle name: {self.launcher_name}
     Dry mass: {self.get_dry_mass():.01f}
     Wet mass: {self.get_wet_mass():.01f}
+    Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
     Payload mass available: {self.mass_available}
     Number of satellites: {self.sats_number}
     Dispenser mass: {self.disp_mass:.1f}
