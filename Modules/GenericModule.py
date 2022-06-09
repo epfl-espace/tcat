@@ -10,7 +10,7 @@ class GenericModule:
 
     Args:
         module_id (str): Standard id. Needs to be unique.
-        servicer (Fleet_module.Servicer): servicer the module belongs to
+        servicer (Scenario.Fleet_module.Servicer): servicer the module belongs to
         dry_mass_override (u.kg): module dry mass (no contingency), overrides possible underlying models
         reference_power_override (u.W): module mean power over designing phase, overrides possible underlying models
         recurring_cost_override (float): recurring cost of module in Euros, overrides possible underlying models
@@ -19,7 +19,7 @@ class GenericModule:
 
     Attributes:
         module_id (str): Standard id. Needs to be unique.
-        servicer (Fleet_module.Servicer or Fleet_module.LaunchVehicle): servicer the module belongs to
+        servicer (Scenario.Fleet_module.Servicer or Fleet_module.LaunchVehicle): servicer the module belongs to
         dry_mass_override (u.kg): module dry mass (no contingency), overrides possible underlying models
         reference_power_override (u.W): module mean power over designing phase, overrides possible underlying models
         recurring_cost_override (float): recurring cost of module in Euros, overrides possible underlying models
@@ -30,10 +30,10 @@ class GenericModule:
         non_recurring_cost (float): non recurring cost of module in Euros
         mass_contingency (float): mass_contingency on the module dry mass
     """
-    def __init__(self, module_id, servicer, dry_mass_override=None, reference_power_override=None, mass_contingency=0.0,
+    def __init__(self, module_id, spacecraft, dry_mass_override=None, reference_power_override=None, mass_contingency=0.0,
                  recurring_cost_override=None, non_recurring_cost_override=None):
         self.id = module_id
-        self.servicer = servicer
+        self.spacecraft = spacecraft
         self.dry_mass_override = dry_mass_override
         self.dry_mass = dry_mass_override
         self.reference_power_override = reference_power_override
@@ -43,8 +43,7 @@ class GenericModule:
         self.recurring_cost = recurring_cost_override
         self.non_recurring_cost_override = non_recurring_cost_override
         self.non_recurring_cost = non_recurring_cost_override
-        self.add_module_to_servicer(servicer)
-        # TODO: check reference power
+        self.add_module_to_servicer(spacecraft)
 
     def add_module_to_servicer(self, servicer):
         """ Add the module to the servicer given in argument. """
@@ -126,5 +125,5 @@ class GenericModule:
     
     def __str__(self):
         return (self.id
-                + "\n\t  Dry mass: " + '{:.01f}'.format(self.get_dry_mass())
-                + "\n\t  Reference power " + '{:.01f}'.format(self.get_reference_power()))
+                + "\n\t\tDry mass: " + '{:.01f}'.format(self.get_dry_mass())
+                + "\n\t\tReference power " + '{:.01f}'.format(self.get_reference_power()))

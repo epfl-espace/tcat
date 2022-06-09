@@ -1,4 +1,4 @@
-import Fleet_module
+import Scenario.Fleet_module
 from Modules.CaptureModule import *
 from Phases.GenericPhase import GenericPhase
 import logging
@@ -36,30 +36,18 @@ class Release(GenericPhase):
     def apply(self):
         """ Separate target from the capture module. The target will now be independent of the servicer."""
         # TODO: check if commented code needs to be used
-        self.get_assigned_module().captured_object = None
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-            self.update_servicer()
-            self.take_servicer_snapshot()
-        else:
-            self.update_launcher()
-            self.take_launcher_snapshot()
 
+        self.get_assigned_module().captured_object = None
+        
         # in case the architecture is launcher and sats, separate sats
         logging.log(21, f"Sat deployed is {self.target}, sats in the dispenser are {self.target.mothership.current_sats}")
         if self.target.mothership:
             logging.log(21, f"Using Launcher mothership architecture")
-            # the launcher's orbit is updated (not just the sat's)
-            self.update_launcher(launcher=self.target.mothership)
             # the sat is separated and updated
-            self.get_assigned_launcher().separate_sat(self.target)
-            self.update_launcher()
-            self.take_launcher_snapshot()
+            self.get_assigned_spacecraft().separate_sat(self.target)
 
-        # if not, then simply update the launcher
-        elif isinstance(self.assigned_module.servicer, Fleet_module.LaunchVehicle):
-            logging.log(21, f"NOT using Launcher mothership architecture")
-            self.update_launcher()
-            self.take_launcher_snapshot()
+        self.update_spacecraft()
+        self.take_spacecraft_snapshot()
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
@@ -75,4 +63,4 @@ class Release(GenericPhase):
 
     def __str__(self):
         return ('--- \nRelease: ' + super().__str__()
-                + '\n\tOf ' + str(self.target))
+                + '\n\tSatellite: ' + str(self.target))

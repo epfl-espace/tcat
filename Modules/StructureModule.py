@@ -39,18 +39,18 @@ class StructureModule(GenericModule):
         if self.dry_mass_override is not None:
             self.dry_mass = self.dry_mass_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             structure_default_mass = 60. * u.kg
             servicer_default_mass = 225. * u.kg
-            self.dry_mass = (structure_default_mass * self.servicer.get_dry_mass(contingency=False)
+            self.dry_mass = (structure_default_mass * self.spacecraft.get_dry_mass(contingency=False)
                              / servicer_default_mass)
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             structure_default_mass = 50.8 * u.kg
             servicer_default_mass = 225. * u.kg
-            self.dry_mass = (structure_default_mass * self.servicer.get_dry_mass(contingency=False)
+            self.dry_mass = (structure_default_mass * self.spacecraft.get_dry_mass(contingency=False)
                              / servicer_default_mass)
         else:
-            raise TypeError('Missing Structure mass model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Structure mass model for group ' + self.spacecraft.group + ' .')
 
     def get_recurring_cost(self):
         """ Returns the recurring cost of the module in Euros.
@@ -60,7 +60,7 @@ class StructureModule(GenericModule):
         """
         if self.recurring_cost_override is not None:
             self.recurring_cost = self.recurring_cost_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             structure_default_recurring_cost = 200. * 1000  # EUR
             structure_default_mass = 50.8 * u.kg
             structure_mass = self.get_dry_mass(contingency=False)
@@ -68,7 +68,7 @@ class StructureModule(GenericModule):
                                    * structure_mass.to(u.kg).value / np.log(structure_mass.to(u.kg).value)
                                    / structure_default_mass.to(u.kg).value
                                    / np.log(structure_default_mass.to(u.kg).value))
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             structure_default_recurring_cost = 200. * 1000  # EUR
             structure_default_mass = 50.8 * u.kg
             structure_mass = self.get_dry_mass(contingency=False)
@@ -77,7 +77,7 @@ class StructureModule(GenericModule):
                                    / structure_default_mass.to(u.kg).value
                                    / np.log(structure_default_mass.to(u.kg).value))
         else:
-            raise TypeError('Missing Structure recurring cost model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Structure recurring cost model for group ' + self.spacecraft.group + ' .')
         return self.recurring_cost
 
     def get_non_recurring_cost(self):
@@ -88,7 +88,7 @@ class StructureModule(GenericModule):
         """
         if self.non_recurring_cost_override is not None:
             self.non_recurring_cost = self.non_recurring_cost_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             structure_engineering_non_recurring_cost = 1202. * 1000  # EUR
             structure_default_non_recurring_cost = 601. * 1000  # EUR
             structure_default_mass = 50.8 * u.kg
@@ -98,7 +98,7 @@ class StructureModule(GenericModule):
                                        * structure_mass.to(u.kg).value / np.log(structure_mass.to(u.kg).value)
                                        / structure_default_mass.to(u.kg).value
                                        / np.log(structure_default_mass.to(u.kg).value))
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             structure_engineering_non_recurring_cost = 1202. * 1000  # EUR
             structure_default_non_recurring_cost = 601. * 1000  # EUR
             structure_default_mass = 50.8 * u.kg
@@ -109,5 +109,5 @@ class StructureModule(GenericModule):
                                        / structure_default_mass.to(u.kg).value
                                        / np.log(structure_default_mass.to(u.kg).value))
         else:
-            raise TypeError('Missing Structure non recurring cost model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Structure non recurring cost model for group ' + self.spacecraft.group + ' .')
         return self.non_recurring_cost

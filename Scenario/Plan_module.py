@@ -1,12 +1,21 @@
-from Phases.Common_functions import *
-import logging
+"""
+Created:        ?
+Last Revision:  23.05.2022
+Author:         ?,Emilien Mingard
+Description:    Plan Class definition
+"""
 
+# Import Classes
+from Phases.Common_functions import *
+
+# Import libraries
+import logging
 
 class Plan:
     """A Plan consists of a list of phases. The list is ordered in terms of the chronology of the phases.
-    The class is initialized with an emtpy list of phases.
-    It contains methods used during simulation to apply changes to the fleet according to the phases.
-    It contains methods to optimize the assignment of phases based on various assumptions.
+        The class is initialized with an emtpy list of phases.
+        It contains methods used during simulation to apply changes to the fleet according to the phases.
+        It contains methods to optimize the assignment of phases based on various assumptions.
 
     Args:
         plan_id (str): Standard id. Needs to be unique.
@@ -17,11 +26,18 @@ class Plan:
         starting_epoch (astropy.Time): reference epoch corresponding to first launch
         phases (list): List of phases (Ordered)
     """
+
+    """
+    Init
+    """
     def __init__(self, plan_id, starting_epoch):
         self.id = plan_id
         self.starting_epoch = starting_epoch
         self.phases = []
     
+    """
+    Methods
+    """
     def add_phase(self, phase):
         """Adds a phase to the Plan class.
 
@@ -32,7 +48,7 @@ class Plan:
         
     def apply(self, verbose=False):
         """Calls the apply function of each phase of the plan in their respective order.
-        This function is used to execute the plan. The phases are reset at the start.
+            This function is used to execute the plan. The phases are reset at the start.
 
         Args:
             verbose (boolean): if True, print message during phase execution
@@ -58,7 +74,7 @@ class Plan:
 
     def get_program_duration(self, additional_schedule_margin=1. * u.year):
         """ Return total duration of program based on operations duration and a margin (1 year by default).
-        The simulation must have run to compute this.
+            The simulation must have run to compute this.
 
         Arg:
             additional_schedule_margin (u.<time unit>): time to add to the duration computation for margin
@@ -88,7 +104,7 @@ class Plan:
 
     def get_baseline_operations_cost(self, fleet):
         """ Returns baseline of operators labour costs. The simulation must have run to compute this. This cost is
-        linked to the duration of the program, not particular operations.
+            linked to the duration of the program, not particular operations.
 
         Arg:
             fleet (Fleet): fleet of servicers, introduced to homogenize "get_" methods implementation
@@ -124,7 +140,7 @@ class Plan:
 
     def get_labour_operations_cost(self, fleet):
         """ Returns direct labour cost for operation. This cost is linked to particular operations that require
-        exceptional labour.
+            exceptional labour.
 
         Arg:
             fleet (Fleet): fleet of servicers, introduced to homogenize "get_" methods implementation

@@ -1,6 +1,6 @@
 from astropy.time import Time
 
-import Fleet_module
+import Scenario.Fleet_module
 from Modules.PropulsionModule import *
 from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
@@ -94,32 +94,19 @@ class OrbitChange(GenericPhase):
         # In case the final orbit is given as a servicer or target, retrieve the object's orbit
         if not isinstance(self.final_orbit, Orbit):
             self.final_orbit = self.final_orbit.current_orbit
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-            # update the final orbit by adding raan drift to match servicer epoch
-            self.final_orbit = update_orbit(self.final_orbit, self.get_assigned_servicer().current_orbit.epoch)
 
-            # update the initial orbit by retrieving current servicer orbit
-            self.initial_orbit = self.get_assigned_servicer().current_orbit
+        # update the final orbit by adding raan drift to match servicer epoch
+        self.final_orbit = update_orbit(self.final_orbit, self.get_assigned_spacecraft().current_orbit.epoch)
 
-            # compute and apply delta v through appropriate propulsion module
-            self.apply_manoeuvres()
+        # update the initial orbit by retrieving current servicer orbit
+        self.initial_orbit = self.get_assigned_spacecraft().current_orbit
 
-            # update servicer according to computed orbits and duration
-            self.update_servicer()
-            self.take_servicer_snapshot()
-        else:
-            # update the final orbit by adding raan drift to match launcher epoch
-            self.final_orbit = update_orbit(self.final_orbit, self.get_assigned_launcher().current_orbit.epoch)
+        # compute and apply delta v through appropriate propulsion module
+        self.apply_manoeuvres()
 
-            # update the initial orbit by retrieving current launcher orbit
-            self.initial_orbit = self.get_assigned_launcher().current_orbit
-
-            # compute and apply delta v through appropriate propulsion module
-            self.apply_manoeuvres()
-
-            # update servicer according to computed orbits and duration
-            self.update_launcher()
-            self.take_launcher_snapshot()
+        # update servicer according to computed orbits and duration
+        self.update_spacecraft()
+        self.take_spacecraft_snapshot()
     
     def apply_delta_v(self):
         """ Compute the delta v for the maneuver and possible orbit maintenance during phasing.
@@ -141,7 +128,7 @@ class OrbitChange(GenericPhase):
         # apply to assigned propulsion module
         self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.delta_v_contingency), 'phasing')
 
-    def update_servicer(self, servicer=None):
+    def update_spacecraft(self, spacecraft=None):
         """ Update the orbits of the servicer and attached targets after phase has ended.
                 If no specific servicer is given as attribute, the servicer assigned to the phase is taken.
         Changes are the orbit raan and epoch according to the specified duration and the servicer orbit at time of
@@ -161,6 +148,7 @@ class OrbitChange(GenericPhase):
         current_raan = (self.initial_orbit.raan + self.raan_drift) % (360. * u.deg)
         if current_raan > 180. * u.deg:
             current_raan = current_raan - 360. * u.deg
+            
         # compute new orbit
         new_orbit = Orbit.from_classical(self.final_orbit.attractor, self.final_orbit.a, self.final_orbit.ecc,
                                          self.final_orbit.inc, current_raan,
@@ -168,42 +156,10 @@ class OrbitChange(GenericPhase):
                                          self.end_date)
         self.final_orbit = new_orbit
 
-        if servicer is None:
-            servicer = self.get_assigned_servicer()
+        if spacecraft is None:
+            spacecraft = self.get_assigned_spacecraft()
         # assign new orbit to servicer and attached targets
-        servicer.change_orbit(new_orbit)
-
-    def update_launcher(self, launcher=None):
-        """ Update the orbits of the launcher and attached targets after phase has ended.
-                If no specific launcher is given as attribute, the launcher assigned to the phase is taken.
-        Changes are the orbit raan and epoch according to the specified duration and the launcher orbit at time of
-        execution. This function may be redefined within inheriting phases.
-
-        Args:
-            launcher (LaunchVehicle):  (optional) launcher to be updated
-                                This optional attributes is used to update launchers connected to the launcher assigned
-                                to the phase, for instance to update the whole mothership if a module of a kit is
-                                assigned to the phase.
-        """
-        # update epochs
-        self.starting_date = self.initial_orbit.epoch
-        self.end_date = self.starting_date + self.duration
-
-        # format raan
-        current_raan = (self.initial_orbit.raan + self.raan_drift) % (360. * u.deg)
-        if current_raan > 180. * u.deg:
-            current_raan = current_raan - 360. * u.deg
-        # compute new orbit
-        new_orbit = Orbit.from_classical(self.final_orbit.attractor, self.final_orbit.a, self.final_orbit.ecc,
-                                         self.final_orbit.inc, current_raan,
-                                         self.final_orbit.argp, self.final_orbit.nu,
-                                         self.end_date)
-        self.final_orbit = new_orbit
-
-        if launcher is None:
-            launcher = self.get_assigned_launcher()
-        # assign new orbit to launcher and attached targets
-        launcher.change_orbit(new_orbit)
+        spacecraft.change_orbit(new_orbit)
 
     def apply_manoeuvres(self, mass=None, thrust=None, isp=None):
         """ Compute and apply the delta v for the maneuver and possible orbit maintenance during phasing.
@@ -217,10 +173,10 @@ class OrbitChange(GenericPhase):
         """
         # retrieve required module attributes
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-                mass = self.get_assigned_servicer().get_current_mass()
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
+                mass = self.get_assigned_spacecraft().get_current_mass()
             else:
-                mass = self.get_assigned_launcher().get_current_mass()
+                mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -270,10 +226,7 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-                mass = self.get_assigned_servicer().get_current_mass()
-            else:
-                mass = self.get_assigned_launcher().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -308,10 +261,10 @@ class OrbitChange(GenericPhase):
         if orbit2 is None:
             orbit2 = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-                mass = self.get_assigned_servicer().get_current_mass()
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
+                mass = self.get_assigned_spacecraft().get_current_mass()
             else:
-                mass = self.get_assigned_launcher().get_current_mass()
+                mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
 
@@ -360,10 +313,10 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-                mass = self.get_assigned_servicer().get_current_mass()
+            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
+                mass = self.get_assigned_spacecraft().get_current_mass()
             else:
-                mass = self.get_assigned_launcher().get_current_mass()
+                mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -383,6 +336,10 @@ class OrbitChange(GenericPhase):
             delta_raan = (final_orbit.raan - initial_orbit.raan - maneuver_delta_raan).to(u.deg) % (360 * u.deg)
             if delta_raan > 180. * u.deg:
                 delta_raan = delta_raan - 360. * u.deg
+            
+            if delta_raan < -180. * u.deg:
+                delta_raan = delta_raan + 360. * u.deg
+
             logging.log(21, f"Orbit_change delta RAAN: {delta_raan}; final orbit RAAN: {final_orbit.raan}; initial orbit RAAN: {initial_orbit.raan}; maneuver delta RAAN: {maneuver_delta_raan}")
             # check if within cut off for maneuver, if so, compute required delta_v and set phasing duration to zero
             if abs(delta_raan) < self.raan_cutoff:
@@ -449,8 +406,7 @@ class OrbitChange(GenericPhase):
         """ Reset the orbits, duration, delta v, raan drift and epochs based on parameters defined during planning. """
         # reset main parameters
         self.duration = 0. * u.second
-        self.servicer_snapshot = None
-        self.launcher_snapshot = None
+        self.spacecraft_snapshot = None
         self.starting_date = Time("2000-01-01 12:00:00")
         self.end_date = Time("2000-01-01 12:00:00")
         self.raan_drift = 0. * u.deg
@@ -463,23 +419,15 @@ class OrbitChange(GenericPhase):
         self.initial_orbit = self.planned_initial_orbit
 
     def __str__(self):
+        # Combine all manoeuvres into a single string
         manoeuvres_string = ""
         for manoeuvre in self.manoeuvres:
             manoeuvres_string += ("\t\t" + str(manoeuvre) + " \n")
-        if isinstance(self.assigned_module.servicer, Fleet_module.Servicer):
-            return ('--- \nOrbit change: ' + super().__str__()
-                    + '\n\tDelta-v: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                    + "\n\tServicer Propellant Mass: "
-                    + "{0:.1f}".format(self.servicer_snapshot.get_main_propulsion_module().current_propellant_mass)
-                    + "\n\tInitial RAAN: " + "{0:.1f}".format(self.initial_orbit.raan % (360 * u.deg))
-                    + "\n\tManoeuvres: \n " + manoeuvres_string
-                    )
-        else:
-            return ('--- \nOrbit change: ' + super().__str__()
-                    + '\n\tDelta-v: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                    + "\n\tLauncher Propellant Mass: "
-                    + "{0:.1f}".format(self.launcher_snapshot.get_main_propulsion_module().current_propellant_mass)
-                    + "\n\tInitial raan: " + "{0:.1f}".format(self.initial_orbit.raan % (360 * u.deg))
-                    + "\n\tManoeuvres: \n " + manoeuvres_string
-                    )
+
+        # Build return string
+        return ('--- \nOrbit change: ' + super().__str__()
+                + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
+                + "\n\t\u0394m: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().delta_mass)
+                + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
+                )
 

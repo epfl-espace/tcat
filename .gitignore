@@ -9,6 +9,7 @@ Snapshots/
 node_modules/
 venv/
 DATA/
+.vscode/
 
 # Don't track these files
 *-lock.json

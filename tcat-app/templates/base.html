@@ -32,16 +32,14 @@
                 </div>
                 {% set nav_items = [('/overview', 'Overview'), ('/configure','Configuration'),('/status','Status')] %}
                 <div class="hidden sm:hidden md:flex flex-grow-0 flex-row space-x-6 items-stretch text-white dark:text-gray-300">
-                    {%  if logged_in() %}
-                        {% for nav_item in nav_items %}
-                            <a class="font-sans text-1xl" href="{{ nav_item[0] }}">
-                                <span class="inline-block align-middle hover:underline">{{ nav_item[1] }}</span>
-                            </a>
-                        {% endfor %}
-                        <a class="font-sans text-1xl" href="/logout">
-                            <span class="inline-block align-middle hover:underline">Logout</span>
+                    {% for nav_item in nav_items %}
+                        <a class="font-sans text-1xl" href="{{ nav_item[0] }}">
+                            <span class="inline-block align-middle hover:underline">{{ nav_item[1] }}</span>
                         </a>
-                    {% endif %}
+                    {% endfor %}
+                    <a class="font-sans text-1xl" href="/logout">
+                        <span class="inline-block align-middle hover:underline">Logout</span>
+                    </a>
                 </div>
                 <div class="md:hidden flex items-center">
                     <button class="outline-none mobile-menu-button">
@@ -60,16 +58,14 @@
                 </div>
             </div>
             <div class="flex-grow hidden md:hidden mobile-menu flex flex-col items-end mt-8 text-white dark:text-gray-300">
-                {%  if logged_in() %}
-                    {% for nav_item in nav_items %}
-                        <a class="font-sans text-1xl" href="{{ nav_item[0] }}">
-                            <span class="inline-block align-middle underline">{{ nav_item[1] }}</span>
-                        </a>
-                    {% endfor %}
-                    <a class="font-sans text-1xl" href="/logout">
-                        <span class="inline-block align-middle underline">Logout</span>
+                {% for nav_item in nav_items %}
+                    <a class="font-sans text-1xl" href="{{ nav_item[0] }}">
+                        <span class="inline-block align-middle underline">{{ nav_item[1] }}</span>
                     </a>
-                {% endif %}
+                {% endfor %}
+                <a class="font-sans text-1xl" href="/logout">
+                    <span class="inline-block align-middle underline">Logout</span>
+                </a>
             </div>
         </nav>
         <div id="content" class="flex-1 py-6 md:py-12 lg:py-16 px-4 md:px-6 lg:px-8 max-w-5x1 mx-auto w-full">{% block content %}{% endblock %}</div>

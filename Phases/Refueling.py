@@ -40,8 +40,8 @@ class Refueling(GenericPhase):
         """ Performs refueling and update servicer. """
         if self.refuel_mass != 0. * u.kg:
             self.refuel(self.find_tank())
-        self.update_servicer()
-        self.take_servicer_snapshot()
+        self.update_spacecraft()
+        self.take_spacecraft_snapshot()
 
     def find_tank(self):
         """ Find a tank within the captured targets to get the propellant from.
@@ -51,7 +51,7 @@ class Refueling(GenericPhase):
         """
         # find all possible captured objects that have propulsion modules
         propulsion_modules = dict()
-        for _, module in self.get_assigned_servicer().get_capture_modules().items():
+        for _, module in self.get_assigned_spacecraft().get_capture_modules().items():
             propulsion_modules = {**propulsion_modules, **module.captured_object.get_refueling_modules()}
         if not propulsion_modules:
             raise Exception('Found no assigned_tanker for '+str(self.ID)+'.')

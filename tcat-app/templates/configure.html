@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% import 'macros/forms.html' as forms %}
 {% block title %}Configure{% endblock %}
 {% block content %}
     <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
-        <form id="config-form" method="post" enctype="multipart/form-data" class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2">
+        <form id="config-form" method="post" action="{{ url_for('configure') }}" enctype="multipart/form-data" class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2">
             <div class="flex-grow bg-blue-200 dark:bg-gray-700 rounded-lg">
             {% for key in inputparams.keys() %}
                 <div class="group flex flex-col p-2 lg:p-6">
@@ -14,33 +15,15 @@
                             {% set required = '' if (input[4] == None) else 'required' %}
                             {% set last_value = None if last_configuration == None else last_configuration[input[2]] %}
                             {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
+                            {% set error = None if (validation_errors == None or input[2] not in validation_errors) else validation_errors[input[2]] %}
                             <label for="{{ input[2] }}" class="flex-grow text-black dark:text-gray-300 {{ fs }}">{{ input[3] }}</label>
                             {% if input[0] == 'input' %}
-                                {% if input[1] == 'number' %}
-                                    <input class="flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ input[1] }}" name="{{ input[2] }}" min="{{ input[5][0] }}" max="{{ input[5][1] }}" value="{{ value }}" {{ required }}>
-                                {% else %}
-                                    <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ input[1] }}" name="{{ input[2] }}" value="{{ value }}" data-validation="{{ input[5] }}" {{ required }}>
-                                {% endif %}
+                                {{ forms.input(input[2], input[1], value, required, input[5], error) }}
                             {% elif input[0] == 'select' %}
-                                <select class="select-input-value bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" name="{{ input[2] }}" data-selected="{{ value }}">
-                                {% for val in input[5] %}
-                                    <option value="{{ val }}">{{ val }}</option>
-                                {% endfor %}
-                                </select>
+                                {{ forms.select(input[2], value, input[5]) }}
                             {% elif input[0] == 'checkbox' %}
                                 {% set checked = 'checked' if value == True else '' %}
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="{{ input[2] }}" {{ checked }} class="checkboxes opacity-0 absolute h-8 w-8" />
-                                    <div class="bg-white dark:bg-gray-900 border-2 rounded-lg border-blue-400 dark:border-blue-200 h-8 w-8 flex flex-shrink-0 justify-center items-center">
-                                        <svg class="fill-current hidden w-4 h-4 pointer-events-none" viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg">
-                                            <g fill="none" fill-rule="evenodd">
-                                                <g transform="translate(-9 -11)" fill="#1F73F1" fill-rule="nonzero">
-                                                    <path d="m25.576 11.414c0.56558 0.55188 0.56558 1.4439 0 1.9961l-9.404 9.176c-0.28213 0.27529-0.65247 0.41385-1.0228 0.41385-0.37034 0-0.74068-0.13855-1.0228-0.41385l-4.7019-4.588c-0.56584-0.55188-0.56584-1.4442 0-1.9961 0.56558-0.55214 1.4798-0.55214 2.0456 0l3.679 3.5899 8.3812-8.1779c0.56558-0.55214 1.4798-0.55214 2.0456 0z" />
-                                                </g>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                </div>
+                                {{ forms.checkbox(input[2], checked) }}
                             {% endif %}
                         </div>
                         {% endfor %}
@@ -85,7 +68,6 @@
         const selectInputValue = document.querySelectorAll('.select-input-value');
         const uploadData = document.querySelector('#upload-data');
         const configForm = document.querySelector('#config-form');
-        const checkboxes = document.querySelectorAll('.checkboxes');
         const loadingSpinner = document.querySelector('#loading-spinner');
         const runConfig = document.querySelector('#run-config');
         const inputs = document.querySelectorAll('input, select');
@@ -146,17 +128,7 @@
         }));
 
         function uploadConfiguration() {
-            let data = new FormData(configForm);
-            if(checkboxes && checkboxes.length > 0) {
-                for(let i = 0; i < checkboxes.length; i++) {
-                    let isChecked = checkboxes[i].checked;
-                    data.set(checkboxes[i].name, isChecked);
-                }
-            }
-            let request = new XMLHttpRequest();
-            request.addEventListener('load', transferComplete);
-            request.open('POST', '{{ url_for('configure') }}');
-            request.send(data);
+            configForm.submit();
         }
 
         function confirmRerunConfig(e) {
@@ -180,16 +152,11 @@
         }
 
         function enableUpload(e) {
-            console.log(e, 'enabled upload');
             changed = true;
             uploadData.disabled = false;
             for(let i = 0; i < inputs.length; i++) {
                 inputs[i].removeEventListener('change', enableUpload);
             }
-        }
-
-        function transferComplete(e) {
-            location.reload();
         }
     </script>
 {% endblock %}

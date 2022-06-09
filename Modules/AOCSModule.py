@@ -39,22 +39,22 @@ class AOCSModule(GenericModule):
         if self.reference_power_override is not None:
             self.reference_power = self.reference_power_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO']:
-            reference_inertia = self.servicer.get_reference_inertia()
+        elif self.spacecraft.group in ['LEO']:
+            reference_inertia = self.spacecraft.get_reference_inertia()
             self.reference_power = 89 * u.W * reference_inertia / (167 * u.kg * u.m * u.m)
-        elif self.servicer.group in ['high_Earth']:
-            reference_inertia = self.servicer.get_reference_inertia()
+        elif self.spacecraft.group in ['high_Earth']:
+            reference_inertia = self.spacecraft.get_reference_inertia()
             self.reference_power = 50 * u.W * reference_inertia / (167 * u.kg * u.m * u.m)
-        elif self.servicer.group in ['planetary']:
-            reference_inertia = self.servicer.get_reference_inertia()
+        elif self.spacecraft.group in ['planetary']:
+            reference_inertia = self.spacecraft.get_reference_inertia()
             # TODO: check ref_inertia
             ref_inertia = 1000.*u.kg*u.m*u.m
             self.reference_power = 1000. * u.W * reference_inertia / (ref_inertia * u.kg * u.m * u.m)
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
-            reference_inertia = self.servicer.get_reference_inertia()
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
+            reference_inertia = self.spacecraft.get_reference_inertia()
             self.reference_power = 89 * u.W * reference_inertia / (167 * u.kg * u.m * u.m)
         else:
-            raise TypeError('Missing AOCS power model for group '+self.servicer.group+' .')
+            raise TypeError('Missing AOCS power model for group '+self.spacecraft.group+' .')
 
     def compute_dry_mass(self, plan):
         """Compute the dry mass of the module depending gon the servicer group.
@@ -65,30 +65,30 @@ class AOCSModule(GenericModule):
         if self.dry_mass_override is not None:
             self.dry_mass = self.dry_mass_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO']:
+        elif self.spacecraft.group in ['LEO']:
             sensors_mass = 5.9 * u.kg
             actuator_default_mass = 6.3 * u.kg
-            reference_inertia = self.servicer.get_reference_inertia()
+            reference_inertia = self.spacecraft.get_reference_inertia()
             self.dry_mass = sensors_mass + actuator_default_mass * reference_inertia / (167. * u.kg * u.m * u.m)
-        elif self.servicer.group in ['high_Earth']:
+        elif self.spacecraft.group in ['high_Earth']:
             sensors_mass = 10. * u.kg
             actuator_default_mass = 5. * u.kg
-            reference_inertia = self.servicer.get_reference_inertia()
+            reference_inertia = self.spacecraft.get_reference_inertia()
             self.dry_mass = sensors_mass + actuator_default_mass * reference_inertia / (167. * u.kg * u.m * u.m)
-        elif self.servicer.group in ['planetary']:
+        elif self.spacecraft.group in ['planetary']:
             sensors_mass = 50. * u.kg
             actuator_default_mass = 200. * u.kg
-            reference_inertia = self.servicer.get_reference_inertia()
+            reference_inertia = self.spacecraft.get_reference_inertia()
             # TODO: check ref_inertia
             ref_inertia = 1000.*u.kg*u.m*u.m
             self.dry_mass = sensors_mass + actuator_default_mass * reference_inertia / (ref_inertia * u.kg * u.m * u.m)
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             sensors_mass = 5.9 * u.kg
             actuator_default_mass = 6.3 * u.kg
-            reference_inertia = self.servicer.get_reference_inertia()
+            reference_inertia = self.spacecraft.get_reference_inertia()
             self.dry_mass = sensors_mass + actuator_default_mass * reference_inertia / (167. * u.kg * u.m * u.m)
         else:
-            raise TypeError('Missing AOCS mass model for group '+self.servicer.group+' .')
+            raise TypeError('Missing AOCS mass model for group '+self.spacecraft.group+' .')
 
     def get_recurring_cost(self):
         """ Returns the recurring cost of the module in Euros.
@@ -113,7 +113,7 @@ class AOCSModule(GenericModule):
         if self.non_recurring_cost_override is not None:
             self.non_recurring_cost = self.non_recurring_cost_override
         else:
-            reference_inertia = self.servicer.get_reference_inertia()
+            reference_inertia = self.spacecraft.get_reference_inertia()
             engineering_non_recurring_cost = 2784. * 1000  # EUR
             sensor_non_recurring_cost = 698. * 1000  # EUR
             actuators_default_non_recurring_cost = 492. * 1000  # EUR

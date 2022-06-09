@@ -30,14 +30,15 @@ class To_NRHO(GenericPhase):
         Calls generic function to update orbit raan and epoch.
         """
         # this workaround to avoid issues when a wrong epoch is given as input
-        if self.get_assigned_servicer().current_orbit.epoch and self.epoch_fix is None:
-            self.epoch_fix = (self.get_assigned_servicer().current_orbit.epoch - self.orbit.epoch).to(u.h)
+        if self.get_assigned_spacecraft().current_orbit.epoch and self.epoch_fix is None:
+            self.epoch_fix = (self.get_assigned_spacecraft().current_orbit.epoch - self.orbit.epoch).to(u.h)
             self.duration += self.epoch_fix
 
-        self.get_assigned_servicer().change_orbit(self.orbit)
+        self.get_assigned_spacecraft().change_orbit(self.orbit)
         self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.contingency), 'To NRHO')
-        self.update_servicer()
-        # return self.get_assigned_servicer()
+        self.update_spacecraft()
+
+        # return self.get_assigned_spacecraft()
 
     def __str__(self):
         return ('--- \nTo NRHO: ' + super().__str__()

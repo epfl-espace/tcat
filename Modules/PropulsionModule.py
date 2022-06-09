@@ -79,12 +79,17 @@ class PropulsionModule(GenericModule):
             plan (Plan_module.Plan): plan for which the module is designed
         """
         rcs_thrust, main_thrust, rcs_prop_mass, ref_delta_v = self.compute_reference_manoeuvers(plan)
+
+        # Here WTF?
         if self.prop_type in ['mono-propellant', 'water']:
             max_phasing_throughput = 150. * u.kg
         else:
             max_phasing_throughput = 1000. * u.kg
+
         max_rendezvous_throughput = 24. * u.kg
         reference_power = 0. * u.W
+
+        # Attitude change
         if rcs_thrust > 0. * u.N:
             n_of_rdv_thrusters, n_of_rdv_sets = self.compute_thrusters_number(rcs_thrust,
                                                                               self.previous_rendezvous_throughput,
@@ -95,6 +100,8 @@ class PropulsionModule(GenericModule):
         else:
             n_of_rdv_thrusters = 0
             n_of_rdv_sets = 0
+
+        # Orbital change
         if main_thrust > 0. * u.N:
             n_of_ph_thrusters, n_of_ph_sets = self.compute_thrusters_number(main_thrust,
                                                                             self.previous_phasing_throughput,
@@ -105,10 +112,15 @@ class PropulsionModule(GenericModule):
         else:
             n_of_ph_thrusters = 0
             n_of_ph_sets = 0
+
+        
         self.reference_power = reference_power
+
+        # Compute number of tanks
         n_of_tanks = self.compute_tanks_number()
-        self.dry_mass = self.compute_dry_mass(plan, n_of_rdv_thrusters, n_of_rdv_sets, n_of_ph_thrusters, n_of_ph_sets,
-                                              n_of_tanks, ref_delta_v)
+
+        # Compute dry mass based on estimated design stage
+        self.dry_mass = self.compute_dry_mass(plan, n_of_rdv_thrusters, n_of_rdv_sets, n_of_ph_thrusters, n_of_ph_sets,n_of_tanks, ref_delta_v)
 
     def compute_reference_manoeuvers(self, plan):
         """ Return the reference thrust and delta v for phasing and rendezvous maneuvers.
@@ -122,10 +134,10 @@ class PropulsionModule(GenericModule):
             (u.N): reference thrust, phasing_thrust
         """
         # setup and get representative delta v
-        ref_delta_v, rcs_prop_mass = self.servicer.get_reference_manoeuvres(plan, self)
+        ref_delta_v, rcs_prop_mass = self.spacecraft.get_reference_manoeuvres(plan, self)
         # for phasing
         if ref_delta_v > 0. * u.m / u.s:
-            reference_servicer_mass = self.servicer.get_wet_mass()
+            reference_servicer_mass = self.spacecraft.get_wet_mass()
             if self.prop_type in ['mono-propellant', 'water', 'solid', "bi-propellant"]:
                 reference_time = 20. * u.minute
                 main_thrust = (reference_servicer_mass * ref_delta_v / reference_time).to(u.N)
@@ -144,7 +156,7 @@ class PropulsionModule(GenericModule):
             ref_delta_v = 0. * u.m / u.s
         # for rendezvous
         if rcs_prop_mass > 0. * u.kg:
-            rcs_thrust = 1. * u.N * self.servicer.get_reference_inertia() / (167. * u.kg * u.m * u.m)
+            rcs_thrust = 1. * u.N * self.spacecraft.get_reference_inertia() / (167. * u.kg * u.m * u.m)
             rcs_prop_mass = rcs_prop_mass / 3
         else:
             rcs_thrust = 0. * u.N
@@ -211,7 +223,7 @@ class PropulsionModule(GenericModule):
         """ Compute module dry mass based on number of elements and other parameters."""
         if self.dry_mass_override is not None:
             self.dry_mass = self.dry_mass_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             # engine_mass = ((1.104 ** -3) * self.max_thrust.to(u.N).value + 27.702) * u.kg
             engine_mass = (9.81 * 10 ** -4 * self.max_thrust.to(u.N).value + 5.37 * 10 ** -4
                            * self.max_thrust.to(u.N).value * 90 ** 0.5 + 25) * u.kg
@@ -251,7 +263,7 @@ class PropulsionModule(GenericModule):
             thruster_mass += 3.2 * u.kg / 8 * n_of_rdv_thrusters * n_of_rdv_sets
             max_continuous_delta_v = max(0. * u.m / u.s, phasing_delta_v)
             # compute tanks for hydrolyzed H2 and O2
-            hydrolyzed_mass = (self.servicer.get_wet_mass()
+            hydrolyzed_mass = (self.spacecraft.get_wet_mass()
                                * (1 - 1 / np.exp((max_continuous_delta_v / self.isp / const.g0).decompose().value)))
             n_h2 = hydrolyzed_mass / (18. * u.g / u.mol)
             n_o2 = hydrolyzed_mass / (36. * u.g / u.mol)
@@ -273,7 +285,7 @@ class PropulsionModule(GenericModule):
         elif self.prop_type == "solid":
             self.dry_mass = 0.1 * self.initial_propellant_mass
         else:
-            raise TypeError('Missing Propulsion mass model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Propulsion mass model for group ' + self.spacecraft.group + ' .')
         if self.is_refueler:
             conditioning_mass = 10. * u.kg
             self.dry_mass += conditioning_mass
@@ -311,21 +323,21 @@ class PropulsionModule(GenericModule):
         """ Make module default phasing module for its servicer.
         Used in automatic generation of planning and servicers.
         """
-        self.servicer.main_propulsion_module_ID = self.id
+        self.spacecraft.main_propulsion_module_ID = self.id
 
     def is_main_propulsion(self):
         """ Check if module is default phasing for its servicer."""
-        return self.servicer.main_propulsion_module_ID == self.id
+        return self.spacecraft.main_propulsion_module_ID == self.id
     
     def define_as_rcs_propulsion(self):
         """ Make module rendezvous capture module for its servicer.
         Used in automatic generation of planning and servicers.
         """
-        self.servicer.rcs_propulsion_module_ID = self.id
+        self.spacecraft.rcs_propulsion_module_ID = self.id
 
     def is_rcs_propulsion(self):
         """ Check if module is default phasing for its servicer."""
-        return self.servicer.rcs_propulsion_module_ID == self.id
+        return self.spacecraft.rcs_propulsion_module_ID == self.id
     
     def apply_delta_v(self, delta_v, phase):
         """Compute and consume the appropriate propellant to perform delta_v.
@@ -334,8 +346,8 @@ class PropulsionModule(GenericModule):
             delta_v (u.m/u.s): delta v to be performed
             phase (str): used to track throughput of thruster ("main_thrusters" or "rcs_thrusters" respectively)
         """
-        delta_mass = self.compute_propellant_mass(delta_v)
-        self.consume_propellant(delta_mass, phase=phase)
+        self.delta_mass = self.compute_propellant_mass(delta_v)
+        self.consume_propellant(self.delta_mass, phase=phase)
 
     def compute_propellant_mass(self, delta_v):
         """ Compute amount of propellant to produce delta v.
@@ -344,7 +356,7 @@ class PropulsionModule(GenericModule):
             (u.kg): propellant mass
         """
         # TODO add propellant mass computation for non impulsive maneuvers
-        initial_mass = self.servicer.get_current_mass()
+        initial_mass = self.spacecraft.get_current_mass()
         temp = np.exp((delta_v.to(u.meter / u.second)/const.g0/self.isp.to(u.second)).value)
         consumed_propellant_mass = initial_mass * (temp-1) / temp
         return consumed_propellant_mass
@@ -421,7 +433,7 @@ class PropulsionModule(GenericModule):
         """
         minimal_propellant_mass = self.initial_propellant_mass
         for i, phase in enumerate(self.get_phases(plan)):
-            phase_propellant_mass = phase.servicer_snapshot.modules[self.id].current_propellant_mass
+            phase_propellant_mass = phase.spacecraft_snapshot.modules[self.id].current_propellant_mass
             if phase_propellant_mass < minimal_propellant_mass:
                 minimal_propellant_mass = phase_propellant_mass
         return minimal_propellant_mass
@@ -454,4 +466,4 @@ class PropulsionModule(GenericModule):
 
     def __str__(self):
         return (super(PropulsionModule, self).__str__()
-                + "\n\t  Propellant mass: " + '{:01.1f}'.format(self.initial_propellant_mass))
+                + "\n\t\tPropellant mass: " + '{:01.1f}'.format(self.initial_propellant_mass))

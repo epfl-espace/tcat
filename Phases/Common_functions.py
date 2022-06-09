@@ -1,40 +1,9 @@
 import numpy as np
-from astropy import constants as const
 from astropy import units as u
 from astropy.time import Time
 from poliastro.bodies import Earth, Moon
 from poliastro.twobody import Orbit
-
-
-class Manoeuvre:
-    """ Class representing a manoeuvre. This is used to simplify computations of thrust, mass and durations.
-
-    Args:
-        delta_v (u.<speed unit>): delta v for the manoeuvre
-
-    Attributes:
-        delta_v (u.<speed unit>): delta v for the manoeuvre
-        burn_duration (u.<time unit>): duration of the burn for the manoeuvre
-    """
-    def __init__(self, delta_v):
-        self.delta_v = delta_v
-        self.burn_duration = 0. * u.minute
-
-    def get_delta_v(self):
-        return self.delta_v
-
-    def compute_burn_duration(self, initial_mass, mean_thrust, isp):
-        final_mass = initial_mass / np.exp((self.delta_v.to(u.meter / u.second) / const.g0 / isp.to(u.second)).value)
-        mean_mass = (final_mass + initial_mass) / 2
-        self.burn_duration = mean_mass / mean_thrust * self.delta_v
-
-    def get_burn_duration(self, duty_cycle=1.):
-        return self.burn_duration / duty_cycle
-
-    def __str__(self):
-        return ('{0:.1f}'.format(self.delta_v.to(u.m/u.s)) + " in "
-                + '{0:.1f}'.format(self.get_burn_duration().to(u.minute)))
-
+from Phases.Manoeuvre import Manoeuvre
 
 def orbit_string(orbit):
     """Custom function to display orbit altitudes over ground. """
@@ -45,7 +14,6 @@ def orbit_string(orbit):
             + ", raan: {0:.0f}".format(orbit.raan % (360 * u.deg))
             + ", ltan {0:.0f}".format((orbit.raan-mean_sun_long(julian_day(orbit.epoch.to_datetime()))) % (360 * u.deg))
             )
-
 
 def nodal_precession(orbit):
     """Returns the nodal precession period and speed of an object orbiting a body.
@@ -306,10 +274,13 @@ def high_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, init
     delta_raan = delta_raan % (360 * u.deg)
     if delta_raan > 180. * u.deg:
         delta_raan -= 360. * u.deg
+
     mean_a = (final_orbit.a + initial_orbit.a) / 2
     mean_inc = (final_orbit.inc + initial_orbit.inc) / 2
-    delta_v = np.pi / 2 * (np.sqrt(initial_orbit.attractor.k / mean_a) * np.sin(mean_inc.to(u.rad).value)
-                           * abs(delta_raan.to(u.rad).value))
+    vel = np.sqrt(initial_orbit.attractor.k / mean_a.to(u.m))
+    d_inc_ratio = np.sin(mean_inc.to(u.rad))
+    delta_v = np.pi / 2 * vel * d_inc_ratio * abs(delta_raan.to(u.rad).value)
+
     manoeuvre = Manoeuvre(delta_v)
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     transfer_duration = (final_orbit.period / 2).to(u.day)
@@ -360,6 +331,8 @@ def update_orbit(orbit, reference_epoch):
     current_raan = (orbit.raan + raan_drift_since_epoch).to(u.deg) % (360 * u.deg)
     if current_raan > 180. * u.deg:
         current_raan = current_raan - 360. * u.deg
+    if current_raan <= -180. * u.deg:
+        current_raan = current_raan + 360. * u.deg
 
     new_orbit = Orbit.from_classical(orbit.attractor, orbit.a, orbit.ecc,
                                      orbit.inc, current_raan,
@@ -449,10 +422,6 @@ def compute_translunar_injection(initial_orbit, final_orbit):
         while epsilon + mu_E / r_1 < 0 * u.m ** 2 / u.s ** 2:
             v_0 = v_0 + 0.05 * u.km / u.s
             epsilon = 0.5 * v_0 ** 2 - mu_E / r_0
-            if counter2 > 100:
-                warnings.warn(
-                    'No convergence: try to modify the increment of v_0 in the while loop or to reduce lambda_1',
-                    RuntimeWarning)
         counter2 = 1
         h_1 = r_0 * v_0 * np.cos(phi_0)
         v_1 = np.sqrt(2 * (epsilon + mu_E / r_1))
@@ -488,9 +457,6 @@ def compute_translunar_injection(initial_orbit, final_orbit):
 
         v_0 = v_0 + (r_f - r_pM) / d_r_pMd_v_0
         tol = r_f - r_pM
-        if counter1 > 100:
-            warnings.warn('No convergence: try to modify the increment of v_0 in the while loop or to reduce lambda_1',
-                          RuntimeWarning)
 
     # delta-V
 

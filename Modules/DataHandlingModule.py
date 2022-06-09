@@ -39,12 +39,12 @@ class DataHandlingModule(GenericModule):
         if self.reference_power_override is not None:
             self.reference_power = self.reference_power_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             self.reference_power = 0. * u.W
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             self.reference_power = 40. * u.W
         else:
-            raise TypeError('Missing Data Handling power model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Data Handling power model for group ' + self.spacecraft.group + ' .')
 
     def compute_dry_mass(self, plan):
         """Compute the dry mass of the module depending gon the servicer group.
@@ -56,12 +56,12 @@ class DataHandlingModule(GenericModule):
         if self.dry_mass_override is not None:
             self.dry_mass = self.dry_mass_override
         # otherwise apply adequate model if available
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             self.dry_mass = 50. * u.kg
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             self.dry_mass = 5.6 * u.kg
         else:
-            raise TypeError('Missing Data Handling mass model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Data Handling mass model for group ' + self.spacecraft.group + ' .')
 
     def get_recurring_cost(self):
         """ Returns the recurring cost of the module in Euros.
@@ -71,12 +71,12 @@ class DataHandlingModule(GenericModule):
         """
         if self.recurring_cost_override is not None:
             self.recurring_cost = self.recurring_cost_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             self.recurring_cost = 500000.
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             self.recurring_cost = 500000.
         else:
-            raise TypeError('Missing Data Handling recurring cost model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Data Handling recurring cost model for group ' + self.spacecraft.group + ' .')
         return self.recurring_cost
 
     def get_non_recurring_cost(self):
@@ -87,10 +87,10 @@ class DataHandlingModule(GenericModule):
         """
         if self.non_recurring_cost_override is not None:
             self.non_recurring_cost = self.non_recurring_cost_override
-        elif self.servicer.group in ['LEO', 'high_Earth', 'planetary']:
+        elif self.spacecraft.group in ['LEO', 'high_Earth', 'planetary']:
             self.non_recurring_cost = 2500000.
-        elif self.servicer.group in ['ADR_servicers', 'tankers']:
+        elif self.spacecraft.group in ['ADR_servicers', 'tankers']:
             self.non_recurring_cost = 2500000.
         else:
-            raise TypeError('Missing Data Handling non recurring cost model for group ' + self.servicer.group + ' .')
+            raise TypeError('Missing Data Handling non recurring cost model for group ' + self.spacecraft.group + ' .')
         return self.non_recurring_cost

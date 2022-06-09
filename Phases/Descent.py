@@ -61,7 +61,7 @@ class Descent(GenericPhase):
         """
         delta_v = self.delta_v + self.transfer().delta_v
         self.get_assigned_module().apply_delta_v(delta_v * (1 + self.delta_v_contingency), 'LTO-NRHO')
-        self.update_servicer()
+        self.update_spacecraft()
 
 
     def __str__(self):
