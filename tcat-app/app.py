@@ -147,7 +147,7 @@ def valid_configuration(configuration):
                     validation_errors[key] = 'Selected value is not in the list of valid values!'
                     continue
             elif isinstance(expected[0], bool):
-                configuration[key] = True # when value is present then true
+                configuration[key] = True  # when value is present then true
                 continue
             elif isinstance(expected[0], float):
                 try:
@@ -406,7 +406,6 @@ def download_run_data(scenario_id, config_run_id):
 
 
 app.jinja_env.globals.update(inputparams=inputparams.params)
-
 
 if __name__ == '__main__':
     app.run()
