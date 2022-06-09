@@ -29,17 +29,17 @@ params = {
         ['select', 'text', 'interpolation_method', 'Interpolation method for the launch vehicle performance', 'linear', ['linear', 'nearest', 'cubic', 'nearest-up', 'zero', 'slinear', 'quadratic', 'previous', 'next']]
     ],
     ('orbits_configuration', 'Orbits Configuration'): [
-        ['input', 'number', 'apogee_sats_insertion', 'Satellite insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 600.0, [0.0, 40000.0]],
-        ['input', 'number', 'perigee_sats_insertion', 'Satellite insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 450.0, [0.0, 40000.0]],
+        ['input', 'number', 'apogee_sats_insertion', 'Satellite insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 600.0, [0.0, 400000.0]],
+        ['input', 'number', 'perigee_sats_insertion', 'Satellite insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 450.0, [0.0, 400000.0]],
         ['input', 'number', 'inc_sats_insertion', 'Satellite insertion orbit inclination (deg)', 87.4, [-90.0, 90.0]],
-        ['input', 'number', 'apogee_sats_operational', 'Satellite operational orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1200.0, [0.0, 40000.0]],
-        ['input', 'number', 'perigee_sats_operational', 'Satellite operational orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 1200.0, [0.0, 40000.0]],
+        ['input', 'number', 'apogee_sats_operational', 'Satellite operational orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1200.0, [0.0, 400000.0]],
+        ['input', 'number', 'perigee_sats_operational', 'Satellite operational orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 1200.0, [0.0, 400000.0]],
         ['input', 'number', 'inc_sats_operational', 'Satellite operational orbit inclination (deg)', 90.0, [-90.0, 90.0]],
-        ['input', 'number', 'apogee_launcher_insertion', 'Launcher insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0, [0.0, 40000.0]],
-        ['input', 'number', 'perigee_launcher_insertion', 'Launcher insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 400.0, [0.0, 40000.0]],
+        ['input', 'number', 'apogee_launcher_insertion', 'Launcher insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0, [0.0, 400000.0]],
+        ['input', 'number', 'perigee_launcher_insertion', 'Launcher insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 400.0, [0.0, 400000.0]],
         ['input', 'number', 'inc_launcher_insertion', 'Launcher insertion orbit inclination (deg)', 87.0, [-90.0, 90.0]],
-        ['input', 'number', 'apogee_launcher_disposal', 'Launcher disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0, [0.0, 40000.0]],
-        ['input', 'number', 'perigee_launcher_disposal', 'Launcher disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0, [0.0, 40000.0]],
+        ['input', 'number', 'apogee_launcher_disposal', 'Launcher disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0, [0.0, 400000.0]],
+        ['input', 'number', 'perigee_launcher_disposal', 'Launcher disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0, [0.0, 400000.0]],
         ['input', 'number', 'inc_launcher_disposal', 'Launcher disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
     ]
 }
