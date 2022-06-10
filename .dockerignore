@@ -7,3 +7,4 @@ Constellation_new_v1.json
 .git/
 *.db
 .idea/
+*.env
