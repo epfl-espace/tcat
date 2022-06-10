@@ -6,3 +6,4 @@ Constellation_new_v1.json
 .gitignore
 .git/
 *.db
+.idea/
