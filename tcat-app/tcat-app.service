@@ -1,0 +1,11 @@
+[Unit]
+Description=uWSGI instance to serve tcat-app
+After=network.target
+[Service]
+User=root
+Group=www-data
+Restart=always
+WorkingDirectory=/app/tcat-app
+ExecStart=/usr/local/bin/uwsgi --ini /app/tcat-app/wsgi.ini
+[Install]
+WantedBy=multi-user.target
