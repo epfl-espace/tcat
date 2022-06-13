@@ -145,7 +145,7 @@ class OrbitChange(GenericPhase):
         self.end_date = self.starting_date + self.duration
 
         # format raan
-        current_raan = (self.final_orbit.raan + self.raan_drift) % (360. * u.deg)
+        current_raan = (self.initial_orbit.raan + self.raan_drift) % (360. * u.deg)
         if current_raan > 180. * u.deg:
             current_raan = current_raan - 360. * u.deg
             
