@@ -13,7 +13,7 @@ import uuid
 import base64
 import mimetypes
 
-from flask import Flask, request, render_template, flash, make_response, send_file
+from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for
 from flask_oidc import OpenIDConnect
 
 from werkzeug.utils import secure_filename
@@ -55,7 +55,7 @@ def create_app():
         'OIDC_ID_TOKEN_COOKIE_SECURE': False,
         'OIDC_REQUIRE_VERIFIED_EMAIL': False,
         'OIDC_USER_INFO_ENABLED': True,
-        'OIDC_OPENID_REALM': 'flask-demo',
+        'OIDC_OPENID_REALM': os.getenv('IDP_REALM'),
         'OIDC_SCOPES': ['openid', 'email', 'profile'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
@@ -180,6 +180,14 @@ def valid_configuration(configuration):
 @oidc.require_login
 def index():
     return render_template('index.html')
+
+
+@app.route("/logout")
+@oidc.require_login
+def logout():
+    logout_request = f'{os.getenv("IDP_LOGOUT_URI")}'
+    oidc.logout()
+    return redirect(logout_request)
 
 
 @app.route('/overview')
