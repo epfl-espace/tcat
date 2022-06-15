@@ -327,21 +327,24 @@ class OrbitChange(GenericPhase):
         _, final_nodal_precession_speed = nodal_precession(final_orbit)
         transfer_mean_nodal_precession_speed = (initial_nodal_precession_speed + final_nodal_precession_speed) / 2
 
-        # first, we consider the case where raan is specified and compute the time in phasing
+        # finalorbit.raan != initialorbit.raan
         if raan_phasing:
-            # find drift that will occur during manoeuvre
+            # Compute drift occuring during pre-computed manoeuvre
             maneuver_delta_precession = transfer_mean_nodal_precession_speed - final_nodal_precession_speed
             maneuver_delta_raan = manoeuvre_duration * maneuver_delta_precession
-            # find delta to be covered through phasing or maneuver (value mapped between -180° and 180°)
+
+            # Compute remainign raan to be covered by phasing
             delta_raan = (final_orbit.raan - initial_orbit.raan - maneuver_delta_raan).to(u.deg) % (360 * u.deg)
+
+            # Correct raan loop
             if delta_raan > 180. * u.deg:
                 delta_raan = delta_raan - 360. * u.deg
-            
             if delta_raan < -180. * u.deg:
                 delta_raan = delta_raan + 360. * u.deg
 
             logging.log(21, f"Orbit_change delta RAAN: {delta_raan}; final orbit RAAN: {final_orbit.raan}; initial orbit RAAN: {initial_orbit.raan}; maneuver delta RAAN: {maneuver_delta_raan}")
-            # check if within cut off for maneuver, if so, compute required delta_v and set phasing duration to zero
+            
+            # Check if phasing can be avoided to the benefit of direct raan change manoeuvre
             if abs(delta_raan) < self.raan_cutoff:
                 phasing_duration = 0. * u.day
                 if self.assigned_module.prop_type == 'electrical':
@@ -354,15 +357,14 @@ class OrbitChange(GenericPhase):
                                                                                                   initial_orbit,
                                                                                                   final_orbit,
                                                                                                   mass, thrust, isp)
-
-            # if not within cut-off, nodal precession is required
-
+                raan_drift = delta_raan + maneuver_delta_raan
+            # Cutoff not available, phasing is triggered
             # here nodal precession is computed to reach a specific raan value, taking in account absolute nodal
             # precession
             elif raan_phasing_absolute:
                 raan_change_manoeuvre = None
                 phasing_duration = delta_raan / initial_nodal_precession_speed
-
+                raan_drift = (initial_nodal_precession_speed * phasing_duration + transfer_mean_nodal_precession_speed * manoeuvre_duration)
             # here nodal precession is computed to reach a specific raan value, taking in account relative nodal
             # precession between two orbits
             else:
@@ -375,20 +377,15 @@ class OrbitChange(GenericPhase):
                 else:
                     phasing_duration = delta_raan / relative_delta_precession
 
+                raan_drift = (initial_nodal_precession_speed * phasing_duration + transfer_mean_nodal_precession_speed * manoeuvre_duration)
 
-        # secondly, we consider the case where no initial raan phasing is made
+        # finalorbit.raan = initialorbit.raan
         else:
+            # No manoeuvre needed
             raan_change_manoeuvre = None
             phasing_duration = 0. * u.day
 
-        # compute the raan drift corresponding to the computed durations (for case 1, should match desired phasing)
-        raan_drift = (initial_nodal_precession_speed * phasing_duration
-                      + transfer_mean_nodal_precession_speed * manoeuvre_duration)
-
-        if initial_orbit.attractor != Earth or final_orbit.attractor != Earth:
-            phasing_duration = 0 * u.day
-            raan_drift = 0 * u.deg
-            raan_change_manoeuvre = None
+            raan_drift = transfer_mean_nodal_precession_speed * manoeuvre_duration
 
         return phasing_duration.to(u.day), raan_drift.to(u.deg), raan_change_manoeuvre
 

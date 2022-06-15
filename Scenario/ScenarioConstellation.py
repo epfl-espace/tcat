@@ -72,6 +72,9 @@ class ScenarioConstellation:
         self.fleet = None
         self.plan = None
 
+        # Flag
+        self.execution_success = False
+
         # Load json configuration file
         with open(config_file) as file:
             json = load_json(file)
@@ -138,8 +141,11 @@ class ScenarioConstellation:
         try:
             self.fleet.design_constellation(self.plan, verbose=False)
             logging.info("Finish executing...")
+            self.execution_success = True
             return True
         except RuntimeWarning as warning:
+            logging.info("Executing failed...")
+            self.execution_success = False
             return warning
 
     def define_constellation(self):
@@ -150,7 +156,7 @@ class ScenarioConstellation:
         self.define_constellation_orbits()
 
         # Check if satellites volume is known, otherwise an estimate is provided
-        if int(self.sat_volume.value) == 0:
+        if float(self.sat_volume.value) == 0:
             logging.info("Estimating satellite volume...")
             self.estimate_satellite_volume()
 
@@ -436,3 +442,46 @@ class ScenarioConstellation:
                 ordered_satellites_id.remove(satellite.ID)
 
             satellites_assigned_to_launcher.clear() ### FLAG USELESS? ###
+    
+    def print_results(self):
+        """ Print results summary in results medium"""
+        # Print general report
+        self.print_report()
+
+        # Print general KPI
+        self.print_KPI()
+
+    def print_report(self):
+        # Print flag
+        """ Print report """
+        print("="*72)
+        print("REPORT")
+        print("="*72)
+
+        # Print Plan related report
+        self.plan.print_report()
+
+        # Print Fleet related report
+        self.fleet.print_report()
+    
+    def print_KPI(self):
+        """ Print mission KPI"""
+        # Print flag
+        print("\n"*3+"="*72)
+        print("KPI")
+        print("="*72)
+
+        # Print execution success
+        if self.execution_success:
+            print("Script succesfully executed: Yes")
+        else:
+            print("Script succesfully executed: No")
+        
+        # Print Plan related KPI
+        self.plan.print_KPI()
+
+        # Print Fleet related KPI
+        self.fleet.print_KPI()
+
+        # Print Constellation related KPI
+        self.constellation.print_KPI()
