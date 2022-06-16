@@ -277,9 +277,9 @@ def configure():
                 flash('No files provided', 'error')
             else:
                 for file in files:
-                    if file.filename == '':
-                        flash('File with empty name found', 'error')
                     if file and allowed_file(file.filename):
+                        if file.filename == '':
+                            flash('File with empty name found', 'error')
                         filename = secure_filename(file.filename)
                         path = os.path.join(UPLOAD_FOLDER, filename)
                         file.save(path)
