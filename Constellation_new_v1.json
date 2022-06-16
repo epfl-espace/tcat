@@ -1,5 +1,5 @@
 {
-  "architecture": "launch_vehicle",
+  "architecture": "upperstage",
   "propulsion_type": "electrical",
   "deployment_strategy":"one_plane_at_a_time_sequential",
   "verbose": false,
