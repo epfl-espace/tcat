@@ -1422,7 +1422,7 @@ class UpperStage(Spacecraft):
         self.dispenser = CaptureModule(self.id + '_Dispenser',
                                             self,
                                             mass_contingency=0.0,
-                                            dry_mass_override=UPPERSTAGE_DRY_MASS)
+                                            dry_mass_override=UPPERSTAGE_DISPENSER_DRY_MASS)
         self.dispenser.define_as_capture_default()
 
         # Add propulsion as PropulsionModule
@@ -1430,7 +1430,7 @@ class UpperStage(Spacecraft):
                                                         self, 'bi-propellant', 294000 * u.N,
                                                         294000 * u.N, 330 * u.s, UPPERSTAGE_INITIAL_FUEL_MASS,
                                                         5000 * u.kg, reference_power_override=0 * u.W,
-                                                        propellant_contingency=0.05, dry_mass_override=0 * u.kg,
+                                                        propellant_contingency=0.05, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
                                                         mass_contingency=0.2)
         self.mainpropulsion.define_as_main_propulsion()
 

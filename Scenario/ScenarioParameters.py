@@ -22,7 +22,8 @@ CONTINGENCY_DELTA_V = 0.1 # dV added to computed dV for each manoeuvres
 MODEL_RAAN_DIRECT_LIMIT = 8 * u.deg # criteria to select between direct RAAN change (small angles only) or use J2 model
 
 # UpperStage initial fuel mass
-UPPERSTAGE_INITIAL_FUEL_MASS = 1000 * u.kg
+UPPERSTAGE_INITIAL_FUEL_MASS = 89.8 * u.kg
 
 # UpperStage initial fuel mass
-UPPERSTAGE_DRY_MASS = 500 * u.kg
+UPPERSTAGE_PROPULSION_DRY_MASS = 0 * u.kg
+UPPERSTAGE_DISPENSER_DRY_MASS = 93.3 *  u.kg
