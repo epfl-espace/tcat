@@ -352,7 +352,7 @@ class Scenario:
             rideshare (bool):
 
         Return:
-            (Fleet_module.LaunchVehicle): created launcher
+            (Fleet_module.UpperStage): created launcher
         """
         # TODO: add nationality of the launcher/satellite to automatically exclude some combination of launcher-satellite
 
@@ -370,7 +370,7 @@ class Scenario:
             l_performance = self.custom_launcher_performance
 
         # Create reference launch vehicle
-        reference_launch_vehicle = LaunchVehicle(launch_vehicle_id, launcher, insertion_orbit, rideshare=rideshare,
+        reference_launch_vehicle = UpperStage(launch_vehicle_id, launcher, insertion_orbit, rideshare=rideshare,
                                                  mass_contingency=0.0)
 
         # Assigning the available mass to the launcher
@@ -709,7 +709,7 @@ class Scenario:
         """ Define launcher servicer_group profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
-            launcher (Fleet_module.LaunchVehicle): launcher to which the profile will be assigned
+            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
             precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
         """
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation

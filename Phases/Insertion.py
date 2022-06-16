@@ -54,7 +54,7 @@ class Insertion(GenericPhase):
             self.take_spacecraft_snapshot()
 
         else:
-            # isinstance(self.assigned_module.spacecraft, Fleet_module.LaunchVehicle)
+            # isinstance(self.assigned_module.spacecraft, Fleet_module.UpperStage)
             self.get_assigned_spacecraft().change_orbit(self.orbit)
             # These two lines avoid propellant consumption for propulsion modules not yet modeled (e.g. launchers ones)
             if isinstance(self.assigned_module, PropulsionModule):

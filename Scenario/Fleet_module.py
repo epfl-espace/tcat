@@ -2,7 +2,7 @@
 Created:        ?
 Last Revision:  23.05.2022
 Author:         ?,Emilien Mingard
-Description:    Fleet,Spacecraft,Servicer and LaunchVehicle Classes definition
+Description:    Fleet,Spacecraft,Servicer and UpperStage Classes definition
 """
 
 # Import Classes
@@ -35,10 +35,17 @@ class Fleet:
     Init
     """
     def __init__(self, fleet_id, architecture):
+        # Fleet id
         self.id = fleet_id
+
+        # Fleet architecture
         self.architecture = architecture
+
+        # Dictionnaries of spacecrafts
         self.servicers = dict()
-        self.launchers = dict()
+        self.upperstages = dict()
+
+        # Flags
         self.is_performance_graph_already_generated = False
     
     """
@@ -57,9 +64,9 @@ class Fleet:
 
         # Define launchers mission profile
         logging.info("Defining Fleet mission profile...")
-        for launcher_id, launcher in self.launchers.items():
-            logging.log(21, f"Defining launcher: {launcher_id}")
-            launcher.define_mission_profile(scenario.plan,global_precession_direction)
+        for upperstage_id, upperstage in self.upperstages.items():
+            logging.log(21, f"Defining upperstage: {upperstage_id}")
+            upperstage.define_mission_profile(scenario.plan,global_precession_direction)
 
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:
@@ -81,16 +88,32 @@ class Fleet:
         else:
             self.servicers[servicer.ID] = servicer
 
-    def add_launcher(self, launcher):
+    def add_upperstage(self, upperstage):
         """ Adds a launcher to the Fleet class.
 
         Args:
-            launcher (LaunchVehicle): launcher to add to the fleet
+            launcher (UpperStage): launcher to add to the fleet
         """
-        if launcher in self.launchers:
-            warnings.warn('Launcher ', launcher.id, ' already in fleet ', self.id, '.', UserWarning)
+        if upperstage in self.upperstages:
+            warnings.warn('Launcher ', upperstage.id, ' already in fleet ', self.id, '.', UserWarning)
         else:
-            self.launchers[launcher.id] = launcher
+            self.upperstages[upperstage.id] = upperstage
+
+    def get_number_upperstages(self):
+        """ Compute and return size of self.upperstages dict
+
+        Return:
+            (int): length of self.upperstages
+        """
+        return len(self.upperstages)
+
+    def get_number_servicers(self):
+        """ Compute and return size of self.servicers dict
+
+        Return:
+            (int): length of self.upperstages
+        """
+        return len(self.servicers)
 
     def design_constellation(self, plan,verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
@@ -101,7 +124,7 @@ class Fleet:
             convergence_margin (u.kg): accuracy required on propellant mass for convergence
         """
         # Converge
-        self.converge(plan,spacecraft_type='LaunchVehicle',convergence_margin=convergence_margin,verbose=verbose,design_loop=True)
+        self.converge(plan,spacecraft_type='UpperStage',convergence_margin=convergence_margin,verbose=verbose,design_loop=True)
 
     def design_ADR(self, plan, clients, verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
@@ -132,7 +155,7 @@ class Fleet:
             print('\nHomogeneous fleet convergence_margin:\n')
         self.converge(plan,spacecraft_type='Servicer', convergence_margin=convergence_margin, verbose=verbose, design_loop=False)
 
-    def converge(self, plan,spacecraft_type='LaunchVehicle',convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
+    def converge(self, plan,spacecraft_type='UpperStage',convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
         """ Iteratively runs the assigned plan and varies initial propellant mass of the fleet until convergence.
             At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
             Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
@@ -163,8 +186,8 @@ class Fleet:
         plan.apply(verbose=False)
 
         # Extract proper spacecraft type
-        if spacecraft_type == 'LaunchVehicle':
-            spacecraft = self.launchers
+        if spacecraft_type == 'UpperStage':
+            spacecraft = self.upperstages
         elif spacecraft_type == 'Servicer':
             spacecraft = self.servicers
 
@@ -301,8 +324,8 @@ class Fleet:
         """
         for _, servicer in self.servicers.items():
             servicer.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
-        for _, launcher in self.launchers.items():
-            launcher.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
+        for _, upperstage in self.upperstages.items():
+            upperstage.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
 
 
     def get_development_cost(self, plan):
@@ -439,7 +462,7 @@ class Fleet:
                 groups.append(servicer.group)
         return groups
 
-    def get_launchers_from_group(self, launcher_group):
+    def get_launchers_from_group(self, upperstage_group):
         """ Return servicers from the fleet that share a servicer_group.
 
         Arg:
@@ -448,8 +471,7 @@ class Fleet:
         Return:
             (dict(Servicer)): Dictionary of servicers of the given group
         """
-        return {launcher_id: launcher for launcher_id, launcher in self.launchers.items()
-                if launcher.group == launcher_group}
+        return {upperstage_id: upperstage for upperstage_id, upperstage in self.upperstages.items() if upperstage.group == upperstage_group}
 
     def get_servicers_from_group(self, servicer_group):
         """ Return servicers from the fleet that share a servicer_group.
@@ -460,8 +482,7 @@ class Fleet:
         Return:
             (dict(Servicer)): Dictionary of servicers of the given group
         """
-        return {servicer_id: servicer for servicer_id, servicer in self.servicers.items()
-                if servicer.group == servicer_group}
+        return {servicer_id: servicer for servicer_id, servicer in self.servicers.items() if servicer.group == servicer_group}
 
     def get_mass_summary(self, rm_duplicates=False):
         """ Returns information in a convenient way for plotting purposes. 
@@ -670,8 +691,8 @@ class Fleet:
         """
         # TODO: deprecate
         temp_string = ''
-        for servicer_ID, servicer in self.servicers.items():
-            temp_string = temp_string + servicer_ID + ' :\n'
+        for servicer_id, servicer in self.servicers.items():
+            temp_string = temp_string + servicer_id+ ' :\n'
             for tgt in servicer.assigned_targets:
                 temp_string = temp_string + '\t' + tgt.ID + '\n'
         print(temp_string)
@@ -681,20 +702,20 @@ class Fleet:
         """
         for _, servicer in self.servicers.items():
             servicer.print_report()
-        for _, launcher in self.launchers.items():
-            launcher.print_report()
+        for _, upperstage in self.upperstages.items():
+            upperstage.print_report()
 
     def print_KPI(self):
         """ Print KPI related to the fleet"""
         # Number of launcher
-        Nb_LaunchVehicle = len(self.launchers)
-        if Nb_LaunchVehicle > 1:
-            print(f"LaunchVehicles: {Nb_LaunchVehicle}")
+        Nb_UpperStage = len(self.upperstages)
+        if Nb_UpperStage > 1:
+            print(f"UpperStages: {Nb_UpperStage}")
         else:
-            print(f"LaunchVehicle: {Nb_LaunchVehicle}")
+            print(f"UpperStage: {Nb_UpperStage}")
 
         # Print total launcher mass accros the fleet
-        launchers_mass = [self.launchers[key].get_initial_mass() for key in self.launchers.keys()]
+        launchers_mass = [self.upperstages[key].get_initial_mass() for key in self.upperstages.keys()]
         print(F"Total mass launched in space: {sum(launchers_mass):.2f}")
 
     def __str__(self):
@@ -1279,9 +1300,9 @@ class Servicer(Spacecraft):
         for _, kit in self.current_kits.items():
             kit.print_report()
 
-class LaunchVehicle(Spacecraft):
-    """LaunchVehicle is an object that performs phases in the plan using its modules.
-    A LaunchVehicle can have any number of modules of any type. A servicer can also host other servicers as in the
+class UpperStage(Spacecraft):
+    """UpperStage is an object that performs phases in the plan using its modules.
+    A UpperStage can have any number of modules of any type. A servicer can also host other servicers as in the
     case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
     mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
     It is added to the fleet specified as argument.
@@ -1316,7 +1337,7 @@ class LaunchVehicle(Spacecraft):
     Init
     """
     def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super(LaunchVehicle, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
+        super(UpperStage, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
         self.launcher_name = scenario.launcher_name
         self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
@@ -1402,7 +1423,7 @@ class LaunchVehicle(Spacecraft):
             logging.warning('No sat '+ sat.ID +' in launcher '+ self.id+ '.')
 
     def assign_sats(self, targets_assigned_to_servicer):
-        """Adds sats to the LaunchVehicle as Target. The LaunchVehicle becomes the sat's mothership.
+        """Adds sats to the UpperStage as Target. The UpperStage becomes the sat's mothership.
 
         Args:
             targets_assigned_to_servicer:
@@ -1410,7 +1431,7 @@ class LaunchVehicle(Spacecraft):
         # TODO: check if can be put into scenario
         for target in targets_assigned_to_servicer:
             if target in self.current_sats:
-                logging.warning('Satellite '+ target.ID+ ' already in LaunchVehicle '+ self.id+ '.')
+                logging.warning('Satellite '+ target.ID+ ' already in UpperStage '+ self.id+ '.')
             else:
                 self.initial_sats[target.ID] = target
                 self.current_sats[target.ID] = target
@@ -1599,7 +1620,7 @@ class LaunchVehicle(Spacecraft):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
-            launcher (Fleet_module.LaunchVehicle): launcher to which the profile will be assigned
+            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
             precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
         """
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation

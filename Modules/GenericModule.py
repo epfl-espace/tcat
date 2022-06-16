@@ -19,7 +19,7 @@ class GenericModule:
 
     Attributes:
         module_id (str): Standard id. Needs to be unique.
-        servicer (Scenario.Fleet_module.Servicer or Fleet_module.LaunchVehicle): servicer the module belongs to
+        servicer (Scenario.Fleet_module.Servicer or Fleet_module.UpperStage): servicer the module belongs to
         dry_mass_override (u.kg): module dry mass (no contingency), overrides possible underlying models
         reference_power_override (u.W): module mean power over designing phase, overrides possible underlying models
         recurring_cost_override (float): recurring cost of module in Euros, overrides possible underlying models
