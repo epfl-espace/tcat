@@ -220,12 +220,12 @@ def status(config_run_id=None):
     return render_template('status.html', config_run=config_run)
 
 
-def generate(config_run_id):
+def generate(config_run_id, file):
     db_session = Session()
     config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
     scenario_id = config_run.configuration.scenario_id
     Session.remove()
-    path = os.path.join(get_data_path(scenario_id, config_run_id), LOG_FILENAME)
+    path = os.path.join(get_data_path(scenario_id, config_run_id), file)
 
     while not os.path.isfile(path):
         sleep(0.1)
@@ -239,13 +239,13 @@ def generate(config_run_id):
 @app.route('/status/stream/log/<int:config_run_id>')
 @oidc.require_login
 def log_stream(config_run_id):
-    return app.response_class(generate(config_run_id), mimetype='text/plain')
+    return app.response_class(generate(config_run_id, LOG_FILENAME), mimetype='text/plain')
 
 
 @app.route('/status/stream/result/<int:config_run_id>')
 @oidc.require_login
 def result_stream(config_run_id):
-    return app.response_class(generate(config_run_id), mimetype='text/plain')
+    return app.response_class(generate(config_run_id, RESULT_FILENAME), mimetype='text/plain')
 
 
 @app.route('/configure', methods=['GET', 'POST'])
