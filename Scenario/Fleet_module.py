@@ -14,7 +14,7 @@ from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
 from Scenario.Interpolation import get_launcher_performance, get_launcher_fairing
 from Scenario.ScenarioParameters import *
-
+from Scenario.Plan_module import *
 
 # Import libraries
 import logging
@@ -24,6 +24,7 @@ from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 import copy
+import math
 
 class Fleet:
     """ A Fleet consists of a dictionary of servicers.
@@ -34,12 +35,12 @@ class Fleet:
     """
     Init
     """
-    def __init__(self, fleet_id, architecture):
+    def __init__(self, fleet_id, scenario):
         # Fleet id
         self.id = fleet_id
 
         # Fleet architecture
-        self.architecture = architecture
+        self.scenario = scenario
 
         # Dictionnaries of spacecrafts
         self.servicers = dict()
@@ -51,6 +52,72 @@ class Fleet:
     """
     Methods
     """
+    def execute(self,clients,verbose=False):
+        """ This function calls all appropriate methods to design the fleet to perform a particular plan.
+
+        Args:
+            clients (Constellation): full or tailored constellation containing satellite treated as targets to reach by any spacecraft
+            verbose (boolean): if True, print convergence information
+        """
+        # Instanciate iteration limits
+        execution_limit = 100
+        execution_count = 1
+
+        # Retrieve unassigned satellites
+        unassigned_satellites = clients.get_optimized_ordered_satellites()
+
+        # Spacecraft launcher counter
+        spacecraft_count = 0
+
+        # Start execution loop
+        while len(unassigned_satellites)>0 and execution_count <= execution_limit:
+            # Create UpperStage
+            spacecraft_count += 1
+            upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
+
+            # Perform initial setup (mass and volume available)
+            upperstage.setup()
+            
+            # Instanciate upperstage execution limit
+            upperstage_execution_limit = 20
+            upperstage_execution_count = 0
+            upperstage_converged = False
+
+            # Iterate until upperstage is validated and its relative plan is satisfactory
+            while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
+                # Compute available mass and volume allowance at current state
+                upperstage.compute_max_sats_number()
+
+                # Assign target as per mass and volume allowance
+                clients.assign_ordered_satellites(upperstage)
+
+                # Define spacecraft mission profile
+                upperstage.define_mission_profile(clients.get_global_precession_rotation())
+
+                # Execute upperstage (Apply owned plan)
+                upperstage.execute()
+
+                # Retrieve plan KPI and satisfactory convergence criterium
+                upperstage_remaining_fuel_mass = upperstage.mainpropulsion.current_propellant_mass
+                if upperstage_remaining_fuel_mass < 0:
+                    # Update upperstage performances and reloop
+                    upperstage.reduce_upperstage_performance(-upperstage_remaining_fuel_mass)
+                else:
+                    # exit loop flat
+                    upperstage_converged = True
+
+                    # remove assigned sats from ordered satellites
+                    clients.remove_in_ordered_satellites(upperstage.assigned_targets)
+
+            # Add converged UpperStage and remove newly assigned satellite
+            self.add_upperstage(upperstage)
+            
+            # Check remaining satellites to be assigned
+            unassigned_satellites = clients.get_optimized_ordered_satellites()
+
+            # Update execution counter
+            execution_count += 1
+
     def define_fleet_mission_profile(self,scenario):
         """ Call the appropriate servicer servicer_group profile definer for the whole fleet
             based on architecture and expected precession direction of the constellation.
@@ -114,17 +181,6 @@ class Fleet:
             (int): length of self.upperstages
         """
         return len(self.servicers)
-
-    def design_constellation(self, plan,verbose=False, convergence_margin=0.5 * u.kg):
-        """ This function calls all appropriate methods to design the fleet to perform a particular plan.
-
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-            verbose (boolean): if True, print convergence information
-            convergence_margin (u.kg): accuracy required on propellant mass for convergence
-        """
-        # Converge
-        self.converge(plan,spacecraft_type='UpperStage',convergence_margin=convergence_margin,verbose=verbose,design_loop=True)
 
     def design_ADR(self, plan, clients, verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
@@ -732,7 +788,8 @@ class Spacecraft:
     """
     Init
     """
-    def __init__(self,id,group,additional_dry_mass,mass_contingency):
+    def __init__(self,id,group,additional_dry_mass,mass_contingency,starting_epoch):
+        # Original attributs (To be described)
         self.id = id
         self.group = group
         self.current_orbit = None
@@ -750,6 +807,9 @@ class Spacecraft:
         self.assigned_targets = []
         self.mothership = None
         self.mass_contingency = mass_contingency
+
+        # Instanciate Plan
+        self.plan = Plan(f"Plan_{self.id}",starting_epoch)
 
     """
     Methods
@@ -1337,8 +1397,9 @@ class UpperStage(Spacecraft):
     Init
     """
     def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super(UpperStage, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
+        super(UpperStage, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency,scenario.starting_epoch)
         self.launcher_name = scenario.launcher_name
+        self.scenario = scenario
         self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
         self.mass_available = None
@@ -1354,37 +1415,63 @@ class UpperStage(Spacecraft):
     """
     Methods
     """
-    def setup(self,scenario):
+    def setup(self):
         """ setup the launcher separately from __init__()
         """
+        # Add dispenser as CaptureModule
+        self.dispenser = CaptureModule(self.id + '_Dispenser',
+                                            self,
+                                            mass_contingency=0.0,
+                                            dry_mass_override=UPPERSTAGE_DRY_MASS)
+        self.dispenser.define_as_capture_default()
+
+        # Add propulsion as PropulsionModule
+        self.mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                                        self, 'bi-propellant', 294000 * u.N,
+                                                        294000 * u.N, 330 * u.s, UPPERSTAGE_INITIAL_FUEL_MASS,
+                                                        5000 * u.kg, reference_power_override=0 * u.W,
+                                                        propellant_contingency=0.05, dry_mass_override=0 * u.kg,
+                                                        mass_contingency=0.2)
+        self.mainpropulsion.define_as_main_propulsion()
+
         # Interpolate launcher performance
-        self.compute_launcher_performance(scenario)
+        self.compute_upperstage_performance(self.scenario)
 
         # Interpolate launcher fairing capacity
-        self.compute_launcher_fairing(scenario)
+        self.compute_upperstage_fairing(self.scenario)
 
-    def compute_launcher_performance(self,scenario):
+    def execute(self):
+        """ Apply own plan
+        """
+        # Apply plan
+        self.plan.apply()
+
+    def compute_upperstage_performance(self,scenario):
         """ Compute the satellite performance
         """
         # Check for custom launcher_name values
         if scenario.custom_launcher_name is None:
             logging.info(f"Gathering Launch Vehicle performance from database...")
-            self.mass_available = get_launcher_performance(scenario.fleet,
-                                                                 scenario.launcher_name,
-                                                                 scenario.launch_site,
-                                                                 self.insertion_orbit.inc.value,
-                                                                 scenario.apogee_launcher_insertion.value,
-                                                                 scenario.perigee_launcher_insertion.value,
-                                                                 scenario.orbit_type,
-                                                                 method=scenario.interpolation_method,
-                                                                 verbose=scenario.verbose,
-                                                                 save="InterpolationGraph",
-                                                                 save_folder=scenario.data_path)
+            # Compute launcher capabilities to deliver into orbit
+            launcher_performance = get_launcher_performance(scenario.fleet,
+                                                            scenario.launcher_name,
+                                                            scenario.launch_site,
+                                                            self.insertion_orbit.inc.value,
+                                                            scenario.apogee_launcher_insertion.value,
+                                                            scenario.perigee_launcher_insertion.value,
+                                                            scenario.orbit_type,
+                                                            method=scenario.interpolation_method,
+                                                            verbose=scenario.verbose,
+                                                            save="InterpolationGraph",
+                                                            save_folder=scenario.data_path)
+
+            # Substract UpperStage mass
+            self.mass_available = launcher_performance - self.get_modules_initial_mass()
         else:
             logging.info(f"Using custom Launch Vehicle performance...")
             self.mass_available = scenario.custom_launcher_performance
 
-    def compute_launcher_fairing(self,scenario):
+    def compute_upperstage_fairing(self,scenario):
         """ Estimate the satellite volume based on mass
         """
         # Check for custom launcher_name values
@@ -1398,7 +1485,35 @@ class UpperStage(Spacecraft):
             logging.info(f"Using custom Launch Vehicle's fairing size...")
             cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
             cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
-            self.olume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+            self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+    
+    def compute_max_sats_number(self):
+        """ Compute number of satellites to fit in the upper stage
+        """
+        # Compute limit in volume terms
+        limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
+
+        # Compute limit in mass terms
+        limit_mass = math.floor(self.volume_available/self.reference_satellite.get_volume())
+
+        # Minimal value is of interest
+        self.max_sats_number =  min([limit_volume,limit_mass])
+
+    def get_max_sats_number(self):
+        """ Return maximum allowable of the upperstage
+        """
+        return self.max_sats_number
+
+
+    def reduce_upperstage_performance(self,value):
+        """ Allow to artificially reduce the upperstage performances
+        """
+        self.mass_available -= value.to(u.kg)
+
+    def reduce_upperstage_fairing(self,value):
+        """ Allow to artificially reduce the upperstage performances
+        """
+        self.volume_available -= value.to(u.m ** 3)
 
     def assign_upper_stage(self, upper_stage):
         """ Adds another servicer to the Servicer class as assigned_upper_stage.
@@ -1437,6 +1552,9 @@ class UpperStage(Spacecraft):
                 self.current_sats[target.ID] = target
                 target.mothership = self
             self.assigned_targets.append(target)
+
+        # Update number of satellites
+        self.sats_number = len(self.assigned_targets)
 
     def converge_launch_vehicle(self, satellite, serviceable_sats_left, dispenser="Auto", tech_level=1):
         """Converges the number of satellites that can be hosted within the launcher. Takes into account the
@@ -1602,6 +1720,14 @@ class UpperStage(Spacecraft):
         capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
         return capture_modules
 
+    def get_modules_initial_mass(self):
+        """ Returns all modules initial mass
+
+        Return:
+            (dict(Module)): dictionary of the modules
+        """
+        return sum([module.get_initial_mass() for _,module in self.modules.items()])
+
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
 
@@ -1616,7 +1742,7 @@ class UpperStage(Spacecraft):
             if capture_module.captured_object:
                 capture_module.captured_object.current_orbit = orbit
 
-    def define_mission_profile(self,plan,precession_direction):
+    def define_mission_profile(self,precession_direction):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
@@ -1640,10 +1766,7 @@ class UpperStage(Spacecraft):
 
         ##########
         # Step 1: Insertion Phase
-        ##########
-        # Logging
-        logging.log(21,f"Launcher insertion orbit's RAAN corrected with {insertion_raan_margin} margin. New RAAN is: {first_target.operational_orbit.raan - precession_direction * insertion_raan_margin}, with a precession direction of {precession_direction}")
-        
+        ##########      
         # Compute insertion orbit
         insertion_orbit = Orbit.from_classical(Earth,
                                                self.insertion_orbit.a - insertion_a_margin,
@@ -1655,7 +1778,7 @@ class UpperStage(Spacecraft):
                                                self.insertion_orbit.epoch)
 
         # Add Insertion phase to the plan
-        insertion = Insertion(f"({self.id}) Goes to insertion orbit",plan, insertion_orbit, duration=1 * u.h)
+        insertion = Insertion(f"({self.id}) Goes to insertion orbit",self.plan, insertion_orbit, duration=1 * u.h)
 
         # Assign propulsion module to insertion phase
         insertion.assign_module(self.get_main_propulsion_module())
@@ -1663,12 +1786,9 @@ class UpperStage(Spacecraft):
         ##########
         # Step 2: Raise from insertion to constellation orbit
         ##########
-        # Logging
-        logging.log(21,"Launcher will raise its orbit")
-
         # Add Raising phase to plan
         raising = OrbitChange(f"({self.id}) goes to first target orbit ({first_target.ID})",
-                              plan,
+                              self.plan,
                               first_target.insertion_orbit,
                               raan_specified=True,
                               initial_orbit=insertion_orbit,
@@ -1698,7 +1818,7 @@ class UpperStage(Spacecraft):
 
                 # Reach phasing orbit and add to plan
                 phasing = OrbitChange(f"({self.id}) goes to ideal phasing orbit",
-                                      plan,
+                                      self.plan,
                                       phasing_orbit,
                                       raan_specified=False,
                                       delta_v_contingency=delta_v_contingency)
@@ -1708,7 +1828,7 @@ class UpperStage(Spacecraft):
 
                 # Change orbit back to target orbit and add to plan
                 raising = OrbitChange(f"({self.id}) goes to next target ({current_target.ID})",
-                                      plan,
+                                      self.plan,
                                       current_target.insertion_orbit,
                                       raan_specified=True,
                                       initial_orbit=phasing_orbit,
@@ -1720,7 +1840,7 @@ class UpperStage(Spacecraft):
             
             # Add Release phase to the plan
             deploy = Release(f"Satellites ({current_target.ID}) released",
-                             plan,
+                             self.plan,
                              current_target,
                              duration=20 * u.min)
 
@@ -1729,7 +1849,6 @@ class UpperStage(Spacecraft):
 
             # Set current_target to deployed
             current_target.state = "Deployed"
-            logging.log(21, f"'{current_target}' state is: {current_target.state}")
 
             # Update current orbit
             current_orbit = current_target.insertion_orbit
@@ -1737,16 +1856,14 @@ class UpperStage(Spacecraft):
         ##########
         # Step 4: De-orbit the launcher
         ##########
-        # Logging
-        logging.log(21, f"Launcher will deorbit itself")
-
         # Add OrbitChange to the plan
-        removal = OrbitChange(f"({self.id}) goes to disposal orbit", plan, self.disposal_orbit,delta_v_contingency=delta_v_contingency)
+        removal = OrbitChange(f"({self.id}) goes to disposal orbit", self.plan, self.disposal_orbit,delta_v_contingency=delta_v_contingency)
 
         # Assign propulsion module to OrbitChange phase
         removal.assign_module(self.get_main_propulsion_module())
 
     def print_report(self):
+        self.plan.print_report()
         """ Print quick summary for debugging purposes."""
         print(f"""---\n---
 Launch Vehicles:

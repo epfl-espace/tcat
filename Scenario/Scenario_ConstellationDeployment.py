@@ -814,7 +814,6 @@ class Scenario:
 
             # Set current_target to deployed
             current_target.state = "Deployed"
-            logging.log(21, f"'{current_target}' state is: {current_target.state}")
 
             # Update current orbit
             current_orbit = current_target.insertion_orbit

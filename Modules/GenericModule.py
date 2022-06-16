@@ -36,6 +36,7 @@ class GenericModule:
         self.spacecraft = spacecraft
         self.dry_mass_override = dry_mass_override
         self.dry_mass = dry_mass_override
+        self.initial_mass = dry_mass_override
         self.reference_power_override = reference_power_override
         self.reference_power = reference_power_override
         self.mass_contingency = mass_contingency
@@ -68,6 +69,14 @@ class GenericModule:
             if phase.get_assigned_module() == self:
                 servicer_phases.append(phase)
         return servicer_phases
+
+    def get_initial_mass(self, contingency=False):
+        """Returns the initial mass of the module.
+
+        Return:
+            (u.kg): dry mass with contingency
+        """
+        return self.get_dry_mass(contingency=contingency)
 
     def get_dry_mass(self, contingency=True):
         """Returns the dry mass of the module (including contingencies by default).

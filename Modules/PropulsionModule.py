@@ -449,6 +449,14 @@ class PropulsionModule(GenericModule):
         self.previous_minimal_propellant_mass = self.get_minimal_propellant_mass(plan)
         self.initial_propellant_mass = new_propellant_mass
 
+    def get_initial_mass(self, contingency=False):
+        """Returns the initial mass of the module.
+
+        Return:
+            (u.kg): dry mass with contingency
+        """
+        return self.get_wet_mass(contingency=contingency)
+
     def reset(self):
         """" Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence_margin.
         """

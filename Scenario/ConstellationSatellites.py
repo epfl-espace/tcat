@@ -47,7 +47,36 @@ class Constellation:
         if satellite in self.satellites:
             warnings.warn('Target ', satellite.ID, ' already in constellation ', self.ID, '.', UserWarning)
         else:
+            # Add new satellite to general list of satellites
             self.satellites[satellite.ID] = satellite
+
+    def set_optimized_ordered_satellites(self,list_of_satellites):
+        """ Set list of ordered satellites to be released.
+        """
+        self.optimized_ordered_satellites = list_of_satellites
+
+    def get_optimized_ordered_satellites(self):
+        """ Set list of ordered satellites to be released.
+
+        Return:
+            (List(Satellite)): List containing optimized ordered satellites left
+        """
+        return self.optimized_ordered_satellites
+
+    def assign_ordered_satellites(self,upperstage):
+        """ Assign remaining ordered satellite to current spacecraft within spacecraft allowance
+        """
+        # Nb satellite to be assign
+        satellite_allowance = upperstage.get_max_sats_number()
+
+        # Assign sats
+        upperstage.assign_sats(self.optimized_ordered_satellites[0:satellite_allowance])
+
+    def remove_in_ordered_satellites(self,satellites):
+        """ Remove already assigned satellites
+        """
+        for satellite in satellites:
+            self.optimized_ordered_satellites.remove(satellite)
 
     def get_standby_satellites(self):
         """ Return dictionary of satellites that have a standby state.
@@ -101,6 +130,8 @@ class Constellation:
             altitude_offset (u.km): ?
             sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly
         """
+        # Add reference_satellite as attribut
+        self.reference_satellite = reference_satellite
         
         # Extract reference satellite orbits
         insertion_orbit = reference_satellite.insertion_orbit

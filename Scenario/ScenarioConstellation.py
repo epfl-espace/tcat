@@ -128,17 +128,12 @@ class ScenarioConstellation:
         self.define_fleet()
         logging.info("Finish defining Fleet...")
 
-        # Define plan based on attributes
-        logging.info("Start defining Plan...")
-        self.define_plan()
-        logging.info("Finish defining Plan...")
-
     def execute(self):
         """ Execute the scenario until the fleet converges using a method from the fleet class.
         """
         logging.info("Start executing...")
         try:
-            self.fleet.design_constellation(self.plan, verbose=False)
+            self.fleet.execute(clients=self.constellation,verbose=False)
             logging.info("Finish executing...")
             self.execution_success = True
             return True
@@ -195,8 +190,8 @@ class ScenarioConstellation:
     def define_fleet(self):
         """ Define fleet object.
         """
-        # Compute total number of satellites
-        satellites_left = self.constellation.get_number_satellites()
+        # # Compute total number of satellites
+        # satellites_left = self.constellation.get_number_satellites()
 
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
@@ -209,93 +204,11 @@ class ScenarioConstellation:
             self.launcher_name = self.custom_launcher_name
 
         # Define fleet
-        self.fleet = Fleet('UpperStages', self.architecture)
+        logging.info("Instanciate Fleet object...")
+        self.fleet = Fleet('UpperStages',self)
 
-        # Assign satellite to launcher as long as satellite are left without launch vehicle
-        index = 0
-        while satellites_left > 0:
-            # Check for architecture compatibility
-            if self.architecture == 'upperstage':
-                # Create launcher id based on index
-                upperstage_id = 'UpperStage_' + '{:04d}'.format(index)
-                logging.info(f"Instanciating {upperstage_id}...")
-
-                # Create a new launch vehicle
-                temp_upperstage, serviced_sats = self.create_upperstage_spacecraft(upperstage_id,satellites_left)
-
-                # Update number of left satellite
-                satellites_left -= serviced_sats
-
-                # Add latest UpperStage to the fleet
-                self.fleet.add_upperstage(temp_upperstage)
-                index += 1
-
-                # Update the number of servicers during convergence
-                self.number_of_servicers = self.fleet.get_number_upperstages()
-
-            else:
-                raise Exception('Unknown architecture {}'.format(self.architecture))
-
-    def define_plan(self):
-        """ Define plan according to constellation and fleet.
-        """
-        # Instanciate Plan object
-        self.plan = Plan('Plan', self.starting_epoch)
-
-        # Assign targets to UpperStage
-        self.assign_satellites()
-
-        # Check for available satellite to deploy
-        self.fleet.define_fleet_mission_profile(self)
-
-    def create_upperstage_spacecraft(self,upperstage_id,serviceable_sats_left):
-        """ Create an upperstage.
-
-        Args:
-            upperstage_id (str): id of the launcher to be created
-            serviceable_sats_left (int): remaining satellites to be serviced
-
-        Return:
-            (Fleet_module.UpperStage): created launcher
-        """
-
-        # Instanciate a reference launch vehicle and set it up
-        reference_launch_vehicle = UpperStage(upperstage_id,self,mass_contingency=0.0)
-        reference_launch_vehicle.setup(self)
-
-        logging.info(f"Converging the number of satellites manifested in the Launch Vehicle...")
-        serviced_sats, _, self.ref_disp_mass, self.ref_disp_volume = reference_launch_vehicle.converge_launch_vehicle(self.reference_satellite,serviceable_sats_left,tech_level=self.dispenser_tech_level)
-
-        # Instanciate Capture and Propulsion modules
-        reference_dispenser = CaptureModule(upperstage_id + '_dispenser',
-                                            reference_launch_vehicle,
-                                            mass_contingency=0.0,
-                                            dry_mass_override=self.ref_disp_mass)
-
-        # TOFIX: the initial mass of propellant in Propulsion Module is set to 0 kg. 
-        # It is further used to compute the wet mass of launcher.
-        # Therefore, the mission the launcher's mass becomes negative while it burns propellant.
-        # Remark: in execute() method, it seems like the converge() method should take care of estimating 
-        # required prop. mass. Looks like it doesn't do the job....
-        reference_phasing_propulsion = PropulsionModule(upperstage_id + '_phasing_propulsion',
-                                                        reference_launch_vehicle, 'bi-propellant', 294000 * u.N, ### FLAG ATTENTION ###
-                                                        294000 * u.N, 330 * u.s, 0. * u.kg,
-                                                        5000 * u.kg, reference_power_override=0 * u.W,
-                                                        propellant_contingency=0.05, dry_mass_override=0 * u.kg,
-                                                        mass_contingency=0.2)
-
-        # Define modules
-        reference_dispenser.define_as_capture_default()
-        reference_phasing_propulsion.define_as_main_propulsion()
-
-        # Return UpperStage and number of serviced sats
-        return reference_launch_vehicle, serviced_sats
-
-    def estimate_satellite_volume(self):
-        """ Estimate the reference satellite volume based on mass
-        """
-        # Estimate volume based on satellite mass
-        self.sat_volume = 9 * 10 ** -9 * self.sat_mass ** 3 - 10 ** -6 * self.sat_mass ** 2 + 0.0028 * self.sat_mass
+        # Compute optimal order to release once spacecraft is known
+        self.organise_satellites()
 
     def define_constellation_orbits(self):
         """ Define orbits needed for constellation and satellites definition.
@@ -351,8 +264,8 @@ class ScenarioConstellation:
                                                             0. * u.deg,
                                                             self.starting_epoch)
 
-    def assign_satellites(self):
-        """Function that creates a plan based on an architecture, clients and fleet.
+    def organise_satellites(self):
+        """Organise satellite release order based on scenario.
         """
         # Determine if precession is turning counter-clockwise (1) or clockwise (-1)
         global_precession_direction = self.constellation.get_global_precession_rotation()
@@ -369,78 +282,65 @@ class ScenarioConstellation:
                                     self.constellation.get_standby_satellites()[satellite_id].operational_orbit.raan.value,
                                     self.constellation.get_standby_satellites()[satellite_id].operational_orbit.nu.value))
 
-        logging.info("Finding 'optimal' sequence of target deployment...")
+        logging.info("Computing 'optimal' deployement sequence ...")
         # For each launcher, find optimal sequence of targets' deployment
-        for _, launcher in self.fleet.get_launchers_from_group('launcher').items():
-            # Extract number of satellites
-            number_satellites = self.constellation.get_number_satellites()
+        # Extract number of satellites
+        number_satellites = self.constellation.get_number_satellites()
 
-            # Instanciate ideal sequence numpy array
-            sequence_list = np.full((number_satellites,min(launcher.sats_number,number_satellites)),-1)
+        # Instanciate ideal sequence numpy array
+        sequence_list = np.full((number_satellites,number_satellites),-1)
 
-            # Built the ideal sequence array
-            for sequence_row in range(0,number_satellites):
-                sequence_list[sequence_row,:] = np.mod(np.arange(sequence_row,sequence_row+launcher.sats_number,1),launcher.sats_number)
+        # Built the ideal sequence array
+        for sequence_row in range(0,number_satellites):
+            sequence_list[sequence_row,:] = np.mod(np.arange(sequence_row,sequence_row+number_satellites,1),number_satellites)
 
-            # After establishing feasible options, compute criterium to prioritize between them
-            criteria_raan_spread = []
-            criteria_altitude = []
-            for i in range(0, len(ordered_satellites_id)):
-                # Get targets id
-                satellite_id_list = [ordered_satellites_id[i] for i in sequence_list[i, :]]
-                logging.log(21,f"List of targets' ID: {satellite_id_list}")
+        # After establishing feasible options, compute criterium to prioritize between them
+        criteria_raan_spread = []
+        criteria_altitude = []
+        for i in range(0, len(ordered_satellites_id)):
+            # Get targets id
+            satellite_id_list = [ordered_satellites_id[i] for i in sequence_list[i, :]]
 
-                # Instanciate raan spread over current sequence
-                sequence_raan_spread = 0 * u.deg
+            # Instanciate raan spread over current sequence
+            sequence_raan_spread = 0 * u.deg
 
-                # Iterate through sequence's satellites
-                for j in range(1, len(satellite_id_list)):
-                    # Extract initial target RAAN
-                    initial_RAAN = self.constellation.satellites[satellite_id_list[j]].insertion_orbit.raan
-                    logging.log(21,f"1: RAAN {initial_RAAN}°")
+            # Iterate through sequence's satellites
+            for j in range(1, len(satellite_id_list)):
+                # Extract initial target RAAN
+                initial_RAAN = self.constellation.satellites[satellite_id_list[j]].insertion_orbit.raan
 
-                    # Extract next target RAAN
-                    final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].insertion_orbit.raan
-                    logging.log(21,f"2: RAAN {final_RAAN}°")
+                # Extract next target RAAN
+                final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].insertion_orbit.raan
 
-                    # Check for opposite precession movement (Has a larger cost)
-                    delta_RAAN = final_RAAN-initial_RAAN
-                    if np.sign(delta_RAAN) != np.sign(global_precession_direction):
-                        # Need to circle around globe to reach final RAAN
-                        delta_RAAN = -np.sign(delta_RAAN)*(360*u.deg-abs(delta_RAAN))
-                    
-                    # Add RAAN spread to sequence's total RAAN spread
-                    sequence_raan_spread += delta_RAAN
+                # Check for opposite precession movement (Has a larger cost)
+                delta_RAAN = final_RAAN-initial_RAAN
+                if np.sign(delta_RAAN) != np.sign(global_precession_direction):
+                    # Need to circle around globe to reach final RAAN
+                    delta_RAAN = -np.sign(delta_RAAN)*(360*u.deg-abs(delta_RAAN))
+                
+                # Add RAAN spread to sequence's total RAAN spread
+                sequence_raan_spread += delta_RAAN
 
-                logging.log(21,f"Total RAAN spread over sequence {i}: {sequence_raan_spread}°")
 
-                # Append sequence_raan_spread to global array
-                criteria_raan_spread.append(abs(sequence_raan_spread.value))
+            # Append sequence_raan_spread to global array
+            criteria_raan_spread.append(abs(sequence_raan_spread.value))
 
-                # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-                satellites_altitude = sum([self.constellation.satellites[sat_id].operational_orbit.a.to(u.km).value for sat_id in satellite_id_list])
-                criteria_altitude.append(satellites_altitude)
-                logging.log(21,f"Total altitude over sequence {i}: {satellites_altitude}")
+            # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
+            satellites_altitude = sum([self.constellation.satellites[sat_id].operational_orbit.a.to(u.km).value for sat_id in satellite_id_list])
+            criteria_altitude.append(satellites_altitude)
 
-            # Find ideal sequence by merging RAAN and altitude in a table
-            ranking = [list(range(0, len(ordered_satellites_id))), criteria_raan_spread, criteria_altitude]
-            ranking = np.array(ranking).T.tolist()
+        # Find ideal sequence by merging RAAN and altitude in a table
+        ranking = [list(range(0, len(ordered_satellites_id))), criteria_raan_spread, criteria_altitude]
+        ranking = np.array(ranking).T.tolist()
 
-            # Sort by RAAN spread (primary) and alitude (secondary)
-            ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
+        # Sort by RAAN spread (primary) and alitude (secondary)
+        ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
 
-            # Extract best sequence
-            best_sequence = int(ranking[0][0])
+        # Extract best sequence
+        best_sequence = int(ranking[0][0])
 
-            # Extract and assign satellite to this launcher
-            satellites_assigned_to_launcher = [self.constellation.satellites[ordered_satellites_id[int(sat_id_in_list)]] for sat_id_in_list in sequence_list[best_sequence, :]]
-            launcher.assign_sats(satellites_assigned_to_launcher)
-
-            # Remove from ordered targets
-            for satellite in satellites_assigned_to_launcher: ### FLAG USELESS? ###
-                ordered_satellites_id.remove(satellite.ID)
-
-            satellites_assigned_to_launcher.clear() ### FLAG USELESS? ###
+        # Extract and assign satellite to this launcher
+        self.constellation.set_optimized_ordered_satellites([self.constellation.satellites[ordered_satellites_id[int(sat_id_in_list)]] for sat_id_in_list in sequence_list[best_sequence, :]])
     
     def print_results(self):
         """ Print results summary in results medium"""
@@ -457,9 +357,6 @@ class ScenarioConstellation:
         print("REPORT")
         print("="*72)
 
-        # Print Plan related report
-        self.plan.print_report()
-
         # Print Fleet related report
         self.fleet.print_report()
     
@@ -475,9 +372,6 @@ class ScenarioConstellation:
             print("Script succesfully executed: Yes")
         else:
             print("Script succesfully executed: No")
-        
-        # Print Plan related KPI
-        self.plan.print_KPI()
 
         # Print Fleet related KPI
         self.fleet.print_KPI()

@@ -341,9 +341,7 @@ class OrbitChange(GenericPhase):
                 delta_raan = delta_raan - 360. * u.deg
             if delta_raan < -180. * u.deg:
                 delta_raan = delta_raan + 360. * u.deg
-
-            logging.log(21, f"Orbit_change delta RAAN: {delta_raan}; final orbit RAAN: {final_orbit.raan}; initial orbit RAAN: {initial_orbit.raan}; maneuver delta RAAN: {maneuver_delta_raan}")
-            
+ 
             # Check if phasing can be avoided to the benefit of direct raan change manoeuvre
             if abs(delta_raan) < self.raan_cutoff:
                 phasing_duration = 0. * u.day

@@ -40,9 +40,7 @@ class Release(GenericPhase):
         self.get_assigned_module().captured_object = None
         
         # in case the architecture is launcher and sats, separate sats
-        logging.log(21, f"Sat deployed is {self.target}, sats in the dispenser are {self.target.mothership.current_sats}")
         if self.target.mothership:
-            logging.log(21, f"Using Launcher mothership architecture")
             # the sat is separated and updated
             self.get_assigned_spacecraft().separate_sat(self.target)
 
