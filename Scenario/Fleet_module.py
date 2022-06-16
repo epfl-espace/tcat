@@ -2,7 +2,7 @@
 Created:        ?
 Last Revision:  23.05.2022
 Author:         ?,Emilien Mingard
-Description:    Fleet,Spacecraft,Servicer and LaunchVehicle Classes definition
+Description:    Fleet,Spacecraft,Servicer and UpperStage Classes definition
 """
 
 # Import Classes
@@ -81,11 +81,11 @@ class Fleet:
         else:
             self.servicers[servicer.ID] = servicer
 
-    def add_launcher(self, launcher):
+    def add_upperstage(self, launcher):
         """ Adds a launcher to the Fleet class.
 
         Args:
-            launcher (LaunchVehicle): launcher to add to the fleet
+            launcher (UpperStage): launcher to add to the fleet
         """
         if launcher in self.launchers:
             warnings.warn('Launcher ', launcher.id, ' already in fleet ', self.id, '.', UserWarning)
@@ -101,7 +101,7 @@ class Fleet:
             convergence_margin (u.kg): accuracy required on propellant mass for convergence
         """
         # Converge
-        self.converge(plan,spacecraft_type='LaunchVehicle',convergence_margin=convergence_margin,verbose=verbose,design_loop=True)
+        self.converge(plan,spacecraft_type='UpperStage',convergence_margin=convergence_margin,verbose=verbose,design_loop=True)
 
     def design_ADR(self, plan, clients, verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
@@ -132,7 +132,7 @@ class Fleet:
             print('\nHomogeneous fleet convergence_margin:\n')
         self.converge(plan,spacecraft_type='Servicer', convergence_margin=convergence_margin, verbose=verbose, design_loop=False)
 
-    def converge(self, plan,spacecraft_type='LaunchVehicle',convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
+    def converge(self, plan,spacecraft_type='UpperStage',convergence_margin=0.5 * u.kg, limit=200, verbose=False, design_loop=True):
         """ Iteratively runs the assigned plan and varies initial propellant mass of the fleet until convergence.
             At each iteration, the fleet is designed for the appropriate propellant mass and the plan is executed.
             Depending on the remaining propellant mass, the initial propellant masses are adjusted until convergence
@@ -163,7 +163,7 @@ class Fleet:
         plan.apply(verbose=False)
 
         # Extract proper spacecraft type
-        if spacecraft_type == 'LaunchVehicle':
+        if spacecraft_type == 'UpperStage':
             spacecraft = self.launchers
         elif spacecraft_type == 'Servicer':
             spacecraft = self.servicers
@@ -689,9 +689,9 @@ class Fleet:
         # Number of launcher
         Nb_LaunchVehicle = len(self.launchers)
         if Nb_LaunchVehicle > 1:
-            print(f"LaunchVehicles: {Nb_LaunchVehicle}")
+            print(f"UpperStages: {Nb_LaunchVehicle}")
         else:
-            print(f"LaunchVehicle: {Nb_LaunchVehicle}")
+            print(f"UpperStage: {Nb_LaunchVehicle}")
 
         # Print total launcher mass accros the fleet
         launchers_mass = [self.launchers[key].get_initial_mass() for key in self.launchers.keys()]
@@ -1279,9 +1279,9 @@ class Servicer(Spacecraft):
         for _, kit in self.current_kits.items():
             kit.print_report()
 
-class LaunchVehicle(Spacecraft):
-    """LaunchVehicle is an object that performs phases in the plan using its modules.
-    A LaunchVehicle can have any number of modules of any type. A servicer can also host other servicers as in the
+class UpperStage(Spacecraft):
+    """UpperStage is an object that performs phases in the plan using its modules.
+    A UpperStage can have any number of modules of any type. A servicer can also host other servicers as in the
     case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
     mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
     It is added to the fleet specified as argument.
@@ -1316,7 +1316,7 @@ class LaunchVehicle(Spacecraft):
     Init
     """
     def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super(LaunchVehicle, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
+        super(UpperStage, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency)
         self.launcher_name = scenario.launcher_name
         self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
@@ -1402,7 +1402,7 @@ class LaunchVehicle(Spacecraft):
             logging.warning('No sat '+ sat.ID +' in launcher '+ self.id+ '.')
 
     def assign_sats(self, targets_assigned_to_servicer):
-        """Adds sats to the LaunchVehicle as Target. The LaunchVehicle becomes the sat's mothership.
+        """Adds sats to the UpperStage as Target. The UpperStage becomes the sat's mothership.
 
         Args:
             targets_assigned_to_servicer:
@@ -1410,7 +1410,7 @@ class LaunchVehicle(Spacecraft):
         # TODO: check if can be put into scenario
         for target in targets_assigned_to_servicer:
             if target in self.current_sats:
-                logging.warning('Satellite '+ target.ID+ ' already in LaunchVehicle '+ self.id+ '.')
+                logging.warning('Satellite '+ target.ID+ ' already in UpperStage '+ self.id+ '.')
             else:
                 self.initial_sats[target.ID] = target
                 self.current_sats[target.ID] = target
@@ -1599,7 +1599,7 @@ class LaunchVehicle(Spacecraft):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
-            launcher (Fleet_module.LaunchVehicle): launcher to which the profile will be assigned
+            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
             precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
         """
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation
