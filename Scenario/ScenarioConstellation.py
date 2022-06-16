@@ -136,7 +136,6 @@ class ScenarioConstellation:
     def execute(self):
         """ Execute the scenario until the fleet converges using a method from the fleet class.
         """
-        # self.fleet.design(self.plan, self.clients, verbose=verbose)
         logging.info("Start executing...")
         try:
             self.fleet.design_constellation(self.plan, verbose=False)
