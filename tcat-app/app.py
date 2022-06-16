@@ -16,8 +16,6 @@ import mimetypes
 from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for
 from flask_oidc import OpenIDConnect
 
-from werkzeug.utils import secure_filename
-
 import inputparams
 from models import db, Configuration, ConfigurationRun
 from sqlalchemy import desc
@@ -26,7 +24,8 @@ from sqlalchemy.orm import sessionmaker
 
 from dotenv import load_dotenv
 
-load_dotenv()  # sets values from .env file as environment vars
+load_dotenv()  # sets values from .env file as environment vars, *.env files are ignored when creating the docker
+# image. so the values for the docker image come from the dockerfile and the provided arguments
 
 BASE_FOLDER = os.getenv('BASE_FOLDER')
 UPLOAD_FOLDER = os.path.join(BASE_FOLDER, 'uploads/')
