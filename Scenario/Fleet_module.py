@@ -71,22 +71,25 @@ class Fleet:
 
         # Start execution loop
         while len(unassigned_satellites)>0 and execution_count <= execution_limit:
-            # Create UpperStage
-            spacecraft_count += 1
-            upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
-
-            # Perform initial setup (mass and volume available)
-            upperstage.setup()
-            
             # Instanciate upperstage execution limit
             upperstage_execution_limit = 20
             upperstage_execution_count = 0
             upperstage_converged = False
 
+            # Create UpperStage
+            spacecraft_count += 1
+            upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
+
+            # Instanciate iteration correction
+            mass_available_correction = 0 * u.kg
+
             # Iterate until upperstage is validated and its relative plan is satisfactory
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
+                # Perform initial setup (mass and volume available)
+                upperstage.compute_upperstage(mass_available_correction,0 * u.m**3)
+
                 # Compute available mass and volume allowance at current state
-                upperstage.compute_max_sats_number(unassigned_satellites)
+                upperstage.design(unassigned_satellites)
 
                 # Assign target as per mass and volume allowance
                 clients.assign_ordered_satellites(upperstage)
@@ -98,11 +101,8 @@ class Fleet:
                 upperstage.execute()
 
                 # Retrieve plan KPI and satisfactory convergence criterium
-                upperstage_remaining_fuel_mass = upperstage.mainpropulsion.current_propellant_mass
-                if upperstage_remaining_fuel_mass < 0:
-                    # Update upperstage performances and reloop
-                    upperstage.reduce_upperstage_performance(-upperstage_remaining_fuel_mass)
-                else:
+                mass_available_correction = - upperstage.mainpropulsion.current_propellant_mass
+                if mass_available_correction < 0:
                     # exit loop flat
                     upperstage_converged = True
 
@@ -1415,30 +1415,16 @@ class UpperStage(Spacecraft):
     """
     Methods
     """
-    def setup(self):
+    def compute_upperstage(self,available_mass_correction,available_volume_correction):
         """ setup the launcher separately from __init__()
         """
-        # Add dispenser as CaptureModule
-        self.dispenser = CaptureModule(self.id + '_Dispenser',
-                                            self,
-                                            mass_contingency=0.0,
-                                            dry_mass_override=UPPERSTAGE_DISPENSER_DRY_MASS)
-        self.dispenser.define_as_capture_default()
-
-        # Add propulsion as PropulsionModule
-        self.mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
-                                                        self, 'bi-propellant', 294000 * u.N,
-                                                        294000 * u.N, 330 * u.s, UPPERSTAGE_INITIAL_FUEL_MASS,
-                                                        5000 * u.kg, reference_power_override=0 * u.W,
-                                                        propellant_contingency=0.05, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
-                                                        mass_contingency=0.2)
-        self.mainpropulsion.define_as_main_propulsion()
-
-        # Interpolate launcher performance
+        # Interpolate launcher performance + correction
         self.compute_upperstage_performance(self.scenario)
+        self.reduce_upperstage_performance(available_mass_correction)
 
-        # Interpolate launcher fairing capacity
+        # Interpolate launcher fairing capacity + correction
         self.compute_upperstage_fairing(self.scenario)
+        self.reduce_upperstage_fairing(available_volume_correction)
 
     def execute(self):
         """ Apply own plan
@@ -1466,7 +1452,7 @@ class UpperStage(Spacecraft):
                                                             save_folder=scenario.data_path)
 
             # Substract UpperStage mass
-            self.mass_available = launcher_performance - self.get_modules_initial_mass()
+            self.mass_available = launcher_performance
         else:
             logging.info(f"Using custom Launch Vehicle performance...")
             self.mass_available = scenario.custom_launcher_performance
@@ -1487,8 +1473,8 @@ class UpperStage(Spacecraft):
             cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
             self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
     
-    def compute_max_sats_number(self,unassigned_satellites):
-        """ Compute number of satellites to fit in the upper stage
+    def design(self,unassigned_satellites):
+        """ Design upperstage and compute necessary information
         """
         # Compute limit in volume terms
         limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
@@ -1502,6 +1488,22 @@ class UpperStage(Spacecraft):
         # Compute filling ratio and disp mass and volume
         self.mass_filling_ratio = (self.max_sats_number * self.reference_satellite.get_initial_mass()) / self.mass_available
         self.volume_filling_ratio = (self.max_sats_number * self.reference_satellite.get_volume()) / self.volume_available
+
+        # Add dispenser as CaptureModule
+        self.dispenser = CaptureModule(self.id + '_Dispenser',
+                                            self,
+                                            mass_contingency=0.0,
+                                            dry_mass_override=UPPERSTAGE_DISPENSER_DRY_MASS)
+        self.dispenser.define_as_capture_default()
+
+        # Add propulsion as PropulsionModule
+        self.mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                                        self, 'bi-propellant', 294000 * u.N,
+                                                        294000 * u.N, 330 * u.s, UPPERSTAGE_INITIAL_FUEL_MASS,
+                                                        5000 * u.kg, reference_power_override=0 * u.W,
+                                                        propellant_contingency=0.05, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
+                                                        mass_contingency=0.2)
+        self.mainpropulsion.define_as_main_propulsion()
 
     def get_max_sats_number(self):
         """ Return maximum allowable of the upperstage
