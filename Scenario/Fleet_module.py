@@ -86,7 +86,7 @@ class Fleet:
             # Iterate until upperstage is validated and its relative plan is satisfactory
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
                 # Compute available mass and volume allowance at current state
-                upperstage.compute_max_sats_number()
+                upperstage.compute_max_sats_number(unassigned_satellites)
 
                 # Assign target as per mass and volume allowance
                 clients.assign_ordered_satellites(upperstage)
@@ -1487,17 +1487,21 @@ class UpperStage(Spacecraft):
             cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
             self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
     
-    def compute_max_sats_number(self):
+    def compute_max_sats_number(self,unassigned_satellites):
         """ Compute number of satellites to fit in the upper stage
         """
         # Compute limit in volume terms
         limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
 
         # Compute limit in mass terms
-        limit_mass = math.floor(self.volume_available/self.reference_satellite.get_volume())
+        limit_mass = math.floor(self.volume_available/self.reference_satellite.get_initial_mass())
 
         # Minimal value is of interest
-        self.max_sats_number =  min([limit_volume,limit_mass])
+        self.max_sats_number =  min([limit_volume,limit_mass,len(unassigned_satellites)])
+
+        # Compute filling ratio and disp mass and volume
+        self.mass_filling_ratio = (self.max_sats_number * self.reference_satellite.get_initial_mass()) / self.mass_available
+        self.volume_filling_ratio = (self.max_sats_number * self.reference_satellite.get_volume()) / self.volume_available
 
     def get_max_sats_number(self):
         """ Return maximum allowable of the upperstage
