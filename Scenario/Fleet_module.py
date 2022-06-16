@@ -1473,7 +1473,7 @@ class UpperStage(Spacecraft):
             cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
             self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
     
-    def design(self,unassigned_satellites):
+    def design(self,unassigned_satellites,tech_level=1):
         """ Design upperstage and compute necessary information
         """
         # Compute limit in volume terms
@@ -1486,14 +1486,17 @@ class UpperStage(Spacecraft):
         self.max_sats_number =  min([limit_volume,limit_mass,len(unassigned_satellites)])
 
         # Compute filling ratio and disp mass and volume
-        self.mass_filling_ratio = (self.max_sats_number * self.reference_satellite.get_initial_mass()) / self.mass_available
+        self.total_satellites_mass = self.max_sats_number * self.reference_satellite.get_initial_mass()
+        self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
         self.volume_filling_ratio = (self.max_sats_number * self.reference_satellite.get_volume()) / self.volume_available
 
         # Add dispenser as CaptureModule
+        dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
+        dispenser_volume = (0.0114 * dispenser_mass.to(u.kg).value / tech_level) * u.m ** 3
         self.dispenser = CaptureModule(self.id + '_Dispenser',
                                             self,
                                             mass_contingency=0.0,
-                                            dry_mass_override=UPPERSTAGE_DISPENSER_DRY_MASS)
+                                            dry_mass_override=dispenser_mass)
         self.dispenser.define_as_capture_default()
 
         # Add propulsion as PropulsionModule
