@@ -35,10 +35,17 @@ class Fleet:
     Init
     """
     def __init__(self, fleet_id, architecture):
+        # Fleet id
         self.id = fleet_id
+
+        # Fleet architecture
         self.architecture = architecture
+
+        # Dictionnaries of spacecrafts
         self.servicers = dict()
-        self.launchers = dict()
+        self.upperstages = dict()
+
+        # Flags
         self.is_performance_graph_already_generated = False
     
     """
@@ -57,7 +64,7 @@ class Fleet:
 
         # Define launchers mission profile
         logging.info("Defining Fleet mission profile...")
-        for launcher_id, launcher in self.launchers.items():
+        for launcher_id, launcher in self.upperstages.items():
             logging.log(21, f"Defining launcher: {launcher_id}")
             launcher.define_mission_profile(scenario.plan,global_precession_direction)
 
@@ -87,10 +94,26 @@ class Fleet:
         Args:
             launcher (UpperStage): launcher to add to the fleet
         """
-        if launcher in self.launchers:
+        if launcher in self.upperstages:
             warnings.warn('Launcher ', launcher.id, ' already in fleet ', self.id, '.', UserWarning)
         else:
-            self.launchers[launcher.id] = launcher
+            self.upperstages[launcher.id] = launcher
+
+    def get_number_upperstages(self):
+        """ Compute and return size of self.upperstages dict
+
+        Return:
+            (int): length of self.upperstages
+        """
+        return len(self.upperstages)
+
+    def get_number_servicers(self):
+        """ Compute and return size of self.servicers dict
+
+        Return:
+            (int): length of self.upperstages
+        """
+        return len(self.servicers)
 
     def design_constellation(self, plan,verbose=False, convergence_margin=0.5 * u.kg):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
@@ -164,7 +187,7 @@ class Fleet:
 
         # Extract proper spacecraft type
         if spacecraft_type == 'UpperStage':
-            spacecraft = self.launchers
+            spacecraft = self.upperstages
         elif spacecraft_type == 'Servicer':
             spacecraft = self.servicers
 
@@ -301,7 +324,7 @@ class Fleet:
         """
         for _, servicer in self.servicers.items():
             servicer.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
-        for _, launcher in self.launchers.items():
+        for _, launcher in self.upperstages.items():
             launcher.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
 
 
@@ -448,7 +471,7 @@ class Fleet:
         Return:
             (dict(Servicer)): Dictionary of servicers of the given group
         """
-        return {launcher_id: launcher for launcher_id, launcher in self.launchers.items()
+        return {launcher_id: launcher for launcher_id, launcher in self.upperstages.items()
                 if launcher.group == launcher_group}
 
     def get_servicers_from_group(self, servicer_group):
@@ -681,20 +704,20 @@ class Fleet:
         """
         for _, servicer in self.servicers.items():
             servicer.print_report()
-        for _, launcher in self.launchers.items():
+        for _, launcher in self.upperstages.items():
             launcher.print_report()
 
     def print_KPI(self):
         """ Print KPI related to the fleet"""
         # Number of launcher
-        Nb_LaunchVehicle = len(self.launchers)
+        Nb_LaunchVehicle = len(self.upperstages)
         if Nb_LaunchVehicle > 1:
             print(f"UpperStages: {Nb_LaunchVehicle}")
         else:
             print(f"UpperStage: {Nb_LaunchVehicle}")
 
         # Print total launcher mass accros the fleet
-        launchers_mass = [self.launchers[key].get_initial_mass() for key in self.launchers.keys()]
+        launchers_mass = [self.upperstages[key].get_initial_mass() for key in self.upperstages.keys()]
         print(F"Total mass launched in space: {sum(launchers_mass):.2f}")
 
     def __str__(self):

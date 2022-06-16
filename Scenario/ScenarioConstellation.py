@@ -232,7 +232,7 @@ class ScenarioConstellation:
                 index += 1
 
                 # Update the number of servicers during convergence
-                self.number_of_servicers = len(self.fleet.launchers)
+                self.number_of_servicers = self.fleet.get_number_upperstages()
 
             else:
                 raise Exception('Unknown architecture {}'.format(self.architecture))
