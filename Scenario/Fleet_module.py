@@ -1476,11 +1476,11 @@ class UpperStage(Spacecraft):
     def design(self,unassigned_satellites,tech_level=1):
         """ Design upperstage and compute necessary information
         """
+        # Compute limit in mass terms
+        limit_mass = math.floor(self.mass_available/self.reference_satellite.get_initial_mass())
+
         # Compute limit in volume terms
         limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
-
-        # Compute limit in mass terms
-        limit_mass = math.floor(self.volume_available/self.reference_satellite.get_initial_mass())
 
         # Minimal value is of interest
         self.max_sats_number =  min([limit_volume,limit_mass,len(unassigned_satellites)])
