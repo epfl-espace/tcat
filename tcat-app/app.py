@@ -257,38 +257,13 @@ def configure():
     validation = [None, None]
 
     if request.method == 'POST':
-        configuration = Configuration(creator_email=current_user_email)
-
         uploaded_configuration = dict(request.form)
-
         validation = valid_configuration(uploaded_configuration)
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
         else:
-            scenario_id = str(uuid.uuid4())
-            uploaded_configuration['scenario_id'] = scenario_id
-            configuration.scenario_id = scenario_id
-            configuration.configuration = json.dumps(uploaded_configuration)
-            last_configuration = uploaded_configuration
-            file_paths = []
-            files = request.files.getlist('file')
-            if files is None or len(files) == 0:
-                flash('No files provided', 'error')
-            else:
-                for file in files:
-                    if file and allowed_file(file.filename):
-                        if file.filename == '':
-                            flash('File with empty name found', 'error')
-                        filename = secure_filename(file.filename)
-                        path = os.path.join(UPLOAD_FOLDER, filename)
-                        file.save(path)
-                        file_paths.append(path)
-                configuration.files = json.dumps(file_paths)
-                flash('Uploaded files', 'success')
-
-            db.session.add(configuration)
-            db.session.commit()
+            last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
         last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
@@ -299,6 +274,50 @@ def configure():
 
     return render_template('configure.html', last_configuration=last_configuration,
                            last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
+
+
+def store_configuration(conf, current_user_email):
+    configuration = Configuration(creator_email=current_user_email)
+    scenario_id = str(uuid.uuid4())
+    conf['scenario_id'] = scenario_id
+    configuration.scenario_id = scenario_id
+    configuration.scenario_name = conf['constellation_name']
+    configuration.configuration = json.dumps(conf)
+    db.session.add(configuration)
+    db.session.commit()
+    return conf
+
+
+@app.route('/configure-from-file', methods=['POST'])
+@oidc.require_login
+def configure_from_file():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    current_user_email = get_user_info()
+    if file is None:
+        flash('File error', 'error')
+    else:
+        if file.filename == '':
+            flash('File has empty name', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            file.seek(0)
+            file_content = file.stream.read()
+            uploaded_config = json.loads(file_content.decode('utf-8'))
+            valid = valid_configuration(uploaded_config)
+            if valid[0]:
+                store_configuration(uploaded_config, current_user_email)
+            else:
+                msg = ''
+                for k, v in valid[1].items():
+                    msg += f'\n{k}: {v}'
+                flash(f'Invalid configuration{msg}', 'error')
+        else:
+            flash('File not supported', 'error')
+
+    return redirect(url_for('configure'))
 
 
 @app.route('/configure/run', methods=['GET'])
