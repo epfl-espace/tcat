@@ -64,9 +64,9 @@ class Fleet:
 
         # Define launchers mission profile
         logging.info("Defining Fleet mission profile...")
-        for launcher_id, launcher in self.upperstages.items():
-            logging.log(21, f"Defining launcher: {launcher_id}")
-            launcher.define_mission_profile(scenario.plan,global_precession_direction)
+        for upperstage_id, upperstage in self.upperstages.items():
+            logging.log(21, f"Defining upperstage: {upperstage_id}")
+            upperstage.define_mission_profile(scenario.plan,global_precession_direction)
 
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:
@@ -88,16 +88,16 @@ class Fleet:
         else:
             self.servicers[servicer.ID] = servicer
 
-    def add_upperstage(self, launcher):
+    def add_upperstage(self, upperstage):
         """ Adds a launcher to the Fleet class.
 
         Args:
             launcher (UpperStage): launcher to add to the fleet
         """
-        if launcher in self.upperstages:
-            warnings.warn('Launcher ', launcher.id, ' already in fleet ', self.id, '.', UserWarning)
+        if upperstage in self.upperstages:
+            warnings.warn('Launcher ', upperstage.id, ' already in fleet ', self.id, '.', UserWarning)
         else:
-            self.upperstages[launcher.id] = launcher
+            self.upperstages[upperstage.id] = upperstage
 
     def get_number_upperstages(self):
         """ Compute and return size of self.upperstages dict
@@ -324,8 +324,8 @@ class Fleet:
         """
         for _, servicer in self.servicers.items():
             servicer.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
-        for _, launcher in self.upperstages.items():
-            launcher.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
+        for _, upperstage in self.upperstages.items():
+            upperstage.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
 
 
     def get_development_cost(self, plan):
@@ -462,7 +462,7 @@ class Fleet:
                 groups.append(servicer.group)
         return groups
 
-    def get_launchers_from_group(self, launcher_group):
+    def get_launchers_from_group(self, upperstage_group):
         """ Return servicers from the fleet that share a servicer_group.
 
         Arg:
@@ -471,8 +471,7 @@ class Fleet:
         Return:
             (dict(Servicer)): Dictionary of servicers of the given group
         """
-        return {launcher_id: launcher for launcher_id, launcher in self.upperstages.items()
-                if launcher.group == launcher_group}
+        return {upperstage_id: upperstage for upperstage_id, upperstage in self.upperstages.items() if upperstage.group == upperstage_group}
 
     def get_servicers_from_group(self, servicer_group):
         """ Return servicers from the fleet that share a servicer_group.
@@ -483,8 +482,7 @@ class Fleet:
         Return:
             (dict(Servicer)): Dictionary of servicers of the given group
         """
-        return {servicer_id: servicer for servicer_id, servicer in self.servicers.items()
-                if servicer.group == servicer_group}
+        return {servicer_id: servicer for servicer_id, servicer in self.servicers.items() if servicer.group == servicer_group}
 
     def get_mass_summary(self, rm_duplicates=False):
         """ Returns information in a convenient way for plotting purposes. 
@@ -693,8 +691,8 @@ class Fleet:
         """
         # TODO: deprecate
         temp_string = ''
-        for servicer_ID, servicer in self.servicers.items():
-            temp_string = temp_string + servicer_ID + ' :\n'
+        for servicer_id, servicer in self.servicers.items():
+            temp_string = temp_string + servicer_id+ ' :\n'
             for tgt in servicer.assigned_targets:
                 temp_string = temp_string + '\t' + tgt.ID + '\n'
         print(temp_string)
@@ -704,17 +702,17 @@ class Fleet:
         """
         for _, servicer in self.servicers.items():
             servicer.print_report()
-        for _, launcher in self.upperstages.items():
-            launcher.print_report()
+        for _, upperstage in self.upperstages.items():
+            upperstage.print_report()
 
     def print_KPI(self):
         """ Print KPI related to the fleet"""
         # Number of launcher
-        Nb_LaunchVehicle = len(self.upperstages)
-        if Nb_LaunchVehicle > 1:
-            print(f"UpperStages: {Nb_LaunchVehicle}")
+        Nb_UpperStage = len(self.upperstages)
+        if Nb_UpperStage > 1:
+            print(f"UpperStages: {Nb_UpperStage}")
         else:
-            print(f"UpperStage: {Nb_LaunchVehicle}")
+            print(f"UpperStage: {Nb_UpperStage}")
 
         # Print total launcher mass accros the fleet
         launchers_mass = [self.upperstages[key].get_initial_mass() for key in self.upperstages.keys()]
