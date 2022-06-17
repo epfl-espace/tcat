@@ -108,7 +108,7 @@ class Fleet:
 
                     # remove assigned sats from ordered satellites
                     clients.remove_in_ordered_satellites(upperstage.assigned_targets)
-
+                         
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
             
