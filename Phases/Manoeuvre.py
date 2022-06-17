@@ -35,8 +35,12 @@ class Manoeuvre:
             duration_print = self.burn_duration.to(u.year)
         elif self.burn_duration > 1. * u.day:
             duration_print = self.burn_duration.to(u.day)
-        else:
+        elif self.burn_duration > 1. * u.minute:
             duration_print = self.burn_duration.to(u.minute)
+        elif self.burn_duration > 0.1 * u.second:
+            duration_print = self.burn_duration.to(u.second)
+        else:
+            duration_print = self.burn_duration.to(u.millisecond)
 
         return (f"\u0394V: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {duration_print:.1f}, {self.id}")
 
