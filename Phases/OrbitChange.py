@@ -173,10 +173,7 @@ class OrbitChange(GenericPhase):
         """
         # retrieve required module attributes
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
-                mass = self.get_assigned_spacecraft().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
