@@ -77,14 +77,17 @@ class Fleet:
             upperstage_converged = False
 
             # Create UpperStage
-            spacecraft_count += 1
             upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
-
+            spacecraft_count += 1
+            
             # Instanciate iteration correction
             mass_available_correction = 0 * u.kg
 
             # Iterate until upperstage is validated and its relative plan is satisfactory
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
+                # Reset the plan
+                upperstage.empty_plan()
+
                 # Perform initial setup (mass and volume available)
                 upperstage.compute_upperstage(mass_available_correction,0 * u.m**3)
 
@@ -814,6 +817,11 @@ class Spacecraft:
     """
     Methods
     """
+    def empty_plan(self):
+        """ Reset plan for next iteration
+        """
+        self.plan.empty()
+
     def add_module(self, module):
         """ Adds a module to the Servicer class.
             TODO: change description

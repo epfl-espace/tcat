@@ -200,6 +200,10 @@ class Plan:
         """ Reset the plan (mainly clear the orbits logged during the plan)."""
         for phase in self.phases:
             phase.reset()
+
+    def empty(self):
+        """  Empty the plan."""
+        self.phases = []
                   
     def print_report(self):
         """ Print quick summary for debugging purposes."""
