@@ -72,6 +72,9 @@ class ScenarioConstellation:
         self.fleet = None
         self.plan = None
 
+        # Flag
+        self.execution_success = False
+
         # Load json configuration file
         with open(config_file) as file:
             json = load_json(file)
@@ -133,13 +136,15 @@ class ScenarioConstellation:
     def execute(self):
         """ Execute the scenario until the fleet converges using a method from the fleet class.
         """
-        # self.fleet.design(self.plan, self.clients, verbose=verbose)
         logging.info("Start executing...")
         try:
             self.fleet.design_constellation(self.plan, verbose=False)
             logging.info("Finish executing...")
+            self.execution_success = True
             return True
         except RuntimeWarning as warning:
+            logging.info("Executing failed...")
+            self.execution_success = False
             return warning
 
     def define_constellation(self):
@@ -150,7 +155,7 @@ class ScenarioConstellation:
         self.define_constellation_orbits()
 
         # Check if satellites volume is known, otherwise an estimate is provided
-        if int(self.sat_volume.value) == 0:
+        if float(self.sat_volume.value) == 0:
             logging.info("Estimating satellite volume...")
             self.estimate_satellite_volume()
 
@@ -195,7 +200,7 @@ class ScenarioConstellation:
 
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
-        self.define_launchers_orbits()
+        self.define_upperstages_orbits()
 
         # Define launch vehicle based on specified launcher
         if self.custom_launcher_name is None:
@@ -204,29 +209,29 @@ class ScenarioConstellation:
             self.launcher_name = self.custom_launcher_name
 
         # Define fleet
-        self.fleet = Fleet('Servicers and Launchers', self.architecture)
+        self.fleet = Fleet('UpperStages', self.architecture)
 
         # Assign satellite to launcher as long as satellite are left without launch vehicle
         index = 0
         while satellites_left > 0:
             # Check for architecture compatibility
-            if self.architecture == 'launch_vehicle':
+            if self.architecture == 'upperstage':
                 # Create launcher id based on index
-                launcher_id = 'launch_vehicle' + '{:04d}'.format(index)
-                logging.info(f"Creating {launcher_id}...")
+                upperstage_id = 'UpperStage_' + '{:04d}'.format(index)
+                logging.info(f"Instanciating {upperstage_id}...")
 
                 # Create a new launch vehicle
-                temp_launcher, serviced_sats = self.create_launch_vehicle(launcher_id,satellites_left)
+                temp_upperstage, serviced_sats = self.create_upperstage_spacecraft(upperstage_id,satellites_left)
 
                 # Update number of left satellite
                 satellites_left -= serviced_sats
 
-                # Add latest LaunchVehicle to the fleet
-                self.fleet.add_launcher(temp_launcher)
+                # Add latest UpperStage to the fleet
+                self.fleet.add_upperstage(temp_upperstage)
                 index += 1
 
                 # Update the number of servicers during convergence
-                self.number_of_servicers = len(self.fleet.launchers)
+                self.number_of_servicers = self.fleet.get_number_upperstages()
 
             else:
                 raise Exception('Unknown architecture {}'.format(self.architecture))
@@ -237,32 +242,32 @@ class ScenarioConstellation:
         # Instanciate Plan object
         self.plan = Plan('Plan', self.starting_epoch)
 
-        # Assign targets to LaunchVehicle
+        # Assign targets to UpperStage
         self.assign_satellites()
 
         # Check for available satellite to deploy
         self.fleet.define_fleet_mission_profile(self)
 
-    def create_launch_vehicle(self,launch_vehicle_id,serviceable_sats_left):
-        """ Create a launcher.
+    def create_upperstage_spacecraft(self,upperstage_id,serviceable_sats_left):
+        """ Create an upperstage.
 
         Args:
-            launch_vehicle_id (str): id of the launcher to be created
+            upperstage_id (str): id of the launcher to be created
             serviceable_sats_left (int): remaining satellites to be serviced
 
         Return:
-            (Fleet_module.LaunchVehicle): created launcher
+            (Fleet_module.UpperStage): created launcher
         """
 
         # Instanciate a reference launch vehicle and set it up
-        reference_launch_vehicle = LaunchVehicle(launch_vehicle_id,self,mass_contingency=0.0)
+        reference_launch_vehicle = UpperStage(upperstage_id,self,mass_contingency=0.0)
         reference_launch_vehicle.setup(self)
 
         logging.info(f"Converging the number of satellites manifested in the Launch Vehicle...")
         serviced_sats, _, self.ref_disp_mass, self.ref_disp_volume = reference_launch_vehicle.converge_launch_vehicle(self.reference_satellite,serviceable_sats_left,tech_level=self.dispenser_tech_level)
 
         # Instanciate Capture and Propulsion modules
-        reference_dispenser = CaptureModule(launch_vehicle_id + '_dispenser',
+        reference_dispenser = CaptureModule(upperstage_id + '_dispenser',
                                             reference_launch_vehicle,
                                             mass_contingency=0.0,
                                             dry_mass_override=self.ref_disp_mass)
@@ -272,7 +277,7 @@ class ScenarioConstellation:
         # Therefore, the mission the launcher's mass becomes negative while it burns propellant.
         # Remark: in execute() method, it seems like the converge() method should take care of estimating 
         # required prop. mass. Looks like it doesn't do the job....
-        reference_phasing_propulsion = PropulsionModule(launch_vehicle_id + '_phasing_propulsion',
+        reference_phasing_propulsion = PropulsionModule(upperstage_id + '_phasing_propulsion',
                                                         reference_launch_vehicle, 'bi-propellant', 294000 * u.N, ### FLAG ATTENTION ###
                                                         294000 * u.N, 330 * u.s, 0. * u.kg,
                                                         5000 * u.kg, reference_power_override=0 * u.W,
@@ -280,10 +285,10 @@ class ScenarioConstellation:
                                                         mass_contingency=0.2)
 
         # Define modules
-        reference_dispenser.define_as_capture_default() ### FLAG ATTENTION ###
+        reference_dispenser.define_as_capture_default()
         reference_phasing_propulsion.define_as_main_propulsion()
 
-        # Return LaunchVehicle and number of serviced sats
+        # Return UpperStage and number of serviced sats
         return reference_launch_vehicle, serviced_sats
 
     def estimate_satellite_volume(self):
@@ -319,8 +324,8 @@ class ScenarioConstellation:
                                                           0. * u.deg,
                                                           self.starting_epoch)
 
-    def define_launchers_orbits(self):
-        """ Define orbits needed for launchers definition.
+    def define_upperstages_orbits(self):
+        """ Define orbits needed for upperstages definition.
         """
         # launcher insertion orbit
         a_launcher_insertion_orbit = (self.apogee_launcher_insertion + self.perigee_launcher_insertion)/2 + Earth.R
@@ -436,3 +441,46 @@ class ScenarioConstellation:
                 ordered_satellites_id.remove(satellite.ID)
 
             satellites_assigned_to_launcher.clear() ### FLAG USELESS? ###
+    
+    def print_results(self):
+        """ Print results summary in results medium"""
+        # Print general report
+        self.print_report()
+
+        # Print general KPI
+        self.print_KPI()
+
+    def print_report(self):
+        # Print flag
+        """ Print report """
+        print("="*72)
+        print("REPORT")
+        print("="*72)
+
+        # Print Plan related report
+        self.plan.print_report()
+
+        # Print Fleet related report
+        self.fleet.print_report()
+    
+    def print_KPI(self):
+        """ Print mission KPI"""
+        # Print flag
+        print("\n"*3+"="*72)
+        print("KPI")
+        print("="*72)
+
+        # Print execution success
+        if self.execution_success:
+            print("Script succesfully executed: Yes")
+        else:
+            print("Script succesfully executed: No")
+        
+        # Print Plan related KPI
+        self.plan.print_KPI()
+
+        # Print Fleet related KPI
+        self.fleet.print_KPI()
+
+        # Print Constellation related KPI
+        self.constellation.print_KPI()

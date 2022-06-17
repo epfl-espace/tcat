@@ -7,9 +7,9 @@ db = SQLAlchemy()
 class Configuration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     scenario_id = db.Column(db.String(128), nullable=False, unique=True)
+    scenario_name = db.Column(db.String(2048), nullable=False)
     creator_email = db.Column(db.String(128), nullable=False)
     configuration = db.Column(db.String(65536), nullable=False)
-    files = db.Column(db.String(65536), nullable=False)
     created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     configuration_runs = db.relationship('ConfigurationRun', back_populates='configuration')
 

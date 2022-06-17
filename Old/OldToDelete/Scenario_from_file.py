@@ -21,11 +21,6 @@ from Interpolation import get_launcher_performance, get_launcher_fairing
 from astropy.time import Time
 import warnings
 from json import load as load_json
-import logging
-
-logging.getLogger('numba').setLevel(logging.WARNING)
-logging.getLogger('matplotlib').setLevel(logging.WARNING)
-logging.addLevelName(21, "DEBUGGING")
 
 warnings.filterwarnings("error")
 
@@ -57,7 +52,7 @@ class Scenario:
               'fairing_diameter', 'fairing_cylinder_height', 'fairing_total_height', 'interpolation_method',
               'a_client_insertion', 'ecc_client_insertion', 'inc_client_insertion',
               'a_client_operational', 'ecc_client_operational', 'inc_client_operational',
-              'a_launcher_insertion', 'ecc_launcher_insertion', 'inc_launcher_insertion ', 'data_path',
+              'a_launcher_insertion', 'ecc_launcher_insertion', 'inc_launcher_insertion '
               ]
     UNIT_FIELDS = [('target_mass', u.kg), ('target_volume', u.m ** 3), ('custom_launcher_performance', u.kg),
                    # ('fairing_diameter', u.m), ('fairing_cylinder_height', u.m), ('fairing_total_height', u.m)
@@ -84,14 +79,7 @@ class Scenario:
                 setattr(self, field, json[field])
         for (field, unit) in self.UNIT_FIELDS:
             if field in json:  # check for optional fields
-                if json[field] is None:
-                    setattr(self, field, json[field])
-                else:
-                    setattr(self, field, json[field] * unit)
-
-
-        # this string enables the logging. Set level >21 to display INFO only
-        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+                setattr(self, field, json[field] * unit)
 
         # missing in current json..
         self.starting_epoch = Time("2025-01-01 12:00:00", scale="tdb")  # needs conversion anyway.
@@ -116,32 +104,24 @@ class Scenario:
         # If clients as argument, assign it to the class and reset it, otherwise define clients form scratch.
 
         if not clients:
-            logging.info("Start defining Clients...")
             self.define_clients()
         else:
-            logging.info("Recovering Clients...")
             self.clients = clients
             self.clients.reset()
-        logging.info("Finish defining Clients...")
 
         # Define fleet given attributes of the class and parameters in arguments.
-        logging.info("Start defining Fleet...")
         self.define_fleet()
-        logging.info("Finish defining Fleet...")
 
         # Define plan, given attributes of the class.
-        logging.info("Start defining Plan...")
         self.define_plan()
-        logging.info("Finish defining Plan...")
 
     def execute(self):
         """ Execute the scenario until the fleet converges using a method from the fleet class.
         """
         # self.fleet.design(self.plan, self.clients, verbose=verbose)
-        logging.info("Start executing...")
+        print("executing")
         try:
-            self.fleet.design(self.plan, self.clients, verbose=False)
-            logging.info("Finish executing...")
+            self.fleet.design(self.plan, self.clients)
             return True
         except RuntimeWarning as warning:
             return warning
@@ -159,14 +139,12 @@ class Scenario:
         # TODO add non-standard constellations
 
         # Define relevant orbits
-        logging.info("Gathering Clients orbits...")
         tgt_insertion_orbit, tgt_operational_orbit, tgt_disposal_orbit = self.define_clients_orbits()
         # Define reference satellite
         # If satellite's volume is unknown it can be estimated
         if int(self.target_volume.value) == 0:
             x = self.target_mass
             self.target_volume = 9 * 10 ** -9 * x ** 3 - 10 ** -6 * x ** 2 + 0.0028 * x
-        logging.info("Generating the reference satellite...")
         reference_satellite = Target('Reference_' + self.constellation_name + 'satellite', self.target_mass,
                                      self.target_volume,
                                      tgt_insertion_orbit,
@@ -174,7 +152,6 @@ class Scenario:
         # Define the clients based on reference satellite
         clients = ConstellationClients(self.constellation_name)
 
-        logging.info("Populating the constellation...")
         clients.populate_standard_constellation(self.constellation_name, reference_satellite,
                                                 number_of_planes=self.n_planes, sat_per_plane=self.n_sats_per_plane,
                                                 plane_distribution_angle=self.plane_distribution_angle,
@@ -182,14 +159,9 @@ class Scenario:
         # Assign clients as class attribute
         self.clients = clients
         # For debug purposes, shows satellites distribution
-        for _, target in self.clients.targets.items():
-            logging.info(
-                f"Sat {target.ID} has {target.insertion_orbit}, {target.insertion_orbit.raan} RAAN, {target.insertion_orbit.nu} nu orbit", )
         if self.verbose:
-            logging.info("Start plotting Clients...")
-            clients.plot_3D_distribution(save="3D_plot", save_folder=self.data_path)
-            clients.plot_distribution(save="2D_plot", save_folder=self.data_path)
-            logging.info("Finish plotting Clients...")
+            clients.plot_3D_distribution(save="3D_plot", save_folder="Figures")
+            clients.plot_distribution(save="2D_plot", save_folder="Figures")
         return clients
 
     def define_clients_orbits(self):
@@ -222,11 +194,9 @@ class Scenario:
         Return:
             (poliastro.twobody.Orbit): servicers insertion orbit
         """
+        # TODO: take this data from a database
         # Servicer insertion orbit
-        servicer_insertion_orbit = Orbit.from_classical(Earth, self.a_launcher_insertion + Earth.R,
-                                                      self.ecc_launcher_insertion,
-                                                      self.inc_launcher_insertion, 0. * u.deg, 90. * u.deg, 0. * u.deg,
-                                                      self.starting_epoch)
+        servicer_insertion_orbit, _, _ = self.define_clients_orbits()
         return servicer_insertion_orbit
 
     def define_launchers_orbits(self):
@@ -235,6 +205,7 @@ class Scenario:
         Return:
             (poliastro.twobody.Orbit): launchers insertion orbit
         """
+        # TODO: take this data from a database
         # launcher insertion orbit
         launcher_insertion_orbit = Orbit.from_classical(Earth, self.a_launcher_insertion + Earth.R, self.ecc_launcher_insertion,
                                                         self.inc_launcher_insertion, 0. * u.deg, 90. * u.deg,
@@ -341,7 +312,7 @@ class Scenario:
     #     reference_approach_suite = ApproachSuiteModule(servicer_id + '_approach_suite', reference_servicer)
     #     return reference_servicer
 
-    def create_launch_vehicle(self, fleet, launch_vehicle_id, launcher, insertion_orbit, serviceable_sats_left,
+    def create_launch_vehicle(self, launch_vehicle_id, launcher, insertion_orbit, serviceable_sats_left,
                               rideshare=True):
         """ Create a launcher based on the shuttle architecture.
 
@@ -352,7 +323,7 @@ class Scenario:
             rideshare (bool):
 
         Return:
-            (Fleet_module.UpperStage): created launcher
+            (Fleet_module.LaunchVehicle): created launcher
         """
         # TODO: add nationality of the launcher/satellite to automatically exclude some combination of launcher-satellite
 
@@ -360,18 +331,14 @@ class Scenario:
 
         # Compute the launcher performance in order to assign it to the reference launch vehicle
         if self.custom_launcher_name is None:
-            logging.info(f"Gathering Launch Vehicle performance from database...")
-            l_performance = get_launcher_performance(fleet, launcher, self.launch_site, self.inclination, self.apogee_h,
+            l_performance = get_launcher_performance(launcher, self.launch_site, self.inclination, self.apogee_h,
                                                      self.perigee_h, self.orbit_type, method=self.interpolation_method,
-                                                     verbose=self.verbose, save="InterpolationGraph",
-                                                     save_folder=self.data_path)
+                                                     verbose=self.verbose)
         else:
-            logging.info(f"Using custom Launch Vehicle performance...")
             l_performance = self.custom_launcher_performance
 
         # Create reference launch vehicle
-        reference_launch_vehicle = UpperStage(launch_vehicle_id, launcher, insertion_orbit, rideshare=rideshare,
-                                                 mass_contingency=0.0)
+        reference_launch_vehicle = LaunchVehicle(launch_vehicle_id, launcher, insertion_orbit, rideshare=rideshare)
 
         # Assigning the available mass to the launcher
         reference_launch_vehicle.mass_available = l_performance
@@ -381,10 +348,8 @@ class Scenario:
             if self.custom_launcher_name is not None or self.custom_launcher_performance is not None:
                 raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
             else:
-                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
                 volume_available = get_launcher_fairing(launcher)
         else:
-            logging.info(f"Using custom Launch Vehicle's fairing size...")
             cylinder_volume = np.pi * (self.fairing_diameter * u.m / 2) ** 2 * self.fairing_cylinder_height * u.m
             cone_volume = np.pi * (self.fairing_diameter * u.m / 2) ** 2 * (
                     self.fairing_total_height * u.m - self.fairing_cylinder_height * u.m)
@@ -400,13 +365,21 @@ class Scenario:
         if self.ref_disp_volume != 0. * u.m ** 3:
             reference_launch_vehicle.disp_mass = self.ref_disp_mass
             reference_launch_vehicle.disp_volume = self.ref_disp_volume
-        logging.info(f"Converging the number of satellites manifested in the Launch Vehicle...")
         serviced_sats, _, self.ref_disp_mass, self.ref_disp_volume = reference_launch_vehicle.converge_launch_vehicle(
             reference_satellite, serviceable_sats_left, tech_level=self.dispenser_tech_level)
+        if self.verbose:
+            print("Creating launch vehicle...")
+            print(f"Launch vehicle: {launcher}")
+            print(f"Mass available: {reference_launch_vehicle.mass_available}")
+            print(f"Number of sats in the fairing: {serviced_sats}")
+            print(f"Dispenser mass: {reference_launch_vehicle.disp_mass:.1f}")
+            print(f"Mass filling ratio: {reference_launch_vehicle.mass_filling_ratio * 100:.1f}%")
+            print(f"Dispenser volume: {reference_launch_vehicle.disp_volume:.1f}")
+            print(f"Volume filling ratio: {reference_launch_vehicle.volume_filling_ratio * 100:.1f}%")
+            print("_____________________________________")
 
         # Define launcher modules
         reference_dispenser = CaptureModule(launch_vehicle_id + '_dispenser', reference_launch_vehicle,
-                                            mass_contingency=0.0,
                                             dry_mass_override=self.ref_disp_mass)
         reference_dispenser.define_as_capture_default()
 
@@ -415,9 +388,7 @@ class Scenario:
         reference_phasing_propulsion = PropulsionModule(launch_vehicle_id + '_phasing_propulsion',
                                                         reference_launch_vehicle, 'bi-propellant', 294000 * u.N,
                                                         294000 * u.N, 330 * u.s, guess,
-                                                        5000 * u.kg, reference_power_override=0 * u.W,
-                                                        propellant_contingency=0.05, dry_mass_override=0 * u.kg,
-                                                        mass_contingency=0.2)
+                                                        5000 * u.kg, propellant_contingency=0.05)
         reference_phasing_propulsion.define_as_main_propulsion()
 
         # if self.architecture == "upper_stage":
@@ -440,11 +411,12 @@ class Scenario:
             targets_per_servicer (int): number of targets that will be assigned to each servicer
             number_of_servicers (int): number of servicers that will be considered in the fleet
         """
-
+        # n_serviceable_sats_guess = 15
         number_of_targets = self.n_sats_per_plane * self.n_planes
         serviceable_sats_left = number_of_targets
+        # number_of_servicers = int(number_of_targets / n_serviceable_sats_guess)
+        # print(number_of_servicers)
         # Define relevant orbits
-        logging.info("Defining Fleet orbits...")
         servicer_insertion_orbit = self.define_servicers_orbits()
         # Define launch vehicle
         if self.custom_launcher_name is None:
@@ -452,7 +424,7 @@ class Scenario:
         else:
             launcher = self.custom_launcher_name
         # Define fleet
-        fleet = Fleet('Servicers and Launchers', self.architecture)
+        fleet = Fleet('Servicers', self.architecture)
         # Iterate for the number of servicers, create appropriate servicers and add it to the fleet
         # TODO verify if it is wise to put here the "serviceable_sat_left" or it is better to have it in the "define_plan" method
 
@@ -462,8 +434,7 @@ class Scenario:
 
             if self.architecture == 'launch_vehicle':
                 servicer_id = 'launch_vehicle' + '{:04d}'.format(index)
-                logging.info(f"Creating {servicer_id}...")
-                temp_launcher, serviced_sats = self.create_launch_vehicle(fleet, servicer_id, launcher,
+                temp_launcher, serviced_sats = self.create_launch_vehicle(servicer_id, launcher,
                                                                           servicer_insertion_orbit,
                                                                           serviceable_sats_left,
                                                                           rideshare=True)
@@ -474,7 +445,6 @@ class Scenario:
                 self.number_of_servicers = len(fleet.launchers)
             elif self.architecture == 'upper_stage':
                 servicer_id = 'servicer' + '{:04d}'.format(index)
-                logging.info(f"Creating {servicer_id}...")
                 temp_upper_stage = self.create_upper_stage()
                 temp_launcher = self.create_launch_vehicle(servicer_id, launcher, servicer_insertion_orbit,
                                                            rideshare=True,
@@ -514,159 +484,145 @@ class Scenario:
             fleet (Fleet_module.Fleet): servicers available to perform plan
         """
         # Determine if precession is turning counter-clockwise (1) or clockwise (-1)
-        global_precession_direction = clients.get_global_precession_rotation()
-
-        # Extract launcher and satellite precession speeds
-        targets_J2_speed = nodal_precession(fleet.launchers['launch_vehicle0000'].insertion_orbit)[1]
-        launchers_J2_speed = nodal_precession(clients.targets['OneWeb_plane0000_sat0000'].insertion_orbit)[1]
-
-        # Compute precession direction based on knowledge from Launcher and Servicers
-        relative_precession_direction = np.sign(launchers_J2_speed-targets_J2_speed)
+        precession_direction = clients.get_global_precession_rotation()
 
         # Order targets by their current raan following precession direction, then by true anomaly
-        ordered_targets_id = sorted(clients.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
+        ordered_targets_id = sorted(clients.get_standby_satellites(), key=lambda satellite_id: (precession_direction *
                                                                                                 clients.get_standby_satellites()[
                                                                                                     satellite_id].operational_orbit.raan.value,
                                                                                                 clients.get_standby_satellites()[
                                                                                                     satellite_id].operational_orbit.nu.value))
-        logging.info("Finding 'optimal' sequence of target deployment...")
-
         # For each launcher, find optimal sequence of targets' deployment
         for launcher_id, launcher in fleet.get_launchers_from_group('launcher').items():
-            # Initialize ideal sequence numpy array
-            sequence_list = np.full((len(ordered_targets_id),min(launcher.sats_number, len(ordered_targets_id))),-1)
+            if ordered_targets_id:
+                # initialize list which will contain the ideal sequence for each first target
+                # initialized with -1 to avoid confusion with positive indexes
+                sequence_list = np.full((len(ordered_targets_id),
+                                         min(launcher.max_sats_number, len(ordered_targets_id))), -1)
 
-            # For the launchers, explore which target should be deployed first for optimal sequence
-            for first_tgt_index in range(0, len(sequence_list)):
-                # set first target of sequence
-                sequence_list[first_tgt_index, 0] = first_tgt_index
-                #first_tgt_id = ordered_targets_id[first_tgt_index]
-                #first_tgt = clients.targets[first_tgt_id]
+                # for the launchers, explore which target should be deployed first for optimal sequence
+                for first_tgt_index in range(0, len(sequence_list)):
+                    # set first target of sequence
+                    sequence_list[first_tgt_index, 0] = first_tgt_index
+                    first_tgt_id = ordered_targets_id[first_tgt_index]
+                    first_tgt = clients.targets[first_tgt_id]
 
-                # for the first target, explore which next targets are achievable in terms of raan phasing
-                # first, initialize to the closest target and find which plane it is in
-                next_tgt_index = first_tgt_index
-                next_tgt_id = ordered_targets_id[next_tgt_index]
-                next_tgt = clients.targets[next_tgt_id]
-                reference_plane_id = next_tgt.ID.split('_')[1]
-                reference_plane_index = int(reference_plane_id[-2:])
+                    # for the first target, explore which next targets are achievable in terms of raan phasing
+                    # first, initialize to the closest target and find which plane it is in
+                    next_tgt_index = first_tgt_index
+                    next_tgt_id = ordered_targets_id[next_tgt_index]
+                    next_tgt = clients.targets[next_tgt_id]
+                    reference_plane_id = next_tgt.ID.split('_')[1]
+                    reference_plane_index = int(reference_plane_id[-2:])
 
-                # then, for each target slot available in the servicer after the first, check validity
-                for target_assigned_to_servicer in range(1, min(launcher.sats_number,len(ordered_targets_id))):
-                    if architecture in ['launch_vehicle', 'upper_stage']:
-                        skip = 0
-                        # if imposed by drift, introduce the need to skip to another plane between each servicing
-                        if architecture in ['launch_vehicle'] and prop_type in ['electrical']:
-                            skip = 1
-                        if architecture in ['upper_stage'] and prop_type in ['chemical', 'water']:
-                            skip = 1
-                        if architecture in ['upper_stage'] and prop_type in ['electrical']:
-                            skip = 2
-                        # if architecture in ['launch_vehicle'] and deployment_strategy in ['one_plane_at_a_time_sequential']:
-                        #     skip = number_of_planes-1
-                        # find next valid target from previous target depending on number of skipped planes
-                        counter = 0
-                        valid_sequencing = False
-                        while not valid_sequencing:
-                            counter += 1
-                            next_tgt_index = int((next_tgt_index + 1) % len(ordered_targets_id))
-                            next_tgt_id = ordered_targets_id[next_tgt_index]
-                            next_tgt = clients.targets[next_tgt_id]
-                            current_plane_index = int(next_tgt.ID.split('_')[1][-2:])
+                    # then, for each target slot available in the servicer after the first, check validity
+                    for target_assigned_to_servicer in range(1, min(launcher.max_sats_number,
+                                                                    len(ordered_targets_id))):
+                        if architecture in ['launch_vehicle', 'upper_stage']:
+                            skip = 0
+                            # if imposed by drift, introduce the need to skip to another plane between each servicing
+                            if architecture in ['launch_vehicle'] and prop_type in ['electrical']:
+                                skip = 1
+                            if architecture in ['upper_stage'] and prop_type in ['chemical', 'water']:
+                                skip = 1
+                            if architecture in ['upper_stage'] and prop_type in ['electrical']:
+                                skip = 2
+                            # if architecture in ['launch_vehicle'] and deployment_strategy in ['one_plane_at_a_time_sequential']:
+                            #     skip = number_of_planes-1
+                            # find next valid target from previous target depending on number of skipped planes
+                            counter = 0
+                            valid_sequencing = False
+                            while not valid_sequencing:
+                                counter += 1
+                                next_tgt_index = int((next_tgt_index + 1) % len(ordered_targets_id))
+                                next_tgt_id = ordered_targets_id[next_tgt_index]
+                                next_tgt = clients.targets[next_tgt_id]
+                                current_plane_index = int(next_tgt.ID.split('_')[1][-2:])
 
-                            if deployment_strategy in ['one_plane_at_a_time_sequential']:
-                                valid_planes = [current_plane_index]
+                                if deployment_strategy in ['one_plane_at_a_time_sequential']:
+                                    valid_planes = [current_plane_index]
 
-                            # TODO: add a distribution one plane at a time with a fixed plane shift
+                                # TODO: add a distribution one plane at a time with a fixed plane shift
 
-                            else:
-                                valid_planes = [
-                                    (reference_plane_index + global_precession_direction * step) % number_of_planes
-                                    for step in list(range(skip, number_of_planes))]
-                            logging.log(21,f"Valid planes: {valid_planes}")
-                            # if the target is not already assigned, check validity
-                            logging.log(21,f"Next target index: {next_tgt_index}; Sequence list: {sequence_list[first_tgt_index, :]}")
-                            if next_tgt_index not in sequence_list[first_tgt_index, :]:
+                                else:
+                                    valid_planes = [
+                                        (reference_plane_index + precession_direction * step) % number_of_planes
+                                        for step in list(range(skip, number_of_planes))]
+                                print(valid_planes)
+                                # if the target is not already assigned, check validity
+                                print(next_tgt_index, sequence_list[first_tgt_index, :])
+                                if next_tgt_index not in sequence_list[first_tgt_index, :]:
 
-                                # if no plane skip, the target is valid
-                                if skip == 0:
-                                    logging.log(21, "No plane to skip")
-                                    valid_sequencing = True
-                                # otherwise, we check if plane is adequate
-                                elif current_plane_index in valid_planes:
-                                    logging.log(21, "The plane is valid")
-                                    valid_sequencing = True
-                                # if no target could be found, then the first next target is chosen
-                                if counter > len(ordered_targets_id):
-                                    logging.log(21, "Counter > number of targets")
-                                    valid_sequencing = True
-                        reference_plane_id = next_tgt.ID.split('_')[1]
-                        reference_plane_index = int(reference_plane_id[-2:])
+                                    # if no plane skip, the target is valid
+                                    if skip == 0:
+                                        print("no plane to skip")
+                                        valid_sequencing = True
+                                    # otherwise, we check if plane is adequate
+                                    elif current_plane_index in valid_planes:
+                                        print("the plane is valid")
+                                        valid_sequencing = True
+                                    # if no target could be found, then the first next target is chosen
+                                    if counter > len(ordered_targets_id):
+                                        print("counter>target number")
+                                        valid_sequencing = True
+                            reference_plane_id = next_tgt.ID.split('_')[1]
+                            reference_plane_index = int(reference_plane_id[-2:])
 
+                        else:
+                            raise Exception('Unknown architecture {}'.format(architecture))
+
+                        if architecture != 'picker':
+                            # when a valid target is found, update sequence
+                            sequence_list[first_tgt_index, target_assigned_to_servicer] = next_tgt_index
+                            # print(sequence_list)
+
+                # after establishing feasible options, compute criterium to prioritize between them
+                raan_spread = []
+                altitude = []
+                for i in range(0, len(ordered_targets_id)):
+                    # get targets id
+                    target_id_list = [ordered_targets_id[i] for i in sequence_list[i, :]]
+                    print(target_id_list)
+                    # find spread between first and last target raan in sequence
+                    temp_raan_spread = (clients.targets[target_id_list[-1]].operational_orbit.raan
+                                        - clients.targets[target_id_list[0]].operational_orbit.raan)
+                    print(temp_raan_spread)
+                    # make sure angles are all expressed correctly and adapt to precession direction
+                    if temp_raan_spread == 0. * u.deg:
+                        raan_spread.append(temp_raan_spread.to(u.deg).value)
+                    elif np.sign(temp_raan_spread) == precession_direction:
+                        raan_spread.append((precession_direction * temp_raan_spread).to(u.deg).value)
                     else:
-                        raise Exception('Unknown architecture {}'.format(architecture))
+                        temp_raan_spread = temp_raan_spread + precession_direction * 365 * u.deg
+                        raan_spread.append((precession_direction * temp_raan_spread).to(u.deg).value)
+                    print(raan_spread)
 
-                    if architecture != 'picker':
-                        # when a valid target is found, update sequence
-                        sequence_list[first_tgt_index, target_assigned_to_servicer] = next_tgt_index
-                        # print(sequence_list)
+                    # find sum of altitudes of all targets, this is used to prioritize sequences with lower targets
+                    temp_altitude = sum([clients.targets[tgt_ID].operational_orbit.a.to(u.km).value
+                                         for tgt_ID in target_id_list])
+                    altitude.append(temp_altitude)
+                    print(altitude)
 
-            # After establishing feasible options, compute criterium to prioritize between them
-            raan_spread = []
-            altitude = []
-            for i in range(0, len(ordered_targets_id)):
-                # get targets id
-                target_id_list = [ordered_targets_id[i] for i in sequence_list[i, :]]
-                logging.log(21,f"List of targets' ID: {target_id_list}")
-                # find RAAN spread between each couple of adjacent targets in sequence
-                temp_raan_spread = 0 * u.deg
+                # find ideal sequence by merging raan and alt. in a table and ranking, first by raan, then by altitude
+                ranking = [list(range(0, len(ordered_targets_id))), raan_spread, altitude]
+                ranking = np.array(ranking).T.tolist()
+                ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
+                best_first_target_index = int(ranking[0][0])
 
-                for j in range(1, len(target_id_list)):
-                    # Extract initial target RAAN
-                    initial_RAAN = clients.targets[target_id_list[j]].insertion_orbit.raan
+                # TODO implement further sequencing rules (e.g. TSP optimization or other)
 
-                    # Extract next target RAAN
-                    final_RAAN = clients.targets[target_id_list[j-1]].insertion_orbit.raan
-
-                    # Check for opposite precession movement (Has a larger cost)
-                    logging.log(21,f"1: RAAN {initial_RAAN}°")
-                    logging.log(21,f"2: RAAN {final_RAAN}°")
-
-                    delta_RAAN = final_RAAN-initial_RAAN
-
-                    if np.sign(delta_RAAN) != np.sign(global_precession_direction):
-                        # Need to circle around globe to reach final RAAN
-                        delta_RAAN = -np.sign(delta_RAAN)*(360*u.deg-abs(delta_RAAN))
-                    
-                    # Compute RAAN spread
-                    temp_raan_spread += delta_RAAN
-                
-                logging.log(21,f"RAAN difference between first and last target in the sequence: {temp_raan_spread}")
-
-                # Update raan_spread with current value
-                raan_spread.append(abs(temp_raan_spread.value))
-                logging.log(21,f"RAAN distance, adapted to precession direction: {raan_spread}")
-
-                # find sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-                temp_altitude = sum([clients.targets[tgt_ID].operational_orbit.a.to(u.km).value
-                                        for tgt_ID in target_id_list])
-                altitude.append(temp_altitude)
-                logging.log(21,f"Sum of altitudes of all targets, for all sequences: {altitude}")
-
-            # find ideal sequence by merging raan and alt. in a table and ranking, first by raan, then by altitude
-            ranking = [list(range(0, len(ordered_targets_id))), raan_spread, altitude]
-            ranking = np.array(ranking).T.tolist()
-            ranking = sorted(ranking, key=lambda element: (element[1], element[2]))
-            best_first_target_index = int(ranking[0][0])
-
-            # assign targets
-            targets_assigned_to_servicer = [clients.targets[ordered_targets_id[int(tgt_id_in_list)]]
-                                            for tgt_id_in_list in sequence_list[best_first_target_index, :]]
-            for tgt in targets_assigned_to_servicer:
-                ordered_targets_id.remove(tgt.ID)
-
-            launcher.assign_sats(targets_assigned_to_servicer)
-            targets_assigned_to_servicer.clear()
+                # assign targets
+                targets_assigned_to_servicer = [clients.targets[ordered_targets_id[int(tgt_id_in_list)]]
+                                                for tgt_id_in_list in sequence_list[best_first_target_index, :]]
+                for tgt in targets_assigned_to_servicer:
+                    ordered_targets_id.remove(tgt.ID)
+                launcher.assign_targets(targets_assigned_to_servicer)
+                # ------ for debug purposes
+                print(launcher_id)
+                for x in range(len(launcher.assigned_targets)):
+                    print(launcher.assigned_targets[x])
+                # ------ for debug purposes
+                targets_assigned_to_servicer.clear()
 
     def define_fleet_mission_profile(self, architecture, fleet, clients):
         """ Call the appropriate servicer servicer_group profile definer for the whole fleet
@@ -681,9 +637,9 @@ class Scenario:
             clients (Constellation_Client_module.ConstellationClients): population to be serviced
         """
         precession_direction = clients.get_global_precession_rotation()
-        logging.info("Defining Fleet mission profile...")
+        print('yes')
         for servicer_ID, servicer, in fleet.servicers.items():
-            logging.log(21, f"Working for Servicer: {servicer_ID}")
+            print('working for servicer')
             if servicer.assigned_targets and architecture == 'shuttle':
                 self.define_shuttle_mission_profile(servicer, precession_direction)
             elif servicer.assigned_targets and architecture == 'current_kits':
@@ -698,139 +654,135 @@ class Scenario:
                     self.define_refueled_shuttle_high_mission_profile(servicer, precession_direction)
             elif servicer.assigned_targets:
                 raise Exception('Unknown architecture {}'.format(architecture))
-        for launcher_ID, launcher in fleet.launchers.items():
-            logging.log(21, f"Working for Launcher: {launcher_ID}")
+        for luncher_ID, launcher in fleet.launchers.items():
+            print('working for launchers')
             if launcher.assigned_targets and architecture == 'launch_vehicle':
                 self.define_launcher_mission_profile(launcher, precession_direction)
-            elif launcher.assigned_targets:
-                raise Exception('Unknown architecture {}'.format(architecture))
 
     def define_launcher_mission_profile(self, launcher, precession_direction):
-        """ Define launcher servicer_group profile by creating and assigning adequate phases for a typical servicer_group profile.
+        """ Define shuttle servicer_group profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
-            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
+            launcher (Fleet_module.LaunchVehicle): launcher to which the profile will be assigned
             precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
         """
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation
         # TODO : implement a launch optimizer
-        
-        # Insertion orbit margin
-        insertion_raan_margin = 10 * u.deg
-        insertion_raan_window = 5 * u.deg
-        insertion_a_margin = 0 * u.km
-
-        # Contingencies and cutoff
-        delta_v_contingency = 0.1
-        raan_cutoff = 11 * u.deg
-
-        # Extract first target
         first_target = launcher.assigned_targets[0]
-
-        ##########
-        # Step 1: Insertion Phase
-        ##########
-        # Logging
-        logging.log(21,f"Launcher insertion orbit's RAAN corrected with {insertion_raan_margin} margin. New RAAN is: {first_target.operational_orbit.raan - precession_direction * insertion_raan_margin}, with a precession direction of {precession_direction}")
-        
-        # Compute insertion orbit
-        insertion_orbit = Orbit.from_classical(Earth,
-                                               self.define_launchers_orbits().a - insertion_a_margin,
+        insertion_raan_margin = 11 * u.deg
+        delta_v_contingency = 0.1
+        raan_cutoff = 10 * u.deg
+        print(
+            f"--------------------------------------------------------------------raan is {launcher.assigned_targets[0].operational_orbit.raan - precession_direction * insertion_raan_margin, precession_direction}")
+        insertion_orbit = Orbit.from_classical(Earth, self.define_launchers_orbits().a - 100 * u.km,
                                                self.define_launchers_orbits().ecc,
                                                self.define_launchers_orbits().inc,
-                                               first_target.insertion_orbit.raan - precession_direction * insertion_raan_margin,
-                                               self.define_launchers_orbits().argp,
-                                               self.define_launchers_orbits().nu,
+                                               launcher.assigned_targets[0].insertion_orbit.raan
+                                               - precession_direction * insertion_raan_margin,
+                                               self.define_launchers_orbits().argp, self.define_launchers_orbits().nu,
                                                self.define_launchers_orbits().epoch)
-
-        # Add Insertion phase to the plan
-        insertion = Insertion(f"({launcher.id}) Goes to insertion orbit", self.plan, insertion_orbit, duration=1 * u.h)
-
-        # Assign propulsion module to insertion phase
+        # launcher insertion
+        insertion = Insertion('Insertion_' + launcher.id, self.plan, insertion_orbit, duration=1 * u.h)
         insertion.assign_module(launcher.get_main_propulsion_module())
 
-        ##########
-        # Step 2: Raise from insertion to constellation orbit
-        ##########
-        # Logging
-        logging.log(21,"Launcher will raise its orbit")
+        # define starting orbit
+        initial_phasing_orbit = insertion_orbit
+        for i, target in enumerate(launcher.assigned_targets):
+            # Initialize with all satellites stacked in the launcher
+            capture = Capture('Capture_' + launcher.id + '_' + target.ID, self.plan, target, duration=0. * u.s)
+            capture.assign_module(launcher.get_capture_module())
+            print("capturing")
 
-        # Add Raising phase to plan
-        raising = OrbitChange(f"({launcher.id}) goes to first target orbit ({first_target.ID})",
-                                      self.plan,
-                                      first_target.insertion_orbit,
-                                      raan_specified=True,
-                                      initial_orbit=insertion_orbit,
-                                      raan_cutoff=raan_cutoff,
-                                      raan_phasing_absolute=True,
+        for i, target in enumerate(launcher.assigned_targets):
+            if i == 0:
+                print("raise orbit")
+                # Raise to phasing orbit
+                print(target.insertion_orbit.raan, initial_phasing_orbit.raan)
+                raising = OrbitChange('Orbit_raise_' + launcher.id + '_' + target.ID, self.plan, target.insertion_orbit,
+                                      raan_specified=True, initial_orbit=launcher.insertion_orbit,
+                                      raan_cutoff=raan_cutoff, raan_phasing_absolute=True,
                                       delta_v_contingency=delta_v_contingency)
-
-        # Assign propulsion module to raising phase
-        raising.assign_module(launcher.get_main_propulsion_module())
-
-        ##########
-        # Step 3: Iterate through organised assigned targets
-        ##########
-        # Initialise current orbit object
-        current_orbit = first_target.insertion_orbit
-
-        # Loop over assigned targets
-        for i, current_target in enumerate(launcher.assigned_targets):
-            # Print target info
-            print(i, current_target, current_target.insertion_orbit, current_target.current_orbit)
-
-            # Check for RAAN drift
-            if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
-                # TODO Compute ideal phasing orgit
-                phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
-                phasing_orbit.a +=100 * u.km
-
-                # Reach phasing orbit and add to plan
-                phasing = OrbitChange(f"({launcher.id}) goes to ideal phasing orbit", self.plan,
-                                      phasing_orbit,
-                                      raan_specified=False, delta_v_contingency=delta_v_contingency)
-
-                # Assign propulsion module to OrbitChange phase
-                phasing.assign_module(launcher.get_main_propulsion_module())
-
-                # Change orbit back to target orbit and add to plan
-                raising = OrbitChange(f"({launcher.id}) goes to next target ({current_target.ID})", self.plan,
-                                      current_target.insertion_orbit,
-                                      raan_specified=True, initial_orbit=phasing_orbit,
-                                      delta_v_contingency=delta_v_contingency,
-                                      raan_cutoff=raan_cutoff)
-
-                # Assign propulsion module to OrbitChange phase
                 raising.assign_module(launcher.get_main_propulsion_module())
-            
-            # Add Release phase to the plan
-            deploy = Release(f"Servicer assigned to target ({current_target.ID}) is released",
-                             self.plan,
-                             current_target,
-                             duration=20 * u.min)
+            if target.state != "Deployed":
+                print("deployment")
+                # Deployment:
+                deploy = Release('Deploy_' + launcher.id + '_' + target.ID, self.plan, target, duration=20 * u.min)
+                deploy.assign_module(launcher.get_capture_module())
+                # target.current_orbit = launcher.current_orbit
+                target.state = "Deployed"
+                print(f"{launcher.assigned_targets[i]} state is {launcher.assigned_targets[i].state}")
 
-            # Assign capture module to the Release phase
-            deploy.assign_module(launcher.get_capture_module())
+                # update starting orbit after
+                initial_phasing_orbit = target.insertion_orbit
+                # for last one, deorbit launcher and dispenser
+                if i == len(launcher.assigned_targets) - 1:
+                    print("deorbit")
+                    removal = OrbitChange('Removal_' + launcher.id, self.plan, target.disposal_orbit,
+                                          delta_v_contingency=delta_v_contingency)
+                    removal.assign_module(launcher.get_main_propulsion_module())
 
-            # Set current_target to deployed
-            current_target.state = "Deployed"
-            logging.log(21, f"'{current_target}' state is: {current_target.state}")
+                else:
+                    # check if it is possible to simoultaneously deploy several sats
+                    print(launcher.assigned_targets[i + 1])
+                    next_raan = launcher.assigned_targets[i + 1].insertion_orbit.raan
+                    print(target, abs(next_raan - target.insertion_orbit.raan))
 
-            # Update current orbit
-            current_orbit = current_target.insertion_orbit
+                    for j in list(range(1, self.n_sats_simultaneously_deployed)):
+                        # check if there are other sats to be deployed
+                        # check if the sats have the same raan and lie in the same orbital plane
+                        try:
 
-        ##########
-        # Step 4: De-orbit the launcher
-        ##########
-        # Logging
-        logging.log(21, f"Launcher will deorbit itself")
+                            if i + j != len(launcher.assigned_targets) and abs(
+                                    next_raan - launcher.assigned_targets[i + j - 1].insertion_orbit.raan) == 0 * u.deg:
 
-        # Add OrbitChange to the plan
-        removal = OrbitChange(f"({launcher.id}) goes to disposal orbit", self.plan, first_target.disposal_orbit,
-                              delta_v_contingency=delta_v_contingency)
+                                print(f"deploy simoultaneously {launcher.assigned_targets[i + j]}")
+                                deploy = Release('Deploy_' + launcher.id + '_' + launcher.assigned_targets[i + j].ID,
+                                                 self.plan, launcher.assigned_targets[i + j],
+                                                 duration=0 * u.min)
+                                deploy.assign_module(launcher.get_capture_module())
+                                launcher.assigned_targets[i + j].state = "Deployed"
+                                try:
+                                    next_raan = launcher.assigned_targets[i + j + 1].insertion_orbit.raan
+                                except IndexError:
+                                    next_raan = launcher.assigned_targets[0].insertion_orbit.raan
 
-        # Assign propulsion module to OrbitChange phase
-        removal.assign_module(launcher.get_main_propulsion_module())
+                            else:
+
+                                # check if there needs to be some phasing to next plane
+                                # print(launcher.assigned_targets[i + 1])
+                                # # next_raan = launcher.assigned_targets[i + 1].current_orbit.raan
+                                # print(target, abs(next_raan - target.current_orbit.raan))
+                                if abs(next_raan - target.insertion_orbit.raan) > 1 * u.deg:
+                                    print("phasing")
+                                    # phasing_orbit = Orbit.from_classical(Earth, target.insertion_orbit.a - 100 * u.km,
+                                    #                                      target.insertion_orbit.ecc,
+                                    #                                      target.insertion_orbit.inc,
+                                    #                                      target.insertion_orbit.raan,
+                                    #                                      target.insertion_orbit.argp,
+                                    #                                      target.insertion_orbit.nu,
+                                    #                                      target.insertion_orbit.epoch)
+
+                                    phasing_orbit = target.insertion_orbit
+                                    phasing_orbit.a -= 100 * u.km
+                                    print(target.insertion_orbit, phasing_orbit)
+
+                                    phasing = OrbitChange('Orbit_phasing_' + launcher.id + '_' + target.ID, self.plan,
+                                                          phasing_orbit,
+                                                          raan_specified=False, delta_v_contingency=delta_v_contingency)
+                                    phasing.assign_module(launcher.get_main_propulsion_module())
+
+                                    raising = OrbitChange('Orbit_raise_' + launcher.id + '_' + target.ID, self.plan,
+                                                          launcher.assigned_targets[i + 1].insertion_orbit,
+                                                          raan_specified=True, initial_orbit=phasing_orbit,
+                                                          delta_v_contingency=delta_v_contingency,
+                                                          raan_cutoff=raan_cutoff)
+                                    raising.assign_module(launcher.get_main_propulsion_module())
+                        except IndexError:
+                            pass
+                        continue
+
+        # for i, targets in enumerate(launcher.assigned_targets):
+        #     print(f"{launcher.assigned_targets[i]} state is {launcher.assigned_targets[i].state}")
 
     def define_shuttle_mission_profile(self, servicer, precession_direction):
         """ Define shuttle servicer_group profile by creating and assigning adequate phases for a typical servicer_group profile.
@@ -849,7 +801,7 @@ class Scenario:
         else:
             insertion_raan_margin = 15 * u.deg
             delta_v_contingency = 0.1
-            raan_cutoff = 15 * u.deg
+            raan_cutoff = 0.6 * u.deg
         insertion_orbit = Orbit.from_classical(Earth, self.define_servicers_orbits().a,
                                                self.define_servicers_orbits().ecc,
                                                self.define_servicers_orbits().inc,

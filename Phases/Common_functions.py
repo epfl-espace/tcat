@@ -178,7 +178,7 @@ def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, i
     v_i_1 = instant_orbital_velocity(initial_orbit, first_burn_radius)
     v_f_1 = instant_orbital_velocity(transfer_orbit, first_burn_radius)
     delta_v_1 = np.sqrt((v_f_1 - v_i_1)**2 + first_inc_delta_v**2)
-    manoeuvre = Manoeuvre(delta_v_1)
+    manoeuvre = Manoeuvre(delta_v_1,"first high-trust dV")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
@@ -186,7 +186,7 @@ def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, i
     v_i_2 = instant_orbital_velocity(transfer_orbit, second_burn_radius)
     v_f_2 = instant_orbital_velocity(final_orbit, second_burn_radius)
     delta_v_2 = np.sqrt((v_f_2 - v_i_2)**2 + second_inc_delta_v**2)
-    manoeuvre = Manoeuvre(delta_v_2)
+    manoeuvre = Manoeuvre(delta_v_2,"second high-trust dV")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
@@ -233,7 +233,7 @@ def low_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, is
 
     # compute delta v for total maneuver
     delta_v = np.sqrt(v_0**2 + v_f**2 - 2*v_0*v_f*np.cos(np.pi/2 * delta_i))
-    manoeuvre = Manoeuvre(delta_v)
+    manoeuvre = Manoeuvre(delta_v,"low-trust maneuver")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
@@ -256,13 +256,13 @@ def compute_altitude_maintenance_delta_v(duration, orbit):
         altitude = orbit.a - orbit.attractor.R
         delta_v_per_year = 9.0e18 * altitude.to(u.km).value**(-6.746) * u.m / u.s / u.year
         delta_v = (delta_v_per_year * duration.to(u.year)).to(u.m / u.s)
-        manoeuvre = Manoeuvre(delta_v)
+        manoeuvre = Manoeuvre(delta_v,id="altitude maintenance")
         manoeuvre.burn_duration = duration
         return manoeuvre
     elif orbit.attractor == Moon:
         delta_v_per_year = 50 *u.m / u.s / u.year
         delta_v = (delta_v_per_year * duration.to(u.year)).to(u.m / u.s)
-        manoeuvre = Manoeuvre(delta_v)
+        manoeuvre = Manoeuvre(delta_v,id="altitude maintenance")
         manoeuvre.burn_duration = duration
         return manoeuvre
     else:

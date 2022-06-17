@@ -7,7 +7,6 @@ Description:    Run python script to test and debug Constellation Deployement TC
 
 # Import class
 from Scenario.ScenarioConstellation import ScenarioConstellation
-from Scenario.ScenarioParameters import SCENARIO_INPUT_JSON
 
 # Import libraries
 import warnings
@@ -20,7 +19,9 @@ warnings.filterwarnings("ignore")
 try:
     config_file = sys.argv[1]
 except IndexError:
-    config_file = SCENARIO_INPUT_JSON
+    print("Please specify an input .json file in the argv: PATH/FILENAME.json")
+    exit()
+    #config_file = SCENARIO_INPUT_JSON
 
 # Open .json and read mission description
 with open(config_file) as file:
@@ -62,8 +63,7 @@ if print_to_files:
     results = scenario.execute()
     
     # Print scenario reports
-    scenario.plan.print_report()
-    scenario.fleet.print_report()
+    scenario.print_results()
     
     # Close .txt file
     result.close()
@@ -85,6 +85,5 @@ else:
     results = scenario.execute()
 
     # Print scenario reports
-    scenario.plan.print_report()
-    scenario.fleet.print_report()
+    scenario.print_results()
 

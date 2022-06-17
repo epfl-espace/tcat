@@ -1,6 +1,11 @@
 import os
 import sys
 import json
+from dotenv import load_dotenv
+
+if len(sys.argv) > 2:
+    env_file = sys.argv[2]
+    load_dotenv(env_file)
 
 web_data = {'issuer': os.getenv('IDP_ISSUER'), 'auth_uri': os.getenv('IDP_AUTH_URI'),
             'client_id': os.getenv('IDP_CLIENT_ID'), 'client_secret': os.getenv('IDP_CLIENT_SECRET'),

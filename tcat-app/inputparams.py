@@ -1,7 +1,7 @@
 # control-datatype-lookup_name-speaking_name-default_value-accepted_values
 params = {
     ('mission_configuration', 'Mission Configuration'): [
-        ['select', 'text', 'architecture', 'Architecture / Mission profile', 'launch_vehicle', ['launch_vehicle', 'upper_stage']],
+        ['select', 'text', 'architecture', 'Architecture / Mission profile', 'upperstage', ['launch_vehicle', 'upperstage']],
         ['select', 'text', 'propulsion_type', 'Propulsion type', 'electrical', ['electrical', 'water', 'mono-propellant', 'solid', 'bi-propellant']],
         ['select', 'text', 'deployment_strategy', 'Deployment strategy', 'one_plane_at_a_time_sequential', ['one_plane_at_a_time_sequential', 'one_sat_per_plane_sequential']],
         ['checkbox', '', 'verbose', 'Debug', False, [True, False]],

@@ -13,10 +13,8 @@ import uuid
 import base64
 import mimetypes
 
-from flask import Flask, request, render_template, flash, make_response, send_file
+from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for
 from flask_oidc import OpenIDConnect
-
-from werkzeug.utils import secure_filename
 
 import inputparams
 from models import db, Configuration, ConfigurationRun
@@ -26,7 +24,8 @@ from sqlalchemy.orm import sessionmaker
 
 from dotenv import load_dotenv
 
-load_dotenv()  # sets values from .env file as environment vars
+load_dotenv()  # sets values from .env file as environment vars, *.env files are ignored when creating the docker
+# image. so the values for the docker image come from the dockerfile and the provided arguments
 
 BASE_FOLDER = os.getenv('BASE_FOLDER')
 UPLOAD_FOLDER = os.path.join(BASE_FOLDER, 'uploads/')
@@ -55,7 +54,7 @@ def create_app():
         'OIDC_ID_TOKEN_COOKIE_SECURE': False,
         'OIDC_REQUIRE_VERIFIED_EMAIL': False,
         'OIDC_USER_INFO_ENABLED': True,
-        'OIDC_OPENID_REALM': 'flask-demo',
+        'OIDC_OPENID_REALM': os.getenv('IDP_REALM'),
         'OIDC_SCOPES': ['openid', 'email', 'profile'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
@@ -182,6 +181,14 @@ def index():
     return render_template('index.html')
 
 
+@app.route("/logout")
+@oidc.require_login
+def logout():
+    logout_request = f'{os.getenv("IDP_LOGOUT_URI")}'
+    oidc.logout()
+    return redirect(logout_request)
+
+
 @app.route('/overview')
 @oidc.require_login
 def overview():
@@ -212,12 +219,12 @@ def status(config_run_id=None):
     return render_template('status.html', config_run=config_run)
 
 
-def generate(config_run_id):
+def generate(config_run_id, file):
     db_session = Session()
     config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
     scenario_id = config_run.configuration.scenario_id
     Session.remove()
-    path = os.path.join(get_data_path(scenario_id, config_run_id), LOG_FILENAME)
+    path = os.path.join(get_data_path(scenario_id, config_run_id), file)
 
     while not os.path.isfile(path):
         sleep(0.1)
@@ -231,13 +238,13 @@ def generate(config_run_id):
 @app.route('/status/stream/log/<int:config_run_id>')
 @oidc.require_login
 def log_stream(config_run_id):
-    return app.response_class(generate(config_run_id), mimetype='text/plain')
+    return app.response_class(generate(config_run_id, LOG_FILENAME), mimetype='text/plain')
 
 
 @app.route('/status/stream/result/<int:config_run_id>')
 @oidc.require_login
 def result_stream(config_run_id):
-    return app.response_class(generate(config_run_id), mimetype='text/plain')
+    return app.response_class(generate(config_run_id, RESULT_FILENAME), mimetype='text/plain')
 
 
 @app.route('/configure', methods=['GET', 'POST'])
@@ -249,38 +256,13 @@ def configure():
     validation = [None, None]
 
     if request.method == 'POST':
-        configuration = Configuration(creator_email=current_user_email)
-
         uploaded_configuration = dict(request.form)
-
         validation = valid_configuration(uploaded_configuration)
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
         else:
-            scenario_id = str(uuid.uuid4())
-            uploaded_configuration['scenario_id'] = scenario_id
-            configuration.scenario_id = scenario_id
-            configuration.configuration = json.dumps(uploaded_configuration)
-            last_configuration = uploaded_configuration
-            file_paths = []
-            files = request.files.getlist('file')
-            if files is None or len(files) == 0:
-                flash('No files provided', 'error')
-            else:
-                for file in files:
-                    if file.filename == '':
-                        flash('File with empty name found', 'error')
-                    if file and allowed_file(file.filename):
-                        filename = secure_filename(file.filename)
-                        path = os.path.join(UPLOAD_FOLDER, filename)
-                        file.save(path)
-                        file_paths.append(path)
-                configuration.files = json.dumps(file_paths)
-                flash('Uploaded files', 'success')
-
-            db.session.add(configuration)
-            db.session.commit()
+            last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
         last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
@@ -291,6 +273,50 @@ def configure():
 
     return render_template('configure.html', last_configuration=last_configuration,
                            last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
+
+
+def store_configuration(conf, current_user_email):
+    configuration = Configuration(creator_email=current_user_email)
+    scenario_id = str(uuid.uuid4())
+    conf['scenario_id'] = scenario_id
+    configuration.scenario_id = scenario_id
+    configuration.scenario_name = conf['constellation_name']
+    configuration.configuration = json.dumps(conf)
+    db.session.add(configuration)
+    db.session.commit()
+    return conf
+
+
+@app.route('/configure-from-file', methods=['POST'])
+@oidc.require_login
+def configure_from_file():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    current_user_email = get_user_info()
+    if file is None:
+        flash('File error', 'error')
+    else:
+        if file.filename == '':
+            flash('File has empty name', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            file.seek(0)
+            file_content = file.stream.read()
+            uploaded_config = json.loads(file_content.decode('utf-8'))
+            valid = valid_configuration(uploaded_config)
+            if valid[0]:
+                store_configuration(uploaded_config, current_user_email)
+            else:
+                msg = ''
+                for k, v in valid[1].items():
+                    msg += f'\n{k}: {v}'
+                flash(f'Invalid configuration{msg}', 'error')
+        else:
+            flash('File not supported', 'error')
+
+    return redirect(url_for('configure'))
 
 
 @app.route('/configure/run', methods=['GET'])
