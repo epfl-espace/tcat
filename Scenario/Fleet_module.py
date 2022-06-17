@@ -77,22 +77,21 @@ class Fleet:
             upperstage_converged = False
 
             # Create UpperStage
-            upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
             spacecraft_count += 1
-            
-            # Instanciate iteration correction
-            mass_available_correction = 0 * u.kg
+            upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
+            upperstage_low_sat_allowance = 0
+            upperstage_up_sat_allowance = upperstage.compute_allowance(unassigned_satellites)
 
             # Iterate until upperstage is validated and its relative plan is satisfactory
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
-                # Reset the plan
-                upperstage.empty_plan()
+                # Compute new current allowance
+                upperstage_cur_sat_allowance = math.floor((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
 
                 # Perform initial setup (mass and volume available)
-                upperstage.compute_upperstage(mass_available_correction,0 * u.m**3)
+                upperstage.reset()
 
-                # Compute available mass and volume allowance at current state
-                upperstage.design(unassigned_satellites)
+                # Compute launcher design for custom satellite allowance
+                upperstage.design(custom_sat_allowance=upperstage_cur_sat_allowance)
 
                 # Assign target as per mass and volume allowance
                 clients.assign_ordered_satellites(upperstage)
@@ -103,14 +102,23 @@ class Fleet:
                 # Execute upperstage (Apply owned plan)
                 upperstage.execute()
 
-                # Retrieve plan KPI and satisfactory convergence criterium
-                mass_available_correction = - upperstage.mainpropulsion.current_propellant_mass
-                if mass_available_correction < 0:
-                    # exit loop flat
-                    upperstage_converged = True
+                if upperstage.mainpropulsion.current_propellant_mass > 0:
+                    # Check if current allowance is similar to upper bound
+                    if upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
+                        # exit loop flat
+                        upperstage_converged = True
 
-                    # remove assigned sats from ordered satellites
-                    clients.remove_in_ordered_satellites(upperstage.assigned_targets)
+                        # remove assigned sats from ordered satellites
+                        clients.remove_in_ordered_satellites(upperstage.assigned_targets)
+
+                    else:
+                        # If two much full, increase lower bound
+                        upperstage_low_sat_allowance = upperstage_cur_sat_allowance
+
+                else:
+                    # If lacking fuel, decrease upper bound
+                    upperstage_up_sat_allowance = upperstage_cur_sat_allowance
+
                          
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
@@ -1413,26 +1421,26 @@ class UpperStage(Spacecraft):
         self.mass_available = None
         self.insertion_orbit = scenario.launcher_insertion_orbit
         self.disposal_orbit = scenario.launcher_disposal_orbit
-        self.assigned_upper_stage = None
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
         self.disp_mass = 0. * u.kg
         self.disp_volume = 0. * u.m ** 3
-        self.max_sats_number = 0
+        self.satellites_allowance = 0
+
+        # Compute initial performances
+        self.compute_upperstage()
 
     """
     Methods
     """
-    def compute_upperstage(self,available_mass_correction,available_volume_correction):
+    def compute_upperstage(self):
         """ setup the launcher separately from __init__()
         """
         # Interpolate launcher performance + correction
         self.compute_upperstage_performance(self.scenario)
-        self.reduce_upperstage_performance(available_mass_correction)
 
         # Interpolate launcher fairing capacity + correction
         self.compute_upperstage_fairing(self.scenario)
-        self.reduce_upperstage_fairing(available_volume_correction)
 
     def execute(self):
         """ Apply own plan
@@ -1481,9 +1489,7 @@ class UpperStage(Spacecraft):
             cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
             self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
     
-    def design(self,unassigned_satellites,tech_level=1):
-        """ Design upperstage and compute necessary information
-        """
+    def compute_allowance(self,unassigned_satellites):
         # Compute limit in mass terms
         limit_mass = math.floor(self.mass_available/self.reference_satellite.get_initial_mass())
 
@@ -1491,12 +1497,22 @@ class UpperStage(Spacecraft):
         limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
 
         # Minimal value is of interest
-        self.max_sats_number =  min([limit_volume,limit_mass,len(unassigned_satellites)])
+        self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
+
+        # Return allowance
+        return self.satellites_allowance
+
+    def design(self,custom_sat_allowance=None,tech_level=1):
+        """ Design upperstage and compute necessary information
+        """
+        # If custom_sat_allowance provided, update upperstage allowance
+        if not(custom_sat_allowance == None):
+            self.satellites_allowance = custom_sat_allowance
 
         # Compute filling ratio and disp mass and volume
-        self.total_satellites_mass = self.max_sats_number * self.reference_satellite.get_initial_mass()
+        self.total_satellites_mass = self.satellites_allowance * self.reference_satellite.get_initial_mass()
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
-        self.volume_filling_ratio = (self.max_sats_number * self.reference_satellite.get_volume()) / self.volume_available
+        self.volume_filling_ratio = (self.satellites_allowance * self.reference_satellite.get_volume()) / self.volume_available
 
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
@@ -1516,10 +1532,10 @@ class UpperStage(Spacecraft):
                                                         mass_contingency=0.2)
         self.mainpropulsion.define_as_main_propulsion()
 
-    def get_max_sats_number(self):
+    def get_satellites_allowance(self):
         """ Return maximum allowable of the upperstage
         """
-        return self.max_sats_number
+        return self.satellites_allowance
 
 
     def reduce_upperstage_performance(self,value):
@@ -1531,16 +1547,6 @@ class UpperStage(Spacecraft):
         """ Allow to artificially reduce the upperstage performances
         """
         self.volume_available -= value.to(u.m ** 3)
-
-    def assign_upper_stage(self, upper_stage):
-        """ Adds another servicer to the Servicer class as assigned_upper_stage.
-
-        TODO: get into scenario
-
-        Args:
-            upper_stage (Servicer): servicer to be added as assigned_upper_stage
-        """
-        self.assigned_upper_stage = upper_stage
 
     def separate_sat(self, sat):
         """ Separate a sat from the launcher. This is used during simulation.
@@ -1596,9 +1602,9 @@ class UpperStage(Spacecraft):
 
         max_sats_number_m = int((self.mass_available - self.disp_mass) / satellite.get_initial_mass())
         max_sats_number_v = int((self.volume_available - self.disp_volume) / satellite.get_volume())
-        self.max_sats_number = min(max_sats_number_m, max_sats_number_v)
-        if self.max_sats_number < serviceable_sats_left:
-            self.sats_number = self.max_sats_number
+        self.satellites_allowance = min(max_sats_number_m, max_sats_number_v)
+        if self.satellites_allowance < serviceable_sats_left:
+            self.sats_number = self.satellites_allowance
         else:
             self.sats_number = serviceable_sats_left
 
@@ -1644,7 +1650,7 @@ class UpperStage(Spacecraft):
             self.mass_filling_ratio = total_sats_mass / self.mass_available
             self.volume_filling_ratio = total_sats_volume / self.volume_available
 
-            self.max_sats_number = self.sats_number
+            self.satellites_allowance = self.sats_number
 
         return self.sats_number, total_sats_mass, self.disp_mass, self.disp_volume
 
@@ -1689,32 +1695,22 @@ class UpperStage(Spacecraft):
 
         return temp_mass
 
-    def reset(self, plan, design_loop=True, convergence_margin=1. * u.kg, verbose=False):
-        """ Reset the servicer current orbit and mass to the parameters given during initialization.
-            This function is used to reset the state of all modules after a simulation.
-            If this is specified as a design loop, the sub-systems can be updated based on different inputs.
-            It also resets the current_kits and the servicer orbits.
-
-        Args:
-            plan (Plan): plan for which the servicer is used and designed
-            design_loop (boolean): if True, redesign modules after resetting them
-            convergence_margin (u.kg): accuracy required on propellant mass for convergence_margin
-            verbose (boolean): if True, print convergence_margin information
+    def reset(self):
+        """ 
         """
-        # reset orbit
+        # Reset attribut
         self.current_orbit = None
+        self.mass_filling_ratio = 1
+        self.volume_filling_ratio = 1
+        self.disp_mass = 0. * u.kg
+        self.disp_volume = 0. * u.m ** 3
 
-        # reset sats to be deployed
-        logging.log(21, f"Resetting sats: current_sats={self.current_sats}, initial_sats={self.initial_sats}...")
-        for _, sat in self.initial_sats.items():
-            self.current_sats[sat.ID] = sat
-        logging.log(21, f"Reset: current_sats={self.current_sats}, initial_sats={self.initial_sats}")
+        # Empty the plan
+        self.empty_plan()
 
-        # reset modules
-        for _, module in self.modules.items():
-            module.reset()
-        if design_loop:
-            self.design(plan, convergence_margin=convergence_margin, verbose=verbose)
+        # Empty targets
+        self.assigned_targets = []
+        self.sats_number = len(self.assigned_targets)
 
     def get_propulsion_modules(self):
         """ Returns all modules that contain propellant. This is used for fleet convergence.

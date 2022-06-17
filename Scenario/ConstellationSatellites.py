@@ -67,7 +67,7 @@ class Constellation:
         """ Assign remaining ordered satellite to current spacecraft within spacecraft allowance
         """
         # Nb satellite to be assign
-        satellite_allowance = upperstage.get_max_sats_number()
+        satellite_allowance = upperstage.get_satellites_allowance()
 
         # Assign sats
         upperstage.assign_sats(self.optimized_ordered_satellites[0:satellite_allowance])
