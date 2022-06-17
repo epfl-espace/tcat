@@ -92,7 +92,16 @@ class GenericPhase:
 
     def take_spacecraft_snapshot(self):
         """ Save current assigned servicer as a snapshot for future references and post-processing. """
-        self.spacecraft_snapshot = copy.copy(self.get_assigned_spacecraft())
+        # Remove plan from spacecraft before deepcopy
+        spacecraft = self.get_assigned_spacecraft()
+        spacecraft_plan = spacecraft.plan
+        delattr(spacecraft,'plan')
+
+        # Deepcopy the spacecraft
+        self.spacecraft_snapshot = copy.deepcopy(self.get_assigned_spacecraft())
+
+        # But back the plan
+        spacecraft.plan = spacecraft_plan
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on operation labour.
