@@ -84,6 +84,11 @@ class Fleet:
 
             # Iterate until upperstage is validated and its relative plan is satisfactory
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
+                # Check if converged
+                if upperstage_low_sat_allowance == upperstage_up_sat_allowance:
+                    # exit loop flat
+                    upperstage_converged = True
+
                 # Compute new current allowance
                 upperstage_cur_sat_allowance = math.ceil((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
 
@@ -102,26 +107,29 @@ class Fleet:
                 # Execute upperstage (Apply owned plan)
                 upperstage.execute()
 
-                if upperstage.mainpropulsion.current_propellant_mass > 0:
-                    # Exit condition: when cur sat allowance = upper bound
-                    tmp = upperstage_up_sat_allowance - upperstage_low_sat_allowance
-                    if  upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
-                        # exit loop flat
-                        upperstage_converged = True
-
-                        # remove assigned sats from ordered satellites
-                        clients.remove_in_ordered_satellites(upperstage.assigned_targets)
-
+                if upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
+                    # If fuel mass > 0 and cur == up, then up is the solution
+                    if upperstage.mainpropulsion.current_propellant_mass > 0 and upperstage_cur_sat_allowance == upperstage_up_sat_allowance:
+                        upperstage_low_sat_allowance = upperstage_up_sat_allowance
+                    # If fuel mass < 0 then low is the solution for sure, hoping it is not zero.
                     else:
-                        # If two much full, increase lower bound
+                        upperstage_up_sat_allowance = upperstage_low_sat_allowance
+
+                # Apply dichotomia to remaining values
+                else:
+                    if upperstage.mainpropulsion.current_propellant_mass > 0:
+                        # If extra fuel, increase lower bound
                         upperstage_low_sat_allowance = upperstage_cur_sat_allowance
 
-                else:
-                    # If lacking fuel, decrease upper bound
-                    upperstage_up_sat_allowance = upperstage_cur_sat_allowance
+                    else:
+                        # If lacking fuel, decrease upper bound
+                        upperstage_up_sat_allowance = upperstage_cur_sat_allowance
                          
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
+            
+            # Remove latest assigned satellites
+            clients.remove_in_ordered_satellites(upperstage.assigned_targets)
             
             # Check remaining satellites to be assigned
             unassigned_satellites = clients.get_optimized_ordered_satellites()
@@ -1415,7 +1423,6 @@ class UpperStage(Spacecraft):
     def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         super(UpperStage, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency,scenario.starting_epoch)
         self.launcher_name = scenario.launcher_name
-        self.scenario = scenario
         self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
         self.mass_available = None
@@ -1428,19 +1435,19 @@ class UpperStage(Spacecraft):
         self.satellites_allowance = 0
 
         # Compute initial performances
-        self.compute_upperstage()
+        self.compute_upperstage(scenario)
 
     """
     Methods
     """
-    def compute_upperstage(self):
+    def compute_upperstage(self,scenario):
         """ setup the launcher separately from __init__()
         """
         # Interpolate launcher performance + correction
-        self.compute_upperstage_performance(self.scenario)
+        self.compute_upperstage_performance(scenario)
 
         # Interpolate launcher fairing capacity + correction
-        self.compute_upperstage_fairing(self.scenario)
+        self.compute_upperstage_fairing(scenario)
 
     def execute(self):
         """ Apply own plan
@@ -1836,7 +1843,7 @@ class UpperStage(Spacecraft):
             if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
                 # TODO Compute ideal phasing orgit
                 phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
-                phasing_orbit.a +=100 * u.km
+                phasing_orbit.inc += 1 * u.deg
 
                 # Reach phasing orbit and add to plan
                 phasing = OrbitChange(f"({self.id}) goes to ideal phasing orbit",
