@@ -82,7 +82,7 @@ class Fleet:
             upperstage_low_sat_allowance = 0
             upperstage_up_sat_allowance = upperstage.compute_allowance(unassigned_satellites)
 
-            # Iterate until upperstage is validated and its relative plan is satisfactory
+            # Iterate until upperstage allowance is converged
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
                 # Check if converged
                 if upperstage_low_sat_allowance == upperstage_up_sat_allowance:
@@ -92,21 +92,10 @@ class Fleet:
                 # Compute new current allowance
                 upperstage_cur_sat_allowance = math.ceil((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
 
-                # Perform initial setup (mass and volume available)
-                upperstage.reset()
+                # Execute upperstage
+                upperstage.execute(clients,upperstage_cur_sat_allowance)
 
-                # Compute launcher design for custom satellite allowance
-                upperstage.design(custom_sat_allowance=upperstage_cur_sat_allowance)
-
-                # Assign target as per mass and volume allowance
-                upperstage.assign_ordered_satellites(clients)
-
-                # Define spacecraft mission profile
-                upperstage.define_mission_profile(clients.get_global_precession_rotation())
-
-                # Execute upperstage (Apply owned plan)
-                upperstage.execute()
-
+                # Check for exit condition
                 if upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
                     # If fuel mass > 0 and cur == up, then up is the solution
                     if upperstage.mainpropulsion.current_propellant_mass > 0 and upperstage_cur_sat_allowance == upperstage_up_sat_allowance:
@@ -124,6 +113,8 @@ class Fleet:
                     else:
                         # If lacking fuel, decrease upper bound
                         upperstage_up_sat_allowance = upperstage_cur_sat_allowance
+
+            # Iterate until upperstage total deployment time is computed (If phasing existing)
                          
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
@@ -136,23 +127,6 @@ class Fleet:
 
             # Update execution counter
             execution_count += 1
-
-    def define_fleet_mission_profile(self,scenario):
-        """ Call the appropriate servicer servicer_group profile definer for the whole fleet
-            based on architecture and expected precession direction of the constellation.
-
-        Args:
-            scenario (Scenario.ScenarioConstellation): scenario encapsulating global problem
-        """
-
-        # Extract global precession direction
-        global_precession_direction = scenario.constellation.get_global_precession_rotation()
-
-        # Define launchers mission profile
-        logging.info("Defining Fleet mission profile...")
-        for upperstage_id, upperstage in self.upperstages.items():
-            logging.log(21, f"Defining upperstage: {upperstage_id}")
-            upperstage.define_mission_profile(scenario.plan,global_precession_direction)
 
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:
@@ -401,7 +375,6 @@ class Fleet:
             servicer.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
         for _, upperstage in self.upperstages.items():
             upperstage.reset(plan, design_loop=design_loop, convergence_margin=convergence_margin, verbose=verbose)
-
 
     def get_development_cost(self, plan):
         """ Compute development cost, taking into account rough order of magnitude estimates.
@@ -1433,6 +1406,7 @@ class UpperStage(Spacecraft):
         self.disp_mass = 0. * u.kg
         self.disp_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
+        self.phasing_delta_inc = 1 * u.deg
 
         # Compute initial performances
         self.compute_upperstage(scenario)
@@ -1440,6 +1414,22 @@ class UpperStage(Spacecraft):
     """
     Methods
     """
+    def execute(self,clients,upperstage_cur_sat_allowance):
+        # Perform initial setup (mass and volume available)
+        self.reset()
+
+        # Compute launcher design for custom satellite allowance
+        self.design(custom_sat_allowance=upperstage_cur_sat_allowance)
+
+        # Assign target as per mass and volume allowance
+        self.assign_ordered_satellites(clients)
+
+        # Define spacecraft mission profile
+        self.define_mission_profile(clients.get_global_precession_rotation())
+
+        # Execute upperstage (Apply owned plan)
+        self.execute_plan()
+
     def compute_upperstage(self,scenario):
         """ setup the launcher separately from __init__()
         """
@@ -1449,7 +1439,7 @@ class UpperStage(Spacecraft):
         # Interpolate launcher fairing capacity + correction
         self.compute_upperstage_fairing(scenario)
 
-    def execute(self):
+    def execute_plan(self):
         """ Apply own plan
         """
         # Apply plan
@@ -1544,17 +1534,6 @@ class UpperStage(Spacecraft):
         """
         return self.satellites_allowance
 
-
-    def reduce_upperstage_performance(self,value):
-        """ Allow to artificially reduce the upperstage performances
-        """
-        self.mass_available -= value.to(u.kg)
-
-    def reduce_upperstage_fairing(self,value):
-        """ Allow to artificially reduce the upperstage performances
-        """
-        self.volume_available -= value.to(u.m ** 3)
-
     def separate_sat(self, sat):
         """ Separate a sat from the launcher. This is used during simulation.
             The sat is still assigned to the launcher and will be linked if the launcher is reset.
@@ -1594,81 +1573,6 @@ class UpperStage(Spacecraft):
 
         # Update number of satellites
         self.sats_number = len(self.assigned_targets)
-
-    def converge_launch_vehicle(self, satellite, serviceable_sats_left, dispenser="Auto", tech_level=1):
-        """Converges the number of satellites that can be hosted within the launcher. Takes into account the
-            volume and mass of the dispenser. A value can be specified for the technology level to vary the mass
-            and volume of the dispenser proportionally. Technology level values greater than 1 make the dispenser heavier
-            and bulkier, vice versa with values less than 1.
-
-        Args:
-            satellite (Client): Target object, represent a reference satellite inside the fairing of the launcher
-            serviceable_sats_left (int): number of sat left to be assigned to launcher
-            dispenser (str): dispenser to be used
-            tech_level (float): technology level is 1 by default, it can be increased or decreased
-
-        Returns:
-            max_sats_number (int): maximum number of satellites hostable in the fairing
-            total_sats_mass (float): total mass in kg of all satellites in the fairing
-        """
-        # TODO: add the possibility to manage satellites that are not all identical (i.e. all the same satellites +
-        #  one or more different satellites)
-        diff = 1
-        i = 0
-
-        max_sats_number_m = int((self.mass_available - self.disp_mass) / satellite.get_initial_mass())
-        max_sats_number_v = int((self.volume_available - self.disp_volume) / satellite.get_volume())
-        self.satellites_allowance = min(max_sats_number_m, max_sats_number_v)
-        if self.satellites_allowance < serviceable_sats_left:
-            self.sats_number = self.satellites_allowance
-        else:
-            self.sats_number = serviceable_sats_left
-
-        if not satellite.is_stackable:
-            if dispenser == "Auto":
-                # Find the maximum number of satellites that can be hosted in the fairing based on mass (m) and volume (v) constraints.
-                while diff > 0.001 or self.mass_filling_ratio > 1 or self.volume_filling_ratio > 1:
-
-                    total_sats_mass = self.sats_number * satellite.get_initial_mass()
-                    disp_mass = 0.1164 * total_sats_mass / tech_level
-                    disp_volume = (0.0114 * disp_mass.to(u.kg).value / tech_level) * u.m ** 3
-
-                    new_mass_filling_ratio = (total_sats_mass + disp_mass) / self.mass_available
-
-                    total_sats_volume = self.sats_number * satellite.get_volume()
-                    new_volume_filling_ratio = (total_sats_volume + disp_volume) / self.volume_available
-
-                    if max_sats_number_m < max_sats_number_v:
-                        diff = new_mass_filling_ratio - self.mass_filling_ratio
-                    else:
-                        diff = new_volume_filling_ratio - self.volume_filling_ratio
-                    self.mass_filling_ratio = new_mass_filling_ratio
-                    self.volume_filling_ratio = new_volume_filling_ratio
-                    if self.mass_filling_ratio > 1 or self.volume_filling_ratio > 1:
-                        self.sats_number -= 1
-                    i += 1
-                    if i > 50:
-                        raise TimeoutError(f"Launch vehicle {self.id} did not converge.")
-
-                self.disp_volume = disp_volume
-                self.disp_mass = disp_mass
-
-            else:
-                raise ValueError(f"Dispenser {dispenser} is not yet implemented. Please select 'Auto' instead")
-        else:
-            max_sats_number_m = int(self.mass_available / satellite.get_initial_mass())
-            max_sats_number_v = int(self.volume_available / satellite.get_volume())
-            max_sats_number = min(max_sats_number_m, max_sats_number_v)
-
-            total_sats_mass = max_sats_number * satellite.get_initial_mass()
-            total_sats_volume = max_sats_number * satellite.get_volume()
-
-            self.mass_filling_ratio = total_sats_mass / self.mass_available
-            self.volume_filling_ratio = total_sats_volume / self.volume_available
-
-            self.satellites_allowance = self.sats_number
-
-        return self.sats_number, total_sats_mass, self.disp_mass, self.disp_volume
 
     def get_current_mass(self):
         """ Returns the total mass of the launcher, including all modules and kits at the current time in the simulation.
@@ -1843,7 +1747,7 @@ class UpperStage(Spacecraft):
             if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
                 # TODO Compute ideal phasing orgit
                 phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
-                phasing_orbit.inc += 1 * u.deg
+                phasing_orbit.inc += self.phasing_delta_inc
 
                 # Reach phasing orbit and add to plan
                 phasing = OrbitChange(f"({self.id}) goes to ideal phasing orbit",
