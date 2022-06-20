@@ -6,6 +6,7 @@ Description:    Plan Class definition
 """
 
 # Import Classes
+from Commons.common import convert_time_for_print
 from Phases.Common_functions import *
 
 # Import libraries
@@ -214,15 +215,8 @@ class Plan:
         starting_Epoch = min([phase.starting_date for phase in self.phases])
         ending_Epoch = max([phase.end_date for phase in self.phases])
         total_duration = (ending_Epoch-starting_Epoch)
-        if total_duration > 30. * u.day:
-            total_duration = total_duration.to(u.year)
-        elif total_duration > 1. * u.day:
-            total_duration= total_duration.to(u.day)
-        else:
-            total_duration = total_duration.to(u.minute)
+        total_duration = convert_time_for_print(total_duration)
         print(f"Total duration: {total_duration:.2f}")
-
-        # 
                 
     def __str__(self):
         temp = self.id
