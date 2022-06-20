@@ -63,15 +63,6 @@ class Constellation:
         """
         return self.optimized_ordered_satellites
 
-    def assign_ordered_satellites(self,upperstage):
-        """ Assign remaining ordered satellite to current spacecraft within spacecraft allowance
-        """
-        # Nb satellite to be assign
-        satellite_allowance = upperstage.get_satellites_allowance()
-
-        # Assign sats
-        upperstage.assign_sats(self.optimized_ordered_satellites[0:satellite_allowance])
-
     def remove_in_ordered_satellites(self,satellites):
         """ Remove already assigned satellites
         """
