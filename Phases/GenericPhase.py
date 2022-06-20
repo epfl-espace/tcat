@@ -1,4 +1,5 @@
 import copy
+from Commons.common import convert_time_for_print
 
 import Scenario.Fleet_module
 from Phases.Common_functions import *
@@ -129,12 +130,7 @@ class GenericPhase:
 
     def __str__(self):
         # format duration
-        if self.duration > 30. * u.day:
-            duration_print = self.duration.to(u.year)
-        elif self.duration > 1. * u.day:
-            duration_print = self.duration.to(u.day)
-        else:
-            duration_print = self.duration.to(u.minute)
+        duration_print = convert_time_for_print(self.duration)
         
         # build string
         return (str(self.ID)
