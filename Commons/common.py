@@ -1,5 +1,6 @@
 import os  # used to interact with system files
 import pickle  # used to save and load large amount of data to binary files
+from astropy import units as u
 
 """ This file contains a few generic functions used to:
     - display a progress bar
@@ -72,3 +73,22 @@ def load_latest_file(folder_name, file_name_start):
     data = load_file(folder_name, newest_file_name)
 
     return data
+
+def convert_time_for_print(dt):
+    """ Returns the time in the lowest unit with decimal > 0.
+    Typ:    dt = 135s --> returns: 2.25 minute
+            dt = 3600s --> returns: 1 hour
+    Args:
+        dt (u.sec, u.minute, u.day, etc...): duration to covert in a printable unit
+    """
+    if dt > 30. * u.day:
+        dt = dt.to(u.year)
+    elif dt > 1. * u.day:
+        dt = dt.to(u.day)
+    elif dt > 1 * u.minute:
+        dt = dt.to(u.minute)
+    elif dt > 1 * u.s:
+        dt = dt.to(u.s)
+    else:
+        dt = dt.to(u.ms)
+    return dt
