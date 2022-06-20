@@ -85,7 +85,7 @@ class Fleet:
             # Iterate until upperstage is validated and its relative plan is satisfactory
             while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
                 # Compute new current allowance
-                upperstage_cur_sat_allowance = math.floor((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
+                upperstage_cur_sat_allowance = math.ceil((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
 
                 # Perform initial setup (mass and volume available)
                 upperstage.reset()
@@ -94,7 +94,7 @@ class Fleet:
                 upperstage.design(custom_sat_allowance=upperstage_cur_sat_allowance)
 
                 # Assign target as per mass and volume allowance
-                clients.assign_ordered_satellites(upperstage)
+                upperstage.assign_ordered_satellites(clients)
 
                 # Define spacecraft mission profile
                 upperstage.define_mission_profile(clients.get_global_precession_rotation())
@@ -103,8 +103,9 @@ class Fleet:
                 upperstage.execute()
 
                 if upperstage.mainpropulsion.current_propellant_mass > 0:
-                    # Check if current allowance is similar to upper bound
-                    if upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
+                    # Exit condition: when cur sat allowance = upper bound
+                    tmp = upperstage_up_sat_allowance - upperstage_low_sat_allowance
+                    if  upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
                         # exit loop flat
                         upperstage_converged = True
 
@@ -118,7 +119,6 @@ class Fleet:
                 else:
                     # If lacking fuel, decrease upper bound
                     upperstage_up_sat_allowance = upperstage_cur_sat_allowance
-
                          
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
@@ -1559,6 +1559,15 @@ class UpperStage(Spacecraft):
             del self.current_sats[sat.ID]
         else:
             logging.warning('No sat '+ sat.ID +' in launcher '+ self.id+ '.')
+
+    def assign_ordered_satellites(self,clients):
+        """ Assign remaining ordered satellite to current spacecraft within spacecraft allowance
+        """
+        # Remaining satellite to be delivered
+        available_satellites = clients.get_optimized_ordered_satellites()
+
+        # Assign sats
+        self.assign_sats(available_satellites[0:self.satellites_allowance])
 
     def assign_sats(self, targets_assigned_to_servicer):
         """Adds sats to the UpperStage as Target. The UpperStage becomes the sat's mothership.
