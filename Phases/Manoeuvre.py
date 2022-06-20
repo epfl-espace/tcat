@@ -2,6 +2,8 @@ import numpy as np
 from astropy import units as u
 from astropy import constants as const
 
+from Commons.common import convert_time_for_print
+
 class Manoeuvre:
     """ Class representing a manoeuvre. This is used to simplify computations of thrust, mass and durations.
 
@@ -31,16 +33,6 @@ class Manoeuvre:
         return self.burn_duration / duty_cycle
 
     def __str__(self):
-        if self.burn_duration > 30. * u.day:
-            duration_print = self.burn_duration.to(u.year)
-        elif self.burn_duration > 1. * u.day:
-            duration_print = self.burn_duration.to(u.day)
-        elif self.burn_duration > 1. * u.minute:
-            duration_print = self.burn_duration.to(u.minute)
-        elif self.burn_duration > 0.1 * u.second:
-            duration_print = self.burn_duration.to(u.second)
-        else:
-            duration_print = self.burn_duration.to(u.millisecond)
-
+        duration_print = convert_time_for_print(self.burn_duration)
         return (f"\u0394V: {self.delta_v.to(u.m/u.s):.1f}, \u0394t {duration_print:.1f}, {self.id}")
 
