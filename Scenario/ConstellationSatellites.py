@@ -304,8 +304,6 @@ class Satellite:
         self.volume = volume
         self.insertion_orbit = insertion_orbit
         self.initial_orbit = insertion_orbit
-        #self.disposal_orbit = disposal_orbit
-        self.is_stackable = is_stackable
         self.operational_orbit = operational_orbit
         self.current_orbit = None
         self.current_mass = initial_mass
