@@ -1389,22 +1389,20 @@ class UpperStage(Spacecraft):
         Return:
             (u.kg): current mass, including kits
         """
-        # launcher dry mass (with contingency)
-        temp_mass = self.additional_dry_mass
-        for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass()
-        temp_mass = temp_mass * (1 + self.mass_contingency)
-        # launcher prop mass and captured target mass
-        for _, module in self.modules.items():
-            if isinstance(module, PropulsionModule):
-                temp_mass = temp_mass + module.get_current_prop_mass()
-            if isinstance(module, CaptureModule):
-                if module.captured_object:
-                    temp_mass = temp_mass + module.captured_object.get_current_mass()
-        # kits mass
-        for _, sats in self.current_sats.items():
-            temp_mass = temp_mass + sats.get_current_mass()
-        return temp_mass
+        # Instanciate current mass
+        current_mass = 0
+
+        # Add propulsion current mass
+        current_mass += self.main_propulsion_module.get_current_prop_mass() + self.main_propulsion_module.get_dry_mass()
+
+        # Add capture module mass
+        current_mass += self.capture_module.get_dry_mass()
+
+        # Add satellites masses
+        current_mass += sum([self.current_sats[key].get_current_mass() for key in self.current_sats.keys()])
+
+        # Return current mass
+        return current_mass
 
     def get_initial_mass(self):
         """ Returns the total mass of the launcher, including all modules and kits at the launch time in the simulation.
@@ -1422,18 +1420,10 @@ class UpperStage(Spacecraft):
         initial_mass += self.capture_module.get_dry_mass()
 
         # Add satellites masses
-        initial_mass += sum([satellite.initial_mass for satellite in self.assigned_targets])
+        initial_mass += sum([satellite.get_initial_mass() for satellite in self.assigned_targets])
 
         # Return initial mass
         return initial_mass
-
-    def get_modules_initial_mass(self):
-        """ Returns all modules initial mass
-
-        Return:
-            (dict(Module)): dictionary of the modules
-        """
-        return sum([module.get_initial_mass() for _,module in self.modules.items()])
 
     def compute_delta_inclination_for_raan_phasing(self):
         """ Computes the inclination change for RAAN phasing basd on two ratios:
