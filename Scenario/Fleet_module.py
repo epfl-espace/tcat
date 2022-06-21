@@ -1416,6 +1416,53 @@ class UpperStage(Spacecraft):
     """
     Methods
     """
+    def execute_with_fuel_usage_optimisation(self,clients):
+        # check default cases
+        if self.mainpropulsion.current_propellant_mass < 0.:
+            logging.info(f"Remaining fuel is negative, remove a satellite")
+            return False
+
+        # initialise algorithm's variables
+        remaining_fuel_prev = 0.
+        self.delta_inc_for_raan_from_opti = 0. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
+
+        delta_inc_up = 1. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
+        delta_inc_low = 0. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
+        nb_iter = 0
+        nb_iter_max = int(MODEL_RAAN_DELTA_INCLINATION_HIGH/(2*MODEL_RAAN_DELTA_INCLINATION_LOW))+1
+        converged = False
+
+        # find inclination change minimising plan's remaining fuel
+        #   exit condition 1: no remaining fuel variation between two loops (converge)
+        #   exit condition 2: relative inclination change is below tolerance (converge)
+        #   exit condition 3: max iter achieved (not converge)
+        while not(converged) and nb_iter < nb_iter_max:
+            # set recursing variables
+            remaining_fuel_prev = self.mainpropulsion.current_propellant_mass
+            nb_iter += 1
+
+            # compute remaining fuel for new inclination change
+            self.delta_inc_for_raan_from_opti = (delta_inc_up+delta_inc_low)/2
+            self.execute(clients,self.satellites_allowance)
+
+            # define new inclination's range
+            if self.mainpropulsion.current_propellant_mass-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
+                delta_inc_low = self.delta_inc_for_raan_from_opti
+            else:
+                delta_inc_up = self.delta_inc_for_raan_from_opti
+
+            # detect algorithm's convergence
+            if MODEL_RAAN_DELTA_INCLINATION_HIGH*(delta_inc_up-delta_inc_low) <= 2*MODEL_RAAN_DELTA_INCLINATION_LOW \
+            or abs(self.mainpropulsion.current_propellant_mass-remaining_fuel_prev) <= UPPERSTAGE_REMAINING_FUEL_TOLERANCE:
+                converged = True
+
+        # ensure remaining fuel is positive
+        if self.mainpropulsion.current_propellant_mass-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
+            self.delta_inc_for_raan_from_opti = delta_inc_low
+            self.execute(clients,self.satellites_allowance)
+
+        return converged
+
     def execute(self,clients,upperstage_cur_sat_allowance):
         # Perform initial setup (mass and volume available)
         self.reset()
@@ -1677,6 +1724,15 @@ class UpperStage(Spacecraft):
             if capture_module.captured_object:
                 capture_module.captured_object.current_orbit = orbit
 
+    def compute_delta_inclination_for_raan_phasing(self):
+        """ Computes the inclination change for RAAN phasing basd on two ratios:
+        self.delta_inc_for_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
+        self.delta_inc_for_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
+        """
+        total_ratio = self.delta_inc_for_raan_from_scenario + self.delta_inc_for_raan_from_opti
+        range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
+        return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
+
     def define_mission_profile(self,precession_direction):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
@@ -1749,7 +1805,7 @@ class UpperStage(Spacecraft):
             if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
                 # TODO Compute ideal phasing orgit
                 phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
-                phasing_orbit.inc += self.phasing_delta_inc
+                phasing_orbit.inc += self.compute_delta_inclination_for_raan_phasing()
 
                 # Reach phasing orbit and add to plan
                 phasing = OrbitChange(f"({self.id}) goes to ideal phasing orbit",
