@@ -597,7 +597,7 @@ class Spacecraft:
     Init
     """
     def __init__(self,id,group,additional_dry_mass,mass_contingency,starting_epoch):
-        # Original attributs (To be described)
+
         self.id = id
         self.group = group
         self.current_orbit = None
@@ -607,8 +607,6 @@ class Spacecraft:
         self.main_propulsion_module_ID = ''
         self.rcs_propulsion_module_ID = ''
         self.capture_module_ID = ''
-        self.initial_kits = dict()
-        self.current_kits = dict()
         self.initial_sats = dict()
         self.current_sats = dict()
         self.assigned_tanker = None
@@ -666,9 +664,6 @@ class Spacecraft:
         unconverged = True
         try:
             while unconverged:
-                # design kits
-                for _, kit in self.initial_kits.items():
-                    kit.design(plan)
                 # design modules based on current wet mass and compare with last iteration wet mass
                 # TODO: replace this very crude convergence_margin with a better solution
                 iteration_mass = self.get_wet_mass()
@@ -715,9 +710,6 @@ class Spacecraft:
         # modules cost
         for _, module in self.modules.items():
             recurring_cost = recurring_cost + module.get_recurring_cost()
-        # kits modules cost
-        for _, kit in self.initial_kits.items():
-            recurring_cost = recurring_cost + kit.get_hardware_recurring_cost()
         return recurring_cost
 
     def get_development_cost(self):
@@ -731,20 +723,8 @@ class Spacecraft:
         # modules non recurring cost
         for _, module in self.modules.items():
             non_recurring_cost = non_recurring_cost + module.get_non_recurring_cost()
-        # find all groups in kits
-        kit_groups = []
-        for _, kit in self.initial_kits.items():
-            if kit.group not in kit_groups:
-                kit_groups.append(kit.group)
-        # for each kit group, find maximum development cost
-        for group in kit_groups:
-            max_kit_development_cost = 0.
-            for _, kit in self.initial_kits.items():
-                if kit.group == group:
-                    kit_development_cost = kit.get_development_cost()
-                    if max_kit_development_cost < kit_development_cost:
-                        max_kit_development_cost = kit_development_cost
-            non_recurring_cost = non_recurring_cost + max_kit_development_cost
+
+        # Return computed non_recurring_cost
         return non_recurring_cost
 
     def get_phases(self, plan):
