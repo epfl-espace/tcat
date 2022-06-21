@@ -1463,12 +1463,18 @@ class UpperStage(Spacecraft):
 
         return converged
 
-    def execute(self,clients,upperstage_cur_sat_allowance):
+    def execute(self,clients,custom_sat_allowance):
+        """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
+
+        Args:
+            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
+            upperstage_cur_sat_allowance: allowance to assign to the launcher (for iterative purpose)
+        """
         # Perform initial setup (mass and volume available)
         self.reset()
 
         # Compute launcher design for custom satellite allowance
-        self.design(custom_sat_allowance=upperstage_cur_sat_allowance)
+        self.design(custom_sat_allowance=custom_sat_allowance)
 
         # Assign target as per mass and volume allowance
         self.assign_ordered_satellites(clients)
@@ -1479,77 +1485,29 @@ class UpperStage(Spacecraft):
         # Execute upperstage (Apply owned plan)
         self.execute_plan()
 
-    def compute_upperstage(self,scenario):
-        """ setup the launcher separately from __init__()
+    def reset(self):
+        """ Reset the object to inital parameters. Empty the plan
         """
-        # Interpolate launcher performance + correction
-        self.compute_upperstage_performance(scenario)
+        # Reset attribut
+        self.current_orbit = None
+        self.mass_filling_ratio = 1
+        self.volume_filling_ratio = 1
+        self.disp_mass = 0. * u.kg
+        self.disp_volume = 0. * u.m ** 3
 
-        # Interpolate launcher fairing capacity + correction
-        self.compute_upperstage_fairing(scenario)
+        # Empty the plan
+        self.empty_plan()
 
-    def execute_plan(self):
-        """ Apply own plan
-        """
-        # Apply plan
-        self.plan.apply()
-
-    def compute_upperstage_performance(self,scenario):
-        """ Compute the satellite performance
-        """
-        # Check for custom launcher_name values
-        if scenario.custom_launcher_name is None:
-            logging.info(f"Gathering Launch Vehicle performance from database...")
-            # Compute launcher capabilities to deliver into orbit
-            launcher_performance = get_launcher_performance(scenario.fleet,
-                                                            scenario.launcher_name,
-                                                            scenario.launch_site,
-                                                            self.insertion_orbit.inc.value,
-                                                            scenario.apogee_launcher_insertion.value,
-                                                            scenario.perigee_launcher_insertion.value,
-                                                            scenario.orbit_type,
-                                                            method=scenario.interpolation_method,
-                                                            verbose=scenario.verbose,
-                                                            save="InterpolationGraph",
-                                                            save_folder=scenario.data_path)
-
-            # Substract UpperStage mass
-            self.mass_available = launcher_performance
-        else:
-            logging.info(f"Using custom Launch Vehicle performance...")
-            self.mass_available = scenario.custom_launcher_performance
-
-    def compute_upperstage_fairing(self,scenario):
-        """ Estimate the satellite volume based on mass
-        """
-        # Check for custom launcher_name values
-        if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
-            if scenario.custom_launcher_name is not None or scenario.custom_launcher_performance is not None:
-                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
-            else:
-                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
-                self.volume_available = get_launcher_fairing(self.launcher_name)
-        else:
-            logging.info(f"Using custom Launch Vehicle's fairing size...")
-            cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
-            cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
-            self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+        # Empty targets
+        self.assigned_targets = []
+        self.sats_number = len(self.assigned_targets)
     
-    def compute_allowance(self,unassigned_satellites):
-        # Compute limit in mass terms
-        limit_mass = math.floor(self.mass_available/self.reference_satellite.get_initial_mass())
-
-        # Compute limit in volume terms
-        limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
-
-        # Minimal value is of interest
-        self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
-
-        # Return allowance
-        return self.satellites_allowance
-
     def design(self,custom_sat_allowance=None,tech_level=1):
-        """ Design upperstage and compute necessary information
+        """ Design the upperstage based on allowance, tech_level and current performances
+
+        Args:
+            custom_sat_allowance: allowance to assign to the launcher (for iterative purpose)
+            tech_level: dispenser technology level
         """
         # If custom_sat_allowance provided, update upperstage allowance
         if not(custom_sat_allowance == None):
@@ -1577,41 +1535,27 @@ class UpperStage(Spacecraft):
                                                         propellant_contingency=0.05, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
                                                         mass_contingency=0.2)
         self.mainpropulsion.define_as_main_propulsion()
-
-    def get_satellites_allowance(self):
-        """ Return maximum allowable of the upperstage
-        """
-        return self.satellites_allowance
-
-    def separate_sat(self, sat):
-        """ Separate a sat from the launcher. This is used during simulation.
-            The sat is still assigned to the launcher and will be linked if the launcher is reset.
+    
+    def assign_ordered_satellites(self,clients):
+        """ Assigned remaining ordered satellites to current launcher within allowance
 
         Args:
-            sat (Client): sat to be removed from launcher
-        """
-        if sat.ID in self.current_sats:
-            del self.current_sats[sat.ID]
-        else:
-            logging.warning('No sat '+ sat.ID +' in launcher '+ self.id+ '.')
-
-    def assign_ordered_satellites(self,clients):
-        """ Assign remaining ordered satellite to current spacecraft within spacecraft allowance
+            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
         """
         # Remaining satellite to be delivered
         available_satellites = clients.get_optimized_ordered_satellites()
 
         # Assign sats
         self.assign_sats(available_satellites[0:self.satellites_allowance])
-
-    def assign_sats(self, targets_assigned_to_servicer):
+    
+    def assign_sats(self, satellite_assigned_to_upperstage):
         """Adds sats to the UpperStage as Target. The UpperStage becomes the sat's mothership.
 
         Args:
-            targets_assigned_to_servicer:
+            satellite_assigned_to_upperstage (Scenario.ConstellationSatellite.Satellite): List of satellites to assign to the upperstage
         """
         # TODO: check if can be put into scenario
-        for target in targets_assigned_to_servicer:
+        for target in satellite_assigned_to_upperstage:
             if target in self.current_sats:
                 logging.warning('Satellite '+ target.ID+ ' already in UpperStage '+ self.id+ '.')
             else:
@@ -1622,6 +1566,103 @@ class UpperStage(Spacecraft):
 
         # Update number of satellites
         self.sats_number = len(self.assigned_targets)
+
+    def execute_plan(self):
+        """ Apply own plan
+        """
+        # Apply plan
+        self.plan.apply()
+
+    def compute_upperstage(self,scenario):
+        """ Compute upperstage initial capacities
+
+        Args:
+            scenario (Scenario.ScenarioConstellation): encapsulating scenario
+        """
+        # Interpolate launcher performance + correction
+        self.compute_mass_available(scenario)
+
+        # Interpolate launcher fairing capacity + correction
+        self.compute_volume_available(scenario)
+
+    def compute_mass_available(self,scenario):
+        """ Compute the satellite performance
+
+        Args:
+            scenario (Scenario.ScenarioConstellation): encapsulating scenario
+        """
+        # Check for custom launcher_name values
+        if scenario.custom_launcher_name is None:
+            logging.info(f"Gathering Launch Vehicle performance from database...")
+            # Compute launcher capabilities to deliver into orbit
+            launcher_performance = get_launcher_performance(scenario.fleet,
+                                                            scenario.launcher_name,
+                                                            scenario.launch_site,
+                                                            self.insertion_orbit.inc.value,
+                                                            scenario.apogee_launcher_insertion.value,
+                                                            scenario.perigee_launcher_insertion.value,
+                                                            scenario.orbit_type,
+                                                            method=scenario.interpolation_method,
+                                                            verbose=scenario.verbose,
+                                                            save="InterpolationGraph",
+                                                            save_folder=scenario.data_path)
+
+            # Substract UpperStage mass
+            self.mass_available = launcher_performance
+        else:
+            logging.info(f"Using custom Launch Vehicle performance...")
+            self.mass_available = scenario.custom_launcher_performance
+
+    def compute_volume_available(self,scenario):
+        """ Estimate the satellite volume based on mass
+
+        Args:
+            scenario (Scenario.ScenarioConstellation): encapsulating scenario
+        """
+        # Check for custom launcher_name values
+        if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
+            if scenario.custom_launcher_name is not None or scenario.custom_launcher_performance is not None:
+                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
+            else:
+                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
+                self.volume_available = get_launcher_fairing(self.launcher_name)
+        else:
+            logging.info(f"Using custom Launch Vehicle's fairing size...")
+            cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
+            cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
+            self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+    
+    def compute_allowance(self,unassigned_satellites):
+        """ Compute satellites allowance based on reference satellite dimensions and capacities
+        """
+        # Compute limit in mass terms
+        limit_mass = math.floor(self.mass_available/self.reference_satellite.get_initial_mass())
+
+        # Compute limit in volume terms
+        limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
+
+        # Minimal value is of interest
+        self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
+
+        # Return allowance
+        return self.satellites_allowance
+
+    def separate_sat(self, satellite):
+        """ Separate a sat from the launcher. This is used during simulation.
+            The sat is still assigned to the launcher and will be linked if the launcher is reset.
+
+        Args:
+            sat (Client): sat to be removed from launcher
+        """
+        if satellite.ID in self.current_sats:
+            del self.current_sats[satellite.ID]
+        else:
+            logging.warning('No sat '+ satellite.ID +' in launcher '+ self.id+ '.')
+
+    def get_satellites_allowance(self):
+        """ Return maximum allowable of the upperstage
+        """
+        return self.satellites_allowance
 
     def get_current_mass(self):
         """ Returns the total mass of the launcher, including all modules and kits at the current time in the simulation.
@@ -1664,23 +1705,6 @@ class UpperStage(Spacecraft):
 
         return temp_mass
 
-    def reset(self):
-        """ 
-        """
-        # Reset attribut
-        self.current_orbit = None
-        self.mass_filling_ratio = 1
-        self.volume_filling_ratio = 1
-        self.disp_mass = 0. * u.kg
-        self.disp_volume = 0. * u.m ** 3
-
-        # Empty the plan
-        self.empty_plan()
-
-        # Empty targets
-        self.assigned_targets = []
-        self.sats_number = len(self.assigned_targets)
-
     def get_propulsion_modules(self):
         """ Returns all modules that contain propellant. This is used for fleet convergence.
 
@@ -1716,10 +1740,11 @@ class UpperStage(Spacecraft):
         Args:
             orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
         """
-        # servicer own orbit
+        # Upperstage own orbit
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
-        # orbit of capture objects
+
+        # Captured objects orbit
         for _, capture_module in self.get_capture_modules().items():
             if capture_module.captured_object:
                 capture_module.captured_object.current_orbit = orbit
