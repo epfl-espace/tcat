@@ -1407,7 +1407,8 @@ class UpperStage(Spacecraft):
         self.disp_mass = 0. * u.kg
         self.disp_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
-        self.phasing_delta_inc = 1 * u.deg
+        self.delta_inc_for_raan_from_scenario = scenario.mission_cost_vs_duration_factor
+        self.delta_inc_for_raan_from_opti = 0.
 
         # Compute initial performances
         self.compute_upperstage(scenario)
