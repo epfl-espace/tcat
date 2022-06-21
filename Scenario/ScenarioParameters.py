@@ -20,9 +20,13 @@ CONTINGENCY_DELTA_V = 0.1 # dV added to computed dV for each manoeuvres
 
 # Different models exist for a same type of manoeuvre, selection is based on certain criteria:
 MODEL_RAAN_DIRECT_LIMIT = 8 * u.deg # criteria to select between direct RAAN change (small angles only) or use J2 model
+MODEL_RAAN_DELTA_INCLINATION_HIGH = 10 *u.deg # higer bound of inclination change for RAAN phasing
+MODEL_RAAN_DELTA_INCLINATION_LOW = 1e-3 * u.deg # lower bound of inclination change for RAAN phasing
 
 # UpperStage initial fuel mass
 UPPERSTAGE_INITIAL_FUEL_MASS = 89.8 * u.kg
+UPPERSTAGE_REMAINING_FUEL_TOLERANCE = 1e-3 * u.kg
+UPPERSTAGE_REMAINING_FUEL_MARGIN = 0. * u.kg
 
 # UpperStage initial fuel mass
 UPPERSTAGE_PROPULSION_DRY_MASS = 0 * u.kg
