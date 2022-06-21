@@ -39,7 +39,8 @@ class ScenarioConstellation:
                       'custom_launcher_name',
                       'interpolation_method',
                       'starting_epoch',
-                      'data_path']
+                      'data_path',
+                      'mission_cost_vs_duration_factor']
 
     scalable_field = [('sat_mass', u.kg),
                       ('sat_volume', u.m ** 3),
