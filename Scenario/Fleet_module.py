@@ -604,9 +604,6 @@ class Spacecraft:
         self.previous_orbit = None
         self.additional_dry_mass = additional_dry_mass
         self.modules = dict()
-        self.main_propulsion_module_ID = ''
-        self.rcs_propulsion_module_ID = ''
-        self.capture_module_ID = ''
         self.initial_sats = dict()
         self.current_sats = dict()
         self.assigned_tanker = None
@@ -637,6 +634,22 @@ class Spacecraft:
         else:
             self.modules[module.id] = module
 
+    def assign_sats(self, targets_assigned_to_servicer):
+        """Adds satellites to the Servicer as Target. The Servicer becomes the sat's mothership.
+
+        Args:
+            targets_assigned_to_servicer:
+        """
+        # TODO: check if can be put into scenario
+        for target in targets_assigned_to_servicer:
+            if target in self.current_sats:
+                warnings.warn('Satellite ', target.ID, ' already in Servicer ', self.id, '.', UserWarning)
+            else:
+                self.initial_sats[target.ID] = target
+                self.current_sats[target.ID] = target
+                target.mothership = self
+            self.assigned_targets.append(target)
+
     def get_dry_mass(self, contingency=True):
         """Returns the total dry mass of the servicer. Does not include kits.
 
@@ -652,30 +665,6 @@ class Spacecraft:
         if contingency:
             temp_mass = temp_mass * (1 + self.mass_contingency)
         return temp_mass
-
-    def design(self, plan, convergence_margin=0.5 * u.kg, verbose=False):
-        """ Loop on the modules computations until the dry mass is stable.
-
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-            convergence_margin (u.kg): accuracy required on propellant mass for convergence
-            verbose (boolean): if True, print convergence_margin information
-        """
-        unconverged = True
-        try:
-            while unconverged:
-                # design modules based on current wet mass and compare with last iteration wet mass
-                # TODO: replace this very crude convergence_margin with a better solution
-                iteration_mass = self.get_wet_mass()
-                for _, module in self.modules.items():
-                    module.design(plan)
-                delta = abs(self.get_wet_mass() - iteration_mass)
-                if verbose:
-                    print('Sub-systems design ', self.id, ' - Delta: ', delta, iteration_mass, self.get_dry_mass(),self.get_wet_mass())
-                if delta <= convergence_margin:
-                    unconverged = False
-        except RecursionError:
-            warnings.warn('No convergence_margin in sub-systems design.', UserWarning)
 
     def get_initial_prop_mass(self):
         """ Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
@@ -778,88 +767,6 @@ class Spacecraft:
         for _, module in self.modules.items():
             nominal_power_draw = nominal_power_draw + module.get_reference_power()
         return nominal_power_draw
-
-    def get_reference_inertia(self):
-        """ Returns estimated inertia of the servicer along its main axis based on a generic box and wings shape.
-            Used for estimations of required mass for aocs systems.
-
-        Return:
-            (u.kg*u.m*u.m): servicer inertia
-        """
-        # TODO: check this models
-        # compute inertia of spacecraft without solar arrays (simple scaling from a reference point of 100kg)
-        box_inertia = 100. * u.kg * u.m * u.m * (self.get_wet_mass(contingency=False).to(u.kg).value / 200.) ** (5 / 3)
-        # compute inertia of solar arrays (simple scaling from a reference of 600W)
-        solar_array_inertia = 50. * u.kg * u.m * u.m * (self.get_reference_power().to(u.W).value / 600.)
-        return (box_inertia + solar_array_inertia).to(u.kg * u.m * u.m)
-
-    def get_attribute_history(self, attribute_name, plan):
-        """ Get the time evolution of an attribute of the servicer over the phases of a plan.
-            The information must be returned in a method of a servicer or phase or an attribute of an orbit.
-
-        Arg:
-            attribute_name (str): name of an attribute of "get_" method
-            plan (Plan): plan for which the fleet needs to be designed
-
-        Return:
-              ([<>]): List of values for the queried data
-              ([epoch]): list of epochs for each data point
-              ([str]): list of phases id for each data point
-        """
-        # get class method name
-        data = []
-        time = []
-        phase_id = []
-        for phase in self.get_phases(plan):
-            # check if this is available in the Scenario class
-            if hasattr(phase, attribute_name):
-                data.append(getattr(phase, attribute_name))
-                time.append(phase.spacecraft_snapshot.current_orbit.epoch)
-                phase_id.append(phase.ID)
-            elif hasattr(phase.spacecraft_snapshot, attribute_name):
-                data.append(getattr(phase.spacecraft_snapshot, attribute_name)())
-                time.append(phase.spacecraft_snapshot.current_orbit.epoch)
-                phase_id.append(phase.ID)
-            elif hasattr(phase.spacecraft_snapshot.current_orbit, attribute_name):
-                data.append(getattr(phase.spacecraft_snapshot.current_orbit, attribute_name))
-                time.append(phase.spacecraft_snapshot.current_orbit.epoch)
-                phase_id.append(phase.ID)
-            else:
-                return False
-        return data, time, phase_id
-
-    def get_capture_module(self):
-        """ Returns default capture module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.capture_module_ID]
-        except KeyError:
-            return False
-
-    def get_main_propulsion_module(self):
-        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.main_propulsion_module_ID]
-        except KeyError:
-            return None
-
-    def get_rcs_propulsion_module(self):
-        """ Returns default rcs propulsion module of servicer. Used to simplify scenario creation.
-
-        Return:
-            (Module): module
-        """
-        try:
-            return self.modules[self.rcs_propulsion_module_ID]
-        except KeyError:
-            return None
 
     def print_report(self):
         print(f"Built-in function print report not defined for Class: {type(self)}")
@@ -1017,22 +924,6 @@ class Servicer(Spacecraft):
         else:
             warnings.warn('No sat ', sat.ID, ' in servicer ', self.id, '.', UserWarning)
 
-    def assign_sats(self, targets_assigned_to_servicer):
-        """Adds sats to the Servicer as Target. The Servicer becomes the sat's mothership.
-
-        Args:
-            targets_assigned_to_servicer:
-        """
-        # TODO: check if can be put into scenario
-        for target in targets_assigned_to_servicer:
-            if target in self.current_sats:
-                warnings.warn('Satellite ', target.ID, ' already in Servicer ', self.id, '.', UserWarning)
-            else:
-                self.initial_sats[target.ID] = target
-                self.current_sats[target.ID] = target
-                target.mothership = self
-            self.assigned_targets.append(target)
-
     def get_current_mass(self):
         """Returns the total mass of the servicer, including all modules and kits at the current time in the simulation.
 
@@ -1189,9 +1080,9 @@ class UpperStage(Spacecraft):
     """
     Init
     """
-    def __init__(self, launch_vehicle_id, scenario, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super(UpperStage, self).__init__(launch_vehicle_id,"launcher",additional_dry_mass,mass_contingency,scenario.starting_epoch)
-        self.launcher_name = scenario.launcher_name
+    def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+        super(UpperStage, self).__init__(id,"launcher",additional_dry_mass,mass_contingency,scenario.starting_epoch)
+        self.upperstage_name = scenario.launcher_name
         self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
         self.mass_available = None
@@ -1199,8 +1090,8 @@ class UpperStage(Spacecraft):
         self.disposal_orbit = scenario.launcher_disposal_orbit
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
-        self.disp_mass = 0. * u.kg
-        self.disp_volume = 0. * u.m ** 3
+        self.dispenser_mass = 0. * u.kg
+        self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
         self.delta_inc_for_raan_from_scenario = scenario.mission_cost_vs_duration_factor
         self.delta_inc_for_raan_from_opti = 0.
@@ -1287,8 +1178,8 @@ class UpperStage(Spacecraft):
         self.current_orbit = None
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
-        self.disp_mass = 0. * u.kg
-        self.disp_volume = 0. * u.m ** 3
+        self.dispenser_mass = 0. * u.kg
+        self.dispenser_volume = 0. * u.m ** 3
 
         # Empty the plan
         self.empty_plan()
@@ -1342,25 +1233,6 @@ class UpperStage(Spacecraft):
 
         # Assign sats
         self.assign_sats(available_satellites[0:self.satellites_allowance])
-    
-    def assign_sats(self, satellite_assigned_to_upperstage):
-        """Adds sats to the UpperStage as Target. The UpperStage becomes the sat's mothership.
-
-        Args:
-            satellite_assigned_to_upperstage (Scenario.ConstellationSatellite.Satellite): List of satellites to assign to the upperstage
-        """
-        # TODO: check if can be put into scenario
-        for target in satellite_assigned_to_upperstage:
-            if target in self.current_sats:
-                logging.warning('Satellite '+ target.ID+ ' already in UpperStage '+ self.id+ '.')
-            else:
-                self.initial_sats[target.ID] = target
-                self.current_sats[target.ID] = target
-                target.mothership = self
-            self.assigned_targets.append(target)
-
-        # Update number of satellites
-        self.sats_number = len(self.assigned_targets)
 
     def execute_plan(self):
         """ Apply own plan
@@ -1420,7 +1292,7 @@ class UpperStage(Spacecraft):
                 raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
             else:
                 logging.info(f"Gathering Launch Vehicle's fairing size from database...")
-                self.volume_available = get_launcher_fairing(self.launcher_name)
+                self.volume_available = get_launcher_fairing(self.upperstage_name)
         else:
             logging.info(f"Using custom Launch Vehicle's fairing size...")
             cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
@@ -1679,15 +1551,15 @@ class UpperStage(Spacecraft):
         print(f"""---\n---
 Launch Vehicles:
     ID: {self.id}
-    Launch vehicle name: {self.launcher_name}
+    Launch vehicle name: {self.upperstage_name}
     Dry mass: {self.get_dry_mass():.01f}
     Wet mass: {self.get_wet_mass():.01f}
     Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
     Payload mass available: {self.mass_available}
     Number of satellites: {self.sats_number}
-    Dispenser mass: {self.disp_mass:.1f}
+    Dispenser mass: {self.dispenser_mass:.1f}
     Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
-    Dispenser volume: {self.disp_volume:.1f}
+    Dispenser volume: {self.dispenser_volume:.1f}
     Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
     Targets assigned to the Launch vehicle:""")
 
