@@ -650,6 +650,18 @@ class Spacecraft:
                 target.mothership = self
             self.assigned_targets.append(target)
 
+    def separate_sat(self, satellite):
+        """ Separate a sat from the launcher. This is used during simulation.
+            The sat is still assigned to the launcher and will be linked if the launcher is reset.
+
+        Args:
+            sat (Client): sat to be removed from launcher
+        """
+        if satellite.ID in self.current_sats:
+            del self.current_sats[satellite.ID]
+        else:
+            logging.warning('No sat '+ satellite.ID +' in '+ self.id+ '.')
+
     def get_dry_mass(self, contingency=True):
         """Returns the total dry mass of the servicer. Does not include kits.
 
@@ -911,18 +923,6 @@ class Servicer(Spacecraft):
             del self.current_kits[kit.ID]
         else:
             warnings.warn('No kit ', kit.ID, ' in servicer ', self.id, '.', UserWarning)
-
-    def separate_sat(self, sat):
-        """ Separate a sat from the servicer. This is used during simulation.
-        The sat is still assigned to the servicer and will be linked if the servicer is reset.
-
-        Args:
-            sat (Client): sat to be removed from launcher
-        """
-        if sat.ID in self.current_sats:
-            del self.current_sats[sat.ID]
-        else:
-            warnings.warn('No sat ', sat.ID, ' in servicer ', self.id, '.', UserWarning)
 
     def get_current_mass(self):
         """Returns the total mass of the servicer, including all modules and kits at the current time in the simulation.
@@ -1313,18 +1313,6 @@ class UpperStage(Spacecraft):
 
         # Return allowance
         return self.satellites_allowance
-
-    def separate_sat(self, satellite):
-        """ Separate a sat from the launcher. This is used during simulation.
-            The sat is still assigned to the launcher and will be linked if the launcher is reset.
-
-        Args:
-            sat (Client): sat to be removed from launcher
-        """
-        if satellite.ID in self.current_sats:
-            del self.current_sats[satellite.ID]
-        else:
-            logging.warning('No sat '+ satellite.ID +' in launcher '+ self.id+ '.')
 
     def get_satellites_allowance(self):
         """ Return maximum allowable of the upperstage
