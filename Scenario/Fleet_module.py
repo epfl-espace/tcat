@@ -115,6 +115,7 @@ class Fleet:
                         upperstage_up_sat_allowance = upperstage_cur_sat_allowance
 
             # Iterate until upperstage total deployment time is computed (If phasing existing)
+            upperstage.execute_with_fuel_usage_optimisation(clients)
                          
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
