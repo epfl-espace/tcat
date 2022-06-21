@@ -94,11 +94,12 @@ class Fleet:
 
                 # Execute upperstage
                 upperstage.execute(clients,upperstage_cur_sat_allowance)
+                upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
 
                 # Check for exit condition
                 if upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
                     # If fuel mass > 0 and cur == up, then up is the solution
-                    if upperstage.mainpropulsion.current_propellant_mass > 0 and upperstage_cur_sat_allowance == upperstage_up_sat_allowance:
+                    if upperstage_main_propulsion_module.get_current_prop_mass() > 0 and upperstage_cur_sat_allowance == upperstage_up_sat_allowance:
                         upperstage_low_sat_allowance = upperstage_up_sat_allowance
                     # If fuel mass < 0 then low is the solution for sure, hoping it is not zero.
                     else:
@@ -106,7 +107,7 @@ class Fleet:
 
                 # Apply dichotomia to remaining values
                 else:
-                    if upperstage.mainpropulsion.current_propellant_mass > 0:
+                    if upperstage_main_propulsion_module.get_current_prop_mass() > 0:
                         # If extra fuel, increase lower bound
                         upperstage_low_sat_allowance = upperstage_cur_sat_allowance
 
@@ -597,13 +598,24 @@ class Spacecraft:
     Init
     """
     def __init__(self,id,group,additional_dry_mass,mass_contingency,starting_epoch):
-
+        # Set id name and groupe
         self.id = id
         self.group = group
+
+        # Instanciate orbits
         self.current_orbit = None
         self.previous_orbit = None
+
+        # Set any additional dry mass to add
         self.additional_dry_mass = additional_dry_mass
+
+        # Instanciate modules
         self.modules = dict()
+        self.main_propulsion_module = None
+        self.rcs_propulsion_module = None
+        self.capture_module = None
+
+        # Satellite related
         self.initial_sats = dict()
         self.current_sats = dict()
         self.assigned_tanker = None
@@ -623,8 +635,7 @@ class Spacecraft:
         self.plan.empty()
 
     def add_module(self, module):
-        """ Adds a module to the Servicer class.
-            TODO: change description
+        """  Adds module to the list
 
         Args:
             module (GenericModule): module to be added
@@ -635,7 +646,7 @@ class Spacecraft:
             self.modules[module.id] = module
 
     def assign_sats(self, targets_assigned_to_servicer):
-        """Adds satellites to the Servicer as Target. The Servicer becomes the sat's mothership.
+        """ Adds satellites to the Servicer as Target. The Servicer becomes the sat's mothership.
 
         Args:
             targets_assigned_to_servicer:
@@ -661,6 +672,90 @@ class Spacecraft:
             del self.current_sats[satellite.ID]
         else:
             logging.warning('No sat '+ satellite.ID +' in '+ self.id+ '.')
+
+    def change_orbit(self, orbit):
+        """ Changes the current_orbit of the servicer and linked objects.
+
+        Args:
+            orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
+        """
+        # Update upperstage own orbit
+        self.previous_orbit = self.current_orbit
+        self.current_orbit = orbit
+
+        # Update capture module orbit
+        capture_module = self.get_capture_module()
+        if capture_module.captured_object:
+            capture_module.captured_object.current_orbit = orbit
+
+    def set_capture_module(self,module):
+        """ Returns default capture module of servicer. Used to simplify scenario creation.
+
+        Args:
+            (Module): module
+        """
+        # Assign capture_module
+        self.capture_module = module
+
+        # Add the module to the list
+        self.add_module(module)
+
+    def set_main_propulsion_module(self,module):
+        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
+
+        Args:
+            (Module): module
+        """
+        # Assign main_propulsion_module
+        self.main_propulsion_module = module
+
+        # Add the module to the list
+        self.add_module(module)
+
+    def set_rcs_propulsion_module(self,module):
+        """ Returns default rcs propulsion module of servicer. Used to simplify scenario creation.
+
+        Args:
+            (Module): module
+        """
+        # Assign rcs_propulsion_module
+        self.rcs_propulsion_module = module
+
+        # Add the module to the list
+        self.add_module(module)
+
+    def get_capture_module(self):
+        """ Returns default capture module of servicer. Used to simplify scenario creation.
+
+        Return:
+            (Module): module
+        """
+        try:
+            return self.capture_module
+        except KeyError:
+            return False
+
+    def get_main_propulsion_module(self):
+        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
+
+        Return:
+            (Module): module
+        """
+        try:
+            return self.main_propulsion_module
+        except KeyError:
+            return None
+
+    def get_rcs_propulsion_module(self):
+        """ Returns default rcs propulsion module of servicer. Used to simplify scenario creation.
+
+        Return:
+            (Module): module
+        """
+        try:
+            return self.rcs_propulsion_module
+        except KeyError:
+            return None
 
     def get_dry_mass(self, contingency=True):
         """Returns the total dry mass of the servicer. Does not include kits.
@@ -986,20 +1081,6 @@ class Servicer(Spacecraft):
                     available_module[module.id] = module
         return available_module
 
-    def get_propulsion_modules(self):
-        """ Returns all modules that contain propellant. This is used for fleet convergence.
-
-        Note: This includes propulsion modules that belong to kits assigned to the servicer. Kits are converged with
-        their mothership.
-
-        Return:
-            (dict(Module)): dictionary of the modules
-        """
-        prop_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, PropulsionModule)}
-        for _, kit in self.initial_kits.items():
-            prop_modules.update(kit.get_propulsion_modules())
-        return prop_modules
-
     def get_capture_modules(self):
         """ Returns only modules that can capture targets of simulation at current time.
 
@@ -1007,25 +1088,7 @@ class Servicer(Spacecraft):
             (dict(Module)): dictionary of the modules
         """
         capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
-        for _, kit in self.current_kits.items():
-            capture_modules.update(kit.get_capture_modules())
         return capture_modules
-
-    def change_orbit(self, orbit):
-        """ Changes the current_orbit of the servicer and linked objects.
-
-        Args:
-            orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
-        """
-        # servicer own orbit
-        self.current_orbit = orbit
-        # orbit of capture objects
-        for _, capture_module in self.get_capture_modules().items():
-            if capture_module.captured_object:
-                capture_module.captured_object.current_orbit = orbit
-        # orbit of kits
-        for _, kit in self.current_kits.items():
-            kit.change_orbit(orbit)
 
     def print_report(self):
         """ Print quick summary for debugging purposes."""
@@ -1104,7 +1167,7 @@ class UpperStage(Spacecraft):
     """
     def execute_with_fuel_usage_optimisation(self,clients):
         # check default cases
-        if self.mainpropulsion.current_propellant_mass < 0.:
+        if self.main_propulsion_module.get_current_prop_mass() < 0.:
             logging.info(f"Remaining fuel is negative, remove a satellite")
             return False
 
@@ -1124,7 +1187,7 @@ class UpperStage(Spacecraft):
         #   exit condition 3: max iter achieved (not converge)
         while not(converged) and nb_iter < nb_iter_max:
             # set recursing variables
-            remaining_fuel_prev = self.mainpropulsion.current_propellant_mass
+            remaining_fuel_prev = self.main_propulsion_module.get_current_prop_mass()
             nb_iter += 1
 
             # compute remaining fuel for new inclination change
@@ -1132,18 +1195,18 @@ class UpperStage(Spacecraft):
             self.execute(clients,self.satellites_allowance)
 
             # define new inclination's range
-            if self.mainpropulsion.current_propellant_mass-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
+            if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
                 delta_inc_low = self.delta_inc_for_raan_from_opti
             else:
                 delta_inc_up = self.delta_inc_for_raan_from_opti
 
             # detect algorithm's convergence
             if MODEL_RAAN_DELTA_INCLINATION_HIGH*(delta_inc_up-delta_inc_low) <= 2*MODEL_RAAN_DELTA_INCLINATION_LOW \
-            or abs(self.mainpropulsion.current_propellant_mass-remaining_fuel_prev) <= UPPERSTAGE_REMAINING_FUEL_TOLERANCE:
+            or abs(self.main_propulsion_module.get_current_prop_mass()-remaining_fuel_prev) <= UPPERSTAGE_REMAINING_FUEL_TOLERANCE:
                 converged = True
 
         # ensure remaining fuel is positive
-        if self.mainpropulsion.current_propellant_mass-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
+        if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
             self.delta_inc_for_raan_from_opti = delta_inc_low
             self.execute(clients,self.satellites_allowance)
 
@@ -1207,21 +1270,22 @@ class UpperStage(Spacecraft):
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
         dispenser_volume = (0.0114 * dispenser_mass.to(u.kg).value / tech_level) * u.m ** 3
-        self.dispenser = CaptureModule(self.id + '_Dispenser',
+        dispenser = CaptureModule(self.id + '_Dispenser',
                                             self,
                                             mass_contingency=0.0,
                                             dry_mass_override=dispenser_mass)
-        self.dispenser.define_as_capture_default()
+
+        self.set_capture_module(dispenser)
 
         # Add propulsion as PropulsionModule
-        self.mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
                                                         self, 'bi-propellant', 294000 * u.N,
                                                         294000 * u.N, 330 * u.s, UPPERSTAGE_INITIAL_FUEL_MASS,
                                                         5000 * u.kg, reference_power_override=0 * u.W,
                                                         propellant_contingency=0.05, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
                                                         mass_contingency=0.2)
-        self.mainpropulsion.define_as_main_propulsion()
-    
+        self.set_main_propulsion_module(mainpropulsion)
+
     def assign_ordered_satellites(self,clients):
         """ Assigned remaining ordered satellites to current launcher within allowance
 
@@ -1348,38 +1412,20 @@ class UpperStage(Spacecraft):
         Return:
             (u.kg): current mass, including kits
         """
-        temp_mass = 0
+        # Instanciate initial mass
+        initial_mass = 0
 
-        prop_modules =  self.get_propulsion_modules()
-        temp_mass += sum([(prop_modules[key].get_initial_prop_mass()+prop_modules[key].get_dry_mass()) for key in prop_modules.keys()])
+        # Add propulsion initial mass
+        initial_mass += self.main_propulsion_module.get_initial_prop_mass() + self.main_propulsion_module.get_dry_mass()
 
-        capt_modules =  self.get_capture_modules()
-        temp_mass += sum([capt_modules[key].get_dry_mass() for key in capt_modules.keys()])
+        # Add capture module mass
+        initial_mass += self.capture_module.get_dry_mass()
 
-        temp_mass += sum([satellite.initial_mass for satellite in self.assigned_targets])
+        # Add satellites masses
+        initial_mass += sum([satellite.initial_mass for satellite in self.assigned_targets])
 
-        return temp_mass
-
-    def get_propulsion_modules(self):
-        """ Returns all modules that contain propellant. This is used for fleet convergence.
-
-        Note: This includes propulsion modules that belong to kits assigned to the servicer. Kits are converged with
-        their mothership.
-
-        Return:
-            (dict(Module)): dictionary of the modules
-        """
-        prop_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, PropulsionModule)}
-        return prop_modules
-
-    def get_capture_modules(self):
-        """ Returns only modules that can capture targets of simulation at current time.
-
-        Return:
-            (dict(Module)): dictionary of the modules
-        """
-        capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
-        return capture_modules
+        # Return initial mass
+        return initial_mass
 
     def get_modules_initial_mass(self):
         """ Returns all modules initial mass
@@ -1388,21 +1434,6 @@ class UpperStage(Spacecraft):
             (dict(Module)): dictionary of the modules
         """
         return sum([module.get_initial_mass() for _,module in self.modules.items()])
-
-    def change_orbit(self, orbit):
-        """ Changes the current_orbit of the servicer and linked objects.
-
-        Args:
-            orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
-        """
-        # Upperstage own orbit
-        self.previous_orbit = self.current_orbit
-        self.current_orbit = orbit
-
-        # Captured objects orbit
-        for _, capture_module in self.get_capture_modules().items():
-            if capture_module.captured_object:
-                capture_module.captured_object.current_orbit = orbit
 
     def compute_delta_inclination_for_raan_phasing(self):
         """ Computes the inclination change for RAAN phasing basd on two ratios:
@@ -1559,6 +1590,5 @@ Launch Vehicles:
         print('Modules:')
         for _, module in self.modules.items():
             print(f"\tModule ID: {module}")
-        print('\tPhasing Module ID: ' + self.main_propulsion_module_ID)
-        print('\tRDV module ID: ' + self.rcs_propulsion_module_ID)
-        print('\tCapture module ID : ' + self.capture_module_ID)
+        print('\tPhasing Module ID: ' + self.main_propulsion_module.id)
+        print('\tCapture module ID : ' + self.capture_module.id)
