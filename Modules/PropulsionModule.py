@@ -318,12 +318,6 @@ class PropulsionModule(GenericModule):
         else:
             self.non_recurring_cost = 1700 * 1000
         return self.non_recurring_cost
-        
-    def define_as_main_propulsion(self):
-        """ Make module default phasing module for its servicer.
-        Used in automatic generation of planning and servicers.
-        """
-        self.spacecraft.main_propulsion_module_ID = self.id
 
     def is_main_propulsion(self):
         """ Check if module is default phasing for its servicer."""

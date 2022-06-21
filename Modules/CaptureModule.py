@@ -23,13 +23,6 @@ class CaptureModule(GenericModule):
                          recurring_cost_override=recurring_cost_override,
                          non_recurring_cost_override=non_recurring_cost_override)
         self.captured_object = None
-    
-    def define_as_capture_default(self):
-        """ Make module default capture module for its servicer.
-        Used in automatic generation of planning and servicers in case of multiple capture modules per servicer.
-        """
-        # if
-        self.spacecraft.capture_module_ID = self.id
 
     def is_capture_default(self):
         """ Check if module is default capture module for its servicer."""
