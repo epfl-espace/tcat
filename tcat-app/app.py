@@ -286,6 +286,7 @@ def configure():
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
+            last_configuration = uploaded_configuration
         else:
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
