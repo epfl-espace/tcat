@@ -155,7 +155,7 @@ class ScenarioConstellation:
         self.define_constellation_orbits()
 
         # Check if satellites volume is known, otherwise an estimate is provided
-        if float(self.sat_volume.value) == 0:
+        if self.sat_volume is None:
             logging.info("Estimating satellite volume...")
             self.estimate_satellite_volume()
 
