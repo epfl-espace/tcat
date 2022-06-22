@@ -1398,7 +1398,7 @@ class UpperStage(Spacecraft):
             logging.info(f"Using custom Launch Vehicle's fairing size...")
             cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
             cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
-            self.olume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+            self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
 
     def assign_upper_stage(self, upper_stage):
         """ Adds another servicer to the Servicer class as assigned_upper_stage.
