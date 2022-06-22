@@ -28,6 +28,8 @@
     {% endif %}
     {% if type == 'number' %}
         <input class="flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" min="{{ validation[0] }}" max="{{ validation[1] }}" value="{{ value }}" {{ required }}>
+    {% elif type == 'datetime-local' %}
+        <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} min="{{ validation[0] }}" max="{{ validation[1] }}"  {% endif %} {{ required }}>
     {% else %}
         <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} data-validation="{{ validation }}" {% endif %} {{ required }}>
     {% endif %}

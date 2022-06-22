@@ -125,6 +125,7 @@ def valid_configuration(configuration):
     validation_errors = {}
     valid = True
     for param in flat_validation_params:
+        type = param[1]
         key = param[2]
         expected = param[5]
         required = param[4]
@@ -138,6 +139,9 @@ def valid_configuration(configuration):
         value = configuration[key]
         if required is None and not value:
             configuration[key] = None
+            continue
+        if type == 'datetime-local':
+            # TODO: add date parsing and validation
             continue
         if isinstance(expected, list):
             if isinstance(expected[0], str):
@@ -219,6 +223,18 @@ def status(config_run_id=None):
     return render_template('status.html', config_run=config_run)
 
 
+def get_status(config_run_id):
+    db_session = Session()
+    config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
+    Session.remove()
+    if config_run.status == 'FAILED':
+        return False
+    elif config_run.status == 'FINISHED':
+        return False
+
+    return True
+
+
 def generate(config_run_id, file):
     db_session = Session()
     config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
@@ -226,13 +242,22 @@ def generate(config_run_id, file):
     Session.remove()
     path = os.path.join(get_data_path(scenario_id, config_run_id), file)
 
+    in_progress = True
+
     while not os.path.isfile(path):
         sleep(0.1)
 
     with open(path, 'rb', 1) as f:
-        while True:
+        count = 0
+        while in_progress:
             yield f.read()
             sleep(0.1)
+            count = count + 1
+            if count == 30:
+                count = 0
+                in_progress = get_status(config_run_id)
+                if not in_progress:
+                    yield f.read()
 
 
 @app.route('/status/stream/log/<int:config_run_id>')
@@ -261,6 +286,7 @@ def configure():
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
+            last_configuration = uploaded_configuration
         else:
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')

@@ -155,7 +155,7 @@ class ScenarioConstellation:
         self.define_constellation_orbits()
 
         # Check if satellites volume is known, otherwise an estimate is provided
-        if float(self.sat_volume.value) == 0:
+        if self.sat_volume is None:
             logging.info("Estimating satellite volume...")
             self.estimate_satellite_volume()
 
@@ -295,7 +295,7 @@ class ScenarioConstellation:
         """ Estimate the reference satellite volume based on mass
         """
         # Estimate volume based on satellite mass
-        self.sat_volume = 9 * 10 ** -9 * self.sat_mass ** 3 - 10 ** -6 * self.sat_mass ** 2 + 0.0028 * self.sat_mass
+        self.sat_volume = (9 * 10 ** -9 * self.sat_mass.value ** 3 - 10 ** -6 * self.sat_mass.value ** 2 + 0.0028 * self.sat_mass.value) * u.m ** 3
 
     def define_constellation_orbits(self):
         """ Define orbits needed for constellation and satellites definition.

@@ -1,16 +1,16 @@
 # control-datatype-lookup_name-speaking_name-default_value-accepted_values
 params = {
     ('mission_configuration', 'Mission Configuration'): [
-        ['select', 'text', 'architecture', 'Architecture / Mission profile', 'upperstage', ['launch_vehicle', 'upperstage']],
+        ['select', 'text', 'architecture', 'Architecture / Mission profile', 'upperstage', ['upperstage']],
         ['select', 'text', 'propulsion_type', 'Propulsion type', 'electrical', ['electrical', 'water', 'mono-propellant', 'solid', 'bi-propellant']],
         ['select', 'text', 'deployment_strategy', 'Deployment strategy', 'one_plane_at_a_time_sequential', ['one_plane_at_a_time_sequential', 'one_sat_per_plane_sequential']],
         ['checkbox', '', 'verbose', 'Debug (display figures)', False, [True, False]],
-        ['input', 'date', 'starting_epoch', 'Starting Epoch', '01.07.2022', None]
+        ['input', 'datetime-local', 'starting_epoch', 'Starting Epoch', '2025-01-01T12:00', ['2000-01-01T00:00', '2100-01-01T00:00']]
     ],
     ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Constellation Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
         ['input', 'number', 'sat_mass', 'Satellite Mass (kg)', 147, [0.1, 99999.9]],
-        ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', None, [0.1, 99999.9]],
+        ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', None, [0.001, 99999.9]],
         ['input', 'number', 'n_planes', 'Number of orbital planes', 3, [1, 100]],
         ['input', 'number', 'n_sats_per_plane', 'Number of satellite per orbital plane', 2, [1, 1000]],
         ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [180, 360]],
