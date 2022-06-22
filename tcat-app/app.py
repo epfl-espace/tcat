@@ -125,6 +125,7 @@ def valid_configuration(configuration):
     validation_errors = {}
     valid = True
     for param in flat_validation_params:
+        type = param[1]
         key = param[2]
         expected = param[5]
         required = param[4]
@@ -138,6 +139,9 @@ def valid_configuration(configuration):
         value = configuration[key]
         if required is None and not value:
             configuration[key] = None
+            continue
+        if type == 'datetime-local':
+            # TODO: add date parsing and validation
             continue
         if isinstance(expected, list):
             if isinstance(expected[0], str):
