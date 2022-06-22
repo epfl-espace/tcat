@@ -295,7 +295,7 @@ class ScenarioConstellation:
         """ Estimate the reference satellite volume based on mass
         """
         # Estimate volume based on satellite mass
-        self.sat_volume = 9 * 10 ** -9 * self.sat_mass ** 3 - 10 ** -6 * self.sat_mass ** 2 + 0.0028 * self.sat_mass
+        self.sat_volume = (9 * 10 ** -9 * self.sat_mass.value ** 3 - 10 ** -6 * self.sat_mass.value ** 2 + 0.0028 * self.sat_mass.value) * u.m ** 3
 
     def define_constellation_orbits(self):
         """ Define orbits needed for constellation and satellites definition.
