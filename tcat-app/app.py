@@ -219,6 +219,18 @@ def status(config_run_id=None):
     return render_template('status.html', config_run=config_run)
 
 
+def get_status(config_run_id):
+    db_session = Session()
+    config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
+    Session.remove()
+    if config_run.status == 'FAILED':
+        return False
+    elif config_run.status == 'FINISHED':
+        return False
+
+    return True
+
+
 def generate(config_run_id, file):
     db_session = Session()
     config_run = db_session.query(ConfigurationRun).filter_by(id=config_run_id).first()
@@ -226,13 +238,22 @@ def generate(config_run_id, file):
     Session.remove()
     path = os.path.join(get_data_path(scenario_id, config_run_id), file)
 
+    in_progress = True
+
     while not os.path.isfile(path):
         sleep(0.1)
 
     with open(path, 'rb', 1) as f:
-        while True:
+        count = 0
+        while in_progress:
             yield f.read()
             sleep(0.1)
+            count = count + 1
+            if count == 30:
+                count = 0
+                in_progress = get_status(config_run_id)
+                if not in_progress:
+                    yield f.read()
 
 
 @app.route('/status/stream/log/<int:config_run_id>')
