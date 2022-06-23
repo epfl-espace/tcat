@@ -113,7 +113,7 @@ def plot_multiple_timeline(fleet, quantity, plan, starting_epoch, fig=None, ax=N
     for _, servicer in fleet.servicers.items():
         plot_single_timeline(servicer, quantity, plan, starting_epoch, ax=ax, fig=fig,
                              annotate=annotate, show=False, color=color_palette(i), **kwargs)
-        legend_to_plot.append(servicer.ID)
+        legend_to_plot.append(servicer.get_id())
         # repeat operation for current_kits if any
         i += 1
         for _, kit in servicer.initial_kits.items():
