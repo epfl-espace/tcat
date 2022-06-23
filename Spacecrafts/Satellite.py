@@ -35,6 +35,3 @@ class Satellite(Spacecraft):
         """
         super().reset()
         self.state = "standby"
-
-    def __str__(self):
-        return self.get_id()
