@@ -177,7 +177,7 @@ class ActiveSpacecraft(Spacecraft):
         Return:
             (u.kg): total dry mass
         """
-        temp_mass = super().dry_mass()
+        temp_mass = super().get_dry_mass()
         for _, module in self.modules.items():
             temp_mass = temp_mass + module.get_dry_mass(contingency=contingency)
         if contingency:
