@@ -45,10 +45,10 @@ class Constellation:
         
         # Check if satellite already in dict
         if satellite in self.satellites:
-            warnings.warn('Target ', satellite.ID, ' already in constellation ', self.ID, '.', UserWarning)
+            warnings.warn('Target ', satellite.get_id(), ' already in constellation ', self.ID, '.', UserWarning)
         else:
             # Add new satellite to general list of satellites
-            self.satellites[satellite.ID] = satellite
+            self.satellites[satellite.get_id()] = satellite
 
     def set_optimized_ordered_satellites(self,list_of_satellites):
         """ Set list of ordered satellites to be released.
@@ -183,7 +183,7 @@ class Constellation:
             temp_satellite = copy.deepcopy(reference_satellite)
             
             # Update new target and add it to clients
-            temp_satellite.ID = temp_satellite_id
+            temp_satellite.get_id() = temp_satellite_id
             temp_satellite.insertion_orbit = temp_insertion_orbit
             temp_satellite.operational_orbit = temp_operational_orbit
             temp_satellite.current_orbit = None
