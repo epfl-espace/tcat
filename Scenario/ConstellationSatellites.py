@@ -263,7 +263,7 @@ class Constellation:
     def print_KPI(self):
         """ Print KPI related to the constellation"""
         # Total mass delivered into space
-        satellites_masses = [self.satellites[key].initial_mass for key in self.satellites.keys()]
+        satellites_masses = [self.satellites[key].get_dry_mass() for key in self.satellites.keys()]
         print(f"Total payload mass released in space: {sum(satellites_masses):.2f}")
     
     def __str__(self):
