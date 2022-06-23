@@ -4,6 +4,7 @@ import Spacecrafts.Servicer
 from Modules.PropulsionModule import *
 from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
+from poliastro.bodies import Earth
 import logging
 
 
@@ -258,7 +259,7 @@ class OrbitChange(GenericPhase):
         if orbit2 is None:
             orbit2 = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
+            if isinstance(self.assigned_module.spacecraft, Spacecrafts.Servicer.Servicer):
                 mass = self.get_assigned_spacecraft().get_current_mass()
             else:
                 mass = self.get_assigned_spacecraft().get_current_mass()
