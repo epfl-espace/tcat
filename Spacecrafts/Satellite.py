@@ -15,7 +15,7 @@ class Satellite(Spacecraft):
         state (str): descriptor of the satellite state, used to identify different possible failures and states
 
     Attributes:
-        ID (str): Standard id. Needs to be unique.
+        id (str): Standard id. Needs to be unique.
         initial_mass (u.kg): Object mass at time 0.
         volume (u.m^3): Volume of the satellite
         initial_orbit (poliastro.twobody.Orbit): Initial orbit of the satellite
@@ -37,4 +37,4 @@ class Satellite(Spacecraft):
         self.state = "standby"
 
     def __str__(self):
-        return self.ID
+        return self.get_id()
