@@ -10,13 +10,18 @@ class Spacecraft:
     """
     def __init__(self, spacecraft_id, initial_mass, volume, insertion_orbit, operational_orbit):
         self.id = spacecraft_id
+
         self.initial_mass = initial_mass
-        self.volume = volume
+        self.initial_volume = volume
+
+        self.current_mass = initial_mass
+        self.current_volume = volume
+
         self.insertion_orbit = insertion_orbit
         self.initial_orbit = insertion_orbit
         self.operational_orbit = operational_orbit
         self.current_orbit = None
-        self.current_mass = initial_mass
+
         self.mothership = None
 
     def get_id(self):
@@ -35,13 +40,29 @@ class Spacecraft:
         """
         return self.current_mass
 
-    def get_volume(self):
-        """ Get the satellite volume.
+    def get_initial_volume(self):
+        """ Get the satellite initial volume.
 
         Returns:
                 (u.m**3): volume
         """
-        return self.volume
+        return self.initial_volume
+
+    def get_current_volume(self):
+        """ Get the satellite current volume.
+
+        Returns:
+                (u.m**3): volume
+        """
+        return self.current_volume
+
+    def get_volume(self):
+        """ Alias for get_current_volume()
+
+        Returns:
+                (u.m**3): volume
+        """
+        return self.get_current_volume()
 
     def get_initial_mass(self):
         """ Get the initial satellite mass.
