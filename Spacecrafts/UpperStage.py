@@ -388,7 +388,7 @@ class UpperStage(ActiveSpacecraft):
         # Step 2: Raise from insertion to constellation orbit
         ##########
         # Add Raising phase to plan
-        raising = OrbitChange(f"({self.id}) goes to first target orbit ({first_target.ID})",
+        raising = OrbitChange(f"({self.get_id()}) goes to first target orbit ({first_target.get_id()})",
                               self.plan,
                               first_target.insertion_orbit,
                               raan_specified=True,
@@ -428,7 +428,7 @@ class UpperStage(ActiveSpacecraft):
                 phasing.assign_module(self.get_main_propulsion_module())
 
                 # Change orbit back to target orbit and add to plan
-                raising = OrbitChange(f"({self.id}) goes to next target ({current_target.ID})",
+                raising = OrbitChange(f"({self.id}) goes to next target ({current_target.get_id()})",
                                       self.plan,
                                       current_target.insertion_orbit,
                                       raan_specified=True,
@@ -440,7 +440,7 @@ class UpperStage(ActiveSpacecraft):
                 raising.assign_module(self.get_main_propulsion_module())
             
             # Add Release phase to the plan
-            deploy = Release(f"Satellites ({current_target.ID}) released",
+            deploy = Release(f"Satellites ({current_target.get_id()}) released",
                              self.plan,
                              current_target,
                              duration=20 * u.min)
@@ -468,7 +468,7 @@ class UpperStage(ActiveSpacecraft):
         """ Print quick summary for debugging purposes."""
         print(f"""---\n---
 Launch Vehicles:
-    ID: {self.id}
+    ID: {self.get_id()}
     Launch vehicle name: {self.upperstage_name}
     Dry mass: {self.get_dry_mass():.01f}
     Wet mass: {self.get_wet_mass():.01f}
