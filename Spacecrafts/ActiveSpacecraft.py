@@ -15,17 +15,10 @@ class ActiveSpacecraft(Spacecraft):
     """
     Init
     """
-    def __init__(self,id,group,additional_dry_mass,mass_contingency,starting_epoch):
-        # Set id name and groupe
-        self.id = id
+    def __init__(self,id,group,dry_mass,mass_contingency,starting_epoch):
+        super().__init__(id,dry_mass)
+        # Set id parameters
         self.group = group
-
-        # Instanciate orbits
-        self.current_orbit = None
-        self.previous_orbit = None
-
-        # Set any additional dry mass to add
-        self.additional_dry_mass = additional_dry_mass
 
         # Instanciate modules
         self.modules = dict()
@@ -38,7 +31,7 @@ class ActiveSpacecraft(Spacecraft):
         self.current_sats = dict()
         self.assigned_tanker = None
         self.assigned_targets = []
-        self.mothership = None
+
         self.mass_contingency = mass_contingency
 
         # Instanciate Plan
@@ -184,7 +177,7 @@ class ActiveSpacecraft(Spacecraft):
         Return:
             (u.kg): total dry mass
         """
-        temp_mass = self.additional_dry_mass
+        temp_mass = super().dry_mass()
         for _, module in self.modules.items():
             temp_mass = temp_mass + module.get_dry_mass(contingency=contingency)
         if contingency:
