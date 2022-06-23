@@ -1,3 +1,6 @@
+from Phases.Common_functions import nodal_precession
+
+
 class Satellite:
     """ Satellite consist of an object in an initial orbit that can be moved by servicers.
     The class is initialized by giving the current object mass and orbit at time 0.
