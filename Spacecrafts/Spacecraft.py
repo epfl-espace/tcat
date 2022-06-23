@@ -25,6 +25,7 @@ class Spacecraft:
         Returns:
             (str): id of the spacecraft
         """
+        return self.id
 
     def get_current_mass(self):
         """ Get the current satellite mass.
