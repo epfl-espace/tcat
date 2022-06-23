@@ -74,13 +74,13 @@ class Spacecraft:
         """
         return self.get_current_volume()
 
-    def get_initial_mass(self):
+    def get_dry_mass(self):
         """ Get the initial satellite mass.
 
         Returns:
             (u.kg): initial mass
         """
-        return self.initial_mass
+        return self.dry_mass
 
     def get_current_orbit(self):
         """ Get the current orbit
