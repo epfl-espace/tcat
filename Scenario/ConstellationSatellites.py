@@ -183,7 +183,7 @@ class Constellation:
             temp_satellite = copy.deepcopy(reference_satellite)
             
             # Update new target and add it to clients
-            temp_satellite.get_id() = temp_satellite_id
+            temp_satellite.id = temp_satellite_id
             temp_satellite.insertion_orbit = temp_insertion_orbit
             temp_satellite.operational_orbit = temp_operational_orbit
             temp_satellite.current_orbit = None
