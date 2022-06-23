@@ -78,9 +78,17 @@ class Spacecraft:
         """ Get the initial satellite mass.
 
         Returns:
-            (u.kg): initial mass
+            (u.kg): dry mass
         """
         return self.dry_mass
+
+    def get_initial_mass(self):
+        """ Alias for get_dry_mass()
+
+        Returns:
+            (u.kg): dry mass
+        """
+        return self.get_dry_mass()
 
     def get_current_orbit(self):
         """ Get the current orbit
@@ -130,7 +138,7 @@ class Spacecraft:
         """ Reset the current satellite orbit and mass to the parameters given during initialization.
             This function is used to reset the state and orbits of the target after a simulation.
         """
-        self.current_mass = self.initial_mass
+        self.current_mass = self.get_dry_mass()
         self.current_orbit = self.initial_orbit
         self.state = "standby"
 
