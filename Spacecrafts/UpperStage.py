@@ -10,13 +10,13 @@ from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
 from Scenario.Interpolation import get_launcher_fairing, get_launcher_performance
 from Scenario.ScenarioParameters import *
-from Spacecrafts.Spacecraft import Spacecraft
+from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 
 
-class UpperStage(Spacecraft):
+class UpperStage(ActiveSpacecraft):
     """UpperStage is an object that performs phases in the plan using its modules.
     A UpperStage can have any number of modules of any type. A servicer can also host other servicers as in the
     case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
