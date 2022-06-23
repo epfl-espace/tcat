@@ -180,7 +180,7 @@ class ScenarioConstellation:
 
         # Log satellites distribution
         for _, satellite in self.constellation.satellites.items():
-            logging.info(f"Sat {satellite.ID} has {satellite.insertion_orbit}, {satellite.insertion_orbit.raan} RAAN, {satellite.insertion_orbit.nu} nu orbit")
+            logging.info(f"Sat {satellite.get_id()} has {satellite.insertion_orbit}, {satellite.insertion_orbit.raan} RAAN, {satellite.insertion_orbit.nu} nu orbit")
 
         # Plot if verbose
         if self.verbose:
