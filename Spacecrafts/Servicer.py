@@ -20,7 +20,7 @@ class Servicer(ActiveSpacecraft):
         additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
 
     Attributes:
-        ID (str): Standard id. Needs to be unique.
+        id (str): Standard id. Needs to be unique.
         expected_number_of_targets (int): expected number of targets assigned to the servicer
         additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
         current_orbit (poliastro.twobody.Orbit): Orbit of the servicer at current time.
