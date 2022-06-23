@@ -1,6 +1,7 @@
-import Scenario.Fleet_module
+import Spacecrafts.Servicer
 from Modules.PropulsionModule import *
 from Phases.GenericPhase import GenericPhase
+from Spacecrafts.Spacecraft import Spacecraft
 
 
 class Insertion(GenericPhase):
@@ -47,7 +48,7 @@ class Insertion(GenericPhase):
         Calls generic function to update orbit raan and epoch.
         """
 
-        if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
+        if isinstance(self.assigned_module.spacecraft, Spacecrafts.Servicer.Servicer):
             self.get_assigned_spacecraft().change_orbit(self.orbit)
             self.get_assigned_module().consume_propellant(self.propellant * (1 + self.contingency), 'rcs_thrusters')
             self.update_spacecraft()
