@@ -8,8 +8,8 @@ class Spacecraft:
     """
     Init
     """
-    def __init__(self, satellite_id, initial_mass, volume, insertion_orbit, operational_orbit):
-        self.ID = satellite_id
+    def __init__(self, spacecraft_id, initial_mass, volume, insertion_orbit, operational_orbit):
+        self.id = spacecraft_id
         self.initial_mass = initial_mass
         self.volume = volume
         self.insertion_orbit = insertion_orbit
@@ -18,6 +18,13 @@ class Spacecraft:
         self.current_orbit = None
         self.current_mass = initial_mass
         self.mothership = None
+
+    def get_id(self):
+        """ Get the spacecraft's id
+        
+        Returns:
+            (str): id of the spacecraft
+        """
 
     def get_current_mass(self):
         """ Get the current satellite mass.
