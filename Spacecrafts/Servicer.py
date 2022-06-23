@@ -1,10 +1,10 @@
 import warnings
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
-from Spacecrafts.Spacecraft import Spacecraft
+from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
 
-class Servicer(Spacecraft):
+class Servicer(ActiveSpacecraft):
     """Servicer is an object that performs phases in the plan using its modules.
     A servicer can have any number of modules of any type. A servicer can also host other servicers as in the
     case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
