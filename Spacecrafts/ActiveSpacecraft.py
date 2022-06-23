@@ -1,11 +1,22 @@
+"""
+Created:        23.06.2022
+Last Revision:  23.06.2022
+Author:         Malo Goury
+Description:    Parent class for all active spacecrafts
+"""
+# Import class
 from Spacecrafts.Spacecraft import Spacecraft
-import logging
-import warnings
+from Scenario.Plan_module import Plan
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
-from Scenario.Plan_module import Plan
+
+# Import libraries
+import logging
+import warnings
 from astropy import units as u
+
+# Import methods
 
 class ActiveSpacecraft(Spacecraft):
     """
