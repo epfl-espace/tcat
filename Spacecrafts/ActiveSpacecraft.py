@@ -72,10 +72,10 @@ class ActiveSpacecraft(Spacecraft):
         # TODO: check if can be put into scenario
         for target in targets_assigned_to_servicer:
             if target in self.current_sats:
-                warnings.warn('Satellite ', target.ID, ' already in Servicer ', self.id, '.', UserWarning)
+                warnings.warn('Satellite ', target.get_id(), ' already in Servicer ', self.id, '.', UserWarning)
             else:
-                self.initial_sats[target.ID] = target
-                self.current_sats[target.ID] = target
+                self.initial_sats[target.get_id()] = target
+                self.current_sats[target.get_id()] = target
                 target.mothership = self
             self.assigned_targets.append(target)
 
@@ -86,10 +86,10 @@ class ActiveSpacecraft(Spacecraft):
         Args:
             sat (Client): sat to be removed from launcher
         """
-        if satellite.ID in self.current_sats:
-            del self.current_sats[satellite.ID]
+        if satellite.get_id() in self.current_sats:
+            del self.current_sats[satellite.get_id()]
         else:
-            logging.warning('No sat '+ satellite.ID +' in '+ self.id+ '.')
+            logging.warning('No sat '+ satellite.get_id() +' in '+ self.id+ '.')
 
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
