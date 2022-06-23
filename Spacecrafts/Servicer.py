@@ -123,7 +123,7 @@ class Servicer(ActiveSpacecraft):
             kit (Servicer): servicer to be added as kit
         """
         if kit in self.current_kits:
-            warnings.warn('Kit ', kit.ID, ' already in servicer ', self.id, '.', UserWarning)
+            warnings.warn('Kit ', kit.ID, ' already in servicer ', self.get_id(), '.', UserWarning)
         else:
             self.initial_kits[kit.ID] = kit
             self.current_kits[kit.ID] = kit
