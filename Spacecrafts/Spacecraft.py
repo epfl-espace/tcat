@@ -1,8 +1,17 @@
+"""
+Created:        23.06.2022
+Last Revision:  23.06.2022
+Author:         Emilien Mingard
+Description:    Base class of the Spacecrafts modules
+"""
+
+# Import methods
 from Phases.Common_functions import nodal_precession
 
+# Class definition
 class Spacecraft:
     """
-    General Attributs
+    Parent class of all Spacecrafts modules.
     """
 
     """
@@ -21,6 +30,7 @@ class Spacecraft:
         self.initial_orbit = insertion_orbit
         self.operational_orbit = operational_orbit
         self.current_orbit = None
+        self.previous_orbit = None
 
         self.mothership = None
 
@@ -79,6 +89,22 @@ class Spacecraft:
             (poliastro.twobody.Orbit): current orbit
         """
         return self.current_orbit
+
+    def get_initial_orbit(self):
+        """ Get the initial orbit
+
+        Returns:
+            (poliastro.twobody.Orbit): current orbit
+        """
+        return self.initial_orbit
+
+    def get_insertion_orbit(self):
+        """ Get the insertion orbit
+
+        Returns:
+            (poliastro.twobody.Orbit): current orbit
+        """
+        return self.insertion_orbit
 
     def get_relative_raan_drift(self, duration, own_orbit=None, other_object_orbit=None):
         """ Returns the relative raan drift between the target and an hypothetical servicer.
