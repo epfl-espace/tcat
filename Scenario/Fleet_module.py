@@ -6,25 +6,14 @@ Description:    Fleet,Spacecraft,Servicer and UpperStage Classes definition
 """
 
 # Import Classes
-from Modules.CaptureModule import CaptureModule
-from Modules.PropulsionModule import PropulsionModule
-from Phases.Approach import Approach
-from Phases.Insertion import Insertion
-from Phases.OrbitChange import OrbitChange
-from Phases.Release import Release
 from Scenario.Interpolation import get_launcher_performance, get_launcher_fairing
 from Scenario.ScenarioParameters import *
 from Scenario.Plan_module import *
 from Spacecrafts.UpperStage import UpperStage
 
 # Import libraries
-import logging
 import warnings
-import numpy as np
 from astropy import units as u
-from poliastro.bodies import Earth
-from poliastro.twobody import Orbit
-import copy
 import math
 
 class Fleet:
