@@ -26,8 +26,8 @@ class ActiveSpacecraft(Spacecraft):
     """
     Init
     """
-    def __init__(self,id,group,dry_mass,mass_contingency,starting_epoch):
-        super().__init__(id,dry_mass)
+    def __init__(self,id,group,dry_mass,mass_contingency,starting_epoch,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+        super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,initial_orbit = initial_orbit,operational_orbit = operational_orbit)
         # Set id parameters
         self.group = group
 
@@ -43,6 +43,9 @@ class ActiveSpacecraft(Spacecraft):
         self.ordered_target_spacecraft = []
 
         self.mass_contingency = mass_contingency
+
+        # Active spacecraft have disposal orbits
+        self.disposal_orbit = disposal_orbit
 
         # Instanciate Plan
         self.plan = Plan(f"Plan_{self.id}",starting_epoch)

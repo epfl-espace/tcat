@@ -17,7 +17,7 @@ class Spacecraft:
     """
     Init
     """
-    def __init__(self, spacecraft_id, dry_mass, volume=0.):
+    def __init__(self, spacecraft_id, dry_mass, volume=0.,insertion_orbit = None,initial_orbit = None,operational_orbit = None):
         self.id = spacecraft_id
 
         self.dry_mass = dry_mass
@@ -26,9 +26,9 @@ class Spacecraft:
         self.current_mass = dry_mass
         self.current_volume = volume
 
-        self.insertion_orbit = None
-        self.initial_orbit = None
-        self.operational_orbit = None
+        self.insertion_orbit = insertion_orbit
+        self.initial_orbit = initial_orbit
+        self.operational_orbit = operational_orbit
         self.current_orbit = None
         self.previous_orbit = None
 

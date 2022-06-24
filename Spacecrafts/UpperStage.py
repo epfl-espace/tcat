@@ -54,7 +54,7 @@ class UpperStage(ActiveSpacecraft):
     """
     def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch)
+        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
@@ -70,10 +70,6 @@ class UpperStage(ActiveSpacecraft):
         self.dispenser_mass = 0. * u.kg
         self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
-
-        # Assign launcher orbits to upperstages
-        self.insertion_orbit = scenario.launcher_insertion_orbit
-        self.disposal_orbit = scenario.launcher_disposal_orbit
 
         # Init ratio of inclination change in raan drift model
         self.ratio_inc_raan_from_scenario = scenario.mission_cost_vs_duration_factor

@@ -26,10 +26,7 @@ class Satellite(Spacecraft):
         state (str): descriptor of the satellite state, used to identify different possible failures and states
     """
     def __init__(self, satellite_id, initial_mass, volume, insertion_orbit, operational_orbit, state, is_stackable=False):
-        super().__init__(satellite_id, initial_mass, volume)
-        self.insertion_orbit = insertion_orbit
-        self.initial_orbit = insertion_orbit
-        self.operational_orbit = operational_orbit
+        super().__init__(satellite_id, initial_mass, volume,insertion_orbit = insertion_orbit,initial_orbit = insertion_orbit,operational_orbit = operational_orbit)
         self.state = state
 
     def reset(self):
