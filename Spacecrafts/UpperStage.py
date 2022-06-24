@@ -153,6 +153,9 @@ class UpperStage(ActiveSpacecraft):
     def reset(self):
         """ Reset the object to inital parameters. Empty the plan
         """
+        # Reset ActiveSpacecraft
+        super().reset()
+
         # Reset attribut
         self.current_orbit = None
         self.mass_filling_ratio = 1
@@ -160,11 +163,7 @@ class UpperStage(ActiveSpacecraft):
         self.dispenser_mass = 0. * u.kg
         self.dispenser_volume = 0. * u.m ** 3
 
-        # Empty the plan
-        self.empty_plan()
-
         # Empty targets
-        self.ordered_target_spacecraft = []
         self.sats_number = 0
     
     def design(self,custom_sat_allowance=None,tech_level=1):

@@ -97,6 +97,15 @@ class ActiveSpacecraft(Spacecraft):
         else:
             logging.warning('No sat '+ satellite.get_id() +' in '+ self.id+ '.')
 
+    def reset(self):
+        """ Reset the object to inital parameters. Empty the plan
+        """
+        # Empty the plan
+        self.empty_plan()
+
+        # Empty spacecrafts
+        self.ordered_target_spacecraft = []
+
     def change_orbit(self, orbit):
         """ Changes the current_orbit of the servicer and linked objects.
 
