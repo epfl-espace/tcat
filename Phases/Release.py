@@ -42,7 +42,7 @@ class Release(GenericPhase):
         # in case the architecture is launcher and sats, separate sats
         if self.target.mothership:
             # the sat is separated and updated
-            self.get_assigned_spacecraft().separate_sat(self.target)
+            self.get_assigned_spacecraft().separate_spacecraft(self.target)
 
         self.update_spacecraft()
         self.take_spacecraft_snapshot()

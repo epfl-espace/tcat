@@ -85,7 +85,7 @@ class ActiveSpacecraft(Spacecraft):
                 target.mothership = self
             self.ordered_target_spacecraft.append(target)
 
-    def separate_sat(self, satellite):
+    def separate_spacecraft(self, satellite):
         """ Separate a sat from the launcher. This is used during simulation.
             The sat is still assigned to the launcher and will be linked if the launcher is reset.
 
