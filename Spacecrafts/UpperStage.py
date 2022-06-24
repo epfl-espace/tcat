@@ -319,7 +319,7 @@ class UpperStage(ActiveSpacecraft):
         current_mass += self.capture_module.get_dry_mass()
 
         # Add satellites masses
-        current_mass += sum([self.current_sats[key].get_current_mass() for key in self.current_sats.keys()])
+        current_mass += sum([self.current_spacecraft[key].get_current_mass() for key in self.current_spacecraft.keys()])
 
         # Return current mass
         return current_mass
