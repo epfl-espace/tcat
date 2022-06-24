@@ -44,6 +44,14 @@ class Spacecraft:
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
 
+    def reset(self):
+        # Reset orbits
+        self.current_orbit = None
+        self.previous_orbit = None
+
+        # Reset mothership link
+        self.mothership = None
+
     def get_id(self):
         """ Get the spacecraft's id
         

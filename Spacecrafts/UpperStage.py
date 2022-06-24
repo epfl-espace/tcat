@@ -157,7 +157,6 @@ class UpperStage(ActiveSpacecraft):
         super().reset()
 
         # Reset attribut
-        self.current_orbit = None
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
         self.dispenser_mass = 0. * u.kg

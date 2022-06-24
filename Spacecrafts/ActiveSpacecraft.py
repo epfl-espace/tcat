@@ -100,6 +100,9 @@ class ActiveSpacecraft(Spacecraft):
     def reset(self):
         """ Reset the object to inital parameters. Empty the plan
         """
+        # Reset Spacecraft
+        super().reset()
+        
         # Empty the plan
         self.empty_plan()
 
