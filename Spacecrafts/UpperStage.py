@@ -283,27 +283,6 @@ class UpperStage(ActiveSpacecraft):
         # Return current mass
         return current_mass
 
-    def get_initial_mass(self):
-        """ Returns the total mass of the launcher, including all modules and kits at the launch time in the simulation.
-
-        Return:
-            (u.kg): current mass, including kits
-        """
-        # Instanciate initial mass
-        initial_mass = 0
-
-        # Add propulsion initial mass
-        initial_mass += self.main_propulsion_module.get_initial_prop_mass() + self.main_propulsion_module.get_dry_mass()
-
-        # Add capture module mass
-        initial_mass += self.capture_module.get_dry_mass()
-
-        # Add satellites masses
-        initial_mass += sum([satellite.get_initial_mass() for satellite in self.ordered_target_spacecraft])
-
-        # Return initial mass
-        return initial_mass
-
     def compute_delta_inclination_for_raan_phasing(self):
         """ Computes the inclination change for RAAN phasing basd on two ratios:
         self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
