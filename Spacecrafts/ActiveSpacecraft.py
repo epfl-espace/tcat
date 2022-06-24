@@ -186,7 +186,7 @@ class ActiveSpacecraft(Spacecraft):
         except KeyError:
             return None
 
-    def get_dry_mass(self, contingency=True):
+    def get_dry_mass(self):
         """Returns the total dry mass of the servicer. Does not include kits.
 
         Args:
@@ -197,9 +197,7 @@ class ActiveSpacecraft(Spacecraft):
         """
         temp_mass = super().get_dry_mass()
         for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass(contingency=contingency)
-        if contingency:
-            temp_mass = temp_mass * (1 + self.mass_contingency)
+            temp_mass = temp_mass + module.get_dry_mass(contingency=False)
         return temp_mass
 
     def get_initial_prop_mass(self):
@@ -208,11 +206,7 @@ class ActiveSpacecraft(Spacecraft):
         Return:
             (u.kg): initial propellant mass
         """
-        temp_mass = 0. * u.kg
-        for _, module in self.modules.items():
-            if isinstance(module, PropulsionModule):
-                temp_mass = temp_mass + module.get_initial_prop_mass()
-        return temp_mass
+        return self.main_propulsion_module.get_initial_prop_mass()
 
     def get_wet_mass(self, contingency=True):
         """ Returns the wet mass of the servicer at launch. Does not include kits.
