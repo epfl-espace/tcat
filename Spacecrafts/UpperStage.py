@@ -17,35 +17,7 @@ from poliastro.twobody import Orbit
 
 
 class UpperStage(ActiveSpacecraft):
-    """UpperStage is an object that performs phases in the plan using its modules.
-    A UpperStage can have any number of modules of any type. A servicer can also host other servicers as in the
-    case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
-    mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
-    It is added to the fleet specified as argument.
-
-    TODO: change description
-
-    Args:
-        servicer_id (str): Standard id. Needs to be unique.
-        group (str): describes what the servicer does (servicing, refueling, ...)
-        expected_number_of_targets (int): expected number of targets assigned to the servicer
-        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
-
-    Attributes:
-        id (str): Standard id. Needs to be unique.
-        expected_number_of_targets (int): expected number of targets assigned to the servicer
-        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
-        current_orbit (poliastro.twobody.Orbit): Orbit of the servicer at current time.
-        modules (dict): Dictionary of modules contained in the servicer.
-        main_propulsion_module_ID (str): id of the default module to be used for phasing on this servicer
-        rcs_propulsion_module_ID (str): id of the default module to be used for rendezvous on this servicer
-        capture_module_ID (str): id of the default module to be used for capture on this servicer
-        initial_kits (dict): Dictionary of other servicers contained in the servicer at time 0.
-        current_kits (dict): Dictionary of other servicers contained in the servicer at current time.
-        assigned_tanker (Servicer): in case of refueling architecture, assigned_tanker assigned to refuel the servicer
-        assigned_targets (list): List of targets in the order of servicing (used during planning)
-        mothership (Servicer): Mothership hosting the servicer if the servicer is a kit
-        mass_contingency (float): contingency to apply at system level on the dry mass
+    """ TO BE FILLED
     """
 
 
