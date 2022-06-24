@@ -37,7 +37,7 @@ class Release(GenericPhase):
         """ Separate target from the capture module. The target will now be independent of the servicer."""
         # TODO: check if commented code needs to be used
 
-        self.get_assigned_module().captured_object = None
+        self.get_assigned_module().release_single_spacecraft(self.target)
         
         # in case the architecture is launcher and sats, separate sats
         if self.target.mothership:
