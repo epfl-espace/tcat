@@ -53,20 +53,31 @@ class UpperStage(ActiveSpacecraft):
     Init
     """
     def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+        # Init ActiveSpacecraft
         super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch)
-        self.upperstage_name = scenario.launcher_name
+
+        # Launcher name
+        self.launcher_name = scenario.launcher_name
+
+        # Keep a satellite as reference
         self.reference_satellite = scenario.reference_satellite
+
+        # Set mass, volumes and filling ratio
         self.volume_available = None
         self.mass_available = None
-        self.insertion_orbit = scenario.launcher_insertion_orbit
-        self.disposal_orbit = scenario.launcher_disposal_orbit
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
         self.dispenser_mass = 0. * u.kg
         self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
-        self.delta_inc_for_raan_from_scenario = scenario.mission_cost_vs_duration_factor
-        self.delta_inc_for_raan_from_opti = 0.
+
+        # Assign launcher orbits to upperstages
+        self.insertion_orbit = scenario.launcher_insertion_orbit
+        self.disposal_orbit = scenario.launcher_disposal_orbit
+
+        # Init ratio of inclination change in raan drift model
+        self.ratio_inc_raan_from_scenario = scenario.mission_cost_vs_duration_factor
+        self.ratio_inc_raan_from_opti = 0.
 
         # Compute initial performances
         self.compute_upperstage(scenario)
@@ -82,7 +93,7 @@ class UpperStage(ActiveSpacecraft):
 
         # initialise algorithm's variables
         remaining_fuel_prev = 0.
-        self.delta_inc_for_raan_from_opti = 0. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
+        self.ratio_inc_raan_from_opti = 0. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
 
         delta_inc_up = 1. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
         delta_inc_low = 0. # % of MODEL_RAAN_DELTA_INCLINATION_HIGH
@@ -100,14 +111,14 @@ class UpperStage(ActiveSpacecraft):
             nb_iter += 1
 
             # compute remaining fuel for new inclination change
-            self.delta_inc_for_raan_from_opti = (delta_inc_up+delta_inc_low)/2
+            self.ratio_inc_raan_from_opti = (delta_inc_up+delta_inc_low)/2
             self.execute(clients,self.satellites_allowance)
 
             # define new inclination's range
             if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
-                delta_inc_low = self.delta_inc_for_raan_from_opti
+                delta_inc_low = self.ratio_inc_raan_from_opti
             else:
-                delta_inc_up = self.delta_inc_for_raan_from_opti
+                delta_inc_up = self.ratio_inc_raan_from_opti
 
             # detect algorithm's convergence
             if MODEL_RAAN_DELTA_INCLINATION_HIGH*(delta_inc_up-delta_inc_low) <= 2*MODEL_RAAN_DELTA_INCLINATION_LOW \
@@ -116,7 +127,7 @@ class UpperStage(ActiveSpacecraft):
 
         # ensure remaining fuel is positive
         if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
-            self.delta_inc_for_raan_from_opti = delta_inc_low
+            self.ratio_inc_raan_from_opti = delta_inc_low
             self.execute(clients,self.satellites_allowance)
 
         return converged
@@ -265,7 +276,7 @@ class UpperStage(ActiveSpacecraft):
                 raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
             else:
                 logging.info(f"Gathering Launch Vehicle's fairing size from database...")
-                self.volume_available = get_launcher_fairing(self.upperstage_name)
+                self.volume_available = get_launcher_fairing(self.launcher_name)
         else:
             logging.info(f"Using custom Launch Vehicle's fairing size...")
             cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
@@ -336,10 +347,10 @@ class UpperStage(ActiveSpacecraft):
 
     def compute_delta_inclination_for_raan_phasing(self):
         """ Computes the inclination change for RAAN phasing basd on two ratios:
-        self.delta_inc_for_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
-        self.delta_inc_for_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
+        self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
+        self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
         """
-        total_ratio = self.delta_inc_for_raan_from_scenario + self.delta_inc_for_raan_from_opti
+        total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
         range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
         return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
 
@@ -469,7 +480,7 @@ class UpperStage(ActiveSpacecraft):
         print(f"""---\n---
 Launch Vehicles:
     ID: {self.get_id()}
-    Launch vehicle name: {self.upperstage_name}
+    Launch vehicle name: {self.launcher_name}
     Dry mass: {self.get_dry_mass():.01f}
     Wet mass: {self.get_wet_mass():.01f}
     Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
