@@ -53,7 +53,7 @@ class UpperStage(ActiveSpacecraft):
     Init
     """
     def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super(UpperStage, self).__init__(id,"launcher",additional_dry_mass,mass_contingency,scenario.starting_epoch)
+        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch)
         self.upperstage_name = scenario.launcher_name
         self.reference_satellite = scenario.reference_satellite
         self.volume_available = None
