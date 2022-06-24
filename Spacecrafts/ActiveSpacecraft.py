@@ -217,7 +217,7 @@ class ActiveSpacecraft(Spacecraft):
         Return:
               (u.kg): total wet mass
         """
-        return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
+        return self.get_dry_mass() + self.get_initial_prop_mass()
 
     def get_hardware_recurring_cost(self):
         """ Returns the recurring cost of the servicer, including all modules and current_kits.
