@@ -396,7 +396,7 @@ class UpperStage(ActiveSpacecraft):
         self.plan.print_report()
         """ Print quick summary for debugging purposes."""
         print(f"""---\n---
-Launch Vehicles:
+Upperstage:
     ID: {self.get_id()}
     Launch vehicle name: {self.launcher_name}
     Dry mass: {self.get_dry_mass():.01f}
