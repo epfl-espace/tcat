@@ -37,14 +37,14 @@ class ActiveSpacecraft(Spacecraft):
         self.rcs_propulsion_module = None
         self.capture_module = None
 
-        # Satellite related
+        # Spacecraft dict and ordered list
         self.initial_spacecraft = dict()
         self.current_spacecraft = dict()
         self.ordered_target_spacecraft = []
 
         self.mass_contingency = mass_contingency
 
-        # Active spacecraft have disposal orbits
+        # Disposal orbit triggered at end of mission
         self.disposal_orbit = disposal_orbit
 
         # Instanciate Plan
