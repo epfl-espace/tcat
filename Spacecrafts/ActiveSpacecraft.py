@@ -38,10 +38,9 @@ class ActiveSpacecraft(Spacecraft):
         self.capture_module = None
 
         # Satellite related
-        self.initial_sats = dict()
-        self.current_sats = dict()
-        self.assigned_tanker = None
-        self.assigned_targets = []
+        self.initial_spacecraft = dict()
+        self.current_spacecraft = dict()
+        self.ordered_target_spacecraft = []
 
         self.mass_contingency = mass_contingency
 
@@ -75,13 +74,13 @@ class ActiveSpacecraft(Spacecraft):
         """
         # TODO: check if can be put into scenario
         for target in targets_assigned_to_servicer:
-            if target in self.current_sats:
+            if target in self.current_spacecraft:
                 warnings.warn('Satellite ', target.get_id(), ' already in Servicer ', self.id, '.', UserWarning)
             else:
-                self.initial_sats[target.get_id()] = target
-                self.current_sats[target.get_id()] = target
+                self.initial_spacecraft[target.get_id()] = target
+                self.current_spacecraft[target.get_id()] = target
                 target.mothership = self
-            self.assigned_targets.append(target)
+            self.ordered_target_spacecraft.append(target)
 
     def separate_sat(self, satellite):
         """ Separate a sat from the launcher. This is used during simulation.
@@ -90,8 +89,8 @@ class ActiveSpacecraft(Spacecraft):
         Args:
             sat (Client): sat to be removed from launcher
         """
-        if satellite.get_id() in self.current_sats:
-            del self.current_sats[satellite.get_id()]
+        if satellite.get_id() in self.current_spacecraft:
+            del self.current_spacecraft[satellite.get_id()]
         else:
             logging.warning('No sat '+ satellite.get_id() +' in '+ self.id+ '.')
 
@@ -145,6 +144,15 @@ class ActiveSpacecraft(Spacecraft):
 
         # Add the module to the list
         self.add_module(module)
+
+    def get_ordered_target_spacecraft(self):
+        """ Return list of ordered spacecraft target
+
+        Return:
+            (List[Spacecraft]): self.ordered_target_spacecraft
+        """
+
+        return self.ordered_target_spacecraft
 
     def get_capture_module(self):
         """ Returns default capture module of servicer. Used to simplify scenario creation.

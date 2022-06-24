@@ -168,8 +168,8 @@ class UpperStage(ActiveSpacecraft):
         self.empty_plan()
 
         # Empty targets
-        self.assigned_targets = []
-        self.sats_number = len(self.assigned_targets)
+        self.ordered_target_spacecraft = []
+        self.sats_number = 0
     
     def design(self,custom_sat_allowance=None,tech_level=1):
         """ Design the upperstage based on allowance, tech_level and current performances
@@ -340,7 +340,7 @@ class UpperStage(ActiveSpacecraft):
         initial_mass += self.capture_module.get_dry_mass()
 
         # Add satellites masses
-        initial_mass += sum([satellite.get_initial_mass() for satellite in self.assigned_targets])
+        initial_mass += sum([satellite.get_initial_mass() for satellite in self.ordered_target_spacecraft])
 
         # Return initial mass
         return initial_mass
@@ -374,7 +374,7 @@ class UpperStage(ActiveSpacecraft):
         raan_cutoff = MODEL_RAAN_DIRECT_LIMIT
 
         # Extract first target
-        first_target = self.assigned_targets[0]
+        first_target = self.ordered_target_spacecraft[0]
 
         ##########
         # Step 1: Insertion Phase
@@ -418,7 +418,7 @@ class UpperStage(ActiveSpacecraft):
         current_orbit = first_target.insertion_orbit
 
         # Loop over assigned targets
-        for i, current_target in enumerate(self.assigned_targets):
+        for i, current_target in enumerate(self.ordered_target_spacecraft):
             # Print target info
             #print(i,current_target,current_target.insertion_orbit,current_target.current_orbit)
 
@@ -492,8 +492,8 @@ Launch Vehicles:
     Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
     Targets assigned to the Launch vehicle:""")
 
-        for x in range(len(self.assigned_targets)):
-            print(f"\t\t{self.assigned_targets[x]}")
+        for x in range(len(self.ordered_target_spacecraft)):
+            print(f"\t\t{self.ordered_target_spacecraft[x]}")
 
         print("---")
 

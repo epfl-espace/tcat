@@ -112,7 +112,7 @@ class Fleet:
             self.add_upperstage(upperstage)
             
             # Remove latest assigned satellites
-            clients.remove_in_ordered_satellites(upperstage.assigned_targets)
+            clients.remove_in_ordered_satellites(upperstage.get_ordered_target_spacecraft())
             
             # Check remaining satellites to be assigned
             unassigned_satellites = clients.get_optimized_ordered_satellites()
@@ -377,7 +377,7 @@ class Fleet:
             # iterate through servicers selected (one of all)
             for _, servicer in selected_servicers.items():
                 # output a string summarizing the servicer mass properties
-                if len(servicer.assigned_targets) == 0:
+                if len(servicer.get_ordered_target_spacecraft) == 0:
                     temp_str = 'assigned_tanker'
                 else:
                     temp_str = 'servicer'
@@ -488,7 +488,7 @@ class Fleet:
             # iterate through servicers selected (one of all)
             for _, servicer in selected_servicers.items():
                 # output a string summarizing the servicer mass properties
-                if len(servicer.assigned_targets) == 0:
+                if len(servicer.get_ordered_target_spacecraft()) == 0:
                     temp_str = 'assigned_tanker'
                 else:
                     temp_str = 'servicer'
@@ -548,7 +548,7 @@ class Fleet:
         temp_string = ''
         for servicer_id, servicer in self.servicers.items():
             temp_string = temp_string + servicer_id+ ' :\n'
-            for tgt in servicer.assigned_targets:
+            for tgt in servicer.get_ordered_target_spacecraft():
                 temp_string = temp_string + '\t' + tgt.ID + '\n'
         print(temp_string)
 
