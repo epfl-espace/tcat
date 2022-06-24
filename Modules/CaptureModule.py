@@ -61,13 +61,13 @@ class CaptureModule(GenericModule):
         """
         return self.captured_spacecrafts
 
-    def get_captured_mass(self):
-        """ Set the capture object to a specified spacecraft
+    def get_dry_mass(self):
+        """Returns the dry mass of the module (including contingencies by default).
 
         Return:
-            self.captured_spacecrafts (Spacecraft): captured spacecraft
+            (u.kg): dry mass
         """
-        return sum([self.captured_spacecrafts[key] for key in self.captured_spacecrafts.keys()])
+        return self.dry_mass + sum([self.captured_spacecrafts[key].get_current_mass() for key in self.captured_spacecrafts.keys()])
 
     def is_capture_default(self):
         """ Check if module is default capture module for its servicer."""

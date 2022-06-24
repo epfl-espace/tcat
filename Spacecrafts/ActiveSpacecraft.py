@@ -186,6 +186,23 @@ class ActiveSpacecraft(Spacecraft):
         except KeyError:
             return None
 
+    def get_current_mass(self):
+        """ Returns the total mass ActiveSpacecraft including module and related satellites
+        Return:
+            (u.kg): current mass, including kits
+        """
+        # Instanciate current mass
+        current_mass = 0
+
+        # Add propulsion current mass
+        current_mass += self.main_propulsion_module.get_current_prop_mass() + self.main_propulsion_module.get_dry_mass()
+
+        # Add capture module mass (including linked satellite)
+        current_mass += self.capture_module.get_dry_mass()
+
+        # Return current mass
+        return current_mass
+
     def get_dry_mass(self):
         """Returns the total dry mass of the servicer. Does not include kits.
 
@@ -197,7 +214,7 @@ class ActiveSpacecraft(Spacecraft):
         """
         temp_mass = super().get_dry_mass()
         for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass(contingency=False)
+            temp_mass = temp_mass + module.get_dry_mass()
         return temp_mass
 
     def get_initial_prop_mass(self):
