@@ -69,7 +69,7 @@ class ActiveSpacecraft(Spacecraft):
         else:
             self.modules[module.id] = module
 
-    def assign_sats(self, targets_assigned_to_servicer):
+    def assign_spacecraft(self, targets_assigned_to_servicer):
         """ Adds satellites to the Servicer as Target. The Servicer becomes the sat's mothership.
 
         Args:

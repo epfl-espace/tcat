@@ -212,7 +212,7 @@ class UpperStage(ActiveSpacecraft):
         available_satellites = clients.get_optimized_ordered_satellites()
 
         # Assign sats
-        self.assign_sats(available_satellites[0:self.satellites_allowance])
+        self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
 
     def execute_plan(self):
         """ Apply own plan
