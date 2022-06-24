@@ -68,14 +68,14 @@ class ActiveSpacecraft(Spacecraft):
         else:
             self.modules[module.id] = module
 
-    def assign_spacecraft(self, targets_assigned_to_servicer):
+    def assign_spacecraft(self, spacecraft_to_assign):
         """ Adds satellites to the Servicer as Target. The Servicer becomes the sat's mothership.
 
         Args:
             targets_assigned_to_servicer:
         """
         # TODO: check if can be put into scenario
-        for target in targets_assigned_to_servicer:
+        for target in spacecraft_to_assign:
             if target in self.current_spacecraft:
                 warnings.warn('Satellite ', target.get_id(), ' already in Servicer ', self.id, '.', UserWarning)
             else:
@@ -83,6 +83,8 @@ class ActiveSpacecraft(Spacecraft):
                 self.current_spacecraft[target.get_id()] = target
                 target.mothership = self
             self.ordered_target_spacecraft.append(target)
+        
+        self.capture_module.add_captured_spacecrafts(spacecraft_to_assign)
 
     def separate_spacecraft(self, satellite):
         """ Separate a sat from the launcher. This is used during simulation.
@@ -127,7 +129,7 @@ class ActiveSpacecraft(Spacecraft):
         capture_module = self.get_capture_module()
 
         for key in capture_module.get_captured_spacecrafts().keys():
-            capture_module.get_captured_object()[key].change_orbit(orbit)
+            capture_module.get_captured_spacecrafts()[key].change_orbit(orbit)
 
     def set_capture_module(self,module):
         """ Returns default capture module of servicer. Used to simplify scenario creation.
