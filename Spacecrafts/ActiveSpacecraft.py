@@ -97,12 +97,18 @@ class ActiveSpacecraft(Spacecraft):
         else:
             logging.warning('No sat '+ satellite.get_id() +' in '+ self.id+ '.')
 
+    def execute_plan(self):
+        """ Apply own plan
+        """
+        # Apply plan
+        self.plan.apply()
+
     def reset(self):
         """ Reset the object to inital parameters. Empty the plan
         """
         # Reset Spacecraft
         super().reset()
-        
+
         # Empty the plan
         self.empty_plan()
 

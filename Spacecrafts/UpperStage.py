@@ -184,12 +184,6 @@ class UpperStage(ActiveSpacecraft):
         # Assign sats
         self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
 
-    def execute_plan(self):
-        """ Apply own plan
-        """
-        # Apply plan
-        self.plan.apply()
-
     def compute_upperstage(self,scenario):
         """ Compute upperstage initial capacities
 
