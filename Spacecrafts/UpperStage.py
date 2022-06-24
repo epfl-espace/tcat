@@ -155,7 +155,6 @@ class UpperStage(ActiveSpacecraft):
 
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
-        dispenser_volume = (0.0114 * dispenser_mass.to(u.kg).value / tech_level) * u.m ** 3
         dispenser = CaptureModule(self.id + '_Dispenser',
                                             self,
                                             mass_contingency=0.0,
