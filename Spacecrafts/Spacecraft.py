@@ -34,6 +34,16 @@ class Spacecraft:
 
         self.mothership = None
 
+    def change_orbit(self, orbit):
+        """ Changes the current_orbit of the spacecraft and linked objects.
+
+        Args:
+            orbit (poliastro.twobody.Orbit): next orbit
+        """
+        # Update upperstage own orbit
+        self.previous_orbit = self.current_orbit
+        self.current_orbit = orbit
+
     def get_id(self):
         """ Get the spacecraft's id
         

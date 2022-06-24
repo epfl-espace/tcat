@@ -103,14 +103,13 @@ class ActiveSpacecraft(Spacecraft):
         Args:
             orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
         """
-        # Update upperstage own orbit
-        self.previous_orbit = self.current_orbit
-        self.current_orbit = orbit
+        # Spacecraft orbit
+        super().change_orbit(orbit)
 
-        # Update capture module orbit
+        # Update all spacecraft within capture module
         capture_module = self.get_capture_module()
-        if capture_module.captured_object:
-            capture_module.captured_object.current_orbit = orbit
+        if capture_module.get_captured_object():
+            capture_module.get_captured_object().change_orbit(orbit)
 
     def set_capture_module(self,module):
         """ Returns default capture module of servicer. Used to simplify scenario creation.

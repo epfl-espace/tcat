@@ -24,6 +24,22 @@ class CaptureModule(GenericModule):
                          non_recurring_cost_override=non_recurring_cost_override)
         self.captured_object = None
 
+    def set_captured_object(self,spacecraft):
+        """ Set the capture object to a specified spacecraft
+
+        Args:
+            spacecraft (Spacecraft): captured spacecraft
+        """
+        self.captured_object = spacecraft
+
+    def get_captured_object(self):
+        """ Set the capture object to a specified spacecraft
+
+        Return:
+            self.captured_object (Spacecraft): captured spacecraft
+        """
+        return self.captured_object
+
     def is_capture_default(self):
         """ Check if module is default capture module for its servicer."""
         return self.spacecraft.capture_module_ID == self.id
