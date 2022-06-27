@@ -192,7 +192,10 @@ class ActiveSpacecraft(Spacecraft):
             (u.kg): current mass, including kits
         """
         # Instanciate current mass
-        current_mass = super().get_current_mass()
+        current_mass = 0
+
+        # Instanciate current mass
+        current_mass += super().get_current_mass()
 
         # Add propulsion current mass
         current_mass += self.main_propulsion_module.get_current_mass()

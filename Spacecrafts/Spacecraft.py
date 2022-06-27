@@ -154,7 +154,6 @@ class Spacecraft:
         """ Reset the current satellite orbit and mass to the parameters given during initialization.
             This function is used to reset the state and orbits of the target after a simulation.
         """
-        self.current_mass = self.get_dry_mass()
         self.current_orbit = self.initial_orbit
         self.state = "standby"
 
