@@ -164,11 +164,11 @@ class UpperStage(ActiveSpacecraft):
 
         # Add propulsion as PropulsionModule
         mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
-                                                        self, 'bi-propellant', 294000 * u.N,
-                                                        294000 * u.N, 330 * u.s, UPPERSTAGE_INITIAL_FUEL_MASS,
-                                                        5000 * u.kg, reference_power_override=0 * u.W,
-                                                        propellant_contingency=0.05, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
-                                                        mass_contingency=0.2)
+                                          self, 'bi-propellant', UPPERSTAGE_MAX_THRUST,
+                                          UPPERSTAGE_MIN_THRUST, UPPERSTAGE_ISP_THRUST, UPPERSTAGE_INITIAL_FUEL_MASS,
+                                          UPPERSTAGE_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
+                                          propellant_contingency=UPPERSTAGE_FUEL_CONTINGENCY, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
+                                          mass_contingency=UPPERSTAGE_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
 
     def assign_ordered_satellites(self,clients):
