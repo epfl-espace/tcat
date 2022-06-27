@@ -7,6 +7,7 @@ from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
+from Phases.Capture import Capture
 from Phases.Release import Release
 from Scenario.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
@@ -40,11 +41,8 @@ class Servicer(ActiveSpacecraft):
         # Assign sats
         self.assign_spacecraft(available_satellites[0:targetperservicers])
 
-    def design(self,tech_level=1):
+    def design(self):
         """ Design the servicer
-
-        Args:
-            tech_level: dispenser technology level
         """
         # Add dispenser as CaptureModule
         dispenser = CaptureModule(self.id + '_Dispenser',
@@ -159,7 +157,38 @@ class Servicer(ActiveSpacecraft):
                 # Assign propulsion module to OrbitChange phase
                 raising.assign_module(self.get_main_propulsion_module())
             
-            # Add Release phase to the plan
+            ##########
+            # Step 3.1: Capture the satellite
+            ##########
+            # Capture the satellite
+            capture = Capture.__init__(f"Satellites ({current_target.get_id()}) captured", 
+                                         self.plan,
+                                         current_target,
+                                         duration=20 * u.min)
+
+            # Assign capture module to the Capture phase
+            capture.assign_module(self.get_capture_module())
+
+            # Set current_target to deployed
+            current_target.state = "Captured"
+
+            ##########
+            # Step 3.2: Change orbit to satellite disposal
+            ##########
+            # Reach phasing orbit and add to plan
+            satellite_disposal = OrbitChange(f"({self.id}) goes to satellite {current_target.get_id()} disposal orbit",
+                                  self.plan,
+                                  current_target.get_disposal_orbit(),
+                                  raan_specified=False,
+                                  delta_v_contingency=delta_v_contingency)
+
+            # Assign propulsion module to OrbitChange phase
+            satellite_disposal.assign_module(self.get_main_propulsion_module())
+
+            ##########
+            # Step 3.3: Release satellite
+            ##########
+            # Release the satellite
             deploy = Release(f"Satellites ({current_target.get_id()}) released",
                              self.plan,
                              current_target,
@@ -169,19 +198,27 @@ class Servicer(ActiveSpacecraft):
             deploy.assign_module(self.get_capture_module())
 
             # Set current_target to deployed
-            current_target.state = "Deployed"
+            current_target.state = "Released"
 
             # Update current orbit
-            current_orbit = current_target.insertion_orbit
+            current_orbit = current_target.get_disposal_orbit()
+
+            # Check current orbit altitude
+            if (1-current_orbit.ecc)*current_orbit.a < ALTITUDE_ATMOSPHERE_LIMIT + Earth.R:
+                # Return 0 as the servicer burnt
+                return 0
 
         ##########
-        # Step 4: De-orbit the launcher
+        # Step 4: De-orbit the servicer if necessary
         ##########
         # Add OrbitChange to the plan
         removal = OrbitChange(f"({self.id}) goes to disposal orbit", self.plan, self.disposal_orbit,delta_v_contingency=delta_v_contingency)
 
         # Assign propulsion module to OrbitChange phase
         removal.assign_module(self.get_main_propulsion_module())
+
+        # Return 1 if success
+        return 1
 
     def print_report(self):
         self.plan.print_report()
