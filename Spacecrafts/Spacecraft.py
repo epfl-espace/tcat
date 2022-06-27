@@ -161,7 +161,7 @@ class Spacecraft:
             (u.deg): relative raan drift after duration from current orbits
         """
         if not own_orbit:
-            own_orbit = self.operational_orbit
+            own_orbit = self.get_initial_orbit()
         _, own_nodal_precession_speed = nodal_precession(own_orbit)
         _, other_nodal_precession_speed = nodal_precession(other_object_orbit)
         delta_nodal_precession_speed = own_nodal_precession_speed - other_nodal_precession_speed
