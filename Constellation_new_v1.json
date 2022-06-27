@@ -1,7 +1,6 @@
 {
   "architecture": "upperstage",
   "propulsion_type": "electrical",
-  "deployment_strategy":"one_plane_at_a_time_sequential",
   "verbose": false,
   "constellation_name": "OneWeb",
   "sat_mass": 147.0,
