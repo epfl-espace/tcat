@@ -1,5 +1,4 @@
 {
-  "architecture": "upperstage",
   "propulsion_type": "electrical",
   "verbose": false,
   "constellation_name": "OneWeb",
