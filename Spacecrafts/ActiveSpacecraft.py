@@ -192,30 +192,16 @@ class ActiveSpacecraft(Spacecraft):
             (u.kg): current mass, including kits
         """
         # Instanciate current mass
-        current_mass = 0
+        current_mass = super().get_current_mass()
 
         # Add propulsion current mass
-        current_mass += self.main_propulsion_module.get_current_prop_mass() + self.main_propulsion_module.get_dry_mass()
+        current_mass += self.main_propulsion_module.get_current_mass()
 
         # Add capture module mass (including linked satellite)
-        current_mass += self.capture_module.get_dry_mass()
+        current_mass += self.capture_module.get_current_mass()
 
         # Return current mass
         return current_mass
-
-    def get_dry_mass(self):
-        """Returns the total dry mass of the servicer. Does not include kits.
-
-        Args:
-            contingency (boolean): if True, apply contingencies
-
-        Return:
-            (u.kg): total dry mass
-        """
-        temp_mass = super().get_dry_mass()
-        for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass()
-        return temp_mass
 
     def get_initial_prop_mass(self):
         """ Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.

@@ -416,6 +416,14 @@ class PropulsionModule(GenericModule):
         """
         return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
 
+    def get_current_mass(self, contingency=True):
+        """Returns the current wet mass of the module (including contingencies by default).
+
+        Return:
+            (u.kg): current wet mass
+        """
+        return self.get_dry_mass(contingency=contingency) + self.get_current_prop_mass()
+
     def get_minimal_propellant_mass(self, plan):
         """ Returns the lowest fuel state of the module over a plan. Used for convergence of fleet.
 

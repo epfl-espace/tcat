@@ -22,8 +22,6 @@ class Spacecraft:
 
         self.dry_mass = dry_mass
         self.initial_volume = volume
-
-        self.current_mass = dry_mass
         self.current_volume = volume
 
         self.insertion_orbit = insertion_orbit
@@ -60,14 +58,6 @@ class Spacecraft:
         """
         return self.id
 
-    def get_current_mass(self):
-        """ Get the current satellite mass.
-
-        Returns:
-            (u.kg): current mass
-        """
-        return self.current_mass
-
     def get_initial_volume(self):
         """ Get the satellite initial volume.
 
@@ -99,6 +89,14 @@ class Spacecraft:
             (u.kg): dry mass
         """
         return self.dry_mass
+
+    def get_current_mass(self):
+        """ Get the initial satellite mass.
+
+        Returns:
+            (u.kg): dry mass
+        """
+        return self.get_dry_mass()
 
     def get_initial_mass(self):
         """ Alias for get_dry_mass()
