@@ -13,6 +13,7 @@ from Scenario.Plan_module import *
 
 # Import Libraries
 from json import load as load_json
+import copy
 
 # Set logging
 logging.getLogger('numba').setLevel(logging.WARNING)
@@ -50,9 +51,6 @@ class ScenarioConstellation:
                       ('apogee_sats_insertion', u.km),
                       ('perigee_sats_insertion', u.km), 
                       ('inc_sats_insertion', u.deg),
-                      ('apogee_sats_operational', u.km),
-                      ('perigee_sats_operational', u.km),
-                      ('inc_sats_operational', u.deg),
                       ('apogee_launcher_insertion', u.km),
                       ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
@@ -74,6 +72,11 @@ class ScenarioConstellation:
 
         # Flag
         self.execution_success = False
+
+        # Class attributes
+        self.sat_insertion_orbit = None
+        self.sat_operational_orbit = None
+        self.sat_disposal_orbit = None
 
         # Load json configuration file
         with open(config_file) as file:
@@ -116,7 +119,7 @@ class ScenarioConstellation:
         # Check if existing_clients are provided
         if not existing_constellation:
             logging.info("Start defining Clients...")
-            self.define_constellation()
+            self.define_constellation(copy.deepcopy(self.sat_insertion_orbit))
         else:
             logging.info("Recovering Clients...")
             self.constellation = existing_constellation
@@ -142,7 +145,7 @@ class ScenarioConstellation:
             self.execution_success = False
             return warning
 
-    def define_constellation(self):
+    def define_constellation(self,sats_initial_orbit):
         """ Define constellation object.
         """
         # Define relevant orbits
@@ -159,8 +162,10 @@ class ScenarioConstellation:
         self.reference_satellite = Satellite('Reference_' + self.constellation_name + '_satellite',
                                              self.sat_mass,
                                              self.sat_volume,
-                                             self.sat_insertion_orbit,
-                                             self.sat_operational_orbit,
+                                             sats_initial_orbit,
+                                             insertion_orbit=self.sat_insertion_orbit,   
+                                             operational_orbit=self.sat_operational_orbit,
+                                             disposal_orbit=self.sat_disposal_orbit,
                                              state='standby',
                                              is_stackable=False)
 
@@ -225,17 +230,8 @@ class ScenarioConstellation:
                                                         0. * u.deg,
                                                         self.starting_epoch)
 
-        # Satellites operational orbit
-        a_sats_operational_orbit = (self.apogee_sats_operational + self.perigee_sats_operational)/2 + Earth.R
-        e_sats_operational_orbit = ((self.apogee_sats_operational + Earth.R)/a_sats_operational_orbit - 1)*u.one
-        self.sat_operational_orbit = Orbit.from_classical(Earth, 
-                                                          a_sats_operational_orbit,
-                                                          e_sats_operational_orbit,
-                                                          self.inc_sats_operational,
-                                                          0. * u.deg,
-                                                          90. * u.deg,
-                                                          0. * u.deg,
-                                                          self.starting_epoch)
+        self.sat_operational_orbit = copy.deepcopy(self.sat_insertion_orbit)
+        self.sat_disposal_orbit = copy.deepcopy(self.sat_insertion_orbit)
 
     def define_upperstages_orbits(self):
         """ Define orbits needed for upperstages definition.
