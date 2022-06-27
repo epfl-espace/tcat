@@ -97,6 +97,18 @@ class ActiveSpacecraft(Spacecraft):
             del self.current_spacecraft[satellite.get_id()]
         else:
             logging.warning('No sat '+ satellite.get_id() +' in '+ self.id+ '.')
+    
+    def add_spacecraft(self, satellite):
+        """ Captured a sat by the launcher. This is used during simulation.
+            The sat is still assigned to the launcher and will be linked if the launcher is reset.
+
+        Args:
+            sat (Client): sat to be added to launcher
+        """
+        if satellite.get_id() in self.current_spacecraft:
+            logging.warning('Sat '+ satellite.get_id() +' already in '+ self.id+ '.')
+        else:
+            self.current_spacecraft[satellite.get_id()] = satellite
 
     def execute_plan(self):
         """ Apply own plan

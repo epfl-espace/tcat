@@ -1,6 +1,14 @@
-import warnings
+import copy
+import logging
+import math
+
+import numpy as np
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
+from Phases.Insertion import Insertion
+from Phases.OrbitChange import OrbitChange
+from Phases.Capture import Capture
+from Phases.Release import Release
 from Scenario.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
@@ -21,8 +29,8 @@ class Servicer(ActiveSpacecraft):
     """
     Methods
     """
-    def assign_ordered_satellites(self,clients):
-        """ Assigned remaining ordered satellites to current launcher within allowance
+    def assign_ordered_satellites(self,clients,targetperservicers):
+        """ Assigned remaining ordered satellites to current servicer
 
         Args:
             clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
@@ -31,7 +39,27 @@ class Servicer(ActiveSpacecraft):
         available_satellites = clients.get_optimized_ordered_satellites()
 
         # Assign sats
-        self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
+        self.assign_spacecraft(available_satellites[0:targetperservicers])
+
+    def design(self):
+        """ Design the servicer
+        """
+        # Add dispenser as CaptureModule
+        dispenser = CaptureModule(self.id + '_Dispenser',
+                                  self,
+                                  mass_contingency=0.0,
+                                  dry_mass_override=SERVICER_CAPTURE_DRY_MASS)
+
+        self.set_capture_module(dispenser)
+
+        # Add propulsion as PropulsionModule
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                          self, 'bi-propellant', SERVICER_MAX_THRUST,
+                                          SERVICER_MIN_THRUST, SERVICER_ISP_THRUST, SERVICER_INITIAL_FUEL_MASS,
+                                          SERVICER_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
+                                          propellant_contingency=SERVICER_FUEL_CONTINGENCY, dry_mass_override=SERVICER_PROPULSION_DRY_MASS,
+                                          mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
+        self.set_main_propulsion_module(mainpropulsion)
 
     def define_mission_profile(self,precession_direction):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
@@ -129,7 +157,38 @@ class Servicer(ActiveSpacecraft):
                 # Assign propulsion module to OrbitChange phase
                 raising.assign_module(self.get_main_propulsion_module())
             
-            # Add Release phase to the plan
+            ##########
+            # Step 3.1: Capture the satellite
+            ##########
+            # Capture the satellite
+            capture = Capture.__init__(f"Satellites ({current_target.get_id()}) captured", 
+                                         self.plan,
+                                         current_target,
+                                         duration=20 * u.min)
+
+            # Assign capture module to the Capture phase
+            capture.assign_module(self.get_capture_module())
+
+            # Set current_target to deployed
+            current_target.state = "Captured"
+
+            ##########
+            # Step 3.2: Change orbit to satellite disposal
+            ##########
+            # Reach phasing orbit and add to plan
+            satellite_disposal = OrbitChange(f"({self.id}) goes to satellite {current_target.get_id()} disposal orbit",
+                                  self.plan,
+                                  current_target.get_disposal_orbit(),
+                                  raan_specified=False,
+                                  delta_v_contingency=delta_v_contingency)
+
+            # Assign propulsion module to OrbitChange phase
+            satellite_disposal.assign_module(self.get_main_propulsion_module())
+
+            ##########
+            # Step 3.3: Release satellite
+            ##########
+            # Release the satellite
             deploy = Release(f"Satellites ({current_target.get_id()}) released",
                              self.plan,
                              current_target,
@@ -139,19 +198,27 @@ class Servicer(ActiveSpacecraft):
             deploy.assign_module(self.get_capture_module())
 
             # Set current_target to deployed
-            current_target.state = "Deployed"
+            current_target.state = "Released"
 
             # Update current orbit
-            current_orbit = current_target.insertion_orbit
+            current_orbit = current_target.get_disposal_orbit()
+
+            # Check current orbit altitude
+            if (1-current_orbit.ecc)*current_orbit.a < ALTITUDE_ATMOSPHERE_LIMIT + Earth.R:
+                # Return 0 as the servicer burnt
+                return 0
 
         ##########
-        # Step 4: De-orbit the launcher
+        # Step 4: De-orbit the servicer if necessary
         ##########
         # Add OrbitChange to the plan
         removal = OrbitChange(f"({self.id}) goes to disposal orbit", self.plan, self.disposal_orbit,delta_v_contingency=delta_v_contingency)
 
         # Assign propulsion module to OrbitChange phase
         removal.assign_module(self.get_main_propulsion_module())
+
+        # Return 1 if success
+        return 1
 
     def print_report(self):
         self.plan.print_report()
