@@ -24,13 +24,13 @@ class ScenarioConstellation:
     """
     General Attributs
     """
-    general_fields = ['propulsion_type',
+    general_fields = ['scenario',
+                      'propulsion_type',
                       'verbose',
                       'constellation_name',
                       'n_planes',
                       'n_sats_per_plane',
                       'plane_distribution_angle',
-                      'n_sats_simultaneously_deployed',
                       'launcher',
                       'launch_site',
                       'orbit_type',
