@@ -8,6 +8,9 @@ Description:    Regroups all user parameter for the senario (margins, contingenc
 
 from astropy import units as u
 
+# Atmosphere limit
+ALTITUDE_ATMOSPHERE_LIMIT = 80 * u.km
+
 # The launcher reaches its orbit with a certain precision that can be defined here:
 INSERTION_RAAN_MARGIN = 0 * u.deg # Defines the raan error.
 INSERTION_A_MARGIN = 0 * u.km # Defines the semi-major axis error
