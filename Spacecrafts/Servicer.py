@@ -1,6 +1,13 @@
-import warnings
+import copy
+import logging
+import math
+
+import numpy as np
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
+from Phases.Insertion import Insertion
+from Phases.OrbitChange import OrbitChange
+from Phases.Release import Release
 from Scenario.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
@@ -21,8 +28,8 @@ class Servicer(ActiveSpacecraft):
     """
     Methods
     """
-    def assign_ordered_satellites(self,clients):
-        """ Assigned remaining ordered satellites to current launcher within allowance
+    def assign_ordered_satellites(self,clients,targetperservicers):
+        """ Assigned remaining ordered satellites to current servicer
 
         Args:
             clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
@@ -31,7 +38,30 @@ class Servicer(ActiveSpacecraft):
         available_satellites = clients.get_optimized_ordered_satellites()
 
         # Assign sats
-        self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
+        self.assign_spacecraft(available_satellites[0:targetperservicers])
+
+    def design(self,tech_level=1):
+        """ Design the servicer
+
+        Args:
+            tech_level: dispenser technology level
+        """
+        # Add dispenser as CaptureModule
+        dispenser = CaptureModule(self.id + '_Dispenser',
+                                  self,
+                                  mass_contingency=0.0,
+                                  dry_mass_override=SERVICER_CAPTURE_DRY_MASS)
+
+        self.set_capture_module(dispenser)
+
+        # Add propulsion as PropulsionModule
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                          self, 'bi-propellant', SERVICER_MAX_THRUST,
+                                          SERVICER_MIN_THRUST, SERVICER_ISP_THRUST, SERVICER_INITIAL_FUEL_MASS,
+                                          SERVICER_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
+                                          propellant_contingency=SERVICER_FUEL_CONTINGENCY, dry_mass_override=SERVICER_PROPULSION_DRY_MASS,
+                                          mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
+        self.set_main_propulsion_module(mainpropulsion)
 
     def define_mission_profile(self,precession_direction):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
