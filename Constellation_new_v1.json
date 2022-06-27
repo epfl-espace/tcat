@@ -32,5 +32,5 @@
   "inc_launcher_disposal": 87.0,
   "starting_epoch":"2025-01-01 12:00:00",
   "data_path": "./Results",
-  "mission_cost_vs_duration_factor": 0.01
+  "mission_cash_limitor": 0.01
 }
