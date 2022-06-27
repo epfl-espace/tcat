@@ -1,230 +1,183 @@
 import warnings
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
+from Scenario.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
+from poliastro.bodies import Earth
+from poliastro.twobody import Orbit
 
 class Servicer(ActiveSpacecraft):
-    """Servicer is an object that performs phases in the plan using its modules.
-    A servicer can have any number of modules of any type. A servicer can also host other servicers as in the
-    case of current_kits. The mass of the servicer depends on the hosted modules. The servicer has a current orbit and
-    mass that will be modified during each applicable phase. The class is initialized with no modules and no orbit.
-    It is added to the fleet specified as argument.
-
-    TODO: remove expected_number_of_targets
-
-    Args:
-        servicer_id (str): Standard id. Needs to be unique.
-        group (str): describes what the servicer does (servicing, refueling, ...)
-        expected_number_of_targets (int): expected number of targets assigned to the servicer
-        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
-
-    Attributes:
-        id (str): Standard id. Needs to be unique.
-        expected_number_of_targets (int): expected number of targets assigned to the servicer
-        additional_dry_mass (u.kg): additional mass, excluding the modules, used to easily tweak dry mass
-        current_orbit (poliastro.twobody.Orbit): Orbit of the servicer at current time.
-        modules (dict): Dictionary of modules contained in the servicer.
-        main_propulsion_module_ID (str): id of the default module to be used for phasing on this servicer
-        rcs_propulsion_module_ID (str): id of the default module to be used for rendezvous on this servicer
-        capture_module_ID (str): id of the default module to be used for capture on this servicer
-        initial_kits (dict): Dictionary of other servicers contained in the servicer at time 0.
-        current_kits (dict): Dictionary of other servicers contained in the servicer at current time.
-        assigned_tanker (Servicer): in case of refueling architecture, assigned_tanker assigned to refuel the servicer
-        assigned_targets (list): List of targets in the order of servicing (used during planning)
-        mothership (Servicer): Mothership hosting the servicer if the servicer is a kit
-        mass_contingency (float): contingency to apply at system level on the dry mass
+    """ TO BE FILLED
     """
 
     """
     Init
     """
-    def __init__(self, servicer_id, group, expected_number_of_targets=3, additional_dry_mass=0. * u.kg,mass_contingency=0.2):
-        super(Servicer, self).__init__(servicer_id,group,additional_dry_mass,mass_contingency)
-        self.expected_number_of_targets = expected_number_of_targets
+    def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.2):
+        # Init ActiveSpacecraft
+        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
     """
     Methods
     """
-    def assign_targets(self, targets_assigned_to_servicer):
-        # TODO: check if can be put into scenario
-        # update initial propellant guess if less targets than expected
-        initial_propellant_mass = self.get_main_propulsion_module().initial_propellant_mass
-        corrected_propellant_mass = (initial_propellant_mass
-                                     * len(targets_assigned_to_servicer) / self.expected_number_of_targets)
-        self.get_main_propulsion_module().initial_propellant_mass = corrected_propellant_mass
-        for target in targets_assigned_to_servicer:
-            self.assigned_targets.append(target)
-
-    def assign_tanker(self, tanker):
-        """ Adds another servicer to the Servicer class as assigned_tanker.
-        TODO: get into scenario
+    def assign_ordered_satellites(self,clients):
+        """ Assigned remaining ordered satellites to current launcher within allowance
 
         Args:
-            tanker (Servicer): servicer to be added as assigned_tanker
+            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
         """
-        self.assigned_tanker = tanker
+        # Remaining satellite to be delivered
+        available_satellites = clients.get_optimized_ordered_satellites()
 
-    def get_module_mass(self, module_name, contingency=True):
-        """ Returns the dry mass of a particular module based on the name of its class.
+        # Assign sats
+        self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
 
-        TODO: remove
-        Args:
-            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
-            contingency (boolean): if True, apply contingencies
-
-        Return:
-            (u.kg): mass of the module for the servicer
-        """
-        dry_mass = 0. * u.kg
-        for _, module in self.modules.items():
-            if module.__class__.__name__ == module_name + 'Module':
-                dry_mass += module.get_current_dry_mass(contingency=contingency)
-        return dry_mass
-
-    def get_module_recurring_cost(self, module_name):
-        """ Returns the dry mass of a particular module based on the name of its class.
-
-        TODO: remove
+    def define_mission_profile(self,precession_direction):
+        """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
-            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
-
-        Return:
-            (float): cost in Euros
+            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
+            precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
         """
-        recurring = 0.
-        for _, module in self.modules.items():
-            if module.__class__.__name__ == module_name + 'Module':
-                recurring += module.get_hardware_recurring_cost()
-        return recurring
+        # Update insertion raan, supposing each target can be sent to an ideal raan for operation
+        # TODO : implement a launch optimizer
+        
+        # Insertion orbit margin
+        insertion_raan_margin = INSERTION_RAAN_MARGIN
+        insertion_raan_window = INSERTION_RAAN_WINDOW
+        insertion_a_margin = INSERTION_A_MARGIN
 
-    def get_module_non_recurring_cost(self, module_name):
-        """ Returns the dry mass of a particular module based on the name of its class.
+        # Contingencies and cutoff
+        delta_v_contingency = CONTINGENCY_DELTA_V
+        raan_cutoff = MODEL_RAAN_DIRECT_LIMIT
 
-        TODO: remove
+        # Extract first target
+        first_target = self.ordered_target_spacecraft[0]
 
-        Args:
-            module_name (str): name of the module class, must be linked to a class as such: <module_name>Module
+        ##########
+        # Step 1: Insertion Phase
+        ##########      
+        # Compute insertion orbit
+        insertion_orbit = Orbit.from_classical(Earth,
+                                               self.insertion_orbit.a - insertion_a_margin,
+                                               self.insertion_orbit.ecc,
+                                               self.insertion_orbit.inc,
+                                               first_target.insertion_orbit.raan - precession_direction * insertion_raan_margin,
+                                               self.insertion_orbit.argp,
+                                               self.insertion_orbit.nu,
+                                               self.insertion_orbit.epoch)
 
-        Return:
-            (float): cost in Euros
-        """
-        non_recurring = 0.
-        for _, module in self.modules.items():
-            if module.__class__.__name__ == module_name + 'Module':
-                non_recurring += module.get_development_cost()
-        return non_recurring
+        # Add Insertion phase to the plan
+        insertion = Insertion(f"({self.id}) Goes to insertion orbit",self.plan, insertion_orbit, duration=1 * u.h)
 
-    def assign_kit(self, kit):
-        """Adds a kit to the servicer as kit. The servicer becomes the kit's mothership.
+        # Assign propulsion module to insertion phase
+        insertion.assign_module(self.get_main_propulsion_module())
 
-        Args:
-            kit (Servicer): servicer to be added as kit
-        """
-        if kit in self.current_kits:
-            warnings.warn('Kit ', kit.ID, ' already in servicer ', self.get_id(), '.', UserWarning)
-        else:
-            self.initial_kits[kit.ID] = kit
-            self.current_kits[kit.ID] = kit
-            kit.mothership = self
+        ##########
+        # Step 2: Raise from insertion to constellation orbit
+        ##########
+        # Add Raising phase to plan
+        raising = OrbitChange(f"({self.get_id()}) goes to first target orbit ({first_target.get_id()})",
+                              self.plan,
+                              first_target.insertion_orbit,
+                              raan_specified=True,
+                              initial_orbit=insertion_orbit,
+                              raan_cutoff=raan_cutoff,
+                              raan_phasing_absolute=True,
+                              delta_v_contingency=delta_v_contingency)
 
-    def separate_kit(self, kit):
-        """ Separate a kit from the servicer. This is used during simulation.
-        The kit is still assigned to the servicer and will be linked if the servicer is reset.
+        # Assign propulsion module to raising phase
+        raising.assign_module(self.get_main_propulsion_module())
 
-        Args:
-            kit (Servicer): kit to be removed from servicer
-        """
-        if kit.ID in self.current_kits:
-            del self.current_kits[kit.ID]
-        else:
-            warnings.warn('No kit ', kit.ID, ' in servicer ', self.id, '.', UserWarning)
+        ##########
+        # Step 3: Iterate through organised assigned targets
+        ##########
+        # Initialise current orbit object
+        current_orbit = first_target.insertion_orbit
 
-    def get_current_mass(self):
-        """Returns the total mass of the servicer, including all modules and kits at the current time in the simulation.
+        # Loop over assigned targets
+        for i, current_target in enumerate(self.ordered_target_spacecraft):
+            # Print target info
+            #print(i,current_target,current_target.insertion_orbit,current_target.current_orbit)
 
-        Return:
-            (u.kg): current mass, including kits
-        """
-        # servicer dry mass (with contingency)
-        temp_mass = self.additional_dry_mass
-        for _, module in self.modules.items():
-            temp_mass = temp_mass + module.get_dry_mass()
-        temp_mass = temp_mass * (1 + self.mass_contingency)
-        # servicer prop mass and captured target mass
-        for _, module in self.modules.items():
-            if isinstance(module, PropulsionModule):
-                temp_mass = temp_mass + module.get_current_prop_mass()
-            if isinstance(module, CaptureModule):
-                if module.captured_object:
-                    temp_mass = temp_mass + module.captured_object.get_current_mass()
-        # kits mass
-        for _, kit in self.current_kits.items():
-            temp_mass = temp_mass + kit.get_current_mass()
-        return temp_mass
+            # Check for RAAN drift
+            if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
+                # TODO Compute ideal phasing orgit
+                phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
+                phasing_orbit.inc += self.compute_delta_inclination_for_raan_phasing()
 
-    def reset(self, plan, design_loop=True, convergence_margin=1. * u.kg, verbose=False):
-        """Reset the servicer current orbit and mass to the parameters given during initialization.
-        This function is used to reset the state of all modules after a simulation.
-        If this is specified as a design loop, the sub-systems can be updated based on different inputs.
-        It also resets the current_kits and the servicer orbits.
+                # Reach phasing orbit and add to plan
+                phasing = OrbitChange(f"({self.id}) goes to ideal phasing orbit",
+                                      self.plan,
+                                      phasing_orbit,
+                                      raan_specified=False,
+                                      delta_v_contingency=delta_v_contingency)
 
-        Args:
-            plan (Plan): plan for which the servicer is used and designed
-            design_loop (boolean): if True, redesign modules after resetting them
-            convergence_margin (u.kg): accuracy required on propellant mass for convergence_margin
-            verbose (boolean): if True, print convergence_margin information
-        """
-        # reset orbit
-        self.current_orbit = None
+                # Assign propulsion module to OrbitChange phase
+                phasing.assign_module(self.get_main_propulsion_module())
 
-        # reset current_kits
-        for _, kit in self.initial_kits.items():
-            kit.reset(plan, design_loop=False, verbose=verbose)
-            self.current_kits[kit.ID] = kit
+                # Change orbit back to target orbit and add to plan
+                raising = OrbitChange(f"({self.id}) goes to next target ({current_target.get_id()})",
+                                      self.plan,
+                                      current_target.insertion_orbit,
+                                      raan_specified=True,
+                                      initial_orbit=phasing_orbit,
+                                      delta_v_contingency=delta_v_contingency,
+                                      raan_cutoff=raan_cutoff)
 
-        # reset modules
-        for _, module in self.modules.items():
-            module.reset()
-        if design_loop:
-            self.design(plan, convergence_margin=convergence_margin, verbose=verbose)
+                # Assign propulsion module to OrbitChange phase
+                raising.assign_module(self.get_main_propulsion_module())
+            
+            # Add Release phase to the plan
+            deploy = Release(f"Satellites ({current_target.get_id()}) released",
+                             self.plan,
+                             current_target,
+                             duration=20 * u.min)
 
-    def get_refueling_modules(self):
-        """ Returns only modules that can offer refueling to other servicers.
+            # Assign capture module to the Release phase
+            deploy.assign_module(self.get_capture_module())
 
-        Return:
-            (dict(Module)): dictionary of the modules
-        """
-        available_module = {}
-        for _, module in self.modules.items():
-            if isinstance(module, PropulsionModule):
-                if module.is_refueler:
-                    available_module[module.id] = module
-        return available_module
+            # Set current_target to deployed
+            current_target.state = "Deployed"
 
-    def get_capture_modules(self):
-        """ Returns only modules that can capture targets of simulation at current time.
+            # Update current orbit
+            current_orbit = current_target.insertion_orbit
 
-        Return:
-            (dict(Module)): dictionary of the modules
-        """
-        capture_modules = {ID: module for ID, module in self.modules.items() if isinstance(module, CaptureModule)}
-        return capture_modules
+        ##########
+        # Step 4: De-orbit the launcher
+        ##########
+        # Add OrbitChange to the plan
+        removal = OrbitChange(f"({self.id}) goes to disposal orbit", self.plan, self.disposal_orbit,delta_v_contingency=delta_v_contingency)
+
+        # Assign propulsion module to OrbitChange phase
+        removal.assign_module(self.get_main_propulsion_module())
 
     def print_report(self):
+        self.plan.print_report()
         """ Print quick summary for debugging purposes."""
-        print('----------------------------------------------------------------')
-        print(self.id)
-        print('Dry mass : ' + '{:.01f}'.format(self.get_dry_mass()))
-        print('Wet mass : ' + '{:.01f}'.format(self.get_wet_mass()))
-        print('Modules : ')
+        print(f"""---\n---
+Servicer:
+    ID: {self.get_id()}
+    Launch vehicle name: {self.launcher_name}
+    Dry mass: {self.get_dry_mass():.01f}
+    Wet mass: {self.get_wet_mass():.01f}
+    Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
+    Payload mass available: {self.mass_available}
+    Number of satellites: {self.sats_number}
+    Dispenser mass: {self.dispenser_mass:.1f}
+    Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
+    Dispenser volume: {self.dispenser_volume:.1f}
+    Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
+    Targets assigned to the Launch vehicle:""")
+
+        for x in range(len(self.ordered_target_spacecraft)):
+            print(f"\t\t{self.ordered_target_spacecraft[x]}")
+
+        print("---")
+
+        print('Modules:')
         for _, module in self.modules.items():
-            print(module)
-        print('Phasing : ' + self.main_propulsion_module_ID)
-        print('RDV : ' + self.rcs_propulsion_module_ID)
-        print('Capture : ' + self.capture_module_ID)
-        print('Mothership : ' + str(self.mothership))
-        print('Kits : ')
-        for _, kit in self.current_kits.items():
-            kit.print_report()
+            print(f"\tModule ID: {module}")
+        print('\tPhasing Module ID: ' + self.main_propulsion_module.id)
+        print('\tCapture module ID : ' + self.capture_module.id)
