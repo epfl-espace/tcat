@@ -98,7 +98,7 @@ class Constellation:
         """
         temp_rotation = 0
         for _, satellite in self.get_standby_satellites().items():
-            temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.operational_orbit)[1].value)
+            temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.get_initial_orbit())[1].value)
         return int(np.sign(temp_rotation))
 
     def reset(self):
@@ -125,8 +125,13 @@ class Constellation:
         self.reference_satellite = reference_satellite
         
         # Extract reference satellite orbits
-        insertion_orbit = reference_satellite.insertion_orbit
-        operational_orbit = reference_satellite.operational_orbit
+        insertion_orbit = reference_satellite.get_insertion_orbit()
+        operational_orbit = reference_satellite.get_operational_orbit()
+        disposal_orbit = reference_satellite.get_disposal_orbit()
+
+        temp_insertion_plane_orbit = None 
+        temp_operational_plane_orbit = None
+        temp_disposal_plane_orbit = None       
         
         # For each plane, create the reference orbits by raan offset and populate the plane
         for i in range(0, number_of_planes):
@@ -134,25 +139,32 @@ class Constellation:
             temp_plane_id = constellation_name + '_plane' + '{:04d}'.format(i)
             
             # Create insertion orbit relative to the plane
-            temp_insertion_plane_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
-                                                              insertion_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
-                                                              insertion_orbit.argp, 0. * u.deg,
-                                                              insertion_orbit.epoch)
+            if(insertion_orbit is not None):
+                temp_insertion_plane_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
+                                                                    insertion_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
+                                                                    insertion_orbit.argp, 0. * u.deg,
+                                                                    insertion_orbit.epoch)
             
             # Create operational orbit relative to the plane
-            temp_operational_plane_orbit = Orbit.from_classical(Earth, operational_orbit.a + altitude_offset * (i-int((number_of_planes+1)/2)),
-                                                                operational_orbit.ecc,
-                                                                operational_orbit.inc,
-                                                                i * plane_distribution_angle * u.deg / number_of_planes,
-                                                                operational_orbit.argp, 0. * u.deg,
-                                                                operational_orbit.epoch)
-            
+            if(operational_orbit is not None):
+                temp_operational_plane_orbit = Orbit.from_classical(Earth, operational_orbit.a + altitude_offset * (i-int((number_of_planes+1)/2)),
+                                                                    operational_orbit.ecc,
+                                                                    operational_orbit.inc,
+                                                                    i * plane_distribution_angle * u.deg / number_of_planes,
+                                                                    operational_orbit.argp, 0. * u.deg,
+                                                                    operational_orbit.epoch)
+            # Create graveyard orbit relative to the plane
+            if(disposal_orbit is not None):
+                temp_disposal_plane_orbit = Orbit.from_classical(Earth, disposal_orbit.a, disposal_orbit.ecc,
+                                                                    disposal_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
+                                                                    disposal_orbit.argp, 0. * u.deg,
+                                                                    disposal_orbit.epoch)
             
             # Populate the plane with its own reference satellite
             self.populate_plane(temp_plane_id, reference_satellite, sat_per_plane, temp_insertion_plane_orbit,
-                                temp_operational_plane_orbit,)
+                                temp_operational_plane_orbit,temp_disposal_plane_orbit)
 
-    def populate_plane(self, plane_id, reference_satellite, sat_per_plane, insertion_orbit, operational_orbit):
+    def populate_plane(self, plane_id, reference_satellite, sat_per_plane, insertion_orbit, operational_orbit, disposal_orbit):
         """ Adds satellites to form a complete plane with equiphased population based on inputs.
 
         Args:
@@ -162,22 +174,34 @@ class Constellation:
             insertion_orbit (poliastro.twobody.Orbit): insertion orbit for the satellites
             operational_orbit (poliastro.twobody.Orbit): operational orbit for the plane, where the capture will occur
         """
+        temp_insertion_orbit = None
+        temp_operational_orbit = None
+        temp_disposal_orbit = None
+
         # For each satellite in the plane, create the reference orbit by anomaly offset and add the target to clients
         for i in range(0, sat_per_plane):
             # Set target id
             temp_satellite_id = plane_id + '_sat' + '{:04d}'.format(i)
             
             # Create insertion orbit relative to the satellite ref
-            temp_insertion_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
-                                                        insertion_orbit.inc, insertion_orbit.raan,
-                                                        insertion_orbit.argp, i * 360 * u.deg / sat_per_plane,
-                                                        insertion_orbit.epoch)
+            if(insertion_orbit is not None):
+                temp_insertion_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
+                                                            insertion_orbit.inc, insertion_orbit.raan,
+                                                            insertion_orbit.argp, i * 360 * u.deg / sat_per_plane,
+                                                            insertion_orbit.epoch)
             
             # Create operational orbit relative to the satellite ref
-            temp_operational_orbit = Orbit.from_classical(Earth, operational_orbit.a, operational_orbit.ecc,
-                                                          operational_orbit.inc, operational_orbit.raan,
-                                                          operational_orbit.argp, i * 360 * u.deg / sat_per_plane,
-                                                          operational_orbit.epoch)
+            if(operational_orbit is not None):
+                temp_operational_orbit = Orbit.from_classical(Earth, operational_orbit.a, operational_orbit.ecc,
+                                                            operational_orbit.inc, operational_orbit.raan,
+                                                            operational_orbit.argp, i * 360 * u.deg / sat_per_plane,
+                                                            operational_orbit.epoch)
+
+            if(disposal_orbit is not None):
+                temp_disposal_orbit = Orbit.from_classical(Earth, disposal_orbit.a, disposal_orbit.ecc,
+                                                            disposal_orbit.inc, disposal_orbit.raan,
+                                                            disposal_orbit.argp, i * 360 * u.deg / sat_per_plane,
+                                                            disposal_orbit.epoch)
             
             # Make a copy of reference target to become new target
             temp_satellite = copy.deepcopy(reference_satellite)
@@ -186,6 +210,7 @@ class Constellation:
             temp_satellite.id = temp_satellite_id
             temp_satellite.insertion_orbit = temp_insertion_orbit
             temp_satellite.operational_orbit = temp_operational_orbit
+            temp_satellite.gdisposal_orbit = temp_disposal_orbit
             temp_satellite.current_orbit = None
             temp_satellite.initial_orbit = temp_insertion_orbit
             self.add_satellite(temp_satellite)
@@ -201,7 +226,7 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.operational_orbit.raan.to(u.deg).value, tgt.operational_orbit.nu.to(u.deg).value, 'ok')
+                axes.plot(tgt.get_initial_orbit().raan.to(u.deg).value, tgt.get_initial_orbit().nu.to(u.deg).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('anomaly spacing [°]')
 
@@ -219,8 +244,8 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.operational_orbit.raan.to(u.deg).value,
-                             (tgt.operational_orbit.a - tgt.operational_orbit.attractor.R).to(u.km).value, 'ok')
+                axes.plot(tgt.get_initial_orbit().raan.to(u.deg).value,
+                             (tgt.get_initial_orbit().a - tgt.get_initial_orbit().attractor.R).to(u.km).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('altitude [km]')
 
@@ -253,12 +278,12 @@ class Constellation:
         for _, target in self.satellites.items():
             i += 1
             if i < len(self.satellites):
-                fig.plot(target.operational_orbit)
+                fig.plot(target.get_initial_orbit())
             else:
                 if save_folder and save:
-                    fig.plot(target.operational_orbit).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
+                    fig.plot(target.get_initial_orbit()).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
                 else:
-                    fig.plot(target.operational_orbit).show(render_mode='webgl')
+                    fig.plot(target.get_initial_orbit()).show(render_mode='webgl')
 
     def print_KPI(self):
         """ Print KPI related to the constellation"""
