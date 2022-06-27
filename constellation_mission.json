@@ -1,4 +1,5 @@
 {
+  "scenario": "constellation_deployment",
   "propulsion_type": "electrical",
   "verbose": false,
   "constellation_name": "OneWeb",
@@ -7,7 +8,6 @@
   "n_planes": 3,
   "n_sats_per_plane": 2,
   "plane_distribution_angle": 180,
-  "n_sats_simultaneously_deployed": 4,
   "launcher": "Soyuz_2.1b_Fregat",
   "launch_site": "Baikonur",
   "orbit_type": "LEO",
@@ -21,9 +21,6 @@
   "apogee_sats_insertion": 600.0,
   "perigee_sats_insertion": 450.0,
   "inc_sats_insertion": 87.4,
-  "apogee_sats_operational": 1200.0,
-  "perigee_sats_operational": 1200.0,
-  "inc_sats_operational": 87.4,
   "apogee_launcher_insertion": 400.0,
   "perigee_launcher_insertion": 400.0,
   "inc_launcher_insertion": 87.0,
