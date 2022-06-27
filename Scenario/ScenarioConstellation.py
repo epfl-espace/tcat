@@ -230,8 +230,8 @@ class ScenarioConstellation:
                                                         0. * u.deg,
                                                         self.starting_epoch)
 
-        self.sat_operational_orbit = copy.deepcopy(self.sat_insertion_orbit)
-        self.sat_disposal_orbit = copy.deepcopy(self.sat_insertion_orbit)
+        self.sat_operational_orbit = None
+        self.sat_disposal_orbit = None
 
     def define_upperstages_orbits(self):
         """ Define orbits needed for upperstages definition.
@@ -275,8 +275,8 @@ class ScenarioConstellation:
 
         # Order targets by their current raan following precession direction, then by true anomaly
         ordered_satellites_id = sorted(self.constellation.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
-                                    self.constellation.get_standby_satellites()[satellite_id].operational_orbit.raan.value,
-                                    self.constellation.get_standby_satellites()[satellite_id].operational_orbit.nu.value))
+                                    self.constellation.get_standby_satellites()[satellite_id].get_initial_orbit().raan.value,
+                                    self.constellation.get_standby_satellites()[satellite_id].get_initial_orbit().nu.value))
 
         logging.info("Computing 'optimal' deployement sequence ...")
         # For each launcher, find optimal sequence of targets' deployment
@@ -322,7 +322,7 @@ class ScenarioConstellation:
             criteria_raan_spread.append(abs(sequence_raan_spread.value))
 
             # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-            satellites_altitude = sum([self.constellation.satellites[sat_id].operational_orbit.a.to(u.km).value for sat_id in satellite_id_list])
+            satellites_altitude = sum([self.constellation.satellites[sat_id].get_initial_orbit().a.to(u.km).value for sat_id in satellite_id_list])
             criteria_altitude.append(satellites_altitude)
 
         # Find ideal sequence by merging RAAN and altitude in a table
