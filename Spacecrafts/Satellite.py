@@ -25,8 +25,8 @@ class Satellite(Spacecraft):
         current_mass (u.kg): Object mass at current time.
         state (str): descriptor of the satellite state, used to identify different possible failures and states
     """
-    def __init__(self, satellite_id, initial_mass, volume, insertion_orbit, operational_orbit, state, is_stackable=False):
-        super().__init__(satellite_id, initial_mass, volume,insertion_orbit = insertion_orbit,initial_orbit = insertion_orbit,operational_orbit = operational_orbit)
+    def __init__(self, satellite_id, initial_mass, volume, initial_orbit, insertion_orbit=None, operational_orbit=None, disposal_orbit=None, state="standby", is_stackable=False):
+        super().__init__(satellite_id, initial_mass, volume,initial_orbit,insertion_orbit=insertion_orbit,operational_orbit=operational_orbit, disposal_orbit=disposal_orbit)
         self.state = state
 
     def reset(self):
