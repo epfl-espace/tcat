@@ -26,7 +26,6 @@ class ScenarioConstellation:
     """
     general_fields = ['architecture',
                       'propulsion_type',
-                      'deployment_strategy',
                       'verbose',
                       'constellation_name',
                       'n_planes',
