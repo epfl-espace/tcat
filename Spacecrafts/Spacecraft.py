@@ -17,7 +17,7 @@ class Spacecraft:
     """
     Init
     """
-    def __init__(self, spacecraft_id, dry_mass, volume=0.,insertion_orbit = None,initial_orbit = None,operational_orbit = None):
+    def __init__(self, spacecraft_id, dry_mass, volume=0., initial_orbit=None, insertion_orbit=None, operational_orbit=None, disposal_orbit=None):
         self.id = spacecraft_id
 
         self.dry_mass = dry_mass
@@ -27,6 +27,7 @@ class Spacecraft:
         self.insertion_orbit = insertion_orbit
         self.initial_orbit = initial_orbit
         self.operational_orbit = operational_orbit
+        self.disposal_orbit = disposal_orbit
         self.current_orbit = None
         self.previous_orbit = None
 
@@ -118,7 +119,7 @@ class Spacecraft:
         """ Get the initial orbit
 
         Returns:
-            (poliastro.twobody.Orbit): current orbit
+            (poliastro.twobody.Orbit): initial orbit
         """
         return self.initial_orbit
 
@@ -126,9 +127,25 @@ class Spacecraft:
         """ Get the insertion orbit
 
         Returns:
-            (poliastro.twobody.Orbit): current orbit
+            (poliastro.twobody.Orbit): insertion orbit
         """
         return self.insertion_orbit
+
+    def get_operational_orbit(self):
+        """ Get the operational orbit
+
+        Returns:
+            (poliastro.twobody.Orbit): operational orbit
+        """
+        return self.operational_orbit
+
+    def get_disposal_orbit(self):
+        """ Get the disposal orbit
+
+        Returns:
+            (poliastro.twobody.Orbit) disposal orbit
+        """
+        return self.disposal_orbit
 
     def get_relative_raan_drift(self, duration, own_orbit=None, other_object_orbit=None):
         """ Returns the relative raan drift between the target and an hypothetical servicer.
