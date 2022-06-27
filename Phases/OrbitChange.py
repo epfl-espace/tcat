@@ -1,11 +1,9 @@
 from astropy.time import Time
 
-import Spacecrafts.Servicer
 from Modules.PropulsionModule import *
 from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
 from poliastro.bodies import Earth
-import logging
 
 
 class OrbitChange(GenericPhase):
@@ -259,9 +257,6 @@ class OrbitChange(GenericPhase):
         if orbit2 is None:
             orbit2 = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Spacecrafts.Servicer.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
                 mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
@@ -311,10 +306,7 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Spacecrafts.Servicer.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
-                mass = self.get_assigned_spacecraft().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
