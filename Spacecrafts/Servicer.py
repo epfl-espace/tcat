@@ -29,7 +29,7 @@ class Servicer(ActiveSpacecraft):
     """
     Methods
     """
-    def assign_ordered_satellites(self,clients,targetperservicers):
+    def assign_ordered_satellites(self,clients,targetperservicers=1):
         """ Assigned remaining ordered satellites to current servicer
 
         Args:
