@@ -44,7 +44,7 @@ class UpperStage(ActiveSpacecraft):
         self.satellites_allowance = 0
 
         # Init ratio of inclination change in raan drift model
-        self.ratio_inc_raan_from_scenario = scenario.mission_cost_vs_duration_factor
+        self.ratio_inc_raan_from_scenario = scenario.mission_cash_limitor
         self.ratio_inc_raan_from_opti = 0.
 
         # Compute initial performances

@@ -24,9 +24,7 @@ class ScenarioConstellation:
     """
     General Attributs
     """
-    general_fields = ['architecture',
-                      'propulsion_type',
-                      'deployment_strategy',
+    general_fields = ['propulsion_type',
                       'verbose',
                       'constellation_name',
                       'n_planes',
@@ -41,7 +39,7 @@ class ScenarioConstellation:
                       'interpolation_method',
                       'starting_epoch',
                       'data_path',
-                      'mission_cost_vs_duration_factor']
+                      'mission_cash_limitor']
 
     scalable_field = [('sat_mass', u.kg),
                       ('sat_volume', u.m ** 3),
