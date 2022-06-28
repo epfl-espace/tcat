@@ -3,7 +3,8 @@ FROM python:3.9.12
 ENV BASE_FOLDER=/tcat-app-data
 ENV TCAT_DIR=/app
 ENV TCAT_PYTHON_EXE=/usr/local/bin/python
-ENV TCAT_RUN_FILE=Run_Constellation.py
+ENV TCAT_CONSTELLATION_RUN_FILE=Run_Constellation.py
+ENV TCAT_ADR_RUN_FILE=Run_ADR.py
 ENV DATABASE_URI=sqlite:////tcat-app-db/tcat.db
 ENV HOST=0.0.0.0
 ENV PORT=5000
