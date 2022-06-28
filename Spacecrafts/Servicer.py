@@ -245,17 +245,10 @@ class Servicer(ActiveSpacecraft):
         print(f"""---\n---
 Servicer:
     ID: {self.get_id()}
-    Launch vehicle name: {self.launcher_name}
     Dry mass: {self.get_dry_mass():.01f}
     Wet mass: {self.get_wet_mass():.01f}
     Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
-    Payload mass available: {self.mass_available}
-    Number of satellites: {self.sats_number}
-    Dispenser mass: {self.dispenser_mass:.1f}
-    Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
-    Dispenser volume: {self.dispenser_volume:.1f}
-    Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
-    Targets assigned to the Launch vehicle:""")
+    Targets assigned to the Servicer:""")
 
         for x in range(len(self.ordered_target_spacecraft)):
             print(f"\t\t{self.ordered_target_spacecraft[x]}")
