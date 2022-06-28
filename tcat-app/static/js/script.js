@@ -51,7 +51,7 @@ function setDarkMode(enabled, save=true) {
 	if(enabled) {
 		html.setAttribute('data-theme', 'dracula');
 	} else {
-		html.setAttribute('data-theme', 'corporate');
+		html.setAttribute('data-theme', 'emerald');
 	}
 	if(save)
 		localStorage.setItem(DARK_MODE_KEY, enabled);

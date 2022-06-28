@@ -38,6 +38,6 @@ module.exports = {
         logs: true,
         rtl: false,
         prefix: "",
-        themes: ["corporate", "dracula"],
+        themes: ["emerald", "dracula"],
     },
 }
