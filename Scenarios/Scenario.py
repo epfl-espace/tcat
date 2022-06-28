@@ -2,7 +2,8 @@
 Created:        28.06.2022
 Last Revision:  28.06.2022
 Author:         Emilien Mingard
-Description:    Parent class for the different implemented scenarios
+Description:    ABSTRACT CLASS - DO NOT USE
+                Parent class for the different implemented scenarios
 """
 
 # Import Class
@@ -22,7 +23,9 @@ logging.addLevelName(21, "DEBUGGING")
 # Class definition
 class Scenario:
     """
-    General Attributs
+    ABSTRACT CLASS - DO NOT USE
+    Virtual methods to define in inherited class (see ScenarioConstellation):
+        def create_constellation(self)
     """
     general_fields = ['scenario',
                       'propulsion_type',
