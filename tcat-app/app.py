@@ -120,8 +120,8 @@ def get_user_info():
     return oidc.user_getinfo(['email'])['email']
 
 
-def valid_configuration(configuration):
-    flat_validation_params = [item for sublist in inputparams.params.values() for item in sublist]
+def valid_configuration(configuration, params):
+    flat_validation_params = [item for sublist in params.values() for item in sublist]
     validation_errors = {}
     valid = True
     for param in flat_validation_params:
@@ -272,9 +272,16 @@ def result_stream(config_run_id):
     return app.response_class(generate(config_run_id, RESULT_FILENAME), mimetype='text/plain')
 
 
-@app.route('/configure', methods=['GET', 'POST'])
+@app.route('/configure-adr', methods=['GET', 'POST'])
 @oidc.require_login
-def configure():
+def configure_adr():
+    current_user_email = get_user_info()
+    return render_template('configure_adr.html')
+
+
+@app.route('/configure-constellation-deployment', methods=['GET', 'POST'])
+@oidc.require_login
+def configure_constellation_deployment():
     current_user_email = get_user_info()
     last_configuration = None
     last_run_for_configuration = None
@@ -282,7 +289,7 @@ def configure():
 
     if request.method == 'POST':
         uploaded_configuration = dict(request.form)
-        validation = valid_configuration(uploaded_configuration)
+        validation = valid_configuration(uploaded_configuration, inputparams.constellation_mission_params)
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
@@ -297,7 +304,7 @@ def configure():
             last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
             last_configuration = json.loads(last_config_item.configuration)
 
-    return render_template('configure.html', last_configuration=last_configuration,
+    return render_template('configure_constellation_deployment.html', last_configuration=last_configuration,
                            last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
 
 
@@ -457,7 +464,7 @@ def download_run_data(scenario_id, config_run_id):
     return send_file(file_obj, attachment_filename=f'{scenario_id}.zip', as_attachment=True)
 
 
-app.jinja_env.globals.update(inputparams=inputparams.params)
+app.jinja_env.globals.update(inputparams=inputparams)
 
 if __name__ == '__main__':
     app.run()
