@@ -2,12 +2,12 @@
 Created:        28.06.2022
 Last Revision:  28.06.2022
 Author:         Emilien Mingard
-Description:    Parent class for the different implemented scenarios
+Description:    ABSTRACT CLASS - DO NOT USE
+                Parent class for the different implemented scenarios
 """
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
-from Scenarios.FleetConstellation import FleetConstellation
 from Scenarios.Plan import *
 from Constellations.Constellation import Constellation
 
@@ -43,9 +43,6 @@ class Scenario:
                       ('fairing_diameter', u.m),
                       ('fairing_cylinder_height', u.m),
                       ('fairing_total_height', u.m),
-                      ('apogee_sats_insertion', u.km),
-                      ('perigee_sats_insertion', u.km), 
-                      ('inc_sats_insertion', u.deg),
                       ('apogee_launcher_insertion', u.km),
                       ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
@@ -74,6 +71,21 @@ class Scenario:
         self.sat_operational_orbit = None
         self.sat_disposal_orbit = None
 
+        self.launcher_insertion_orbit = None
+        self.launcher_disposal_orbit = None
+
+        self.create_attributes_from_input_json(json)
+
+        # Instanciate epoch
+        self.starting_epoch = Time(self.starting_epoch, scale="tdb")
+
+        # Enabling logging. Set level >21 to display INFO only
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+    """
+    Methods
+    """
+    def create_attributes_from_input_json(self,json):
         # Look through general_fields
         for field in self.general_fields:
             # Check if field in file
@@ -91,15 +103,6 @@ class Scenario:
                 else:
                     setattr(self, field, json[field] * unit)
 
-        # Instanciate epoch
-        self.starting_epoch = Time(self.starting_epoch, scale="tdb")
-
-        # Enabling logging. Set level >21 to display INFO only
-        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-
-    """
-    Methods
-    """
     def setup(self,existing_constellation=None):
         """ Create the clients, fleet and plan based on json inputs files (Provided through Class attributs).
             Off the capability of re-using pre-set constellation in case multiple scenario are used. The existing client can be
@@ -144,11 +147,6 @@ class Scenario:
         logging.info("Gathering satellite orbits...")
         self.define_constellation_orbits()
 
-        # Check if satellites volume is known, otherwise an estimate is provided
-        if float(self.sat_volume.value) == 0:
-            logging.info("Estimating satellite volume...")
-            self.estimate_satellite_volume()
-
         # Define a reference satellite
         logging.info("Generating the reference satellite...")
         self.reference_satellite = Satellite('Reference_' + self.constellation_name + '_satellite',
@@ -191,17 +189,11 @@ class Scenario:
 
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
-        self.define_upperstages_orbits()
-
-        # Define launch vehicle based on specified launcher
-        if self.custom_launcher_name is None:
-            self.launcher_name = self.launcher
-        else:
-            self.launcher_name = self.custom_launcher_name
+        self.define_fleet_orbits()
 
         # Define fleet
         logging.info("Instanciate Fleet object...")
-        self.fleet = FleetConstellation('UpperStages',self)
+        self.create_fleet()
 
         # Compute optimal order to release once spacecraft is known
         self.organise_satellites()
@@ -209,20 +201,13 @@ class Scenario:
     def define_constellation_orbits(self):
         """ Define orbits needed for constellation and satellites definition.
         """
-        # Satellites insertion orbit
-        a_sats_insertion_orbit = (self.apogee_sats_insertion + self.perigee_sats_insertion)/2 + Earth.R
-        e_sats_insertion_orbit = ((self.apogee_sats_insertion + Earth.R)/a_sats_insertion_orbit - 1)*u.one
-        self.sat_insertion_orbit = Orbit.from_classical(Earth,
-                                                        a_sats_insertion_orbit,
-                                                        e_sats_insertion_orbit,
-                                                        self.inc_sats_insertion,
-                                                        0. * u.deg,
-                                                        90. * u.deg,
-                                                        0. * u.deg,
-                                                        self.starting_epoch)
+        raise NotImplementedError()
 
-        self.sat_operational_orbit = None
-        self.sat_disposal_orbit = None
+    def define_fleet_orbits(self):
+        self.define_upperstages_orbits()
+
+    def create_fleet(self):
+        raise NotImplementedError()
 
     def define_upperstages_orbits(self):
         """ Define orbits needed for upperstages definition.
