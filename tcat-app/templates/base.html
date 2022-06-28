@@ -1,3 +1,5 @@
+{% import 'macros/navigation.html' as n %}
+{% import 'macros/footer.html' as f %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,50 +27,10 @@
         </div>
     </div>
     <div class="flex flex-col min-h-screen md:w-full lg:w-4/5 mx-auto">
-        <nav id="header" class="w-full bg-blue-900 dark:bg-gray-900 text-white p-8 flex flex-col lg:rounded-b-lg">
-            <div class="flex-grow flex flex-row justify-between">
-                <div class="flex-grow-0">
-                    <a class="font-sans md:text-xl lg:text-3xl dark:text-gray-300" href="/index">TCAT App</a>
-                </div>
-                {% set nav_items = [('/overview', 'Overview'), ('/configure','Configuration'),('/status','Status')] %}
-                <div class="hidden sm:hidden md:flex flex-grow-0 flex-row space-x-6 items-stretch text-white dark:text-gray-300">
-                    {% for nav_item in nav_items %}
-                        <a class="font-sans text-1xl" href="{{ nav_item[0] }}">
-                            <span class="inline-block align-middle hover:underline">{{ nav_item[1] }}</span>
-                        </a>
-                    {% endfor %}
-                    <a class="font-sans text-1xl" href="/logout">
-                        <span class="inline-block align-middle hover:underline">Logout</span>
-                    </a>
-                </div>
-                <div class="md:hidden flex items-center">
-                    <button class="outline-none mobile-menu-button">
-                        <svg
-                            class="w-6 h-6 text-gray-500"
-                            x-show="!showMenu"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            stroke="white">
-                            <path d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-grow hidden md:hidden mobile-menu flex flex-col items-end mt-8 text-white dark:text-gray-300">
-                {% for nav_item in nav_items %}
-                    <a class="font-sans text-1xl" href="{{ nav_item[0] }}">
-                        <span class="inline-block align-middle underline">{{ nav_item[1] }}</span>
-                    </a>
-                {% endfor %}
-                <a class="font-sans text-1xl" href="/logout">
-                    <span class="inline-block align-middle underline">Logout</span>
-                </a>
-            </div>
-        </nav>
-        <div id="content" class="flex-1 py-6 md:py-12 lg:py-16 px-4 md:px-6 lg:px-8 max-w-5x1 mx-auto w-full">{% block content %}{% endblock %}</div>
+        <header>
+            {{ n.navigation() }}
+        </header>
+        <main id="content" class="flex-1 py-6 md:py-12 lg:py-16 px-4 md:px-6 lg:px-8 max-w-5x1 mx-auto w-full">{% block content %}{% endblock %}</main>
         <div id="messages" class="max-h-56 overflow-auto">
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
@@ -81,16 +43,7 @@
               {% endif %}
             {% endwith %}
         </div>
-        <div id="footer" class="flex w-full bg-blue-900 dark:bg-gray-900 text-white dark:text-gray-300 text-sm lg:text-base font-light p-6 lg:rounded-t-lg">
-            <div class="flex-grow-0">&copy; Copyright 2022 by <a href="https://www.epfl.ch/">EPFL</a>.</div>
-            <div class="flex-grow"></div>
-            <div id="toggle-dark-mode" class="flex flex-row checked">
-                <label for="toggle-dark-mode" class="text-white dark:text-gray-300">Dark Mode</label>
-                <div class="w-14 h-7 flex items-center bg-gray-300 rounded-full mx-3 px-1 dark:bg-blue-700">
-                    <div class="bg-white w-5 h-5 rounded-full shadow-md transform dark:translate-x-7"></div>
-                </div>
-            </div>
-        </div>
+        {{ f.footer() }}
     </div>
     <script src="{{url_for('static',filename='js/script.js')}}"></script>
     {% block script %}{% endblock %}
