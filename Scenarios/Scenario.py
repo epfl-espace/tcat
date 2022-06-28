@@ -11,10 +11,6 @@ from Scenarios.FleetConstellation import FleetConstellation
 from Scenarios.Plan import *
 from Constellations.Constellation import Constellation
 
-# Import Libraries
-from json import load as load_json
-import copy
-
 # Set logging
 logging.getLogger('numba').setLevel(logging.WARNING)
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
