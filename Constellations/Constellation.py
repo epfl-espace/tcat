@@ -210,9 +210,9 @@ class Constellation:
             temp_satellite.id = temp_satellite_id
             temp_satellite.insertion_orbit = temp_insertion_orbit
             temp_satellite.operational_orbit = temp_operational_orbit
-            temp_satellite.gdisposal_orbit = temp_disposal_orbit
+            temp_satellite.disposal_orbit = temp_disposal_orbit
             temp_satellite.current_orbit = None
-            temp_satellite.initial_orbit = temp_insertion_orbit
+            temp_satellite.initial_orbit = None
             self.add_satellite(temp_satellite)
 
     def plot_distribution(self, save=None, save_folder=None):
