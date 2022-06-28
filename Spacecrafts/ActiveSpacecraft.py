@@ -6,7 +6,7 @@ Description:    Parent class for all active spacecrafts
 """
 # Import class
 from Spacecrafts.Spacecraft import Spacecraft
-from Scenarios.Plan_module import Plan
+from Scenarios.Plan import Plan
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
@@ -27,7 +27,7 @@ class ActiveSpacecraft(Spacecraft):
     Init
     """
     def __init__(self,id,group,dry_mass,mass_contingency,starting_epoch,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
-        super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,initial_orbit = initial_orbit,operational_orbit = operational_orbit)
+        super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
 
@@ -44,7 +44,7 @@ class ActiveSpacecraft(Spacecraft):
         self.mass_contingency = mass_contingency
 
         # Disposal orbit triggered at end of mission
-        self.disposal_orbit = disposal_orbit
+        self.initial_orbit = initial_orbit
 
         # Instanciate Plan
         self.plan = Plan(f"Plan_{self.id}",starting_epoch)
@@ -121,7 +121,7 @@ class ActiveSpacecraft(Spacecraft):
         """
         # Reset Spacecraft
         super().reset()
-
+        self.current_orbit = self.get_initial_orbit()
         # Empty the plan
         self.empty_plan()
 
@@ -217,6 +217,14 @@ class ActiveSpacecraft(Spacecraft):
 
         # Return current mass
         return current_mass
+
+    def get_initial_orbit(self):
+        """ Get the initial orbit
+
+        Returns:
+            (poliastro.twobody.Orbit): initial orbit
+        """
+        return self.initial_orbit
 
     def get_initial_prop_mass(self):
         """ Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.

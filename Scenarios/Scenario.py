@@ -2,14 +2,14 @@
 Created:        28.06.2022
 Last Revision:  28.06.2022
 Author:         Emilien Mingard
-Description:    ABSTRACT CLASS - DO NOT USE
-                Parent class for the different implemented scenarios
+Description:    Parent class for the different implemented scenarios
 """
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
-from Scenarios.Fleet import *
+from Scenarios.FleetConstellation import FleetConstellation
 from Scenarios.Plan import *
+from Constellations.Constellation import Constellation
 
 # Import Libraries
 from json import load as load_json
@@ -23,9 +23,6 @@ logging.addLevelName(21, "DEBUGGING")
 # Class definition
 class Scenario:
     """
-    ABSTRACT CLASS - DO NOT USE
-    Virtual methods to define in inherited class (see ScenarioConstellation):
-        def create_constellation(self)
     """
     general_fields = ['scenario',
                       'propulsion_type',
@@ -118,7 +115,7 @@ class Scenario:
         # Check if existing_clients are provided
         if not existing_constellation:
             logging.info("Start defining Clients...")
-            self.define_constellation(copy.deepcopy(self.sat_insertion_orbit))
+            self.define_constellation()
         else:
             logging.info("Recovering Clients...")
             self.constellation = existing_constellation
@@ -135,7 +132,7 @@ class Scenario:
         """
         logging.info("Start executing...")
         try:
-            self.fleet.execute(clients=self.constellation,verbose=False)
+            self.fleet.execute(clients=self.constellation)
             logging.info("Finish executing...")
             self.execution_success = True
             return True
@@ -144,7 +141,7 @@ class Scenario:
             self.execution_success = False
             return warning
 
-    def define_constellation(self,sats_initial_orbit):
+    def define_constellation(self):
         """ Define constellation object.
         """
         # Define relevant orbits
@@ -161,7 +158,6 @@ class Scenario:
         self.reference_satellite = Satellite('Reference_' + self.constellation_name + '_satellite',
                                              self.sat_mass,
                                              self.sat_volume,
-                                             sats_initial_orbit,
                                              insertion_orbit=self.sat_insertion_orbit,   
                                              operational_orbit=self.sat_operational_orbit,
                                              disposal_orbit=self.sat_disposal_orbit,
@@ -170,7 +166,7 @@ class Scenario:
 
         # Instanciate ConstellationSatellites object
         logging.info("Instanciating the constellation...")
-        self.create_constellation()
+        self.constellation = Constellation(self.constellation_name)
 
         logging.info("Populating the constellation based on the reference satellite...")
         self.constellation.populate_standard_constellation(self.constellation_name,
@@ -191,11 +187,6 @@ class Scenario:
             self.satellites.plot_distribution(save="2D_plot", save_folder=self.data_path)
             logging.info("Finish plotting Clients...")
 
-    def create_constellation(self):
-        """ Virtual method
-        """
-        raise NotImplementedError()
-
     def define_fleet(self):
         """ Define fleet object.
         """
@@ -214,7 +205,7 @@ class Scenario:
 
         # Define fleet
         logging.info("Instanciate Fleet object...")
-        self.fleet = Fleet('UpperStages',self)
+        self.fleet = FleetConstellation('UpperStages',self)
 
         # Compute optimal order to release once spacecraft is known
         self.organise_satellites()
@@ -279,8 +270,8 @@ class Scenario:
 
         # Order targets by their current raan following precession direction, then by true anomaly
         ordered_satellites_id = sorted(self.constellation.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
-                                    self.constellation.get_standby_satellites()[satellite_id].get_initial_orbit().raan.value,
-                                    self.constellation.get_standby_satellites()[satellite_id].get_initial_orbit().nu.value))
+                                    self.constellation.get_standby_satellites()[satellite_id].get_insertion_orbit().raan.value,
+                                    self.constellation.get_standby_satellites()[satellite_id].get_insertion_orbit().nu.value))
 
         logging.info("Computing 'optimal' deployement sequence ...")
         # For each launcher, find optimal sequence of targets' deployment
@@ -326,7 +317,7 @@ class Scenario:
             criteria_raan_spread.append(abs(sequence_raan_spread.value))
 
             # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-            satellites_altitude = sum([self.constellation.satellites[sat_id].get_initial_orbit().a.to(u.km).value for sat_id in satellite_id_list])
+            satellites_altitude = sum([self.constellation.satellites[sat_id].get_insertion_orbit().a.to(u.km).value for sat_id in satellite_id_list])
             criteria_altitude.append(satellites_altitude)
 
         # Find ideal sequence by merging RAAN and altitude in a table
