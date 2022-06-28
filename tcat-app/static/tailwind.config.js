@@ -1,12 +1,10 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: 'class',
-    purge: {
-        enabled: true,
-        content: [
-            '../templates/**/*.html',
-            './js/**/*.js'
-        ],
-    },
+    content: [
+        '../templates/**/*.html',
+        './js/**/*.js'
+    ],
     theme: {
         extend: {
             animation: {
@@ -30,5 +28,7 @@ module.exports = {
             cursor: ['hover', 'disabled', 'dark']
         }
     },
-    plugins: [],
+    plugins: [
+        require('daisyui')
+    ],
 }
