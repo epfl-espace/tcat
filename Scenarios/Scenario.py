@@ -8,8 +8,8 @@ Description:    ABSTRACT CLASS - DO NOT USE
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
-from Scenarios.Fleet_module import *
-from Scenarios.Plan_module import *
+from Scenarios.Fleet import *
+from Scenarios.Plan import *
 
 # Import Libraries
 from json import load as load_json
