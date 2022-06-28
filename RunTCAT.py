@@ -2,7 +2,7 @@
 Created:        17.05.2022
 Last Revision:  18.05.2022
 Author:         Emilien Mingard
-Description:    Run python script to test and debug Constellation Deployement TCAT
+Description:    Python script to run TCAT scenario
 """
 
 # Import class
@@ -40,7 +40,7 @@ def main():
     create_results_dir(results_dir_path)
 
     set_sys_std_dir(PRINT_IN_FILES,results_dir_path)
-    
+
     create_and_run_scenario(json,"test_from_file")    
 
     reset_sys_std_dir()
