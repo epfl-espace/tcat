@@ -70,6 +70,7 @@ class Scenario:
         self.sat_insertion_orbit = None
         self.sat_operational_orbit = None
         self.sat_disposal_orbit = None
+        self.sat_default_orbit = None
 
         self.launcher_insertion_orbit = None
         self.launcher_disposal_orbit = None
@@ -156,6 +157,7 @@ class Scenario:
                                              operational_orbit=self.sat_operational_orbit,
                                              disposal_orbit=self.sat_disposal_orbit,
                                              state='standby',
+                                             default_orbit=self.sat_default_orbit,
                                              is_stackable=False)
 
         # Instanciate ConstellationSatellites object
@@ -172,7 +174,7 @@ class Scenario:
 
         # Log satellites distribution
         for _, satellite in self.constellation.satellites.items():
-            logging.info(f"Sat {satellite.get_id()} has {satellite.insertion_orbit}, {satellite.insertion_orbit.raan} RAAN, {satellite.insertion_orbit.nu} nu orbit")
+            logging.info(f"Sat {satellite.get_id()} has {satellite.get_default_orbit()}, {satellite.get_default_orbit().raan} RAAN, {satellite.get_default_orbit().nu} nu orbit")
 
         # Plot if verbose
         if self.verbose:
@@ -244,15 +246,15 @@ class Scenario:
 
         # Extract launcher and satellite precession speeds
         targets_J2_speed = nodal_precession(self.launcher_insertion_orbit)[1]
-        launchers_J2_speed = nodal_precession(self.sat_insertion_orbit)[1]
+        launchers_J2_speed = nodal_precession(self.sat_default_orbit)[1]
 
         # Compute precession direction based on knowledge from Launcher and Servicers
         relative_precession_direction = np.sign(launchers_J2_speed-targets_J2_speed)
 
         # Order targets by their current raan following precession direction, then by true anomaly
         ordered_satellites_id = sorted(self.constellation.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
-                                    self.constellation.get_standby_satellites()[satellite_id].get_insertion_orbit().raan.value,
-                                    self.constellation.get_standby_satellites()[satellite_id].get_insertion_orbit().nu.value))
+                                    self.constellation.get_standby_satellites()[satellite_id].get_default_orbit().raan.value,
+                                    self.constellation.get_standby_satellites()[satellite_id].get_default_orbit().nu.value))
 
         logging.info("Computing 'optimal' deployement sequence ...")
         # For each launcher, find optimal sequence of targets' deployment
@@ -279,10 +281,10 @@ class Scenario:
             # Iterate through sequence's satellites
             for j in range(1, len(satellite_id_list)):
                 # Extract initial target RAAN
-                initial_RAAN = self.constellation.satellites[satellite_id_list[j]].insertion_orbit.raan
+                initial_RAAN = self.constellation.satellites[satellite_id_list[j]].get_default_orbit().raan
 
                 # Extract next target RAAN
-                final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].insertion_orbit.raan
+                final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].get_default_orbit().raan
 
                 # Check for opposite precession movement (Has a larger cost)
                 delta_RAAN = final_RAAN-initial_RAAN
@@ -298,7 +300,7 @@ class Scenario:
             criteria_raan_spread.append(abs(sequence_raan_spread.value))
 
             # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-            satellites_altitude = sum([self.constellation.satellites[sat_id].get_insertion_orbit().a.to(u.km).value for sat_id in satellite_id_list])
+            satellites_altitude = sum([self.constellation.satellites[sat_id].get_default_orbit().a.to(u.km).value for sat_id in satellite_id_list])
             criteria_altitude.append(satellites_altitude)
 
         # Find ideal sequence by merging RAAN and altitude in a table

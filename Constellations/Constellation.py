@@ -98,7 +98,7 @@ class Constellation:
         """
         temp_rotation = 0
         for _, satellite in self.get_standby_satellites().items():
-            temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.get_insertion_orbit())[1].value)
+            temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.get_default_orbit())[1].value)
         return int(np.sign(temp_rotation))
 
     def reset(self):

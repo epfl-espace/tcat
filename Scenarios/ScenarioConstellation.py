@@ -35,6 +35,12 @@ class ScenarioConstellation(Scenario):
 
         self.sat_operational_orbit = None
         self.sat_disposal_orbit = None
+        self.sat_default_orbit = self.sat_insertion_orbit
     
     def create_fleet(self):
         self.fleet = FleetConstellation('UpperStages',self)
+
+    def log_constellation_data(self):
+        # Log satellites distribution
+        for _, satellite in self.constellation.satellites.items():
+            logging.info(f"Sat {satellite.get_id()} has {satellite.inse_orbit}, {satellite.inse_orbit.raan} RAAN, {satellite.inse_orbit.nu} nu orbit")

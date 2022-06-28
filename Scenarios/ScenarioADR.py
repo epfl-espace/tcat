@@ -59,6 +59,7 @@ class ScenarioADR(Scenario):
                                                         90. * u.deg,
                                                         0. * u.deg,
                                                         self.starting_epoch)
+        self.sat_default_orbit = self.sat_operational_orbit
 
     def define_fleet_orbits(self):
         super().define_fleet_orbits()
