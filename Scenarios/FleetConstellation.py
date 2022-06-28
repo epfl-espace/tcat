@@ -69,7 +69,7 @@ class FleetConstellation(Fleet):
                 upperstage_cur_sat_allowance = math.ceil((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
 
                 # Execute upperstage
-                upperstage.execute(clients,upperstage_cur_sat_allowance)
+                upperstage.execute(unassigned_satellites,constellation_precession=clients.get_global_precession_rotation(),custom_sat_allowance=upperstage_cur_sat_allowance)
                 upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
 
                 # Check for exit condition
@@ -92,7 +92,7 @@ class FleetConstellation(Fleet):
                         upperstage_up_sat_allowance = upperstage_cur_sat_allowance
 
             # Iterate until upperstage total deployment time is computed (If phasing existing)
-            upperstage.execute_with_fuel_usage_optimisation(clients)
+            upperstage.execute_with_fuel_usage_optimisation(unassigned_satellites,constellation_precession=clients.get_global_precession_rotation())
                          
             # Add converged UpperStage and remove newly assigned satellite
             self.add_upperstage(upperstage)
