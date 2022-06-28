@@ -8,6 +8,8 @@ Description:    FleetConstellation related class
 # Import Classes
 from Scenarios.Fleet import Fleet
 from Spacecrafts.UpperStage import UpperStage
+
+# Import libraries
 import math
 
 class FleetConstellation(Fleet):
@@ -26,7 +28,7 @@ class FleetConstellation(Fleet):
     """
     Methods
     """
-    def execute(self,clients,verbose=False):
+    def execute(self,clients):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
 
         Args:
