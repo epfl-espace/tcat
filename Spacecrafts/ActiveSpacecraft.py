@@ -6,7 +6,7 @@ Description:    Parent class for all active spacecrafts
 """
 # Import class
 from Spacecrafts.Spacecraft import Spacecraft
-from Scenarios.Plan_module import Plan
+from Scenarios.Plan import Plan
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
