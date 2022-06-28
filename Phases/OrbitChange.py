@@ -1,10 +1,9 @@
 from astropy.time import Time
 
-import Scenario.Fleet_module
 from Modules.PropulsionModule import *
 from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
-import logging
+from poliastro.bodies import Earth
 
 
 class OrbitChange(GenericPhase):
@@ -173,10 +172,7 @@ class OrbitChange(GenericPhase):
         """
         # retrieve required module attributes
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
-                mass = self.get_assigned_spacecraft().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -261,9 +257,6 @@ class OrbitChange(GenericPhase):
         if orbit2 is None:
             orbit2 = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
                 mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
@@ -313,10 +306,7 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
-                mass = self.get_assigned_spacecraft().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -341,9 +331,7 @@ class OrbitChange(GenericPhase):
                 delta_raan = delta_raan - 360. * u.deg
             if delta_raan < -180. * u.deg:
                 delta_raan = delta_raan + 360. * u.deg
-
-            logging.log(21, f"Orbit_change delta RAAN: {delta_raan}; final orbit RAAN: {final_orbit.raan}; initial orbit RAAN: {initial_orbit.raan}; maneuver delta RAAN: {maneuver_delta_raan}")
-            
+ 
             # Check if phasing can be avoided to the benefit of direct raan change manoeuvre
             if abs(delta_raan) < self.raan_cutoff:
                 phasing_duration = 0. * u.day

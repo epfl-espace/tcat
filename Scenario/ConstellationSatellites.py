@@ -45,9 +45,29 @@ class Constellation:
         
         # Check if satellite already in dict
         if satellite in self.satellites:
-            warnings.warn('Target ', satellite.ID, ' already in constellation ', self.ID, '.', UserWarning)
+            warnings.warn('Target ', satellite.get_id(), ' already in constellation ', self.ID, '.', UserWarning)
         else:
-            self.satellites[satellite.ID] = satellite
+            # Add new satellite to general list of satellites
+            self.satellites[satellite.get_id()] = satellite
+
+    def set_optimized_ordered_satellites(self,list_of_satellites):
+        """ Set list of ordered satellites to be released.
+        """
+        self.optimized_ordered_satellites = list_of_satellites
+
+    def get_optimized_ordered_satellites(self):
+        """ Set list of ordered satellites to be released.
+
+        Return:
+            (List(Satellite)): List containing optimized ordered satellites left
+        """
+        return self.optimized_ordered_satellites
+
+    def remove_in_ordered_satellites(self,satellites):
+        """ Remove already assigned satellites
+        """
+        for satellite in satellites:
+            self.optimized_ordered_satellites.remove(satellite)
 
     def get_standby_satellites(self):
         """ Return dictionary of satellites that have a standby state.
@@ -78,7 +98,7 @@ class Constellation:
         """
         temp_rotation = 0
         for _, satellite in self.get_standby_satellites().items():
-            temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.operational_orbit)[1].value)
+            temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.get_initial_orbit())[1].value)
         return int(np.sign(temp_rotation))
 
     def reset(self):
@@ -101,10 +121,17 @@ class Constellation:
             altitude_offset (u.km): ?
             sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly
         """
+        # Add reference_satellite as attribut
+        self.reference_satellite = reference_satellite
         
         # Extract reference satellite orbits
-        insertion_orbit = reference_satellite.insertion_orbit
-        operational_orbit = reference_satellite.operational_orbit
+        insertion_orbit = reference_satellite.get_insertion_orbit()
+        operational_orbit = reference_satellite.get_operational_orbit()
+        disposal_orbit = reference_satellite.get_disposal_orbit()
+
+        temp_insertion_plane_orbit = None 
+        temp_operational_plane_orbit = None
+        temp_disposal_plane_orbit = None       
         
         # For each plane, create the reference orbits by raan offset and populate the plane
         for i in range(0, number_of_planes):
@@ -112,25 +139,32 @@ class Constellation:
             temp_plane_id = constellation_name + '_plane' + '{:04d}'.format(i)
             
             # Create insertion orbit relative to the plane
-            temp_insertion_plane_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
-                                                              insertion_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
-                                                              insertion_orbit.argp, 0. * u.deg,
-                                                              insertion_orbit.epoch)
+            if(insertion_orbit is not None):
+                temp_insertion_plane_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
+                                                                    insertion_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
+                                                                    insertion_orbit.argp, 0. * u.deg,
+                                                                    insertion_orbit.epoch)
             
             # Create operational orbit relative to the plane
-            temp_operational_plane_orbit = Orbit.from_classical(Earth, operational_orbit.a + altitude_offset * (i-int((number_of_planes+1)/2)),
-                                                                operational_orbit.ecc,
-                                                                operational_orbit.inc,
-                                                                i * plane_distribution_angle * u.deg / number_of_planes,
-                                                                operational_orbit.argp, 0. * u.deg,
-                                                                operational_orbit.epoch)
-            
+            if(operational_orbit is not None):
+                temp_operational_plane_orbit = Orbit.from_classical(Earth, operational_orbit.a + altitude_offset * (i-int((number_of_planes+1)/2)),
+                                                                    operational_orbit.ecc,
+                                                                    operational_orbit.inc,
+                                                                    i * plane_distribution_angle * u.deg / number_of_planes,
+                                                                    operational_orbit.argp, 0. * u.deg,
+                                                                    operational_orbit.epoch)
+            # Create graveyard orbit relative to the plane
+            if(disposal_orbit is not None):
+                temp_disposal_plane_orbit = Orbit.from_classical(Earth, disposal_orbit.a, disposal_orbit.ecc,
+                                                                    disposal_orbit.inc, i * plane_distribution_angle * u.deg / number_of_planes,
+                                                                    disposal_orbit.argp, 0. * u.deg,
+                                                                    disposal_orbit.epoch)
             
             # Populate the plane with its own reference satellite
             self.populate_plane(temp_plane_id, reference_satellite, sat_per_plane, temp_insertion_plane_orbit,
-                                temp_operational_plane_orbit,)
+                                temp_operational_plane_orbit,temp_disposal_plane_orbit)
 
-    def populate_plane(self, plane_id, reference_satellite, sat_per_plane, insertion_orbit, operational_orbit):
+    def populate_plane(self, plane_id, reference_satellite, sat_per_plane, insertion_orbit, operational_orbit, disposal_orbit):
         """ Adds satellites to form a complete plane with equiphased population based on inputs.
 
         Args:
@@ -140,30 +174,43 @@ class Constellation:
             insertion_orbit (poliastro.twobody.Orbit): insertion orbit for the satellites
             operational_orbit (poliastro.twobody.Orbit): operational orbit for the plane, where the capture will occur
         """
+        temp_insertion_orbit = None
+        temp_operational_orbit = None
+        temp_disposal_orbit = None
+
         # For each satellite in the plane, create the reference orbit by anomaly offset and add the target to clients
         for i in range(0, sat_per_plane):
             # Set target id
             temp_satellite_id = plane_id + '_sat' + '{:04d}'.format(i)
             
             # Create insertion orbit relative to the satellite ref
-            temp_insertion_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
-                                                        insertion_orbit.inc, insertion_orbit.raan,
-                                                        insertion_orbit.argp, i * 360 * u.deg / sat_per_plane,
-                                                        insertion_orbit.epoch)
+            if(insertion_orbit is not None):
+                temp_insertion_orbit = Orbit.from_classical(Earth, insertion_orbit.a, insertion_orbit.ecc,
+                                                            insertion_orbit.inc, insertion_orbit.raan,
+                                                            insertion_orbit.argp, i * 360 * u.deg / sat_per_plane,
+                                                            insertion_orbit.epoch)
             
             # Create operational orbit relative to the satellite ref
-            temp_operational_orbit = Orbit.from_classical(Earth, operational_orbit.a, operational_orbit.ecc,
-                                                          operational_orbit.inc, operational_orbit.raan,
-                                                          operational_orbit.argp, i * 360 * u.deg / sat_per_plane,
-                                                          operational_orbit.epoch)
+            if(operational_orbit is not None):
+                temp_operational_orbit = Orbit.from_classical(Earth, operational_orbit.a, operational_orbit.ecc,
+                                                            operational_orbit.inc, operational_orbit.raan,
+                                                            operational_orbit.argp, i * 360 * u.deg / sat_per_plane,
+                                                            operational_orbit.epoch)
+
+            if(disposal_orbit is not None):
+                temp_disposal_orbit = Orbit.from_classical(Earth, disposal_orbit.a, disposal_orbit.ecc,
+                                                            disposal_orbit.inc, disposal_orbit.raan,
+                                                            disposal_orbit.argp, i * 360 * u.deg / sat_per_plane,
+                                                            disposal_orbit.epoch)
             
             # Make a copy of reference target to become new target
             temp_satellite = copy.deepcopy(reference_satellite)
             
             # Update new target and add it to clients
-            temp_satellite.ID = temp_satellite_id
+            temp_satellite.id = temp_satellite_id
             temp_satellite.insertion_orbit = temp_insertion_orbit
             temp_satellite.operational_orbit = temp_operational_orbit
+            temp_satellite.gdisposal_orbit = temp_disposal_orbit
             temp_satellite.current_orbit = None
             temp_satellite.initial_orbit = temp_insertion_orbit
             self.add_satellite(temp_satellite)
@@ -179,7 +226,7 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.operational_orbit.raan.to(u.deg).value, tgt.operational_orbit.nu.to(u.deg).value, 'ok')
+                axes.plot(tgt.get_initial_orbit().raan.to(u.deg).value, tgt.get_initial_orbit().nu.to(u.deg).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('anomaly spacing [°]')
 
@@ -197,8 +244,8 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.operational_orbit.raan.to(u.deg).value,
-                             (tgt.operational_orbit.a - tgt.operational_orbit.attractor.R).to(u.km).value, 'ok')
+                axes.plot(tgt.get_initial_orbit().raan.to(u.deg).value,
+                             (tgt.get_initial_orbit().a - tgt.get_initial_orbit().attractor.R).to(u.km).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('altitude [km]')
 
@@ -231,17 +278,17 @@ class Constellation:
         for _, target in self.satellites.items():
             i += 1
             if i < len(self.satellites):
-                fig.plot(target.operational_orbit)
+                fig.plot(target.get_initial_orbit())
             else:
                 if save_folder and save:
-                    fig.plot(target.operational_orbit).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
+                    fig.plot(target.get_initial_orbit()).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
                 else:
-                    fig.plot(target.operational_orbit).show(render_mode='webgl')
+                    fig.plot(target.get_initial_orbit()).show(render_mode='webgl')
 
     def print_KPI(self):
         """ Print KPI related to the constellation"""
         # Total mass delivered into space
-        satellites_masses = [self.satellites[key].initial_mass for key in self.satellites.keys()]
+        satellites_masses = [self.satellites[key].get_dry_mass() for key in self.satellites.keys()]
         print(f"Total payload mass released in space: {sum(satellites_masses):.2f}")
     
     def __str__(self):
@@ -249,106 +296,3 @@ class Constellation:
         for _, target in self.satellites.items():
             temp = temp + '\n\t' + target.__str__()
         return temp
-
-
-
-class Satellite:
-    """ Satellite consist of an object in an initial orbit that can be moved by servicers.
-    The class is initialized by giving the current object mass and orbit at time 0.
-    It is added to the Clients class taken as argument during initialization.
-
-    Args:
-        satellite_id (str): Standard id. Needs to be unique.
-        initial_mass (u.kg): Object mass at time 0.
-        insertion_orbit (poliastro.twobody.Orbit): Object orbit after insertion
-        operational_orbit (poliastro.twobody.Orbit): Object orbit after orbit raising
-        state (str): descriptor of the satellite state, used to identify different possible failures and states
-
-    Attributes:
-        ID (str): Standard id. Needs to be unique.
-        initial_mass (u.kg): Object mass at time 0.
-        volume (u.m^3): Volume of the satellite
-        initial_orbit (poliastro.twobody.Orbit): Initial orbit of the satellite
-        insertion_orbit (poliastro.twobody.Orbit): Object orbit after insertion
-        operational_orbit (poliastro.twobody.Orbit): Object orbit after orbit raising
-        current_orbit (poliastro.twobody.Orbit): Object orbit at current time.
-        current_mass (u.kg): Object mass at current time.
-        state (str): descriptor of the satellite state, used to identify different possible failures and states
-    """
-
-    def __init__(self, satellite_id, initial_mass, volume, insertion_orbit, operational_orbit, state, is_stackable=False):
-        self.ID = satellite_id
-        self.initial_mass = initial_mass
-        self.volume = volume
-        self.insertion_orbit = insertion_orbit
-        self.initial_orbit = insertion_orbit
-        #self.disposal_orbit = disposal_orbit
-        self.is_stackable = is_stackable
-        self.operational_orbit = operational_orbit
-        self.current_orbit = None
-        self.current_mass = initial_mass
-        self.state = state
-        self.mothership = None
-
-    def get_current_mass(self):
-        """ Get the current satellite mass.
-
-        Returns:
-            (u.kg): current mass
-        """
-        return self.current_mass
-
-    def get_volume(self):
-        """ Get the satellite volume.
-
-        Returns:
-             (u.m**3): volume
-        """
-        return self.volume
-
-    def get_initial_mass(self):
-        """ Get the initial satellite mass.
-
-        Returns:
-            (u.kg): initial mass
-        """
-        return self.initial_mass
-
-    def get_current_orbit(self):
-        """ Get the current orbit
-
-        Returns:
-            (poliastro.twobody.Orbit): current orbit
-        """
-        return self.current_orbit
-
-    def get_relative_raan_drift(self, duration, own_orbit=None, other_object_orbit=None):
-        """ Returns the relative raan drift between the target and an hypothetical servicer.
-            Used for planning purposes, to make sure phasing is feasible with current raan.
-
-        Args:
-            duration (u.<time unit>): duration after which to compute relative raan drift
-            own_orbit (poliastro.twobody.Orbit): orbit of the target,
-                                                 by default the target operational orbit
-            other_object_orbit (poliastro.twobody.Orbit): orbit of the other object,
-                                                          by default the target insertion orbit
-        Return:
-            (u.deg): relative raan drift after duration from current orbits
-        """
-        if not own_orbit:
-            own_orbit = self.operational_orbit
-        _, own_nodal_precession_speed = nodal_precession(own_orbit)
-        _, other_nodal_precession_speed = nodal_precession(other_object_orbit)
-        delta_nodal_precession_speed = own_nodal_precession_speed - other_nodal_precession_speed
-        return (delta_nodal_precession_speed * duration).decompose()
-
-    def reset(self):
-        """ Reset the current satellite orbit and mass to the parameters given during initialization.
-            This function is used to reset the state and orbits of the target after a simulation.
-        """
-        self.current_mass = self.initial_mass
-        self.current_orbit = self.initial_orbit
-        self.state = "standby"
-
-    def __str__(self):
-        return self.ID

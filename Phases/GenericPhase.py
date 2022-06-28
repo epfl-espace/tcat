@@ -1,4 +1,5 @@
 import copy
+from Commons.common import convert_time_for_print
 
 import Scenario.Fleet_module
 from Phases.Common_functions import *
@@ -92,7 +93,16 @@ class GenericPhase:
 
     def take_spacecraft_snapshot(self):
         """ Save current assigned servicer as a snapshot for future references and post-processing. """
+        # Remove plan from spacecraft before deepcopy
+        spacecraft = self.get_assigned_spacecraft()
+        spacecraft_plan = spacecraft.plan
+        delattr(spacecraft,'plan')
+
+        # Deepcopy the spacecraft
         self.spacecraft_snapshot = copy.deepcopy(self.get_assigned_spacecraft())
+
+        # But back the plan
+        spacecraft.plan = spacecraft_plan
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on operation labour.
@@ -120,12 +130,7 @@ class GenericPhase:
 
     def __str__(self):
         # format duration
-        if self.duration > 30. * u.day:
-            duration_print = self.duration.to(u.year)
-        elif self.duration > 1. * u.day:
-            duration_print = self.duration.to(u.day)
-        else:
-            duration_print = self.duration.to(u.minute)
+        duration_print = convert_time_for_print(self.duration)
         
         # build string
         return (str(self.ID)

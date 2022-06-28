@@ -40,16 +40,12 @@ class Capture(GenericPhase):
          Calls generic function to update orbit raan and epoch.
          """
         # assign capture object to the appropriate module
-        self.get_assigned_module().captured_object = self.captured_object
+        self.get_assigned_module().add_captured_spacecrafts(self.captured_object)
 
         # in case the architecture is mothership and current_kits, separate kit
-        if self.get_assigned_spacecraft().mothership:
-            # the mothership's orbit is updated (not just the kit's)
-            self.update_spacecraft(servicer=self.get_assigned_spacecraft().mothership)
-            # the kit is separated and updated
-            self.get_assigned_spacecraft().mothership.separate_kit(self.get_assigned_spacecraft())
-            self.update_spacecraft()
-            self.take_spacecraft_snapshot()
+        if self.target.mothership:
+            # the sat is separated and updated
+            self.get_assigned_spacecraft().add_spacecraft(self.target)
 
         # if not, then simply update the servicer
         self.update_spacecraft()
