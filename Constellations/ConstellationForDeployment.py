@@ -1,8 +1,8 @@
 """
 Created:        ?
 Last Revision:  23.05.2022
-Author:         ?,Emilien Mingard
-Description:    Constellation,Satellite Classes definitions
+Author:         Malo Goury
+Description:    Constellation class definitions
 """
 # Import Classes
 from Constellations.Constellation import *
