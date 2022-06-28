@@ -7,7 +7,7 @@ Description:    Parent class for the different implemented scenarios
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
-from Scenarios.Fleet import *
+from Scenarios.FleetConstellation import FleetConstellation
 from Scenarios.Plan import *
 from Constellations.Constellation import Constellation
 
@@ -132,7 +132,7 @@ class Scenario:
         """
         logging.info("Start executing...")
         try:
-            self.fleet.execute(clients=self.constellation,verbose=False)
+            self.fleet.execute(clients=self.constellation)
             logging.info("Finish executing...")
             self.execution_success = True
             return True
@@ -205,7 +205,7 @@ class Scenario:
 
         # Define fleet
         logging.info("Instanciate Fleet object...")
-        self.fleet = Fleet('UpperStages',self)
+        self.fleet = FleetConstellation('UpperStages',self)
 
         # Compute optimal order to release once spacecraft is known
         self.organise_satellites()
