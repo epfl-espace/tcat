@@ -17,15 +17,15 @@ class Spacecraft:
     """
     Init
     """
-    def __init__(self, spacecraft_id, dry_mass, volume=0., initial_orbit=None, insertion_orbit=None, operational_orbit=None, disposal_orbit=None):
+    def __init__(self, spacecraft_id, dry_mass, volume=0., insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
         self.id = spacecraft_id
+        self.state = state
 
         self.dry_mass = dry_mass
         self.initial_volume = volume
         self.current_volume = volume
 
         self.insertion_orbit = insertion_orbit
-        self.initial_orbit = initial_orbit
         self.operational_orbit = operational_orbit
         self.disposal_orbit = disposal_orbit
         self.current_orbit = None
@@ -115,14 +115,6 @@ class Spacecraft:
         """
         return self.current_orbit
 
-    def get_initial_orbit(self):
-        """ Get the initial orbit
-
-        Returns:
-            (poliastro.twobody.Orbit): initial orbit
-        """
-        return self.initial_orbit
-
     def get_insertion_orbit(self):
         """ Get the insertion orbit
 
@@ -161,7 +153,7 @@ class Spacecraft:
             (u.deg): relative raan drift after duration from current orbits
         """
         if not own_orbit:
-            own_orbit = self.get_initial_orbit()
+            own_orbit = self.get_insertion_orbit()
         _, own_nodal_precession_speed = nodal_precession(own_orbit)
         _, other_nodal_precession_speed = nodal_precession(other_object_orbit)
         delta_nodal_precession_speed = own_nodal_precession_speed - other_nodal_precession_speed
@@ -171,7 +163,6 @@ class Spacecraft:
         """ Reset the current satellite orbit and mass to the parameters given during initialization.
             This function is used to reset the state and orbits of the target after a simulation.
         """
-        self.current_orbit = self.initial_orbit
         self.state = "standby"
 
     def __str__(self):
