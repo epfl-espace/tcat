@@ -195,6 +195,11 @@ class Scenario:
             self.satellites.plot_distribution(save="2D_plot", save_folder=self.data_path)
             logging.info("Finish plotting Clients...")
 
+    def create_constellation(self):
+        """ Virtual method
+        """
+        raise NotImplementedError()
+
     def define_fleet(self):
         """ Define fleet object.
         """
