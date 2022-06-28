@@ -7,45 +7,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TCAT - {% block title %}{% endblock %}</title>
 
-    <link rel="stylesheet" href="{{url_for('static',filename='css/main.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}">
 </head>
 <body id="body" class="bg-white dark:bg-gray-800">
-    <div class="fixed hidden inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="modal">
-        <div class="w-full h-full flex justify-center items-center">
-            <div class="flex flex-col w-1/4 h-1/4 bg-white dark:bg-gray-800 rounded p-4 lg:p-8 gap-4 lg:gap-8">
-                <div id="modal-title" class="flex-grow text-black dark:text-gray-300 text-xl lg:text3xl font-semibold lg:font-bold">
-                    Title
-                </div>
-                <div id="modal-content" class="flex-grow text-black dark:text-gray-300 break-words">
+<div class="fixed hidden inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="modal">
+    <div class="w-full h-full flex justify-center items-center">
+        <div class="flex flex-col w-1/4 h-1/4 bg-white dark:bg-gray-800 rounded p-4 lg:p-8 gap-4 lg:gap-8">
+            <div id="modal-title"
+                 class="flex-grow text-black dark:text-gray-300 text-xl lg:text3xl font-semibold lg:font-bold">
+                Title
+            </div>
+            <div id="modal-content" class="flex-grow text-black dark:text-gray-300 break-words">
 
-                </div>
-                <div class="flex flex-row justify-end gap-4 lg:gap-8">
-                    <button id="modal-cancel" type="button" class="flex-grow md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold">Cancel</button>
-                    <button id="modal-confirm" type="button" class="flex-grow md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold">Confirm</button>
-                </div>
+            </div>
+            <div class="flex flex-row justify-end gap-4 lg:gap-8">
+                <button id="modal-cancel" type="button"
+                        class="flex-grow md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold">
+                    Cancel
+                </button>
+                <button id="modal-confirm" type="button"
+                        class="flex-grow md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold">
+                    Confirm
+                </button>
             </div>
         </div>
     </div>
-    <div class="flex flex-col min-h-screen md:w-full lg:w-4/5 mx-auto">
-        <header>
-            {{ n.navigation() }}
-        </header>
-        <main id="content" class="flex-1 py-6 md:py-12 lg:py-16 px-4 md:px-6 lg:px-8 max-w-5x1 mx-auto w-full">{% block content %}{% endblock %}</main>
-        <div id="messages" class="max-h-56 overflow-auto">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
+</div>
+<div class="flex flex-col min-h-screen md:w-full lg:w-4/5 mx-auto">
+    <header>
+        {{ n.navigation() }}
+    </header>
+    <main id="content" class="flex-1 py-6 md:py-12 lg:py-16 px-4 md:px-6 lg:px-8 max-w-5x1 mx-auto w-full">
+        {% block content %}{% endblock %}</main>
+    <div id="messages" class="max-h-56 overflow-auto">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
                 <div class="flashes flex flex-col m-4">
-                {% for category, message in messages %}
-                    {% set bg = 'bg-green-400 dark:bg-green-800' if category == 'success' else 'bg-red-400 dark:bg-red-800' %}
-                  <div class="flex-grow-0 p-4 rounded-lg text-black dark:text-gray-300 mt-2 mb-2 {{ bg }}">{{ message }}</div>
-                {% endfor %}
+                    {% for category, message in messages %}
+                        {% set bg = 'bg-green-400 dark:bg-green-800' if category == 'success' else 'bg-red-400 dark:bg-red-800' %}
+                        <div class="flex-grow-0 p-4 rounded-lg text-black dark:text-gray-300 mt-2 mb-2 {{ bg }}">{{ message }}</div>
+                    {% endfor %}
                 </div>
-              {% endif %}
-            {% endwith %}
-        </div>
-        {{ f.footer() }}
+            {% endif %}
+        {% endwith %}
     </div>
-    <script src="{{url_for('static',filename='js/script.js')}}"></script>
-    {% block script %}{% endblock %}
+    {{ f.footer() }}
+</div>
+<script src="{{ url_for('static',filename='js/script.js') }}"></script>
+{% block script %}{% endblock %}
 </body>
 </html>
