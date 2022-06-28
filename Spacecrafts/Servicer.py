@@ -24,7 +24,7 @@ class Servicer(ActiveSpacecraft):
     """
     def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.2):
         # Init ActiveSpacecraft
-        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
+        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
 
     """
     Methods
@@ -110,7 +110,7 @@ class Servicer(ActiveSpacecraft):
                                                self.insertion_orbit.a - insertion_a_margin,
                                                self.insertion_orbit.ecc,
                                                self.insertion_orbit.inc,
-                                               first_target.insertion_orbit.raan,
+                                               self.insertion_orbit.raan,
                                                self.insertion_orbit.argp,
                                                self.insertion_orbit.nu,
                                                self.insertion_orbit.epoch)
@@ -127,7 +127,7 @@ class Servicer(ActiveSpacecraft):
         # Add Raising phase to plan
         raising = OrbitChange(f"({self.get_id()}) goes to first target orbit ({first_target.get_id()})",
                               self.plan,
-                              first_target.insertion_orbit,
+                              first_target.operational_orbit,
                               raan_specified=True,
                               initial_orbit=insertion_orbit,
                               raan_cutoff=raan_cutoff,
@@ -141,7 +141,7 @@ class Servicer(ActiveSpacecraft):
         # Step 3: Iterate through organised assigned targets
         ##########
         # Initialise current orbit object
-        current_orbit = first_target.insertion_orbit
+        current_orbit = first_target.operational_orbit
 
         # Loop over assigned targets
         for i, current_target in enumerate(self.ordered_target_spacecraft):
@@ -149,9 +149,9 @@ class Servicer(ActiveSpacecraft):
             #print(i,current_target,current_target.insertion_orbit,current_target.current_orbit)
 
             # Check for RAAN drift
-            if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
+            if abs(current_target.operational_orbit.raan - current_orbit.raan) > insertion_raan_window:
                 # TODO Compute ideal phasing orgit
-                phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
+                phasing_orbit = copy.deepcopy(current_target.operational_orbit)
                 phasing_orbit.inc += self.compute_delta_inclination_for_raan_phasing()
 
                 # Reach phasing orbit and add to plan
@@ -180,7 +180,7 @@ class Servicer(ActiveSpacecraft):
             # Step 3.1: Capture the satellite
             ##########
             # Capture the satellite
-            capture = Capture.__init__(f"Satellites ({current_target.get_id()}) captured", 
+            capture = Capture(f"Satellites ({current_target.get_id()}) captured", 
                                          self.plan,
                                          current_target,
                                          duration=20 * u.min)

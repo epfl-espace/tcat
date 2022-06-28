@@ -1,9 +1,7 @@
 from astropy import units as u
 
-import Scenario.Fleet_module
 from Phases.GenericPhase import GenericPhase
 from Modules.CaptureModule import *
-
 
 class Capture(GenericPhase):
     """A Phase that represents capture and links an object given in argument to the servicer for subsequent phases.
@@ -43,9 +41,9 @@ class Capture(GenericPhase):
         self.get_assigned_module().add_captured_spacecrafts(self.captured_object)
 
         # in case the architecture is mothership and current_kits, separate kit
-        if self.target.mothership:
+        if self.captured_object.mothership:
             # the sat is separated and updated
-            self.get_assigned_spacecraft().add_spacecraft(self.target)
+            self.get_assigned_spacecraft().add_spacecraft(self.captured_object)
 
         # if not, then simply update the servicer
         self.update_spacecraft()

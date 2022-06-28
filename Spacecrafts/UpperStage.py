@@ -26,13 +26,10 @@ class UpperStage(ActiveSpacecraft):
     """
     def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
-
-        # Keep a satellite as reference
-        self.reference_satellite = scenario.reference_satellite
 
         # Set mass, volumes and filling ratio
         self.volume_available = None

@@ -13,7 +13,8 @@ from Scenarios.FleetADR import FleetADR
 class ScenarioADR(Scenario):
     def __init__(self, scenario_id, json):
         self.general_fields.extend(['sats_reliability',
-                                    'seed_random_sats_failure'])
+                                    'seed_random_sats_failure',
+                                    'architecture'])
         self.scalable_field.extend([('apogee_sats_operational', u.km),
                                     ('perigee_sats_operational', u.km), 
                                     ('inc_sats_operational', u.deg),

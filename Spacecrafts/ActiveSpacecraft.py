@@ -5,6 +5,7 @@ Author:         Malo Goury
 Description:    Parent class for all active spacecrafts
 """
 # Import class
+from numpy import isin
 from Spacecrafts.Spacecraft import Spacecraft
 from Scenarios.Plan import Plan
 from Modules.PropulsionModule import PropulsionModule
@@ -26,7 +27,7 @@ class ActiveSpacecraft(Spacecraft):
     """
     Init
     """
-    def __init__(self,id,group,dry_mass,mass_contingency,starting_epoch,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+    def __init__(self,id,group,dry_mass,mass_contingency,scenario,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
         super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
@@ -35,6 +36,9 @@ class ActiveSpacecraft(Spacecraft):
         self.modules = dict()
         self.main_propulsion_module = None
         self.capture_module = None
+        
+        # Keep a satellite as reference
+        self.reference_satellite = scenario.reference_satellite
 
         # Spacecraft dict and ordered list
         self.initial_spacecraft = dict()
@@ -47,7 +51,7 @@ class ActiveSpacecraft(Spacecraft):
         self.initial_orbit = initial_orbit
 
         # Instanciate Plan
-        self.plan = Plan(f"Plan_{self.id}",starting_epoch)
+        self.plan = Plan(f"Plan_{self.id}",scenario.starting_epoch)
 
     """
     Methods
@@ -74,7 +78,9 @@ class ActiveSpacecraft(Spacecraft):
         Args:
             targets_assigned_to_servicer:
         """
-        # TODO: check if can be put into scenario
+        if not isinstance(spacecraft_to_assign,list):
+            spacecraft_to_assign = [spacecraft_to_assign]
+
         for target in spacecraft_to_assign:
             if target in self.current_spacecraft:
                 warnings.warn('Satellite ', target.get_id(), ' already in Servicer ', self.id, '.', UserWarning)

@@ -76,6 +76,7 @@ class Scenario:
         self.launcher_disposal_orbit = None
 
         self.create_attributes_from_input_json(json)
+        self.launcher_name = self.launcher
 
         # Instanciate epoch
         self.starting_epoch = Time(self.starting_epoch, scale="tdb")
