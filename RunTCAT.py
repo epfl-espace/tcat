@@ -16,11 +16,34 @@ from json import load as load_json
 import os
 warnings.filterwarnings("ignore")
 
+# user defines
+PRINT_IN_FILES = True #DEBUG: Toggling bool for console printing: True = Print in file | False = print in console
+
 # Access system output and error
 original_stdout = sys.stdout  # Save a reference to the original standard output
 original_stderr = sys.stderr  # Save a reference to the original standard error
+# Output files
 result = None
 log = None
+
+"""
+Methods definition
+"""
+
+def main():
+    """ main function of the script to run TCAT Scenario
+    """
+    json = open_input_json()
+    if(json is None): exit() 
+
+    results_dir_path = json["data_path"]
+    create_results_dir(results_dir_path)
+
+    set_sys_std_dir(PRINT_IN_FILES,results_dir_path)
+    
+    create_and_run_scenario(json,"test_from_file")    
+
+    reset_sys_std_dir()
 
 def open_input_json():
     ''' Opens and return the json file specified in sys.argv[1].
@@ -119,19 +142,10 @@ def reset_sys_std_dir():
     sys.stdout = original_stdout  # Reset the standard output to its original value
     sys.stderr = original_stderr  # Reset the standard error to its original value
 
+"""
+Main script
+"""
+
 if __name__ == "__main__":
-    # DEBUG: Toggling bool for console printing: True = Print in file | False = print in console
-    print_to_files = True
-
-    json = open_input_json()
-    if(json is None): exit() 
-
-    results_dir_path = json["data_path"]
-    create_results_dir(results_dir_path)
-
-    set_sys_std_dir(print_to_files,results_dir_path)
-
-    sim_message = create_and_run_scenario(json,"test_from_file")    
-
-    reset_sys_std_dir()
+    main()
 
