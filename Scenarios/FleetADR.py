@@ -12,6 +12,7 @@ from Spacecrafts.UpperStage import UpperStage
 
 # Import libraries
 import warnings
+import copy
 
 class FleetADR(Fleet):
     """ A Fleet consists of a dictionary of servicers.
@@ -43,34 +44,47 @@ class FleetADR(Fleet):
         unassigned_satellites = clients.get_optimized_ordered_satellites()
 
         # Spacecraft launcher counter
-        spacecraft_count = 0
+        upperstage_count = 0
+        servicer_count = 0
+
+        # Servicer list
+        servicer_assigned_to_launcher = []
 
         # Strategy depend on architecture
         if self.scenario.architecture == "single_picker":
+            # Create UpperStage
+            upperstage_count += 1
+            upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario,mass_contingency=0.0)
+
             for unassigned_satellite in unassigned_satellites:
                 # Create Servicer and compute servicer plan
-                servicer = Servicer(f"Servicer_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
+                servicer_count += 1
+                servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,mass_contingency=0.0)
                 servicer.execute(unassigned_satellite)
 
-                # Create UpperStage
-                spacecraft_count += 1
-                upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
-                upperstage.execute(servicer,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
+                temporary_servicer_list = copy.deepcopy(servicer_assigned_to_launcher)
+                temporary_servicer_list.append(servicer)
+                upperstage.execute(temporary_servicer_list,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
+                upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
+
+                if upperstage_main_propulsion_module.get_current_prop_mass() > 0:
+                    servicer_assigned_to_launcher.append(servicer)
+                else:
+                    upperstage.execute(servicer_assigned_to_launcher,constellation_precession=0,custom_sat_allowance=1)
+                    self.add_upperstage(servicer)
+
+                    upperstage_count += 1
+                    upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario,mass_contingency=0.0)
+                    servicer_assigned_to_launcher = [servicer]
 
                 # Add converged UpperStage
                 self.add_servicer(servicer)
-
-                # Add converged UpperStage
-                self.add_upperstage(upperstage)
                 
                 # Remove latest assigned satellites
                 clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
                 
                 # Check remaining satellites to be assigned
                 unassigned_satellites = clients.get_optimized_ordered_satellites()
-
-                # Update execution counter
-                execution_count += 1
             
         elif self.scenario.architecture == "multi_picker":
             raise Exception('multi_picker option not available')
