@@ -454,8 +454,8 @@ class Fleet:
     def print_report(self):
         """ Print a quick summary of fleet information for debugging purposes.
         """
-        for _, upperstage in self.upperstages.items():
-            upperstage.print_report()
+        for _, activecpacecraft in self.activespacecrafts.items():
+            activecpacecraft.print_report()
 
     def print_KPI(self):
         """ Print KPI related to the fleet"""
