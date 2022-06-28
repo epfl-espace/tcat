@@ -44,7 +44,7 @@ class Fleet:
     """
     Methods
     """
-    def execute(self,clients,verbose=False):
+    def execute(self):
         """ This function calls all appropriate methods to design the fleet to perform a particular plan.
 
         Args:
@@ -237,40 +237,6 @@ class Fleet:
             servicers_id_list.append(servicer.ID)
             launch_mass_list.append(servicer.get_wet_mass(contingency=True))
         return launch_mass_list, servicers_id_list
-
-    def get_servicer_groups(self):
-        """ Return list of servicer_group names present in the fleet.
-
-        Return:
-            ([str]): list of string identifier for each servicer_group found in the fleet
-        """
-        groups = []
-        for _, servicer in self.servicers.items():
-            if servicer.group not in groups:
-                groups.append(servicer.group)
-        return groups
-
-    def get_launchers_from_group(self, upperstage_group):
-        """ Return servicers from the fleet that share a servicer_group.
-
-        Arg:
-            servicer_group (str): string identifier for every group in the fleet (group types: servicer, tanker, etc.)
-
-        Return:
-            (dict(Servicer)): Dictionary of servicers of the given group
-        """
-        return {upperstage_id: upperstage for upperstage_id, upperstage in self.upperstages.items() if upperstage.group == upperstage_group}
-
-    def get_servicers_from_group(self, servicer_group):
-        """ Return servicers from the fleet that share a servicer_group.
-
-        Arg:
-            servicer_group (str): string identifier for every group in the fleet (group types: servicer, tanker, etc.)
-
-        Return:
-            (dict(Servicer)): Dictionary of servicers of the given group
-        """
-        return {servicer_id: servicer for servicer_id, servicer in self.servicers.items() if servicer.group == servicer_group}
 
     def get_mass_summary(self, rm_duplicates=False):
         """ Returns information in a convenient way for plotting purposes. 
