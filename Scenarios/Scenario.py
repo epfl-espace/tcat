@@ -9,6 +9,7 @@ Description:    Parent class for the different implemented scenarios
 from Spacecrafts.Satellite import Satellite
 from Scenarios.Fleet import *
 from Scenarios.Plan import *
+from Constellations.Constellation import Constellation
 
 # Import Libraries
 from json import load as load_json
