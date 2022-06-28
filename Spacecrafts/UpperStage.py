@@ -53,7 +53,7 @@ class UpperStage(ActiveSpacecraft):
     """
     Methods
     """
-    def execute_with_fuel_usage_optimisation(self,clients):
+    def execute_with_fuel_usage_optimisation(self,satellites,constellation_precession=0):
         # check default cases
         if self.main_propulsion_module.get_current_prop_mass() < 0.:
             logging.info(f"Remaining fuel is negative, remove a satellite")
@@ -80,7 +80,7 @@ class UpperStage(ActiveSpacecraft):
 
             # compute remaining fuel for new inclination change
             self.ratio_inc_raan_from_opti = (delta_inc_up+delta_inc_low)/2
-            self.execute(clients,self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession,custom_sat_allowance=self.satellites_allowance)
 
             # define new inclination's range
             if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
@@ -96,11 +96,11 @@ class UpperStage(ActiveSpacecraft):
         # ensure remaining fuel is positive
         if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
             self.ratio_inc_raan_from_opti = delta_inc_low
-            self.execute(clients,self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession,custom_sat_allowance=self.satellites_allowance)
 
         return converged
 
-    def execute(self,clients,custom_sat_allowance):
+    def execute(self,satellites,constellation_precession=0,custom_sat_allowance=1):
         """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
 
         Args:
@@ -114,10 +114,10 @@ class UpperStage(ActiveSpacecraft):
         self.design(custom_sat_allowance=custom_sat_allowance)
 
         # Assign target as per mass and volume allowance
-        self.assign_ordered_satellites(clients)
+        self.assign_ordered_satellites(satellites)
 
         # Define spacecraft mission profile
-        self.define_mission_profile(clients.get_global_precession_rotation())
+        self.define_mission_profile(constellation_precession)
 
         # Execute upperstage (Apply owned plan)
         self.execute_plan()
@@ -171,17 +171,17 @@ class UpperStage(ActiveSpacecraft):
                                           mass_contingency=UPPERSTAGE_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
 
-    def assign_ordered_satellites(self,clients):
+    def assign_ordered_satellites(self,satellites):
         """ Assigned remaining ordered satellites to current launcher within allowance
 
         Args:
             clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
         """
-        # Remaining satellite to be delivered
-        available_satellites = clients.get_optimized_ordered_satellites()
-
-        # Assign sats
-        self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
+        if isinstance(satellites,list):
+            # Assign sats
+            self.assign_spacecraft(satellites[0:self.satellites_allowance])
+        else:
+            self.assign_spacecraft(satellites)
 
     def compute_upperstage(self,scenario):
         """ Compute upperstage initial capacities
