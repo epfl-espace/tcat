@@ -4,8 +4,8 @@ const html = document.querySelector('html');
 const btn = document.querySelector('button.mobile-menu-button');
 const menu = document.querySelector('.mobile-menu');
 const toggleDarkMode = document.querySelector('#toggle-dark-mode');
-const modal = document.querySelector('#modal');
-const modalCancel = document.querySelector('#modal-cancel');
+
+const modalToggle = document.querySelector('#modal-toggle');
 const modalConfirm = document.querySelector('#modal-confirm');
 const modalContent = document.querySelector('#modal-content');
 const modalTitle = document.querySelector('#modal-title');
@@ -24,10 +24,6 @@ if(toggleDarkMode) {
 	});
 }
 
-if(modalCancel) {
-	modalCancel.addEventListener('click', hideModal);
-}
-
 if(modalConfirm) {
 	modalConfirm.addEventListener('click', (e) => {
 		hideModal();
@@ -39,11 +35,11 @@ function openModal(title, content, callback) {
 	if(modalTitle) modalTitle.innerHTML = title;
 	if(modalContent) modalContent.innerHTML = content;
 	modalConfirmationCallback = callback;
-	modal.style.display = 'block';
+	modalToggle.checked = true;
 }
 
 function hideModal() {
-	modal.style.display = 'none';
+	modalToggle.checked = false;
 }
 
 function isDarkMode() {

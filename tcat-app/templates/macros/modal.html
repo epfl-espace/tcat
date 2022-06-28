@@ -1,0 +1,15 @@
+{% macro modal() -%}
+    <div>
+        <input type="checkbox" id="modal-toggle" class="modal-toggle"/>
+        <div class="modal">
+            <div class="modal-box">
+                <h3 id="modal-title" class="font-bold text-lg"></h3>
+                <p id="modal-content" class="py-4"></p>
+                <div class="modal-action">
+                    <label for="modal-toggle" class="btn">Close</label>
+                    <button id="modal-confirm" class="btn btn-active btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
