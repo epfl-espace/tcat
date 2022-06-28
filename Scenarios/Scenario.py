@@ -2,18 +2,14 @@
 Created:        28.06.2022
 Last Revision:  28.06.2022
 Author:         Emilien Mingard
-Description:    Parent class for the different implemented scenarios
+Description:    ABSTRACT CLASS - DO NOT USE
+                Parent class for the different implemented scenarios
 """
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
-from Scenarios.FleetConstellation import FleetConstellation
 from Scenarios.Plan import *
 from Constellations.Constellation import Constellation
-
-# Import Libraries
-from json import load as load_json
-import copy
 
 # Set logging
 logging.getLogger('numba').setLevel(logging.WARNING)
@@ -47,9 +43,6 @@ class Scenario:
                       ('fairing_diameter', u.m),
                       ('fairing_cylinder_height', u.m),
                       ('fairing_total_height', u.m),
-                      ('apogee_sats_insertion', u.km),
-                      ('perigee_sats_insertion', u.km), 
-                      ('inc_sats_insertion', u.deg),
                       ('apogee_launcher_insertion', u.km),
                       ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
@@ -77,7 +70,23 @@ class Scenario:
         self.sat_insertion_orbit = None
         self.sat_operational_orbit = None
         self.sat_disposal_orbit = None
+        self.sat_default_orbit = None
 
+        self.launcher_insertion_orbit = None
+        self.launcher_disposal_orbit = None
+
+        self.create_attributes_from_input_json(json)
+
+        # Instanciate epoch
+        self.starting_epoch = Time(self.starting_epoch, scale="tdb")
+
+        # Enabling logging. Set level >21 to display INFO only
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+    """
+    Methods
+    """
+    def create_attributes_from_input_json(self,json):
         # Look through general_fields
         for field in self.general_fields:
             # Check if field in file
@@ -95,15 +104,6 @@ class Scenario:
                 else:
                     setattr(self, field, json[field] * unit)
 
-        # Instanciate epoch
-        self.starting_epoch = Time(self.starting_epoch, scale="tdb")
-
-        # Enabling logging. Set level >21 to display INFO only
-        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-
-    """
-    Methods
-    """
     def setup(self,existing_constellation=None):
         """ Create the clients, fleet and plan based on json inputs files (Provided through Class attributs).
             Off the capability of re-using pre-set constellation in case multiple scenario are used. The existing client can be
@@ -148,11 +148,6 @@ class Scenario:
         logging.info("Gathering satellite orbits...")
         self.define_constellation_orbits()
 
-        # Check if satellites volume is known, otherwise an estimate is provided
-        if float(self.sat_volume.value) == 0:
-            logging.info("Estimating satellite volume...")
-            self.estimate_satellite_volume()
-
         # Define a reference satellite
         logging.info("Generating the reference satellite...")
         self.reference_satellite = Satellite('Reference_' + self.constellation_name + '_satellite',
@@ -162,6 +157,7 @@ class Scenario:
                                              operational_orbit=self.sat_operational_orbit,
                                              disposal_orbit=self.sat_disposal_orbit,
                                              state='standby',
+                                             default_orbit=self.sat_default_orbit,
                                              is_stackable=False)
 
         # Instanciate ConstellationSatellites object
@@ -178,7 +174,7 @@ class Scenario:
 
         # Log satellites distribution
         for _, satellite in self.constellation.satellites.items():
-            logging.info(f"Sat {satellite.get_id()} has {satellite.insertion_orbit}, {satellite.insertion_orbit.raan} RAAN, {satellite.insertion_orbit.nu} nu orbit")
+            logging.info(f"Sat {satellite.get_id()} has {satellite.get_default_orbit()}, {satellite.get_default_orbit().raan} RAAN, {satellite.get_default_orbit().nu} nu orbit")
 
         # Plot if verbose
         if self.verbose:
@@ -195,17 +191,11 @@ class Scenario:
 
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
-        self.define_upperstages_orbits()
-
-        # Define launch vehicle based on specified launcher
-        if self.custom_launcher_name is None:
-            self.launcher_name = self.launcher
-        else:
-            self.launcher_name = self.custom_launcher_name
+        self.define_fleet_orbits()
 
         # Define fleet
         logging.info("Instanciate Fleet object...")
-        self.fleet = FleetConstellation('UpperStages',self)
+        self.create_fleet()
 
         # Compute optimal order to release once spacecraft is known
         self.organise_satellites()
@@ -213,20 +203,13 @@ class Scenario:
     def define_constellation_orbits(self):
         """ Define orbits needed for constellation and satellites definition.
         """
-        # Satellites insertion orbit
-        a_sats_insertion_orbit = (self.apogee_sats_insertion + self.perigee_sats_insertion)/2 + Earth.R
-        e_sats_insertion_orbit = ((self.apogee_sats_insertion + Earth.R)/a_sats_insertion_orbit - 1)*u.one
-        self.sat_insertion_orbit = Orbit.from_classical(Earth,
-                                                        a_sats_insertion_orbit,
-                                                        e_sats_insertion_orbit,
-                                                        self.inc_sats_insertion,
-                                                        0. * u.deg,
-                                                        90. * u.deg,
-                                                        0. * u.deg,
-                                                        self.starting_epoch)
+        raise NotImplementedError()
 
-        self.sat_operational_orbit = None
-        self.sat_disposal_orbit = None
+    def define_fleet_orbits(self):
+        self.define_upperstages_orbits()
+
+    def create_fleet(self):
+        raise NotImplementedError()
 
     def define_upperstages_orbits(self):
         """ Define orbits needed for upperstages definition.
@@ -263,15 +246,15 @@ class Scenario:
 
         # Extract launcher and satellite precession speeds
         targets_J2_speed = nodal_precession(self.launcher_insertion_orbit)[1]
-        launchers_J2_speed = nodal_precession(self.sat_insertion_orbit)[1]
+        launchers_J2_speed = nodal_precession(self.sat_default_orbit)[1]
 
         # Compute precession direction based on knowledge from Launcher and Servicers
         relative_precession_direction = np.sign(launchers_J2_speed-targets_J2_speed)
 
         # Order targets by their current raan following precession direction, then by true anomaly
         ordered_satellites_id = sorted(self.constellation.get_standby_satellites(), key=lambda satellite_id: (relative_precession_direction *
-                                    self.constellation.get_standby_satellites()[satellite_id].get_insertion_orbit().raan.value,
-                                    self.constellation.get_standby_satellites()[satellite_id].get_insertion_orbit().nu.value))
+                                    self.constellation.get_standby_satellites()[satellite_id].get_default_orbit().raan.value,
+                                    self.constellation.get_standby_satellites()[satellite_id].get_default_orbit().nu.value))
 
         logging.info("Computing 'optimal' deployement sequence ...")
         # For each launcher, find optimal sequence of targets' deployment
@@ -298,10 +281,10 @@ class Scenario:
             # Iterate through sequence's satellites
             for j in range(1, len(satellite_id_list)):
                 # Extract initial target RAAN
-                initial_RAAN = self.constellation.satellites[satellite_id_list[j]].insertion_orbit.raan
+                initial_RAAN = self.constellation.satellites[satellite_id_list[j]].get_default_orbit().raan
 
                 # Extract next target RAAN
-                final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].insertion_orbit.raan
+                final_RAAN = self.constellation.satellites[satellite_id_list[j-1]].get_default_orbit().raan
 
                 # Check for opposite precession movement (Has a larger cost)
                 delta_RAAN = final_RAAN-initial_RAAN
@@ -317,7 +300,7 @@ class Scenario:
             criteria_raan_spread.append(abs(sequence_raan_spread.value))
 
             # Compute sum of altitudes of all targets, this is used to prioritize sequences with lower targets
-            satellites_altitude = sum([self.constellation.satellites[sat_id].get_insertion_orbit().a.to(u.km).value for sat_id in satellite_id_list])
+            satellites_altitude = sum([self.constellation.satellites[sat_id].get_default_orbit().a.to(u.km).value for sat_id in satellite_id_list])
             criteria_altitude.append(satellites_altitude)
 
         # Find ideal sequence by merging RAAN and altitude in a table
