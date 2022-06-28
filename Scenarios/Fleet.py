@@ -454,8 +454,6 @@ class Fleet:
     def print_report(self):
         """ Print a quick summary of fleet information for debugging purposes.
         """
-        for _, servicer in self.servicers.items():
-            servicer.print_report()
         for _, upperstage in self.upperstages.items():
             upperstage.print_report()
 
