@@ -1,0 +1,32 @@
+{% macro navigation() -%}
+    {% set nav_items = [('/overview', 'Overview'), ('/configure','Configuration'),('/status','Status')] %}
+    <nav class="navbar bg-blue-900 dark:bg-gray-900 font-sans text-white dark:text-gray-300 rounded-b-lg">
+        <div class="flex-1">
+            <a class="btn btn-link normal-case text-white dark:text-gray-300 text-xl md:text-xl lg:text-3xl"
+               href="/index">TCAT App</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal p-0">
+                <li>
+                    <a class="btn btn-link" href="/overview">Overview</a>
+                </li>
+                <li>
+                    <a class="btn btn-link">
+                        Configure
+                    </a>
+                    <ul class="p-2 bg-blue-700 dark:bg-gray-600">
+                        <li><a class="btn btn-link" href="/configure_constellation_deployment">Constellation
+                            Deployment</a></li>
+                        <li><a class="btn btn-link" href="/configure_adr">ADR</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/status">Status</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+{%- endmacro %}
