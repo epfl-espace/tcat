@@ -6,7 +6,7 @@ Description:    Constellation dedicated Scenario Class definition
 """
 
 # Import Class
-from Constellation.Constellation import Constellation
+from Constellations.Constellation import Constellation
 from Spacecrafts.Satellite import Satellite
 from Scenario.Fleet_module import *
 from Scenario.Plan_module import *
