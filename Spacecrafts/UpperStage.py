@@ -8,7 +8,7 @@ from Modules.PropulsionModule import PropulsionModule
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
-from Scenario.Interpolation import get_launcher_fairing, get_launcher_performance
+from Commons.Interpolation import get_launcher_fairing, get_launcher_performance
 from Scenario.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u

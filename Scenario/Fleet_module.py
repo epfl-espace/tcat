@@ -6,7 +6,7 @@ Description:    Fleet,Spacecraft,Servicer and UpperStage Classes definition
 """
 
 # Import Classes
-from Scenario.Interpolation import get_launcher_performance, get_launcher_fairing
+from Commons.Interpolation import get_launcher_performance, get_launcher_fairing
 from Scenario.ScenarioParameters import *
 from Scenario.Plan_module import *
 from Spacecrafts.UpperStage import UpperStage
