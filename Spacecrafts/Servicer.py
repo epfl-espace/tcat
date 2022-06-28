@@ -24,22 +24,41 @@ class Servicer(ActiveSpacecraft):
     """
     def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.2):
         # Init ActiveSpacecraft
-        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
 
     """
     Methods
     """
-    def assign_ordered_satellites(self,clients,targetperservicers=1):
+    def assign_ordered_satellites(self,satellites):
         """ Assigned remaining ordered satellites to current servicer
 
         Args:
             clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
         """
-        # Remaining satellite to be delivered
-        available_satellites = clients.get_optimized_ordered_satellites()
-
         # Assign sats
-        self.assign_spacecraft(available_satellites[0:targetperservicers])
+        self.assign_spacecraft(satellites)
+
+    def execute(self,satellites):
+        """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
+
+        Args:
+            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
+            upperstage_cur_sat_allowance: allowance to assign to the launcher (for iterative purpose)
+        """
+        # Perform initial setup (mass and volume available)
+        self.reset()
+
+        # Compute servicer modules
+        self.design()
+
+        # Assign target as per mass and volume allowance
+        self.assign_ordered_satellites(satellites)
+
+        # Define spacecraft mission profile
+        self.define_mission_profile()
+
+        # Execute upperstage (Apply owned plan)
+        self.execute_plan()
 
     def design(self):
         """ Design the servicer
@@ -61,7 +80,7 @@ class Servicer(ActiveSpacecraft):
                                           mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
 
-    def define_mission_profile(self,precession_direction):
+    def define_mission_profile(self):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
@@ -91,7 +110,7 @@ class Servicer(ActiveSpacecraft):
                                                self.insertion_orbit.a - insertion_a_margin,
                                                self.insertion_orbit.ecc,
                                                self.insertion_orbit.inc,
-                                               first_target.insertion_orbit.raan - precession_direction * insertion_raan_margin,
+                                               first_target.insertion_orbit.raan,
                                                self.insertion_orbit.argp,
                                                self.insertion_orbit.nu,
                                                self.insertion_orbit.epoch)
