@@ -272,16 +272,7 @@ def result_stream(config_run_id):
     return app.response_class(generate(config_run_id, RESULT_FILENAME), mimetype='text/plain')
 
 
-@app.route('/configure-adr', methods=['GET', 'POST'])
-@oidc.require_login
-def configure_adr():
-    current_user_email = get_user_info()
-    return render_template('configure_adr.html')
-
-
-@app.route('/configure-constellation-deployment', methods=['GET', 'POST'])
-@oidc.require_login
-def configure_constellation_deployment():
+def configure(current_scenario, template, params):
     current_user_email = get_user_info()
     last_configuration = None
     last_run_for_configuration = None
@@ -289,7 +280,9 @@ def configure_constellation_deployment():
 
     if request.method == 'POST':
         uploaded_configuration = dict(request.form)
-        validation = valid_configuration(uploaded_configuration, inputparams.constellation_mission_params)
+        validation = valid_configuration(uploaded_configuration, params)
+
+        uploaded_configuration['scenario'] = current_scenario
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
@@ -298,21 +291,32 @@ def configure_constellation_deployment():
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
+        last_config_item = Configuration.query.filter(and_(Configuration.creator_email==current_user_email, Configuration.scenario==current_scenario)).order_by(
             desc(Configuration.created_date)).first()
         if last_config_item is not None:
             last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
             last_configuration = json.loads(last_config_item.configuration)
 
-    return render_template('configure_constellation_deployment.html', last_configuration=last_configuration,
+    return render_template(template, last_configuration=last_configuration,
                            last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
+
+
+@app.route('/configure-adr', methods=['GET', 'POST'])
+@oidc.require_login
+def configure_adr():
+    return configure('adr', 'configure_adr.html', inputparams.adr_mission_params)
+
+
+@app.route('/configure-constellation-deployment', methods=['GET', 'POST'])
+@oidc.require_login
+def configure_constellation_deployment():
+    return configure('constellation_deployment', 'configure_constellation_deployment.html', inputparams.constellation_mission_params)
 
 
 def store_configuration(conf, current_user_email):
     configuration = Configuration(creator_email=current_user_email)
-    scenario_id = str(uuid.uuid4())
-    conf['scenario_id'] = scenario_id
-    configuration.scenario_id = scenario_id
+    configuration.scenario_id = str(uuid.uuid4())
+    configuration.scenario = conf['scenario']
     configuration.scenario_name = conf['constellation_name']
     configuration.configuration = json.dumps(conf)
     db.session.add(configuration)
