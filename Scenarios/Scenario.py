@@ -6,7 +6,6 @@ Description:    Parent class for the different implemented scenarios
 """
 
 # Import Class
-from Constellations.Constellation import Constellation
 from Spacecrafts.Satellite import Satellite
 from Scenarios.Fleet_module import *
 from Scenarios.Plan_module import *
@@ -69,6 +68,7 @@ class Scenario:
         self.clients = None
         self.fleet = None
         self.plan = None
+        self.constellation = None
 
         # Flag
         self.execution_success = False
@@ -171,7 +171,7 @@ class Scenario:
 
         # Instanciate ConstellationSatellites object
         logging.info("Instanciating the constellation...")
-        self.constellation = Constellation(self.constellation_name)
+        self.create_constellation()
 
         logging.info("Populating the constellation based on the reference satellite...")
         self.constellation.populate_standard_constellation(self.constellation_name,
