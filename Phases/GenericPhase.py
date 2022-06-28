@@ -1,7 +1,6 @@
 import copy
 from Commons.common import convert_time_for_print
 
-import Scenario.Fleet_module
 from Phases.Common_functions import *
 from astropy.time import Time
 from Phases.Common_functions import *

@@ -9,7 +9,7 @@ from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
 from Commons.Interpolation import get_launcher_fairing, get_launcher_performance
-from Scenario.ScenarioParameters import *
+from Scenarios.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
 from poliastro.bodies import Earth

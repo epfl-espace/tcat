@@ -1,7 +1,5 @@
-import Scenario.Fleet_module
 from Modules.CaptureModule import *
 from Phases.GenericPhase import GenericPhase
-import logging
 
 class Release(GenericPhase):
     """A Phase that represents release and separates the target given in argument from the servicer.

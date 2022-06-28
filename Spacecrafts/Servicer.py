@@ -9,7 +9,7 @@ from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Capture import Capture
 from Phases.Release import Release
-from Scenario.ScenarioParameters import *
+from Scenarios.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
 from poliastro.bodies import Earth
