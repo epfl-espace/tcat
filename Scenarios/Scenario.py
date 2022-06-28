@@ -63,7 +63,7 @@ class Scenario:
     """
     Init
     """
-    def __init__(self,scenario_id,config_file):
+    def __init__(self,scenario_id,json):
         # Set identification
         self.id = scenario_id
 
@@ -80,10 +80,6 @@ class Scenario:
         self.sat_insertion_orbit = None
         self.sat_operational_orbit = None
         self.sat_disposal_orbit = None
-
-        # Load json configuration file
-        with open(config_file) as file:
-            json = load_json(file)
 
         # Look through general_fields
         for field in self.general_fields:
