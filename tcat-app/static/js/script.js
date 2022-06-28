@@ -53,11 +53,9 @@ function isDarkMode() {
 
 function setDarkMode(enabled, save=true) {
 	if(enabled) {
-		if(!html.classList.contains('dark'))
-			html.classList.add('dark');
+		html.setAttribute('data-theme', 'dracula');
 	} else {
-		if(html.classList.contains('dark'))
-			html.classList.remove('dark');
+		html.setAttribute('data-theme', 'corporate');
 	}
 	if(save)
 		localStorage.setItem(DARK_MODE_KEY, enabled);
