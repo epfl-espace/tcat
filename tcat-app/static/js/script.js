@@ -19,7 +19,9 @@ if(btn && menu) {
 }
 
 if(toggleDarkMode) {
-	toggleDarkMode.addEventListener('click', switchDarkMode);
+	toggleDarkMode.addEventListener('change', (e) => {
+		setDarkMode(e.currentTarget.checked);
+	});
 }
 
 if(modalCancel) {
@@ -64,14 +66,11 @@ function setDarkMode(enabled, save=true) {
 function checkDarkMode() {
 	if(isDarkMode()) {
 		setDarkMode(true, false);
+		toggleDarkMode.checked = true;
 		return;
 	}
 	setDarkMode(false, false);
-}
-
-function switchDarkMode() {
-	if(isDarkMode()) setDarkMode(false);
-	else setDarkMode(true);
+	toggleDarkMode.checked = false;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
