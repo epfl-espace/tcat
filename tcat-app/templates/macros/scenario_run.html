@@ -1,11 +1,11 @@
 {% macro scenario_run(config_run, active) -%}
     <div class="flex-grow flex flex-row gap-4 m-4">
         {% if not active %}
-            {% set back_color = 'bg-success' if config_run.finished_date != None else 'bg-error' %}
+            {% set col = 'bg-success text-success-content' if config_run.finished_date != None else 'bg-error text-error-content' %}
         {% else %}
-            {% set back_color = 'bg-info' %}
+            {% set col = 'bg-info text-info-content' %}
         {% endif %}
-        <div class="flex-grow flex flex-row justify-between align-center rounded-lg {{ back_color }}">
+        <div class="flex-grow flex flex-row justify-between align-center rounded-lg {{ col }}">
             <div class="flex-grow flex flex-row gap-4 font-medium align-middle">
                 <div class="align-middle p-4">
                     Scenario id: {{ config_run.configuration.scenario_id }}

@@ -1,28 +1,27 @@
+import base64
 import io
-import os
 import json
+import mimetypes
+import os
 import re
 import subprocess
 import threading
 import time
+import uuid
 import zipfile
+from datetime import datetime
 from operator import and_, or_
 from time import sleep
-from datetime import datetime
-import uuid
-import base64
-import mimetypes
 
+from dotenv import load_dotenv
 from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for
 from flask_oidc import OpenIDConnect
-
-import inputparams
-from models import db, Configuration, ConfigurationRun
 from sqlalchemy import desc
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from dotenv import load_dotenv
+import inputparams
+from models import db, Configuration, ConfigurationRun
 
 load_dotenv()  # sets values from .env file as environment vars, *.env files are ignored when creating the docker
 # image. so the values for the docker image come from the dockerfile and the provided arguments
@@ -292,7 +291,8 @@ def configure(current_scenario, template, params):
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter(and_(Configuration.creator_email==current_user_email, Configuration.scenario==current_scenario)).order_by(
+        last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
+                                                           Configuration.scenario == current_scenario)).order_by(
             desc(Configuration.created_date)).first()
         if last_config_item is not None:
             last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
@@ -311,7 +311,8 @@ def configure_adr():
 @app.route('/configure-constellation-deployment', methods=['GET', 'POST'])
 @oidc.require_login
 def configure_constellation_deployment():
-    return configure('constellation_deployment', 'configure_constellation_deployment.html', inputparams.constellation_mission_params)
+    return configure('constellation_deployment', 'configure_constellation_deployment.html',
+                     inputparams.constellation_mission_params)
 
 
 def store_configuration(conf, current_user_email):

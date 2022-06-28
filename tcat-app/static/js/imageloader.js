@@ -26,20 +26,20 @@ function checkForPlotImages(scenarioId, configRunId, finishedOrFailed) {
     let request = new XMLHttpRequest();
     request.addEventListener('load', (e) => {
         let response = JSON.parse(e.currentTarget.response);
-        if(response.failed || response.finished || response.plot_files.length > 0) {
+        if (response.failed || response.finished || response.plot_files.length > 0) {
             imageContainer.classList.remove('hidden');
-            if(response.failed || response.finished) {
+            if (response.failed || response.finished) {
                 clearInterval(checkForPlotImagesInterval);
-                if(finishedOrFailed) finishedOrFailed();
+                if (finishedOrFailed) finishedOrFailed();
             }
 
-            for(let i = 0; i < response.plot_files.length; i++) {
+            for (let i = 0; i < response.plot_files.length; i++) {
                 let file = response.plot_files[i];
-                if(addedPlotImages.indexOf(file) > -1) continue;
+                if (addedPlotImages.indexOf(file) > -1) continue;
                 addPlotImage(scenarioId, configRunId, file);
             }
 
-            if(response.failed) {
+            if (response.failed) {
                 failedRunningConfig();
             }
         }

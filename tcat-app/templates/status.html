@@ -3,7 +3,8 @@
 {% block content %}
     {% if config_run != None %}
         <div class="flex flex-row mb-4 lg:mb-8">
-            <p class="font-sans text-lg lg:text-xl text-blue-600 dark:text-blue-300">Status of {{ config_run.configuration.scenario_name }} / {{ config_run.configuration.scenario_id }}</p>
+            <p class="font-sans text-lg lg:text-xl">Status of {{ config_run.configuration.scenario_name }}
+                / {{ config_run.configuration.scenario_id }}</p>
         </div>
         <div class="flex-grow flex flex-col gap-4 md:gap-8">
             <div class="flex flex-col xl:flex-row gap-4 md:gap-8">
@@ -15,9 +16,9 @@
                     </div>
                 </div>
                 <div class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full xl:max-w-1/2">
-                    <p class="flex-grow-0 p-4 font-sans font-semibold text-black dark:text-gray-300">Results:</p>
+                    <p class="flex-grow-0 p-4 font-sans font-semibold">Results:</p>
                     <div class="flex-grow h-96 max-h-96 overflow-auto">
-                        <span id="results" class="text-xs whitespace-pre-line dark:text-gray-300">
+                        <span id="results" class="text-xs whitespace-pre-line">
 
                         </span>
                     </div>
@@ -27,14 +28,15 @@
 
             </div>
             <div class="flex-grow md:flex-grow-0 flex flex-row gap-2 justify-center md:justify-end">
-                <a class="flex-grow md:flex-grow-0 p-3 text-center text-white dark:text-gray-300 bg-red-400 dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-900 rounded-lg font-semibold" href="{{ url_for('download_run_data', scenario_id=config_run.configuration.scenario_id, config_run_id=config_run.id) }}">Export</a>
+                <a class="flex-grow md:flex-grow-0 btn btn-primary"
+                   href="{{ url_for('download_run_data', scenario_id=config_run.configuration.scenario_id, config_run_id=config_run.id) }}">Export</a>
             </div>
         </div>
     {% endif %}
 {% endblock %}
 {% block script %}
     {% if config_run != None %}
-        <script src="{{url_for('static',filename='js/imageloader.js')}}"></script>
+        <script src="{{ url_for('static',filename='js/imageloader.js') }}"></script>
         <script>
             const consoleLog = document.querySelector('#console-log');
             const results = document.querySelector('#results');
@@ -49,12 +51,12 @@
             resultXhr.send();
 
             setInterval(() => {
-                if(logXhr.responseText.length === 0) {
+                if (logXhr.responseText.length === 0) {
                     consoleLog.textContent = 'File not found or empty!';
                 } else {
                     consoleLog.textContent = logXhr.responseText;
                 }
-                if(resultXhr.responseText.length === 0) {
+                if (resultXhr.responseText.length === 0) {
                     results.textContent = 'File not found or empty!'
                 } else {
                     results.textContent = resultXhr.responseText;
