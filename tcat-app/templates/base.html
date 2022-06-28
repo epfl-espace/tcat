@@ -1,5 +1,6 @@
 {% import 'macros/navigation.html' as n %}
 {% import 'macros/footer.html' as f %}
+{% import 'macros/modal.html' as m %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,20 +16,27 @@
         {{ n.navigation() }}
     </header>
     <main id="content" class="flex-1 py-6 md:py-12 lg:py-16 px-4 md:px-6 lg:px-8 max-w-5x1 mx-auto w-full">
-        {% block content %}{% endblock %}</main>
+        {% block content %}{% endblock %}
+    </main>
     <div id="messages" class="max-h-56 overflow-auto">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flashes flex flex-col m-4">
                     {% for category, message in messages %}
-                        {% set bg = 'bg-green-400 dark:bg-green-800' if category == 'success' else 'bg-red-400 dark:bg-red-800' %}
-                        <div class="flex-grow-0 p-4 rounded-lg text-black dark:text-gray-300 mt-2 mb-2 {{ bg }}">{{ message }}</div>
+                        {% set type = 'alert-success' if category == 'success' else 'alert-error' %}
+                        <div class="alert {{ type }} shadow-lg">
+                          <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>{{ message }}</span>
+                          </div>
+                        </div>
                     {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}
     </div>
     {{ f.footer() }}
+    {{ m.modal() }}
 </div>
 <script src="{{ url_for('static',filename='js/script.js') }}"></script>
 {% block script %}{% endblock %}

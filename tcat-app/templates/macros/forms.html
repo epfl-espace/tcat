@@ -3,7 +3,7 @@
 {%- endmacro %}
 
 {% macro select(name, selectedValue, values) -%}
-    <select class="select select-sm max-w-xs" name="{{ name }}" data-selected="{{ selectedValue }}">
+    <select class="select select-sm select-bordered max-w-xs" name="{{ name }}" data-selected="{{ selectedValue }}">
     {% for val in values %}
         <option value="{{ val }}">{{ val }}</option>
     {% endfor %}
@@ -16,11 +16,11 @@
         <p class="text-red-700 dark:text-red-300">{{ error }}</p>
     {% endif %}
     {% if type == 'number' %}
-        <input class="flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" min="{{ validation[0] }}" max="{{ validation[1] }}" value="{{ value }}" {{ required }}>
+        <input class="flex-grow-0 input input-bordered " type="{{ type }}" name="{{ name }}" min="{{ validation[0] }}" max="{{ validation[1] }}" value="{{ value }}" {{ required }}>
     {% elif type == 'datetime-local' %}
-        <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} min="{{ validation[0] }}" max="{{ validation[1] }}"  {% endif %} {{ required }}>
+        <input class="text-input-validated flex-grow-0 input input-bordered" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} min="{{ validation[0] }}" max="{{ validation[1] }}"  {% endif %} {{ required }}>
     {% else %}
-        <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} data-validation="{{ validation }}" {% endif %} {{ required }}>
+        <input class="text-input-validated flex-grow-0 input input-bordered" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} data-validation="{{ validation }}" {% endif %} {{ required }}>
     {% endif %}
     </div>
 {%- endmacro %}
