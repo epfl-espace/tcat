@@ -1,11 +1,11 @@
 {% macro scenario_run(config_run, active) -%}
     <div class="flex-grow flex flex-row gap-4 m-4">
         {% if not active %}
-            {% set col = 'bg-success text-success-content' if config_run.finished_date != None else 'bg-error text-error-content' %}
+            {% set col = 'bg-success/75 text-success-content' if config_run.finished_date != None else 'bg-error/75 text-error-content' %}
         {% else %}
             {% set col = 'bg-info text-info-content' %}
         {% endif %}
-        <div class="flex-grow flex flex-row justify-between align-center rounded-lg {{ col }}">
+        <div class="flex-grow flex flex-row justify-between align-center rounded-lg {{ col }} shadow-lg">
             <div class="flex-grow flex flex-row gap-4 font-medium align-middle">
                 <div class="align-middle p-4">
                     Scenario id: {{ config_run.configuration.scenario_id }}
@@ -33,10 +33,10 @@
                 {% endif %}
             </div>
             <div class="flex flex-col justify-center p-2">
-                <div class="badge badge-lg">{{ config_run.configuration.scenario }}</div>
+                <div class="badge badge-lg bg-info text-info-content">{{ config_run.configuration.scenario }}</div>
             </div>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col shadow-lg">
             <a class="btn btn-primary h-full" href="{{ url_for('status', config_run_id=config_run.id) }}">View</a>
         </div>
     </div>

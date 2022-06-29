@@ -17,6 +17,11 @@ module.exports = {
             '1/2': '50%',
             '3/4': '75%',
             '95/100': '95%'
+        },
+        maxHeight: {
+            'screen-1/2': '50vh',
+            'screen-1/3': '33vh',
+            'screen-1/4': '25vh',
         }
     },
     variants: {
