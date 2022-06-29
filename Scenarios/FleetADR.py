@@ -47,41 +47,52 @@ class FleetADR(Fleet):
         upperstage_count = 0
         servicer_count = 0
 
+        # Instanciate iteration limits
+        execution_limit = max(100,len(unassigned_satellites))
+        execution_count = 1
+
         # Servicer list
-        servicer_assigned_to_launcher = []
+        servicer_assigned_to_upperstage = []
 
         # Strategy depend on architecture
         if self.scenario.architecture == "single_picker":
             # Create UpperStage
             upperstage_count += 1
-            upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario,mass_contingency=0.0)
+            upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario)
 
-            for unassigned_satellite in unassigned_satellites:
-                # Create Servicer and compute servicer plan
+            while len(unassigned_satellites)>0 and execution_count <= execution_limit:
+                # Create Servicer
                 servicer_count += 1
-                servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,mass_contingency=0.0)
-                servicer.execute(unassigned_satellite)
+                current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario)
+                servicer_assigned_to_upperstage.append(current_servicer)
 
-                temporary_servicer_list = copy.deepcopy(servicer_assigned_to_launcher)
-                temporary_servicer_list.append(servicer)
-                upperstage.execute(temporary_servicer_list,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
+                # Compute upperstage based on servicer assigned to this upperstage
+                upperstage.set_reference_spacecraft(current_servicer)
+                upperstage.execute(servicer_assigned_to_upperstage,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
                 upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
 
-                if upperstage_main_propulsion_module.get_current_prop_mass() > 0:
-                    servicer_assigned_to_launcher.append(servicer)
-                else:
-                    upperstage.execute(servicer_assigned_to_launcher,constellation_precession=0,custom_sat_allowance=1)
-                    self.add_upperstage(servicer)
+                # Check if the upperstage still has fuel for more servicer
+                if upperstage_main_propulsion_module.get_current_prop_mass() < 0:
+                    # Remove last servicer
+                    del servicer_assigned_to_upperstage[-1]
 
+                    # Re-execute upperstage and update servicer starting epoch
+                    upperstage.execute(servicer_assigned_to_upperstage,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
+
+                    # Create new UpperStage
                     upperstage_count += 1
                     upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario,mass_contingency=0.0)
-                    servicer_assigned_to_launcher = [servicer]
 
-                # Add converged UpperStage
-                self.add_servicer(servicer)
-                
-                # Remove latest assigned satellites
-                clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
+                    # Execute servicer from updated starting epoch
+                    for i,servicer in enumerate(servicer_assigned_to_upperstage):
+                        # Execute servicer
+                        servicer.execute(unassigned_satellites[i])
+
+                        # Remove target from ordered satellites
+                        clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
+
+                    # Reset list
+                    servicer_assigned_to_upperstage = [current_servicer]
                 
                 # Check remaining satellites to be assigned
                 unassigned_satellites = clients.get_optimized_ordered_satellites()
