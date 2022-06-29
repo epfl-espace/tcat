@@ -146,9 +146,9 @@ class UpperStage(ActiveSpacecraft):
             self.satellites_allowance = custom_sat_allowance
 
         # Compute filling ratio and disp mass and volume
-        self.total_satellites_mass = self.satellites_allowance * self.reference_satellite.get_initial_mass()
+        self.total_satellites_mass = self.satellites_allowance * self.reference_spacecraft.get_initial_mass()
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
-        self.volume_filling_ratio = (self.satellites_allowance * self.reference_satellite.get_volume()) / self.volume_available
+        self.volume_filling_ratio = (self.satellites_allowance * self.reference_spacecraft.get_volume()) / self.volume_available
 
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
@@ -243,10 +243,10 @@ class UpperStage(ActiveSpacecraft):
         """ Compute satellites allowance based on reference satellite dimensions and capacities
         """
         # Compute limit in mass terms
-        limit_mass = math.floor(self.mass_available/self.reference_satellite.get_initial_mass())
+        limit_mass = math.floor(self.mass_available/self.reference_spacecraft.get_initial_mass())
 
         # Compute limit in volume terms
-        limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
+        limit_volume = math.floor(self.volume_available/self.reference_spacecraft.get_volume())
 
         # Minimal value is of interest
         self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])

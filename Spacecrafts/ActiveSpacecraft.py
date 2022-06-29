@@ -38,7 +38,7 @@ class ActiveSpacecraft(Spacecraft):
         self.capture_module = None
         
         # Keep a satellite as reference
-        self.reference_satellite = scenario.reference_satellite
+        self.reference_spacecraft = scenario.reference_satellite
 
         # Spacecraft dict and ordered list
         self.initial_spacecraft = dict()
@@ -116,6 +116,14 @@ class ActiveSpacecraft(Spacecraft):
         else:
             self.current_spacecraft[satellite.get_id()] = satellite
 
+    def set_reference_spacecraft(self,spacecraft):
+        """ Modified reference spacecraft to new one if necessary
+
+        Args:
+            spacecraft (Spacecraft.Spacecraft): new reference spacecraft
+        """
+        self.reference_spacecraft = spacecraft
+        
     def execute_plan(self):
         """ Apply own plan
         """
@@ -128,6 +136,7 @@ class ActiveSpacecraft(Spacecraft):
         # Reset Spacecraft
         super().reset()
         self.current_orbit = self.get_initial_orbit()
+
         # Empty the plan
         self.empty_plan()
 
