@@ -31,16 +31,7 @@ class Servicer(ActiveSpacecraft):
     """
     Methods
     """
-    def assign_ordered_satellites(self,satellites):
-        """ Assigned remaining ordered satellites to current servicer
-
-        Args:
-            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
-        """
-        # Assign sats
-        self.assign_spacecraft(satellites)
-
-    def execute(self,satellites):
+    def execute(self,assigned_satellites):
         """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
 
         Args:
@@ -54,7 +45,7 @@ class Servicer(ActiveSpacecraft):
         self.design()
 
         # Assign target as per mass and volume allowance
-        self.assign_ordered_satellites(satellites)
+        self.assign_spacecraft(assigned_satellites)
 
         # Define spacecraft mission profile
         self.define_mission_profile()
