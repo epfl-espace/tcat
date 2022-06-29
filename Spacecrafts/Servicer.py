@@ -121,10 +121,7 @@ class Servicer(ActiveSpacecraft):
         raising = OrbitChange(f"({self.get_id()}) goes to first target orbit ({first_target.get_id()})",
                               self.plan,
                               first_target.operational_orbit,
-                              raan_specified=True,
-                              initial_orbit=insertion_orbit,
-                              raan_cutoff=raan_cutoff,
-                              raan_phasing_absolute=True,
+                              raan_specified=False,
                               delta_v_contingency=delta_v_contingency)
 
         # Assign propulsion module to raising phase
