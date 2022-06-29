@@ -67,7 +67,6 @@ class FleetADR(Fleet):
                 servicer_assigned_to_upperstage.append(current_servicer)
 
                 # Compute upperstage based on servicer assigned to this upperstage
-                upperstage.set_reference_spacecraft(current_servicer)
                 upperstage.execute(servicer_assigned_to_upperstage,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
                 upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
 
