@@ -51,50 +51,55 @@ class FleetADR(Fleet):
         execution_limit = max(100,len(unassigned_satellites))
         execution_count = 1
 
-        # Servicer list
-        servicer_assigned_to_upperstage = []
-
         # Strategy depend on architecture
         if self.scenario.architecture == "single_picker":
-            # Create UpperStage
-            upperstage_count += 1
-            upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario)
-
             while len(unassigned_satellites)>0 and execution_count <= execution_limit:
-                # Create Servicer
-                servicer_count += 1
-                current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario)
-                servicer_assigned_to_upperstage.append(current_servicer)
+                # Create UpperStage
+                upperstage_count += 1
+                upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario)
+                upperstage_converged = False
 
-                # Compute upperstage based on servicer assigned to this upperstage
-                upperstage.execute(servicer_assigned_to_upperstage,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
-                upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
+                # Instanciate assigned_servicers list
+                assigned_servicers = []
 
-                # Check if the upperstage still has fuel for more servicer
-                if upperstage_main_propulsion_module.get_current_prop_mass() < 0:
-                    # Remove last servicer
-                    del servicer_assigned_to_upperstage[-1]
+                # Fill the upperstage as long as there is fuel left
+                while not(upperstage_converged):
+                    # Create Servicer
+                    servicer_count += 1
+                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario)
 
-                    # Re-execute upperstage and update servicer starting epoch
-                    upperstage.execute(servicer_assigned_to_upperstage,constellation_precession=0,custom_sat_allowance=1) # No RAAN margin and a single servicer per upperstage
+                    # Assign the servicer
+                    assigned_servicers.append(current_servicer)
 
-                    # Create new UpperStage
-                    upperstage_count += 1
-                    upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario,mass_contingency=0.0)
+                    # Compute upperstage based on servicer assigned to this upperstage
+                    upperstage.execute(assigned_servicers,constellation_precession=0) # No RAAN margin and a single servicer per upperstage
+                    upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
 
-                    # Execute servicer from updated starting epoch
-                    for i,servicer in enumerate(servicer_assigned_to_upperstage):
-                        # Execute servicer
-                        servicer.execute(unassigned_satellites[i])
+                    if upperstage_main_propulsion_module.get_current_prop_mass() < 0:
+                        # Remove last
+                        del assigned_servicers[-1]
 
-                        # Remove target from ordered satellites
-                        clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
+                        # Upperstage has converged if last servicers is discared
+                        upperstage_converged = True
+                    
+                    elif len(assigned_servicers) == len(unassigned_satellites):
+                        # No more servicer necessary
+                        upperstage_converged = True
 
-                    # Reset list
-                    servicer_assigned_to_upperstage = [current_servicer]
+                # If converged, execute with updated assigned servicers
+                upperstage.execute(assigned_servicers,constellation_precession=0)
+
+                # Execute all servicers
+                for i,servicer in enumerate(assigned_servicers):
+                    # Execute servicer
+                    servicer.execute(unassigned_satellites[i])
+                    clients.remove_in_ordered_satellites(current_servicer.get_ordered_target_spacecraft())
                 
-                # Check remaining satellites to be assigned
+                # Update remaining satellites to be assigned
                 unassigned_satellites = clients.get_optimized_ordered_satellites()
+
+                # Update execution counter
+                execution_count += 1
             
         elif self.scenario.architecture == "multi_picker":
             raise Exception('multi_picker option not available')
