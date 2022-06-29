@@ -332,6 +332,7 @@ def configure_from_file():
     if 'file' not in request.files:
         flash('No file part')
         return redirect(request.url)
+    scenario = 'constellation_deployment'
     file = request.files['file']
     current_user_email = get_user_info()
     if file is None:
@@ -344,7 +345,14 @@ def configure_from_file():
             file.seek(0)
             file_content = file.stream.read()
             uploaded_config = json.loads(file_content.decode('utf-8'))
-            valid = valid_configuration(uploaded_config)
+
+            if uploaded_config['scenario'] is None:
+                flash('No scenario specified', 'error')
+                return redirect(request.url)
+
+            scenario = uploaded_config['scenario']
+            valid = valid_configuration(uploaded_config, inputparams.adr_mission_params) if scenario == 'adr' else valid_configuration(uploaded_config, inputparams.constellation_mission_params)
+
             if valid[0]:
                 store_configuration(uploaded_config, current_user_email)
             else:
@@ -355,7 +363,7 @@ def configure_from_file():
         else:
             flash('File not supported', 'error')
 
-    return redirect(url_for('configure'))
+    return redirect(url_for('configure_adr') if scenario == 'adr' else url_for('configure_constellation_deployment'))
 
 
 def run_configuration(conf_scenario):
