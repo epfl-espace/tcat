@@ -77,7 +77,7 @@ class UpperStage(ActiveSpacecraft):
 
             # compute remaining fuel for new inclination change
             self.ratio_inc_raan_from_opti = (delta_inc_up+delta_inc_low)/2
-            self.execute(satellites,constellation_precession=constellation_precession,custom_sat_allowance=self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession)
 
             # define new inclination's range
             if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
@@ -97,7 +97,7 @@ class UpperStage(ActiveSpacecraft):
 
         return converged
 
-    def execute(self,satellites,constellation_precession=0,custom_sat_allowance=1):
+    def execute(self,assigned_satellites,constellation_precession=0):
         """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
 
         Args:
@@ -108,10 +108,10 @@ class UpperStage(ActiveSpacecraft):
         self.reset()
 
         # Compute launcher design for custom satellite allowance
-        self.design(custom_sat_allowance=custom_sat_allowance)
+        self.design(assigned_satellites)
 
         # Assign target as per mass and volume allowance
-        self.assign_ordered_satellites(satellites)
+        self.assign_spacecraft(assigned_satellites)
 
         # Define spacecraft mission profile
         self.define_mission_profile(constellation_precession)
@@ -134,21 +134,17 @@ class UpperStage(ActiveSpacecraft):
         # Empty targets
         self.sats_number = 0
     
-    def design(self,custom_sat_allowance=None,tech_level=1):
+    def design(self,assigned_satellites,tech_level=1):
         """ Design the upperstage based on allowance, tech_level and current performances
 
         Args:
             custom_sat_allowance: allowance to assign to the launcher (for iterative purpose)
             tech_level: dispenser technology level
         """
-        # If custom_sat_allowance provided, update upperstage allowance
-        if not(custom_sat_allowance == None):
-            self.satellites_allowance = custom_sat_allowance
-
         # Compute filling ratio and disp mass and volume
-        self.total_satellites_mass = self.satellites_allowance * self.reference_spacecraft.get_initial_mass()
+        self.total_satellites_mass = sum([satellite.get_initial_mass() for satellite in assigned_satellites])
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
-        self.volume_filling_ratio = (self.satellites_allowance * self.reference_spacecraft.get_volume()) / self.volume_available
+        self.volume_filling_ratio = sum([satellite.get_initial_volume() for satellite in assigned_satellites]) / self.volume_available
 
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
@@ -167,18 +163,6 @@ class UpperStage(ActiveSpacecraft):
                                           propellant_contingency=UPPERSTAGE_FUEL_CONTINGENCY, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
                                           mass_contingency=UPPERSTAGE_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
-
-    def assign_ordered_satellites(self,satellites):
-        """ Assigned remaining ordered satellites to current launcher within allowance
-
-        Args:
-            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
-        """
-        if isinstance(satellites,list):
-            # Assign sats
-            self.assign_spacecraft(satellites[0:self.satellites_allowance])
-        else:
-            self.assign_spacecraft(satellites)
 
     def compute_upperstage(self,scenario):
         """ Compute upperstage initial capacities
@@ -243,10 +227,10 @@ class UpperStage(ActiveSpacecraft):
         """ Compute satellites allowance based on reference satellite dimensions and capacities
         """
         # Compute limit in mass terms
-        limit_mass = math.floor(self.mass_available/self.reference_spacecraft.get_initial_mass())
+        limit_mass = math.floor(self.mass_available/self.constellation_reference_spacecraft.get_initial_mass())
 
         # Compute limit in volume terms
-        limit_volume = math.floor(self.volume_available/self.reference_spacecraft.get_volume())
+        limit_volume = math.floor(self.volume_available/self.constellation_reference_spacecraft.get_volume())
 
         # Minimal value is of interest
         self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
