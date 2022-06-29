@@ -24,7 +24,7 @@ class Servicer(ActiveSpacecraft):
     """
     def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.0):
         # Init ActiveSpacecraft
-        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
+        super(Servicer, self).__init__(id,"servicer",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
 
         # Design the launcher
         self.design()
