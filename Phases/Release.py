@@ -1,5 +1,6 @@
 from Modules.CaptureModule import *
 from Phases.GenericPhase import GenericPhase
+import copy
 
 class Release(GenericPhase):
     """A Phase that represents release and separates the target given in argument from the servicer.
@@ -44,6 +45,9 @@ class Release(GenericPhase):
 
         self.update_spacecraft()
         self.take_spacecraft_snapshot()
+
+        # Update target current orbit
+        self.target.set_current_orbit(copy.deepcopy(self.get_assigned_spacecraft().get_current_orbit()))
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
