@@ -41,7 +41,7 @@ class FleetADR(Fleet):
             verbose (boolean): if True, print convergence information
         """
         # Retrieve unassigned broken satellites
-        unassigned_satellites = clients.get_optimized_ordered_satellites()
+        unassigned_satellites = clients.get_optimized_ordered_satellites().copy()
 
         # Spacecraft launcher counter
         upperstage_count = 0
@@ -89,14 +89,20 @@ class FleetADR(Fleet):
                 # If converged, execute with updated assigned servicers
                 upperstage.execute(assigned_servicers,constellation_precession=0)
 
+                # Add upperstage to fleet
+                self.add_upperstage(upperstage)
+
                 # Execute all servicers
                 for i,servicer in enumerate(assigned_servicers):
                     # Execute servicer
                     servicer.execute(unassigned_satellites[i])
-                    clients.remove_in_ordered_satellites(current_servicer.get_ordered_target_spacecraft())
+                    clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
+
+                    # Add servicer to fleet
+                    self.add_servicer(servicer)
                 
                 # Update remaining satellites to be assigned
-                unassigned_satellites = clients.get_optimized_ordered_satellites()
+                unassigned_satellites = clients.get_optimized_ordered_satellites().copy()
 
                 # Update execution counter
                 execution_count += 1
