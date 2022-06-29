@@ -105,7 +105,7 @@ class OrbitChange(GenericPhase):
 
         # update servicer according to computed orbits and duration
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
     
     def apply_delta_v(self):
         """ Compute the delta v for the maneuver and possible orbit maintenance during phasing.
@@ -403,16 +403,15 @@ class OrbitChange(GenericPhase):
         # reset the initial orbit
         self.initial_orbit = self.planned_initial_orbit
 
-    def __str__(self):
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
         # Combine all manoeuvres into a single string
         manoeuvres_string = ""
         for manoeuvre in self.manoeuvres:
             manoeuvres_string += ("\t\t" + str(manoeuvre) + " \n")
 
-        # Build return string
-        return ('--- \nOrbit change: ' + super().__str__()
-                + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                + "\n\t\u0394m: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().delta_mass)
-                + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
-                )
+        return('--- \nOrbit change: ' + super().build_spacecraft_snapshot_string()
+        + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
+        + "\n\t\u0394m: " + "{0:.1f}".format(self.get_assigned_spacecraft().get_main_propulsion_module().delta_mass)
+        + "\n\tManoeuvres: \n " + manoeuvres_string[:-2])
 

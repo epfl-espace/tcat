@@ -44,7 +44,7 @@ class Release(GenericPhase):
             self.get_assigned_spacecraft().separate_spacecraft(self.target)
 
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
 
         # Update target current orbit
         self.target.set_current_orbit(copy.deepcopy(self.get_assigned_spacecraft().get_current_orbit()))
@@ -61,6 +61,7 @@ class Release(GenericPhase):
         passes_cost = number_of_additional_gnd_station_passes * 100.
         return (fte_operation * cost_fte_operation * self.duration + passes_cost).decompose()
 
-    def __str__(self):
-        return ('--- \nRelease: ' + super().__str__()
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
+        return ('--- \nRelease: ' + super().build_spacecraft_snapshot_string()
                 + '\n\tSatellite: ' + str(self.target))

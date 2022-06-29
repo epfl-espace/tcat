@@ -48,7 +48,7 @@ class Insertion(GenericPhase):
         self.get_assigned_spacecraft().change_orbit(self.orbit)
         self.get_assigned_module().consume_propellant(self.propellant * (1 + self.contingency), 'rcs_thrusters')
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
@@ -59,6 +59,7 @@ class Insertion(GenericPhase):
         fte_operation = 10  # FTE
         cost_fte_operation = 100 * 1000 / u.year  # Euros per year
         return (fte_operation * cost_fte_operation * self.duration).decompose()
-        
-    def __str__(self):
-        return '--- \nInsertion: ' + super().__str__()
+    
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
+        return '--- \nInsertion: ' + super().build_spacecraft_snapshot_string()

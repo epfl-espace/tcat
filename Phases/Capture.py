@@ -47,7 +47,7 @@ class Capture(GenericPhase):
 
         # if not, then simply update the servicer
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
@@ -61,6 +61,7 @@ class Capture(GenericPhase):
         passes_cost = number_of_additional_gnd_station_passes * 100.  # Euros
         return (fte_operation * cost_fte_operation * self.duration + passes_cost).decompose()
 
-    def __str__(self):
-        return ('--- \nCapture: ' + super().__str__()
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
+        return ('--- \nCapture: ' + super().build_spacecraft_snapshot_string()
                 + '\n\tOf ' + str(self.captured_object))
