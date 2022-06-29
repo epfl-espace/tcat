@@ -7,5 +7,5 @@
 {% endblock %}
 {% block script %}
     <script src="{{ url_for('static',filename='js/imageloader.js') }}"></script>
-    {{ conf.configure_script(last_run_for_configuration) }}
+    {{ conf.configure_script('constellation_deployment', last_run_for_configuration) }}
 {% endblock %}

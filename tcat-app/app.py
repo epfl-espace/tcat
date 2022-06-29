@@ -358,11 +358,10 @@ def configure_from_file():
     return redirect(url_for('configure'))
 
 
-@app.route('/configure/run', methods=['GET'])
-@oidc.require_login
-def run_configuration():
+def run_configuration(conf_scenario):
     current_user_email = get_user_info()
-    last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
+    last_config_item = Configuration.query.filter(
+        and_(Configuration.creator_email == current_user_email, Configuration.scenario == conf_scenario)).order_by(
         desc(Configuration.created_date)).first()
     scenario_id = None
     config_run_id = None
@@ -405,6 +404,18 @@ def run_configuration():
     response['config_run_id'] = config_run_id
 
     return response
+
+
+@app.route('/configure/run/adr', methods=['GET'])
+@oidc.require_login
+def run_adr():
+    return run_configuration('adr')
+
+
+@app.route('/configure/run/constellation-deployment', methods=['GET'])
+@oidc.require_login
+def run_constellation_deployment():
+    return run_configuration('constellation_deployment')
 
 
 @app.route('/configure/run/plot/<string:scenario_id>/<int:config_run_id>', methods=['GET'])

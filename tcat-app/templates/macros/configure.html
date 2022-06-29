@@ -54,7 +54,7 @@
     </div>
 {%- endmacro %}
 
-{% macro configure_script(last_run_for_configuration) -%}
+{% macro configure_script(scenario, last_run_for_configuration) -%}
     <script>
         const fileInput = document.querySelector('.file-input');
         const fileSelectForm = document.querySelector('#file-select-form');
@@ -138,7 +138,7 @@
                     loadingSpinner.classList.add('hidden');
                 }), 1000);
             });
-            request.open('GET', '{{ url_for('run_configuration') }}');
+            request.open('GET', '{{ url_for('run_' + scenario) }}');
             request.send();
             runConfig.disabled = true;
         }
