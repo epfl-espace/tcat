@@ -470,6 +470,11 @@ def download_run_data(scenario_id, config_run_id):
         return 'No configuration run found with the provided scenario_id and config_run_id'
 
     files_path = get_data_path(scenario_id, config_run_id)
+
+    f = open(os.path.join(files_path, f'{scenario_id}-configuration.json'), "w")
+    f.write(config.configuration)
+    f.close()
+
     files = os.listdir(files_path)
     file_obj = io.BytesIO()
 
