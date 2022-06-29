@@ -115,6 +115,14 @@ class Spacecraft:
         """
         return self.current_orbit
 
+    def set_current_orbit(self,orbit):
+        """ Get the current orbit
+
+        Args:
+            (poliastro.twobody.Orbit): orbit
+        """
+        self.current_orbit = orbit
+
     def get_insertion_orbit(self):
         """ Get the insertion orbit
 
