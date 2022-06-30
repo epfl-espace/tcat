@@ -63,17 +63,17 @@ This class contain the different Spacecrafts and the Plan required for the Scena
 
 Fleet
 ---------------------
-.. automodule:: Fleet.Fleet
+.. automodule:: Fleets.Fleet
    :members:
 
 FleetConstellation
 ---------------------
-.. automodule:: Fleet.FleetConstellation
+.. automodule:: Fleets.FleetConstellation
    :members:
 
 FleetADR
 ---------------------
-.. automodule:: Fleet.FleetADR
+.. automodule:: Fleets.FleetADR
    :members:
 
 Plan
