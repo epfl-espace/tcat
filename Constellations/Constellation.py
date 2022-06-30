@@ -144,7 +144,7 @@ class Constellation:
         and self.seed_for_random_sats_failure.
         """
         random.seed(self.seed_for_random_sats_failure)
-        nb_sat_dead = np.round(self.get_number_satellites()*(1-self.sats_reliability))
+        nb_sat_dead = int(np.round(self.get_number_satellites()*(1-self.sats_reliability)))
         for key in random.sample(self.satellites.keys(),nb_sat_dead):
             del self.satellites[key]
 
