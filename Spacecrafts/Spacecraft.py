@@ -56,7 +56,7 @@ class Spacecraft:
         return self.id
 
     def get_initial_volume(self):
-        """ Get the satellite initial volume
+        """ Get the initial volume
 
         :return: initial volume
         :rtype: (u.m**3)
@@ -64,89 +64,88 @@ class Spacecraft:
         return self.initial_volume
 
     def get_current_volume(self):
-        """ Get the satellite current volume
+        """ Get the current volume
 
-        :return:  current volume
+        :return: current volume
         :rtype: (u.m**3)
         """
         return self.current_volume
 
     def get_dry_mass(self):
-        """ Get the initial satellite mass.
+        """ Get the dry mass
 
-        Returns:
-            (u.kg): dry mass
+        :return: dry mass
+        :rtype: (u.kg)
         """
         return self.dry_mass
 
     def get_current_mass(self):
-        """ Get the initial satellite mass.
+        """ Get the current mass. Alias to :meth:`~Spacecrafts.Spacecraft.Spacecraft.get_dry_mass`
 
-        Returns:
-            (u.kg): dry mass
+        :return: current mass
+        :rtype: (u.kg)
         """
         return self.get_dry_mass()
 
     def get_initial_mass(self):
-        """ Alias for get_dry_mass()
+        """ Get the initial mass. Alias to :meth:`~Spacecrafts.Spacecraft.Spacecraft.get_dry_mass`
 
-        Returns:
-            (u.kg): dry mass
+        :return: dry mass
+        :rtype: (u.kg)
         """
         return self.get_dry_mass()
 
     def get_current_orbit(self):
         """ Get the current orbit
 
-        Returns:
-            (poliastro.twobody.Orbit): current orbit
+        :return: current orbit
+        :rtype orbit: poliastro.twobody.Orbit
         """
         return self.current_orbit
 
     def set_current_orbit(self,orbit):
-        """ Get the current orbit
+        """ Set the current orbit
 
-        Args:
-            (poliastro.twobody.Orbit): orbit
+        :param orbit: new orbit
+        :type orbit: poliastro.twobody.Orbit
         """
         self.current_orbit = orbit
 
     def get_insertion_orbit(self):
         """ Get the insertion orbit
 
-        Returns:
-            (poliastro.twobody.Orbit): insertion orbit
+        :return: insertion orbit
+        :rtype orbit: poliastro.twobody.Orbit
         """
         return self.insertion_orbit
 
     def get_operational_orbit(self):
         """ Get the operational orbit
 
-        Returns:
-            (poliastro.twobody.Orbit): operational orbit
+        :return:  operational orbit
+        :rtype orbit: poliastro.twobody.Orbit
         """
         return self.operational_orbit
 
     def get_disposal_orbit(self):
         """ Get the disposal orbit
 
-        Returns:
-            (poliastro.twobody.Orbit) disposal orbit
+        :return: disposal orbit
+        :rtype orbit: poliastro.twobody.Orbit
         """
         return self.disposal_orbit
 
     def get_relative_raan_drift(self, duration, own_orbit=None, other_object_orbit=None):
-        """ Returns the relative raan drift between the target and an hypothetical servicer.
-            Used for planning purposes, to make sure phasing is feasible with current raan.
+        """ Returns the relative raan drift two orbits
 
-        Args:
-            duration (u.<time unit>): duration after which to compute relative raan drift
-            own_orbit (poliastro.twobody.Orbit): orbit of the target,
-                                                    by default the target operational orbit
-            other_object_orbit (poliastro.twobody.Orbit): orbit of the other object,
-                                                            by default the target insertion orbit
-        Return:
-            (u.deg): relative raan drift after duration from current orbits
+        :param duration: drift duration
+        :type duration: u.<time unit>
+        :param own_orbit: first orbit, defaults to None
+        :type own_orbit: poliastro.twobody.Orbit, optional
+        :param other_object_orbit: second orbit, defaults to None
+        :type other_object_orbit: poliastro.twobody.Orbit, optional
+        :return: total raan drift from orbit 1 raan
+        :rtype: u.deg
         """
         if not own_orbit:
             own_orbit = self.get_insertion_orbit()
@@ -156,8 +155,7 @@ class Spacecraft:
         return (delta_nodal_precession_speed * duration).decompose()
 
     def reset(self):
-        """ Reset the current satellite orbit and mass to the parameters given during initialization.
-            This function is used to reset the state and orbits of the target after a simulation.
+        """ Reset spacecraft state
         """
         self.state = "standby"
 
