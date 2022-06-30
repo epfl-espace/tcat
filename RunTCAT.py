@@ -1,9 +1,8 @@
-"""
-Created:        17.05.2022
-Last Revision:  18.05.2022
-Author:         Emilien Mingard
-Description:    Python script to run TCAT scenario
-"""
+# Created:          17.05.2022
+# Last Revision:    30.06.2022
+# Authors:          Emilien Mingard, Malo Goury du Roslan
+# Emails:           emilien.mingard@tcdc.ch, malo.goury@tcdc.ch
+# Description:      Python script to run TCAT scenario
 
 # Import class
 from Scenarios.ScenarioConstellation import ScenarioConstellation
@@ -16,12 +15,13 @@ from json import load as load_json
 import os
 warnings.filterwarnings("ignore")
 
-# user defines
+# User defines
 PRINT_IN_FILES = True #DEBUG: Toggling bool for console printing: True = Print in file | False = print in console
 
 # Access system output and error
 original_stdout = sys.stdout  # Save a reference to the original standard output
 original_stderr = sys.stderr  # Save a reference to the original standard error
+
 # Output files
 result = None
 log = None
@@ -31,7 +31,7 @@ Methods definition
 """
 
 def main():
-    """ main function of the script to run TCAT Scenario
+    """ Script main static function
     """
     json = open_input_json()
     if(json is None): exit() 
@@ -46,11 +46,11 @@ def main():
     reset_sys_std_dir()
 
 def open_input_json():
-    ''' Opens and return the json file specified in sys.argv[1].
+    """ Open the input json file given as sys.argv[1]
 
-    Returns:
-        (dict): content of json file. None if sys.argv[1] is empty
-    '''
+    :return: json input structure
+    :rtype: dict
+    """
     # Set configuration file as input or manually inserted
     try:
         config_file = sys.argv[1]
@@ -66,27 +66,36 @@ def open_input_json():
     return json
 
 def create_results_dir(results_folder_path):
-    """ if results dir doesn't exist, create it
+    """ Create results directories if not existing
+
+    :param results_folder_path: relative results folder path
+    :type results_folder_path: str
     """
     # Create results folder if non-existent
     if not os.path.exists(results_folder_path):
         os.makedirs(results_folder_path, exist_ok=True)
 
 def create_and_run_scenario(input_json, scenario_id="test_scenario"):
-    """ creates the scenario object and runs the simulation
+    """ Creates and execute
 
-    return:
-        (str) message outputed by scenario
+    :param input_json: json input structure
+    :type input_json: dict
+    :param scenario_id: scenario id name, defaults to "test_scenario"
+    :type scenario_id: str, optional
+    :return: execution flag
+    :rtype: bool or Warning
     """
     scenario = create_scenario(input_json, scenario_id)
     sim_message = run_scenario(scenario)
     return sim_message
 
 def run_scenario(scenario):
-    """ runs the different methods from the scenario object
+    """ Setup and execute a scenario
 
-    return:
-        (str) message outputed by scenario
+    :param scenario: main scenario
+    :type scenario: :class:`~Scenarios.Scenario.Scenario`
+    :return: execution flag
+    :rtype: bool or Warning
     """
     if(scenario is None): return "error - invalid scenario"
 
@@ -102,13 +111,14 @@ def run_scenario(scenario):
     return results
 
 def create_scenario(input_json,scenario_id="test_scenario"):
-    """ creates the scenario based on the scenario type specified in input json
-    args:
-        input_json (dict): json object containing the scenario inputs 
-        scenario_id (str): to give a name to the scenario
+    """ Create a scenario based on input json file
 
-    return:
-        (Scenario): the proper object inheriting from Scenario class.
+    :param input_json: json input structure
+    :type input_json: dict
+    :param scenario_id: scenario id name, defaults to "test_scenario"
+    :type scenario_id: str, optional
+    :return: main scenario
+    :rtype: :class:`~Scenarios.Scenario.Scenario`
     """
     scenario = None
     scenario_type = input_json["scenario"]
@@ -119,7 +129,12 @@ def create_scenario(input_json,scenario_id="test_scenario"):
     return scenario
 
 def set_sys_std_dir(print_to_files=True,results_folder_path="./Results"):
-    """ if print_to_files is true, redirect the sys console to the output files
+    """ If print_to_files is true, redirect the sys console to the output files
+
+    :param print_to_files: print to file flag, defaults to True
+    :type print_to_files: bool, optional
+    :param results_folder_path: relative results folder path, defaults to "./Results"
+    :type results_folder_path: str, optional
     """
     if(print_to_files): 
         # Open files (with statement wont write exceptions to the file, see https://stackoverflow.com/questions/66151573)
@@ -132,8 +147,7 @@ def set_sys_std_dir(print_to_files=True,results_folder_path="./Results"):
         sys.stderr = log  # Change the standard error to the file log.txt
 
 def reset_sys_std_dir():
-    """ re-define the system std dir to their original value. 
-        close files eventualy openend.
+    """ Re-define the system std dir to their original value. Close all files already open
     """
     # Close .txt file
     if(result is not None): result.close()

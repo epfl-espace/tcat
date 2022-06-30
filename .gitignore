@@ -10,6 +10,7 @@ node_modules/
 venv/
 DATA/
 .vscode/
+Doc/_build
 
 # Don't track these files
 *-lock.json
