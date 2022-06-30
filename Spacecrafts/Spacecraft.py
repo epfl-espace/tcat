@@ -1,21 +1,15 @@
-"""
-Created:        23.06.2022
-Last Revision:  23.06.2022
-Author:         Emilien Mingard
-Description:    Base class of the Spacecrafts modules
-"""
+# Created:          23.06.2022
+# Last Revision:    30.06.2022
+# Authors:          Emilien Mingard, Malo Goury du Roslan
+# Emails:           emilien.mingard@tcdc.ch, malo.goury@tcdc.ch
+# Description:      Base class of the Spacecrafts classes
 
 # Import methods
 from Phases.Common_functions import nodal_precession
 
 # Class definition
 class Spacecraft:
-    """
-    Parent class of all Spacecrafts modules.
-    """
-
-    """
-    Init
+    """ Spacecraft acts ase a base Class implementing all necessary attributes relative to any spacecraft
     """
     def __init__(self, spacecraft_id, dry_mass, volume=0., insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
         self.id = spacecraft_id
@@ -34,16 +28,18 @@ class Spacecraft:
         self.mothership = None
 
     def change_orbit(self, orbit):
-        """ Changes the current_orbit of the spacecraft and linked objects.
+        """ Update current orbit. Save previous orbit
 
-        Args:
-            orbit (poliastro.twobody.Orbit): next orbit
+        :param orbit: new orbit
+        :type orbit: poliastro.twobody.Orbit
         """
         # Update upperstage own orbit
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
 
     def reset(self):
+        """ Reset the instance. Mothership and current orbits are cleared
+        """
         # Reset orbits
         self.current_orbit = None
         self.previous_orbit = None
@@ -52,36 +48,28 @@ class Spacecraft:
         self.mothership = None
 
     def get_id(self):
-        """ Get the spacecraft's id
-        
-        Returns:
-            (str): id of the spacecraft
+        """_summary_
+
+        :return: instance id
+        :rtype: str
         """
         return self.id
 
     def get_initial_volume(self):
-        """ Get the satellite initial volume.
+        """ Get the satellite initial volume
 
-        Returns:
-                (u.m**3): volume
+        :return: initial volume
+        :rtype: (u.m**3)
         """
         return self.initial_volume
 
     def get_current_volume(self):
-        """ Get the satellite current volume.
+        """ Get the satellite current volume
 
-        Returns:
-                (u.m**3): volume
+        :return:  current volume
+        :rtype: (u.m**3)
         """
         return self.current_volume
-
-    def get_volume(self):
-        """ Alias for get_current_volume()
-
-        Returns:
-                (u.m**3): volume
-        """
-        return self.get_current_volume()
 
     def get_dry_mass(self):
         """ Get the initial satellite mass.

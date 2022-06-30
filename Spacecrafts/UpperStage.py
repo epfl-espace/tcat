@@ -230,7 +230,7 @@ class UpperStage(ActiveSpacecraft):
         limit_mass = math.floor(self.mass_available/self.constellation_reference_spacecraft.get_initial_mass())
 
         # Compute limit in volume terms
-        limit_volume = math.floor(self.volume_available/self.constellation_reference_spacecraft.get_volume())
+        limit_volume = math.floor(self.volume_available/self.constellation_reference_spacecraft.get_current_volume())
 
         # Minimal value is of interest
         self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
