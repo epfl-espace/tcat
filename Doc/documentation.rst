@@ -11,7 +11,7 @@ Creates the proper Scenario object and runs it.
 
 Senarios
 ===================
-Senario classes instantiate the :py:class:Fleet.Fleet.Fleet, Plan and Constellation objects based on the input json.
+Senario classes instantiate the :class:'Fleets.Fleet.Fleet', Plan and Constellation objects based on the input json.
 
 Senario
 ----
@@ -63,17 +63,17 @@ This class contain the different Spacecrafts and the Plan required for the Scena
 
 Fleet
 ---------------------
-.. automodule:: Fleet.Fleet
+.. automodule:: Fleets.Fleet
    :members:
 
 FleetConstellation
 ---------------------
-.. automodule:: Fleet.FleetConstellation
+.. automodule:: Fleets.FleetConstellation
    :members:
 
 FleetADR
 ---------------------
-.. automodule:: Fleet.FleetADR
+.. automodule:: Fleets.FleetADR
    :members:
 
 Plan
