@@ -11,7 +11,7 @@ Creates the proper Scenario object and runs it.
 
 Senarios
 ===================
-Senario classes instantiate the :class:'Fleets.Fleet.Fleet', Plan and Constellation objects based on the input json.
+Senario classes instantiate the :class:`~Fleets.Fleet.Fleet` and :class:`~Constellations.Constellation.Constellation` objects based on the input json.
 
 Senario
 ----
