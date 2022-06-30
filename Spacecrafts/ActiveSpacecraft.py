@@ -333,7 +333,3 @@ class ActiveSpacecraft(Spacecraft):
 
     def print_report(self):
         print(f"Built-in function print report not defined for Class: {type(self)}")
-
-    def __str__(self):
-        return (super().__str__()
-                + "\n\t  dry mass: " + '{:.01f}'.format(self.get_dry_mass())) 

@@ -373,30 +373,26 @@ class UpperStage(ActiveSpacecraft):
         removal.assign_module(self.get_main_propulsion_module())
 
     def print_report(self):
+        print(f"-"*72
+        + "\nActiveSpacecraft.UpperStage:"
+        + f"\n\tSpacecraft id: {self.get_id()}"
+        + f"\n\tLaunch vehicle name: {self.launcher_name}"
+        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
+        + f"\n\tWet mass: {self.get_wet_mass():.01f}"
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}"
+        + f"\n\tTotal payload mass available: {self.mass_available}"
+        + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
+        + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
+        + f"\n\tNumber of spacecrafts onboard: {self.sats_number}"
+        + f"\n\tAssigned Spacecrafts:")
+
+        for target in self.ordered_target_spacecraft:
+            print(f"\t\t{target}")
+
+        print("---")
         self.plan.print_report()
-        """ Print quick summary for debugging purposes."""
-        print(f"""---\n---
-Upperstage:
-    ID: {self.get_id()}
-    Launch vehicle name: {self.launcher_name}
-    Dry mass: {self.get_dry_mass():.01f}
-    Wet mass: {self.get_wet_mass():.01f}
-    Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
-    Payload mass available: {self.mass_available}
-    Number of satellites: {self.sats_number}
-    Dispenser mass: {self.dispenser_mass:.1f}
-    Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
-    Dispenser volume: {self.dispenser_volume:.1f}
-    Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
-    Targets assigned to the Launch vehicle:""")
-
-        for x in range(len(self.ordered_target_spacecraft)):
-            print(f"\t\t{self.ordered_target_spacecraft[x]}")
-
         print("---")
 
         print('Modules:')
         for _, module in self.modules.items():
             print(f"\tModule ID: {module}")
-        print('\tPhasing Module ID: ' + self.main_propulsion_module.id)
-        print('\tCapture module ID : ' + self.capture_module.id)

@@ -230,23 +230,21 @@ class Servicer(ActiveSpacecraft):
         return 1
 
     def print_report(self):
+        print(f"-"*72
+        + "\nActiveSpacecraft.Servicer:"
+        + f"\n\tSpacecraft id: {self.get_id()}"
+        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
+        + f"\n\tWet mass: {self.get_wet_mass():.01f}"
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}"
+        + f"\n\tAssigned Satellites:")
+
+        for target in self.ordered_target_spacecraft:
+            print(f"\t\t{target}")
+
+        print("---")
         self.plan.print_report()
-        """ Print quick summary for debugging purposes."""
-        print(f"""---\n---
-Servicer:
-    ID: {self.get_id()}
-    Dry mass: {self.get_dry_mass():.01f}
-    Wet mass: {self.get_wet_mass():.01f}
-    Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
-    Targets assigned to the Servicer:""")
-
-        for x in range(len(self.ordered_target_spacecraft)):
-            print(f"\t\t{self.ordered_target_spacecraft[x]}")
-
         print("---")
 
         print('Modules:')
         for _, module in self.modules.items():
             print(f"\tModule ID: {module}")
-        print('\tPhasing Module ID: ' + self.main_propulsion_module.id)
-        print('\tCapture module ID : ' + self.capture_module.id)
