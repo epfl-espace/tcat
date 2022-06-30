@@ -8,7 +8,7 @@ Description:    ABSTRACT CLASS - DO NOT USE
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
-from Scenarios.Plan import *
+from Plan.Plan import *
 from Constellations.Constellation import Constellation
 
 # Set logging

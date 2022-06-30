@@ -7,7 +7,7 @@ Description:    Scenario for constellation deployment
 
 # Import Class
 from Scenarios.Scenario import *
-from Scenarios.FleetADR import FleetADR
+from Fleet.FleetADR import FleetADR
 
 # Class definition
 class ScenarioADR(Scenario):

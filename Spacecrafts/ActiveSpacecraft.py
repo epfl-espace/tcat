@@ -7,7 +7,7 @@ Description:    Parent class for all active spacecrafts
 # Import class
 from numpy import isin
 from Spacecrafts.Spacecraft import Spacecraft
-from Scenarios.Plan import Plan
+from Plan.Plan import Plan
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
