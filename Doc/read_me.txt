@@ -18,3 +18,6 @@ Welcome to Sphinx doc 101:
 4. to add a module to the doc:
     - open: .Doc/documentation.rst
     - follow logic of the template to add your module
+
+5. usefull links:
+    - to perform hyperlinks: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects
