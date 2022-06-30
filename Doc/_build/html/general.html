@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General concepts &mdash; TCAT 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="start.html" />
+    <link rel="prev" title="Support, Installation and Setup" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> TCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Support, Installation and Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moon_use_case.html">Moon Cargo Use Case</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adr_use_case.html">Active Debris Removal Use Case</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>General concepts</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/general.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="general-concepts">
+<h1>General concepts<a class="headerlink" href="#general-concepts" title="Permalink to this heading">¶</a></h1>
+<p>TCAT has two objectives:</p>
+<ul class="simple">
+<li><p>Offer quick assessment of feasibility of space missions (both in systems design and operations)</p></li>
+<li><p>Enable trade-offs of architectures, technologies, etc. by providing rough estimates of cost and performance figures</p></li>
+</ul>
+<p>The main concepts that are used by TCAT to fulfill its objectives are:</p>
+<dl class="simple">
+<dt>Use Case</dt><dd><p>A use case is a particular type of service that fulfills the needs of a client. The original purpose of TCAT was the
+use case of active debris removal for large satellite constellations. Another use case that was implemented in TCAT
+was the transfer of cargo to the Moon for institutional actors. The goal of TCAT is to consolidate a number of tools
+and methods that are not specific to a use case, but can be used to analyse, optimize and trade-off multiple aspects
+of any use case, given appropriate delta development. The code base linked to use cases is separate from the core of
+TCAT.</p>
+</dd>
+<dt>Scenario</dt><dd><p>A scenario is a particular configuration of a <strong>use case</strong> described by a number of parameters. These parameters are
+usually linked to the overall architecture of the service, the design of the systems, the orbits, the operations.
+A scenario for active debris removal could be for instance 3 servicers, with their design and insertion orbits
+defined, each visiting 5 targets to perform orbit lowering with a visit to a tanker for refueling between each
+target. The code base linked to scenarios is separate from the core of TCAT and linked to the code base of the use
+case.</p>
+</dd>
+<dt>Fleet</dt><dd><p>A fleet is a collection of <em>servicers</em> (satellites, launchers, ground segments, etc) that will be used to fulfill
+a <strong>scenario</strong>. Within a fleet, servicers can be grouped together depending on their purpose and design.
+For instance the  active debris removal fleet can consist of removers and tankers. The code base linked to the
+definition, management and use of fleets is not dependant on the use case.</p>
+</dd>
+<dt>Servicer</dt><dd><p>A servicer is a collection of <em>modules</em> (propulsion, communication, data handling, cargo, etc) that is part of a
+<strong>fleet</strong>.</p>
+</dd>
+<dt>Module</dt><dd><p>Each module that constitutes the <strong>servicer</strong> needs to be thought of as a functional block. The most important
+modules for a servicer will generally be modules that deal with transport and propellant (launch, orbit change,
+planetary insertions, etc). Each module has models for their power consumption and dry mass and possible
+additional performance models (propulsion specific impulse, etc). These models can be different depending on the
+servicer group. The code base linked to the definition, management and use of servicers is not dependant on the use
+case. Each new use case might require the refinement of existing modules or the creation of additional modules.</p>
+</dd>
+<dt>Plan</dt><dd><p>A plan is a collection of <em>phases</em> that will be required to perform a <strong>scenario</strong> (launch, orbit changes,
+rendezvous, servicing, etc) . A plan has a chronological order. The code base linked to the definition, management
+and use of plans is not dependant on the use case.</p>
+</dd>
+<dt>Phase</dt><dd><p>A phase describes any type of operations performed during a <strong>plan</strong>. Each phase needs to be assigned to a
+<strong>module</strong>. For instance, an orbit change needs to be assigned to a propulsion module of the servicer that will
+perform the operation. The phase is defined in terms of its duration and its impact on the performing servicer
+and on its environment. These impacts are usually either changes in orbits, consumption or production of resources
+or servicing operations. For instance, a capture phase, performed by a capture module on a servicer needs to be
+assigned a target (removal client) and will link the motion of the target with the servicer until a release phase
+is called. Each new use case might require the refinement of existing phases or the creation of additional modules.</p>
+</dd>
+</dl>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Support, Installation and Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="start.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, B. Gorret, F. Brancato, R. Joye.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

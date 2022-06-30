@@ -29,7 +29,11 @@ following packages.
 Package       Usage
 ============  ==================
 astropy       Orbital dynamics
-xlrd          Excel files
+xlrd          read Excel files
+gurobi        optimization
+mystic        optimization
+poliastro     orbital dynamics
+TLE-tools     read TLE
 ============  ==================
 
 Alternatively, you can use `Anaconda <https://www.anaconda.com/products/individual>`_ to simplify the management of your

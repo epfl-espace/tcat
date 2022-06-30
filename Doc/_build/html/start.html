@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; TCAT 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Moon Cargo Use Case" href="moon_use_case.html" />
+    <link rel="prev" title="General concepts" href="general.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> TCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Support, Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.html">General concepts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-inputs">Specifying inputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-inputs">General inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#orbit-inputs">Orbit inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fleet-and-servicers-inputs">Fleet and servicers inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-inputs">Client inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plan-and-phase-inputs">Plan and phase inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#execute-simulation">Execute simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analyse-results">Analyse results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="moon_use_case.html">Moon Cargo Use Case</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adr_use_case.html">Active Debris Removal Use Case</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/start.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h1>
+<p>Using TCAT is decomposed in three tasks:</p>
+<ol class="arabic simple">
+<li><p>Specify inputs</p></li>
+<li><p>Execute simulations</p></li>
+<li><p>Analyse results</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User actions might be different for each use case, therefore each use case implemented might specify their own
+ways to get started with TCAT. Some use cases might provide graphical user interfaces, others will require
+the user to open the python code and manually change inputs.</p>
+</div>
+<p>To help the user get familiar with the logic behind these, we propose a walk-through of a simple example based on the
+debris removal use case. This section goes through and explains the code in the ‘getting_started_example.py’ script
+available inside the TCAT folder.</p>
+<div class="section" id="specifying-inputs">
+<h2>Specifying inputs<a class="headerlink" href="#specifying-inputs" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="general-inputs">
+<h3>General inputs<a class="headerlink" href="#general-inputs" title="Permalink to this heading">¶</a></h3>
+<p>With this example, we will go through how to define a simple debris removal mission with a single target and chaser.</p>
+<p>First, let’s import what we need to use the general concepts linked to Plans (Plan_module) and the phases we will want to use for
+this use case.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">Plan_module</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Phases.Approach</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Phases.Capture</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Phases.Insertion</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Phases.OrbitChange</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Phases.Release</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>Then, let’s import what we need to use the general concepts linked to Fleets (Fleet_module) and the modules we will
+want to use for this use case.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">Fleet_module</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.PropulsionModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.CaptureModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.StructureModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.ThermalModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.AOCSModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.EPSModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.CommunicationModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.DataHandlingModule</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Modules.ApproachSuiteModule</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>Lastly, let’s import a use case specific class, the ADR_Client class, that gathers useful methods to define the client
+of the use case. ADR stands for Active Debris Removal.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ADRClient_module</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>We start by fixing the starting time at which the simulation will start (start of the first phase). This will serve as
+reference throughout the code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">starting_epoch</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="s2">&quot;2025-06-02 12:00:00&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;tdb&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="orbit-inputs">
+<h3>Orbit inputs<a class="headerlink" href="#orbit-inputs" title="Permalink to this heading">¶</a></h3>
+<p>Then we will define all orbits required during the mission. The following code block shows how we define the insertion
+orbit for the servicer. Notice the use of the astropy Orbit and unit packages (imported as Orbit and u respectively)
+to define the units used. The target orbit and reentry orbit are defined similarly but not listed below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="mf">500.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">km</span> <span class="o">+</span> <span class="n">Earth</span><span class="o">.</span><span class="n">R</span>
+<span class="n">ecc</span> <span class="o">=</span> <span class="mf">0.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">rad</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">rad</span>
+<span class="n">inc</span> <span class="o">=</span> <span class="mf">98.6</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">deg</span>
+<span class="n">raan</span> <span class="o">=</span> <span class="mf">30.5</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">deg</span>
+<span class="n">argp</span> <span class="o">=</span> <span class="mf">0.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">deg</span>
+<span class="n">nu</span> <span class="o">=</span> <span class="mf">0.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">deg</span>
+<span class="n">servicer_insertion_orbit</span> <span class="o">=</span> <span class="n">Orbit</span><span class="o">.</span><span class="n">from_classical</span><span class="p">(</span><span class="n">Earth</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">raan</span><span class="p">,</span> <span class="n">argp</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">starting_epoch</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Astropy provides two interesting packages to handled units and constants (Astropy.units and Astropy.constants,
+usually imported in the code as u and const) that are used extensively in TCAT. Using them ensures easy unit
+conversions and highlights immediately formulas with units mismatch.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>The definition of orbits is important to ensure a feasible plan. Make sure that when using TCAT, you are familiar
+with the impact astrodynamics can have on your plan. For instance, if the servicer starts on a similar altitude as
+the target but with a big raan difference, then the phasing duration will be prohibitively long and an additional
+manoeuvre might be required to a lower or higher phasing orbit.</p>
+</div>
+</div>
+<div class="section" id="fleet-and-servicers-inputs">
+<h3>Fleet and servicers inputs<a class="headerlink" href="#fleet-and-servicers-inputs" title="Permalink to this heading">¶</a></h3>
+<p>This part of the inputs let’s us define the servicer. First, we define the servicer and its modules. To start, we
+create a fleet that will host the servicer. We give it an identifier and an architecture (here single_picker as a
+single servicer grabs a single target).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fleet</span> <span class="o">=</span> <span class="n">Fleet</span><span class="p">(</span><span class="s1">&#39;ADR&#39;</span><span class="p">,</span> <span class="s1">&#39;singe_picker&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then we similarly create a servicer with its own identifier and a group (here servicers).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">servicer001</span> <span class="o">=</span> <span class="n">Servicer</span><span class="p">(</span><span class="s1">&#39;servicer001&#39;</span><span class="p">,</span> <span class="s1">&#39;ADR_servicers&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, we define the modules of the servicer, giving them appropriate identifiers (based on the servicer identifier) and
+specifying that they belong to the servicer.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each of these modules will use the models linked to the servicer group defined for its servicer.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reference_structure</span> <span class="o">=</span> <span class="n">StructureModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_structure&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+<span class="n">reference_thermal</span> <span class="o">=</span> <span class="n">ThermalModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_thermal&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+<span class="n">reference_aocs</span> <span class="o">=</span> <span class="n">AOCSModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_aocs&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+<span class="n">reference_eps</span> <span class="o">=</span> <span class="n">EPSModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_eps&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+<span class="n">reference_com</span> <span class="o">=</span> <span class="n">CommunicationModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_communication&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+<span class="n">reference_data_handling</span> <span class="o">=</span> <span class="n">DataHandlingModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_data_handling&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+<span class="n">reference_approach_suite</span> <span class="o">=</span> <span class="n">ApproachSuiteModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_approach_suite&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The capture module requires more inputs. Indeed, because multiple modules of the same kind could be placed on a single
+servicer it is possible to specify which is the default module used by the servicer to perform capture phases. This is
+used to simplify the creation of the plan later.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Note that when defining the capture module, a dry mass is given to override the usual dry mass model that would
+normally be used. There are a number of arguments that can be given to modules and phases to override or refine
+their parameters.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reference_capture</span> <span class="o">=</span> <span class="n">CaptureModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_capture&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">,</span> <span class="n">dry_mass_override</span><span class="o">=</span><span class="mf">20.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="p">)</span>
+<span class="n">reference_capture</span><span class="o">.</span><span class="n">define_as_capture_default</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The propulsion module also requires more inputs. Similarly to the capture module, it is possible to specify a default
+module to perform orbit change phases (main propulsion) and a module to perform approach phases (RCS, Reaction Control
+System) phases.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>When defining default modules, it is possible to assign the same module for different tasks. In our case for
+instance, the same propulsion module is in charge of both orbital maneouvres and reaction control. The underlying
+model takes this into account and will size the module to ensure it has the thrusters necessary to perform its
+tasks.</p>
+</div>
+<p>Most importantly, the propulsion modules requires an initial guess for the propellant mass to
+be budgeted. This initial guess is the starting point for the simulation and is refined through convergence.</p>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>It is possible that if the initial propellant guess is too far from the actual value, convergence is not possible.
+This problem is increasingly important with more complex servicers and models. Some use cases implement smart ways
+to define these initial guesses. For this example, the initial guess is set at 100kg of propellant.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">initial_propellant_guess</span> <span class="o">=</span> <span class="mf">100.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span>
+<span class="n">reference_rendezvous_propulsion</span> <span class="o">=</span> <span class="n">PropulsionModule</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="s1">&#39;_propulsion&#39;</span><span class="p">,</span> <span class="n">servicer001</span><span class="p">,</span> <span class="s1">&#39;mono-propellant&#39;</span><span class="p">,</span>
+                                                   <span class="mi">22</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="mi">240</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">initial_propellant_guess</span><span class="p">,</span>
+                                                   <span class="mf">100.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="p">,</span> <span class="n">propellant_contingency</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">reference_rendezvous_propulsion</span><span class="o">.</span><span class="n">define_as_rcs_propulsion</span><span class="p">()</span>
+<span class="n">reference_rendezvous_propulsion</span><span class="o">.</span><span class="n">define_as_main_propulsion</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Additionally, parameters of the propulsion can be specified in the declaration of the module itself. Here
+the maximum and minimum thrust, the specific impulse, the maximum tank capacity and the propellant contingency to
+be used are defined.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Contingencies are used in TCAT to reach realistic solutions. There are dry mass contingencies, propellant
+contingencies and delta v contingencies. Dry mass contingencies can be defined when creating modules, otherwise
+default values will be added. When querying the dry mass of the module, the mass with contingency will be given
+(for instance, this means that the additional mass for contingency is taken into account when dimensioning
+manoeuvres and other modules). There are propellant contingencies, as defined in our example at 10% or 0.1. This
+contingency represents the amount of propellant we want left in the tanks at the end of the plan. When querying the
+propellant mass or wet mass of a servicer, the actual simulated amount of propellant is returned. The delta v
+contingency is defined when defining phases (see below).</p>
+</div>
+<p>Finally, the servicer is added to the fleet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fleet</span><span class="o">.</span><span class="n">add_servicer</span><span class="p">(</span><span class="n">servicer001</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="client-inputs">
+<h3>Client inputs<a class="headerlink" href="#client-inputs" title="Permalink to this heading">¶</a></h3>
+<p>This part of the inputs varies depending on the use case. For the debris removal use case, the definition of the
+debris is required prior to the definition of the plan. The syntax here is specific to the use case and simply defines
+the identifier for the target and assigns a mass to it and specify the orbits for its insertion (not relevant here),
+its current operational orbit (where the servicer needs to capture it) and its reentry orbit (where the servicer needs
+to release it).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clients</span> <span class="o">=</span> <span class="n">ADRClients</span><span class="p">(</span><span class="s1">&#39;targets&#39;</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">Target</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="mf">100.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="p">,</span> <span class="n">target_orbit</span><span class="p">,</span> <span class="n">target_orbit</span><span class="p">,</span> <span class="n">target_orbit</span><span class="p">)</span>
+<span class="n">clients</span><span class="o">.</span><span class="n">add_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In some use cases, no clients are foreseen. In this case, simply disregard this step.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For the developers, the use of a client class is very useful to gather all elements that are external to the fleet
+but will still be influenced by the plan (therefore need to be changed during simulations and reset before each
+simulation).</p>
+</div>
+</div>
+<div class="section" id="plan-and-phase-inputs">
+<h3>Plan and phase inputs<a class="headerlink" href="#plan-and-phase-inputs" title="Permalink to this heading">¶</a></h3>
+<p>This part of the inputs let’s use define how we want the servicer to perform the mission.</p>
+<p>First we create the plan. We will then create the phase in chronological order.</p>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>If the phases are not created in a chronological manner, then the simulation will run into timing problems.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>If a fleet has multiple agents (multiple servicers for instance), that are in practice performing tasks in parallel,
+the current implementation in TCAT is still valid, as long as there is no interdependence between the tasks
+of each servicer. Otherwise, the simulation’s results will be wrong.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="s1">&#39;plan&#39;</span><span class="p">,</span> <span class="n">starting_epoch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The mission profile is defined as such: launch insertion, rendezvous and approach of target, capture of target,
+lowering of orbit to reentry orbit, release of target. Each phase is created with its parameters and assigned to a
+module previously created in the servicer.</p>
+<p>The insertion phase requires the insertion orbit. In this example, a specific duration is also given. Usually, if
+these values are not given explicitly, default values are used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">insertion</span> <span class="o">=</span> <span class="n">Insertion</span><span class="p">(</span><span class="s1">&#39;Insertion&#39;</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">insertion_orbit</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">30.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+<span class="n">insertion</span><span class="o">.</span><span class="n">assign_module</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">get_main_propulsion_module</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Then a first orbit change is performed to the target orbit. An initial orbit is also specified (this is used in early
+iterations to ease convergence). A specific delta v contingency is specified.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Delta v contingencies are applied to the delta v computed based on the astrodynamical models for each phase.</p>
+</div>
+<p>Another important option is the option to specify a desired Right Angle of Ascension Node (raan) for the final orbit.
+By default or if it is set to False, the orbit change will only affect apogee, perigee and inclination. If it set to
+True, the orbit change will also include raan correction and possibly some nodal precession phasing.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>The current astrodynamical models in TCAT do not take differences in argument of periapsis when computing manoeuvres!</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The raan_specified parameter is particularly useful because some manoeuvres care about raan but others do not.
+In our case for instance, the orbit change to reach the target needs to specify the raan so that approach can happen
+, but the orbit change to bring the target on its reentry orbit does not because only the final perigee is
+important.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">orbit_raise</span> <span class="o">=</span> <span class="n">OrbitChange</span><span class="p">(</span><span class="s1">&#39;Raise&#39;</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">target_orbit</span><span class="p">,</span> <span class="n">raan_specified</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">initial_orbit</span><span class="o">=</span><span class="n">insertion_orbit</span><span class="p">,</span>
+                          <span class="n">delta_v_contingency</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">orbit_raise</span><span class="o">.</span><span class="n">assign_module</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">get_main_propulsion_module</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Then, the approach is performed. This phase represents the manoeuvres required to bring two objects in similar orbits
+within close proximity of each other. The approach phase needs as inputs an estimation of the consumed propellant during
+this phase (here 5 kg based on rough control simulations). The capture phase needs to specify which object is captured
+(thus the importance of defining the target beforehand). The same is true for the release phase, which concludes the
+plan.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">approach</span> <span class="o">=</span> <span class="n">Approach</span><span class="p">(</span><span class="s1">&#39;Approach&#39;</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="mf">5.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="p">)</span>
+<span class="n">approach</span><span class="o">.</span><span class="n">assign_module</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">get_rcs_propulsion_module</span><span class="p">())</span>
+
+<span class="n">capture</span> <span class="o">=</span> <span class="n">Capture</span><span class="p">(</span><span class="s1">&#39;Capture&#39;</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<span class="n">capture</span><span class="o">.</span><span class="n">assign_module</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">get_capture_module</span><span class="p">())</span>
+
+<span class="n">deorbit</span> <span class="o">=</span> <span class="n">OrbitChange</span><span class="p">(</span><span class="s1">&#39;Deorbit&#39;</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">reentry_orbit</span><span class="p">,</span> <span class="n">raan_specified</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">initial_orbit</span><span class="o">=</span><span class="n">target_orbit</span><span class="p">,</span>
+                      <span class="n">delta_v_contingency</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">deorbit</span><span class="o">.</span><span class="n">assign_module</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">get_main_propulsion_module</span><span class="p">())</span>
+
+<span class="n">release</span> <span class="o">=</span> <span class="n">Release</span><span class="p">(</span><span class="s1">&#39;Release&#39;</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<span class="n">release</span><span class="o">.</span><span class="n">assign_module</span><span class="p">(</span><span class="n">servicer001</span><span class="o">.</span><span class="n">get_capture_module</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>This sequence of inputs is the most basic way to set parameters and assumptions. More complex tasks, like setting up
+custom models and behaviors require the involvement of a developer to implement new phases, modules and models.</p>
+</div>
+</div>
+<div class="section" id="execute-simulation">
+<h2>Execute simulation<a class="headerlink" href="#execute-simulation" title="Permalink to this heading">¶</a></h2>
+<p>Now that all inputs are set, the fleet is converged. We need to give it as input the plan and the clients as we defined
+them. Here the convergence margin is also specified instead of the default. This margin is the precision we want when
+it comes to dry mass models and propellant computations. What this does is that iw will execute the phases of the
+mission and change the initial propellant mass until convergence is reached and the servicer is sized to perform the
+plan with the contingencies we specified.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fleet</span><span class="o">.</span><span class="n">converge</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">clients</span><span class="p">,</span> <span class="n">convergence_margin</span><span class="o">=</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To execute the code, you can use your favorite IDE to run the script or directly execute the script from your
+OS command prompt. Refer to the Support, Installation and Setup section for more details.</p>
+</div>
+</div>
+<div class="section" id="analyse-results">
+<h2>Analyse results<a class="headerlink" href="#analyse-results" title="Permalink to this heading">¶</a></h2>
+<p>After the simulation runs, a number of tools are available depending on the use case. The crudest way to see the
+results of TCAT is to ask for text reports. These will ouptut a description for each fleet, servicer, module, plan and
+phase. In our script, the last two lines will trigger the results ot be printed in the command prompt.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plan</span><span class="o">.</span><span class="n">print_report</span><span class="p">()</span>
+<span class="n">fleet</span><span class="o">.</span><span class="n">print_report</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The result will be as follow for the plan. Note the evolution in propellant mass, orbit and date. Also note the
+manoeuvres duration which are very long. This let’s us know that to be a better representation of the mission, we
+probably need to assign intermediate raising and lowering orbits to split the manoeuvres into more manageable durations.
+This is an example of output that the tool can provide.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Start</span> <span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">02</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000</span>
+<span class="o">---</span>
+<span class="n">Insertion</span><span class="p">:</span> <span class="n">Insertion</span>
+        <span class="n">Epoch</span><span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">02</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000</span>
+        <span class="n">Servicer</span><span class="p">:</span> <span class="n">servicer001</span>
+        <span class="n">Module</span><span class="p">:</span> <span class="n">servicer001_propulsion</span>
+        <span class="n">Duration</span> <span class="p">:</span> <span class="mf">30.0</span> <span class="n">d</span>
+        <span class="n">Servicer</span> <span class="n">Orbit</span> <span class="p">:</span> <span class="mi">500</span> <span class="n">km</span> <span class="n">x</span> <span class="mi">500</span> <span class="n">km</span><span class="p">,</span> <span class="n">raan</span><span class="p">:</span> <span class="mi">65</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ltan</span> <span class="mi">324</span> <span class="n">deg</span>
+        <span class="n">Servicer</span> <span class="n">Current</span> <span class="n">Mass</span> <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+        <span class="n">Servicer</span> <span class="n">Wet</span> <span class="n">Mass</span>     <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+<span class="o">---</span>
+<span class="n">Orbit</span> <span class="n">change</span><span class="p">:</span> <span class="n">Raise</span>
+        <span class="n">Epoch</span><span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">23</span> <span class="mi">11</span><span class="p">:</span><span class="mi">50</span><span class="p">:</span><span class="mf">47.448</span>
+        <span class="n">Servicer</span><span class="p">:</span> <span class="n">servicer001</span>
+        <span class="n">Module</span><span class="p">:</span> <span class="n">servicer001_propulsion</span>
+        <span class="n">Duration</span> <span class="p">:</span> <span class="mf">0.3</span> <span class="n">yr</span>
+        <span class="n">Servicer</span> <span class="n">Orbit</span> <span class="p">:</span> <span class="mi">715</span> <span class="n">km</span> <span class="n">x</span> <span class="mi">729</span> <span class="n">km</span><span class="p">,</span> <span class="n">raan</span><span class="p">:</span> <span class="mi">194</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ltan</span> <span class="mi">342</span> <span class="n">deg</span>
+        <span class="n">Servicer</span> <span class="n">Current</span> <span class="n">Mass</span> <span class="p">:</span> <span class="mf">205.8</span> <span class="n">kg</span>
+        <span class="n">Servicer</span> <span class="n">Wet</span> <span class="n">Mass</span>     <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+        <span class="n">Delta</span> <span class="n">v</span><span class="p">:</span> <span class="mf">137.6</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span>
+        <span class="n">Servicer</span> <span class="n">Prop</span><span class="o">.</span> <span class="n">Mass</span> <span class="p">:</span>
+        <span class="n">Initial</span> <span class="n">raan</span> <span class="p">:</span> <span class="mf">64.8</span> <span class="n">deg</span>
+        <span class="n">Manoeuvres</span> <span class="p">:</span>
+                <span class="mf">1.7</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span> <span class="ow">in</span> <span class="mf">162662.4</span> <span class="nb">min</span>
+                <span class="mf">58.3</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span> <span class="ow">in</span> <span class="mf">12.3</span> <span class="nb">min</span>
+                <span class="mf">65.0</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span> <span class="ow">in</span> <span class="mf">13.8</span> <span class="nb">min</span>
+
+<span class="o">---</span>
+<span class="n">Approach</span><span class="p">:</span> <span class="n">Approach</span>
+        <span class="n">Epoch</span><span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">02</span> <span class="mi">11</span><span class="p">:</span><span class="mi">50</span><span class="p">:</span><span class="mf">47.448</span>
+        <span class="n">Servicer</span><span class="p">:</span> <span class="n">servicer001</span>
+        <span class="n">Module</span><span class="p">:</span> <span class="n">servicer001_propulsion</span>
+        <span class="n">Duration</span> <span class="p">:</span> <span class="mf">10.0</span> <span class="n">d</span>
+        <span class="n">Servicer</span> <span class="n">Orbit</span> <span class="p">:</span> <span class="mi">715</span> <span class="n">km</span> <span class="n">x</span> <span class="mi">729</span> <span class="n">km</span><span class="p">,</span> <span class="n">raan</span><span class="p">:</span> <span class="mi">205</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ltan</span> <span class="mi">343</span> <span class="n">deg</span>
+        <span class="n">Servicer</span> <span class="n">Current</span> <span class="n">Mass</span> <span class="p">:</span> <span class="mf">200.3</span> <span class="n">kg</span>
+        <span class="n">Servicer</span> <span class="n">Wet</span> <span class="n">Mass</span>     <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+        <span class="n">Of</span> <span class="n">target</span>
+<span class="o">---</span>
+<span class="n">Capture</span><span class="p">:</span> <span class="n">Capture</span>
+        <span class="n">Epoch</span><span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">03</span> <span class="mi">11</span><span class="p">:</span><span class="mi">50</span><span class="p">:</span><span class="mf">47.448</span>
+        <span class="n">Servicer</span><span class="p">:</span> <span class="n">servicer001</span>
+        <span class="n">Module</span><span class="p">:</span> <span class="n">servicer001_capture</span>
+        <span class="n">Duration</span> <span class="p">:</span> <span class="mf">1440.0</span> <span class="nb">min</span>
+        <span class="n">Servicer</span> <span class="n">Orbit</span> <span class="p">:</span> <span class="mi">715</span> <span class="n">km</span> <span class="n">x</span> <span class="mi">729</span> <span class="n">km</span><span class="p">,</span> <span class="n">raan</span><span class="p">:</span> <span class="mi">206</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ltan</span> <span class="mi">343</span> <span class="n">deg</span>
+        <span class="n">Servicer</span> <span class="n">Current</span> <span class="n">Mass</span> <span class="p">:</span> <span class="mf">300.3</span> <span class="n">kg</span>
+        <span class="n">Servicer</span> <span class="n">Wet</span> <span class="n">Mass</span>     <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+        <span class="n">Of</span> <span class="n">target</span>
+<span class="o">---</span>
+<span class="n">Orbit</span> <span class="n">change</span><span class="p">:</span> <span class="n">Deorbit</span>
+        <span class="n">Epoch</span><span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">03</span> <span class="mi">12</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">57.799</span>
+        <span class="n">Servicer</span><span class="p">:</span> <span class="n">servicer001</span>
+        <span class="n">Module</span><span class="p">:</span> <span class="n">servicer001_propulsion</span>
+        <span class="n">Duration</span> <span class="p">:</span> <span class="mf">46.2</span> <span class="nb">min</span>
+        <span class="n">Servicer</span> <span class="n">Orbit</span> <span class="p">:</span> <span class="mi">50</span> <span class="n">km</span> <span class="n">x</span> <span class="mi">729</span> <span class="n">km</span><span class="p">,</span> <span class="n">raan</span><span class="p">:</span> <span class="mi">206</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ltan</span> <span class="mi">343</span> <span class="n">deg</span>
+        <span class="n">Servicer</span> <span class="n">Current</span> <span class="n">Mass</span> <span class="p">:</span> <span class="mf">275.3</span> <span class="n">kg</span>
+        <span class="n">Servicer</span> <span class="n">Wet</span> <span class="n">Mass</span>     <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+        <span class="n">Delta</span> <span class="n">v</span><span class="p">:</span> <span class="mf">205.2</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span>
+        <span class="n">Servicer</span> <span class="n">Prop</span><span class="o">.</span> <span class="n">Mass</span> <span class="p">:</span>
+        <span class="n">Initial</span> <span class="n">raan</span> <span class="p">:</span> <span class="mf">205.6</span> <span class="n">deg</span>
+        <span class="n">Manoeuvres</span> <span class="p">:</span>
+                <span class="mf">186.5</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span> <span class="ow">in</span> <span class="mf">53.0</span> <span class="nb">min</span>
+                <span class="mf">0.0</span> <span class="n">m</span> <span class="o">/</span> <span class="n">s</span> <span class="ow">in</span> <span class="mf">0.0</span> <span class="nb">min</span>
+
+<span class="o">---</span>
+<span class="n">Release</span><span class="p">:</span> <span class="n">Release</span>
+        <span class="n">Epoch</span><span class="p">:</span> <span class="mi">2025</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">57.799</span>
+        <span class="n">Servicer</span><span class="p">:</span> <span class="n">servicer001</span>
+        <span class="n">Module</span><span class="p">:</span> <span class="n">servicer001_capture</span>
+        <span class="n">Duration</span> <span class="p">:</span> <span class="mf">3.0</span> <span class="n">d</span>
+        <span class="n">Servicer</span> <span class="n">Orbit</span> <span class="p">:</span> <span class="mi">50</span> <span class="n">km</span> <span class="n">x</span> <span class="mi">729</span> <span class="n">km</span><span class="p">,</span> <span class="n">raan</span><span class="p">:</span> <span class="mi">209</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ltan</span> <span class="mi">343</span> <span class="n">deg</span>
+        <span class="n">Servicer</span> <span class="n">Current</span> <span class="n">Mass</span> <span class="p">:</span> <span class="mf">175.3</span> <span class="n">kg</span>
+        <span class="n">Servicer</span> <span class="n">Wet</span> <span class="n">Mass</span>     <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+        <span class="n">Of</span> <span class="n">target</span>
+</pre></div>
+</div>
+<p>The result will be as follow for the fleet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ADR</span>
+<span class="o">----------------------------------------------------------------</span>
+<span class="n">servicer001</span>
+<span class="n">Dry</span> <span class="n">mass</span> <span class="p">:</span> <span class="mf">170.45</span> <span class="n">kg</span>
+<span class="n">Wet</span> <span class="n">mass</span> <span class="p">:</span> <span class="mf">218.2</span> <span class="n">kg</span>
+<span class="n">Modules</span> <span class="p">:</span>
+<span class="n">servicer001_structure</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">29.7</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">0.0</span> <span class="n">W</span>
+<span class="n">servicer001_thermal</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">8.7</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">26.9</span> <span class="n">W</span>
+<span class="n">servicer001_aocs</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">10.5</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">51.7</span> <span class="n">W</span>
+<span class="n">servicer001_eps</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">11.7</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">40.0</span> <span class="n">W</span>
+<span class="n">servicer001_communication</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">15.1</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">20.0</span> <span class="n">W</span>
+<span class="n">servicer001_data_handling</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">7.0</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">40.0</span> <span class="n">W</span>
+<span class="n">servicer001_approach_suite</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">17.4</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">45.0</span> <span class="n">W</span>
+<span class="n">servicer001_propulsion</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">17.0</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">49.6</span> <span class="n">W</span>
+          <span class="n">prop</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">47.8</span> <span class="n">kg</span>
+<span class="n">servicer001_capture</span>
+          <span class="n">dry</span> <span class="n">mass</span><span class="p">:</span> <span class="mf">25.0</span> <span class="n">kg</span>
+          <span class="n">reference</span> <span class="n">power</span> <span class="mf">0.0</span> <span class="n">W</span>
+<span class="n">Phasing</span> <span class="p">:</span> <span class="n">servicer001_propulsion</span>
+<span class="n">RDV</span> <span class="p">:</span> <span class="n">servicer001_propulsion</span>
+<span class="n">Capture</span> <span class="p">:</span> <span class="n">servicer001_capture</span>
+<span class="n">Mothership</span> <span class="p">:</span> <span class="kc">None</span>
+<span class="n">Kits</span> <span class="p">:</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="general.html" class="btn btn-neutral float-left" title="General concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="moon_use_case.html" class="btn btn-neutral float-right" title="Moon Cargo Use Case" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, B. Gorret, F. Brancato, R. Joye.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
