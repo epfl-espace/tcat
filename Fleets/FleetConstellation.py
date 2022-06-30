@@ -6,7 +6,7 @@ Description:    FleetConstellation related class
 """
 
 # Import Classes
-from Fleet.Fleet import Fleet
+from Fleets.Fleet import Fleet
 from Spacecrafts.UpperStage import UpperStage
 
 # Import libraries
