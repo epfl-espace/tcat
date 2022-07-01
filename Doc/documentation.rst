@@ -19,7 +19,7 @@ Scenario
    :members:
 
 ScenarioConstellation
-------------------
+-----------------------
 .. automodule:: Scenarios.ScenarioConstellation
    :members:
 
@@ -110,12 +110,12 @@ Insertion Phase
    :members:
 
 Orbit Change Phase
-------------------
+---------------------
 .. automodule:: Phases.OrbitChange
    :members:
 
 Orbit Maintenance Phase
-------------------
+--------------------------
 .. automodule:: Phases.OrbitMaintenance
    :members:
 
@@ -146,7 +146,7 @@ Release Phase
    :members:
 
 Common Functions used in phases
-------------------
+--------------------------------
 .. automodule:: Phases.Common_functions
    :members:
 
@@ -161,17 +161,17 @@ Generic Module
    :members:
 
 Data Handling Module
-------------------
+------------------------
 .. automodule:: Modules.DataHandlingModule
    :members:
 
 Communication Module
-------------------
+-------------------------
 .. automodule:: Modules.CommunicationModule
    :members
 
 Electrical Power System Module
-------------------
+----------------------------------
 .. automodule:: Modules.EPSModule
    :members:
 
@@ -186,7 +186,7 @@ Thermal Module
    :members:
 
 Attitude and Orbit Control System Module
-------------------
+--------------------------------------------
 .. automodule:: Modules.AOCSModule
    :members:
 
@@ -201,6 +201,6 @@ Capture Module
    :members:
 
 Approach Suite Module
-------------------
+------------------------
 .. automodule:: Modules.ApproachSuiteModule
    :members:
