@@ -139,7 +139,7 @@ class Spacecraft:
         return self.disposal_orbit
 
     def get_relative_raan_drift(self, duration, own_orbit=None, other_object_orbit=None):
-        """ Returns the relative raan drift two orbits
+        """ Returns the relative raan drift between two orbits
 
         :param duration: drift duration
         :type duration: u.<time unit>
