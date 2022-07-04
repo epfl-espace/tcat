@@ -7,11 +7,14 @@
 # Import methods
 from Phases.Common_functions import nodal_precession
 
+# Import libraries
+from astropy import units as u
+
 # Class definition
 class Spacecraft:
     """ Spacecraft acts ase a base Class implementing all necessary attributes relative to any spacecraft
     """
-    def __init__(self, spacecraft_id, dry_mass, volume=0., insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
+    def __init__(self, spacecraft_id, dry_mass, volume=0.*u.m**3, insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
         self.id = spacecraft_id
         self.state = state
 

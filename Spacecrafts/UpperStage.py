@@ -130,9 +130,6 @@ class UpperStage(ActiveSpacecraft):
         self.volume_filling_ratio = 1
         self.dispenser_mass = 0. * u.kg
         self.dispenser_volume = 0. * u.m ** 3
-
-        # Empty targets
-        self.sats_number = 0
     
     def design(self,assigned_satellites,tech_level=1):
         """ Design the upperstage based on allowance, tech_level and current performances
@@ -142,9 +139,9 @@ class UpperStage(ActiveSpacecraft):
             tech_level: dispenser technology level
         """
         # Compute filling ratio and disp mass and volume
-        self.total_satellites_mass = sum([satellite.get_initial_mass() for satellite in assigned_satellites])
+        self.total_satellites_mass = sum([satellite.get_current_mass() for satellite in assigned_satellites])
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
-        self.volume_filling_ratio = sum([satellite.get_initial_volume() for satellite in assigned_satellites]) / self.volume_available
+        self.volume_filling_ratio = sum([satellite.get_current_volume() for satellite in assigned_satellites]) / self.volume_available
 
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
@@ -383,7 +380,7 @@ class UpperStage(ActiveSpacecraft):
         + f"\n\tTotal payload mass available: {self.mass_available}"
         + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
         + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
-        + f"\n\tNumber of spacecrafts onboard: {self.sats_number}"
+        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
         + f"\n\tAssigned Spacecrafts:")
 
         for target in self.ordered_target_spacecraft:
