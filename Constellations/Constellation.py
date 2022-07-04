@@ -11,6 +11,7 @@ from Phases.Common_functions import nodal_precession
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
@@ -26,12 +27,17 @@ class Constellation:
     """
     Init
     """
-    def __init__(self, constellation_id):
+    def __init__(self, constellation_id, sats_reliability=1.,seed_for_random_sats_failure=10):
         # Set id
         self.ID = constellation_id
 
+        # Set seed for random sat failure function
+        self.sats_reliability = sats_reliability
+        self.seed_for_random_sats_failure = seed_for_random_sats_failure
+
         # Instanciate dictionnary containing all satellites
         self.satellites = dict()
+        self.initial_satellites = dict()
 
     """
     Methods
@@ -49,6 +55,23 @@ class Constellation:
         else:
             # Add new satellite to general list of satellites
             self.satellites[satellite.get_id()] = satellite
+            self.initial_satellites[satellite.get_id()] = satellite
+
+    def set_sats_reliability(self,sats_reliability):
+        """ Reliability is used by self.perform_random_sat_failure() 
+
+        :param sats_reliability: [0.,1.] with 1., all satellites remain operational
+        :type sats_reliability: float
+        """
+        self.sats_reliability = sats_reliability
+
+    def set_seed_for_random_sats_failure(self, seed_number):
+        """seed number will be used by self.perform_random_sat_failure()
+
+        :param seed_number: seed for random module
+        :type seed_number: int
+        """
+        self.seed_for_random_sats_failure = seed_number
 
     def set_optimized_ordered_satellites(self,list_of_satellites):
         """ Set list of ordered satellites to be released.
@@ -89,6 +112,14 @@ class Constellation:
         """
         return len(self.satellites.keys())
 
+    def get_initial_satellites(self):
+        """ Returns all satellites of the original constellation.
+
+        :return: self.initial_satellites: satellites of the original constellation
+        :rtype: dict
+        """
+        return self.initial_satellites
+
     def get_global_precession_rotation(self):
         """ Return global nodal precession direction of the client failed satellites.
         If more targets rotate clockwise, return -1, otherwise returns 1
@@ -105,8 +136,17 @@ class Constellation:
         """ Calls the reset function for each satellite.
             This function is used to reset the mass and orbits of targets after a simulation.
         """
-        for _, satellite in self.satellites.items():
+        for _, satellite in self.initial_satellites.items():
             satellite.reset()
+
+    def perform_random_sat_failure(self):
+        """ Randomly remove salellites from self.satellites based on self.sats_reliability 
+        and self.seed_for_random_sats_failure.
+        """
+        random.seed(self.seed_for_random_sats_failure)
+        nb_sat_dead = int(np.round(self.get_number_satellites()*(1-self.sats_reliability)))
+        for key in random.sample(self.satellites.keys(),nb_sat_dead):
+            del self.satellites[key]
 
     def populate_standard_constellation(self, constellation_name, reference_satellite, number_of_planes=2, sat_per_plane=10, plane_distribution_angle=180, altitude_offset = 10*u.km):
         """ Adds satellites to form a complete constellation with equi-phased planes based on inputs.

@@ -51,7 +51,7 @@ class Spacecraft:
         self.mothership = None
 
     def get_id(self):
-        """_summary_
+        """Get the Spacecraft's id
 
         :return: instance id
         :rtype: str

@@ -14,8 +14,8 @@ Welcome to TCAT's documentation!
    install
    general
    start
-   moon_use_case
-   adr_use_case
+   .. moon_use_case
+   .. adr_use_case
    documentation
    misc
 

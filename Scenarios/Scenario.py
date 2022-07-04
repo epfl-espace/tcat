@@ -1,10 +1,8 @@
-"""
-Created:        28.06.2022
-Last Revision:  28.06.2022
-Author:         Emilien Mingard
-Description:    ABSTRACT CLASS - DO NOT USE
-                Parent class for the different implemented scenarios
-"""
+# Created:          15.06.2022
+# Last Revision:    30.06.2022
+# Authors:          Emilien Mingard, Malo Goury du Roslan
+# Emails:           emilien.mingard@tcdc.ch, malo.goury@tcdc.ch
+# Description:      Parent class for the different implemented scenarios
 
 # Import Class
 from Spacecrafts.Satellite import Satellite
@@ -18,8 +16,14 @@ logging.addLevelName(21, "DEBUGGING")
 
 # Class definition
 class Scenario:
-    """
-    """
+    """ Parent class for the different implemented Scenarios. 
+    A scenario triggers the following tasks:
+    
+    - setup the simulation based on input json
+    - create the :class:`~Fleets.Fleet.Fleet` and :class:`~Constellations.Constellation.Constellation` required for the mission
+    - optimises the :class:`~Plans.Plan.Pan`
+    - print the result
+    """    
     general_fields = ['scenario',
                       'propulsion_type',
                       'verbose',
@@ -50,10 +54,8 @@ class Scenario:
                       ('perigee_launcher_disposal', u.km),
                       ('inc_launcher_disposal', u.deg)]
 
-    """
-    Init
-    """
-    def __init__(self,scenario_id,json):
+    # Inits
+    def __init__(self,scenario_id,json):    
         # Set identification
         self.id = scenario_id
 
@@ -84,10 +86,13 @@ class Scenario:
         # Enabling logging. Set level >21 to display INFO only
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-    """
-    Methods
-    """
     def create_attributes_from_input_json(self,json):
+        """ Create class attributes based on the static fields "general_fields" and "scalable_fields".
+        Instantiates these attributes and initilises them with values from inut json file.
+
+        :param json: input json file containing the scenario parameters
+        :type json: json
+        """
         # Look through general_fields
         for field in self.general_fields:
             # Check if field in file
@@ -106,12 +111,13 @@ class Scenario:
                     setattr(self, field, json[field] * unit)
 
     def setup(self,existing_constellation=None):
-        """ Create the clients, fleet and plan based on json inputs files (Provided through Class attributs).
-            Off the capability of re-using pre-set constellation in case multiple scenario are used. The existing client can be
-            provided by another scenario
+        """ Create the :class:`~Fleets.Fleet.Fleet` and :class:`~Constellations.Constellation.Constellation` 
+        based on json inputs.
+        
+        Offer the capability of re-using pre-set constellation in case multiple scenario are used. 
 
-        Args:
-            existing_constellation (Constellation_Client_Module.ConstellationClients): (optional) clients that serve as input; re-generated if not given
+        :param existing_constellation: :class:`~Constellations.Constellation.Constellation` that serve as input, defaults to None
+        :type existing_constellation: :class:`~Constellations.Constellation.Constellation`, optional
         """
         # Check if existing_clients are provided
         if not existing_constellation:
@@ -129,7 +135,10 @@ class Scenario:
         logging.info("Finish defining Fleet...")
 
     def execute(self):
-        """ Execute the scenario until the fleet converges using a method from the fleet class.
+        """ Design the fleet's Plan, execute it and optimises it.
+
+        :return: True of execution was usccessfull
+        :rtype: bool
         """
         logging.info("Start executing...")
         try:
@@ -143,7 +152,9 @@ class Scenario:
             return warning
 
     def define_constellation(self):
-        """ Define constellation object.
+        """ Based on input json, creates the orbits, 
+        the :class:`~Constellations.Constellation.Constellation` 
+        and fills the latter with :class:`~Spacecrafts.Sattelite.Sattelite` objects. 
         """
         # Define relevant orbits
         logging.info("Gathering satellite orbits...")
@@ -185,11 +196,10 @@ class Scenario:
             logging.info("Finish plotting Clients...")
 
     def define_fleet(self):
-        """ Define fleet object.
+        """ Based on input json, define the :class:`~Fleets.Fleet.Fleet`'s orbits,
+        create the :class:`~Fleets.Fleet.Fleet` object,
+        and organise the targeted :class:`~Constellations.Constellation.Constellation`.
         """
-        # # Compute total number of satellites
-        # satellites_left = self.constellation.get_number_satellites()
-
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
         self.define_fleet_orbits()
@@ -202,18 +212,26 @@ class Scenario:
         self.organise_satellites()
 
     def define_constellation_orbits(self):
-        """ Define orbits needed for constellation and satellites definition.
+        """ Define orbits needed for :class:`~Constellations.Constellation.Constellation` and :class:`~Spacecrafts.Satellite.Satellite` definition.
+
+        :raises NotImplementedError: Virtual method
         """
         raise NotImplementedError()
 
     def define_fleet_orbits(self):
+        """ Define the :class:`~Spacecrafts.UpperStage.UpperStage` orbits based on input json.
+        """
         self.define_upperstages_orbits()
 
     def create_fleet(self):
+        """ Create the :class:`~Fleets.Fleet.Fleet` object.
+
+        :raises NotImplementedError: Virtual method
+        """
         raise NotImplementedError()
 
     def define_upperstages_orbits(self):
-        """ Define orbits needed for upperstages definition.
+        """ Define orbits needed for :class:`~Spacecrafts.UpperStage.UpperStage` definition based on input json.
         """
         # launcher insertion orbit
         a_launcher_insertion_orbit = (self.apogee_launcher_insertion + self.perigee_launcher_insertion)/2 + Earth.R
@@ -240,7 +258,7 @@ class Scenario:
                                                             self.starting_epoch)
 
     def organise_satellites(self):
-        """Organise satellite release order based on scenario.
+        """ Organise :class:`~Spacecrafts.Satellite.Satellite` release order based on :class:`~Scenarios.Scenario.Scenario`.
         """
         # Determine if precession is turning counter-clockwise (1) or clockwise (-1)
         global_precession_direction = self.constellation.get_global_precession_rotation()
@@ -318,7 +336,8 @@ class Scenario:
         self.constellation.set_optimized_ordered_satellites([self.constellation.satellites[ordered_satellites_id[int(sat_id_in_list)]] for sat_id_in_list in sequence_list[best_sequence, :]])
     
     def print_results(self):
-        """ Print results summary in results medium"""
+        """ Print results summary in results medium.
+        """
         # Print general report
         self.print_report()
 
@@ -327,7 +346,8 @@ class Scenario:
 
     def print_report(self):
         # Print flag
-        """ Print report """
+        """ Print report.
+        """
         print("="*72)
         print("REPORT")
         print("="*72)
@@ -336,7 +356,8 @@ class Scenario:
         self.fleet.print_report()
     
     def print_KPI(self):
-        """ Print mission KPI"""
+        """ Print mission KPI.
+        """
         # Print flag
         print("\n"*3+"="*72)
         print("KPI")
