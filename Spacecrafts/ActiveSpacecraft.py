@@ -90,7 +90,7 @@ class ActiveSpacecraft(Spacecraft):
         """ Assign a list of spacecrafts as targets
 
         :param spacecraft_to_assign: list of spacecrafts or child class instances
-        :type spacecraft_to_assign: :class:`~Spacecrafts.Spacecraft.Spacecraft`
+        :type spacecraft_to_assign: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         """
         if not isinstance(spacecraft_to_assign,list):
             spacecraft_to_assign = [spacecraft_to_assign]
