@@ -79,6 +79,7 @@ class FleetADR(Fleet):
                     if upperstage_main_propulsion_module.get_current_prop_mass() < 0:
                         # Remove last
                         del assigned_servicers[-1]
+                        servicer_count -= 1
 
                         # Upperstage has converged if last servicers is discared
                         upperstage_converged = True
