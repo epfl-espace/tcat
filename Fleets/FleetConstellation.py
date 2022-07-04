@@ -7,6 +7,7 @@ Description:    FleetConstellation related class
 
 # Import Classes
 from Fleets.Fleet import Fleet
+from Scenarios.ScenarioParameters import UPPERSTAGE_DRY_MASS
 from Spacecrafts.UpperStage import UpperStage
 
 # Import libraries
@@ -54,7 +55,7 @@ class FleetConstellation(Fleet):
 
             # Create UpperStage
             spacecraft_count += 1
-            upperstage = UpperStage(f"UpperStage_{spacecraft_count:04d}",self.scenario,mass_contingency=0.0)
+            upperstage = self.create_upperstage(f"UpperStage_{spacecraft_count:04d}")
             upperstage_low_sat_allowance = 0
             upperstage_up_sat_allowance = upperstage.compute_allowance(unassigned_satellites)
 

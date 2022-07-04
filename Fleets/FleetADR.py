@@ -7,6 +7,7 @@ Description:    FleetADR related class
 
 # Import Classes
 from Fleets.Fleet import Fleet
+from Scenarios.ScenarioParameters import SERVICER_DRY_MASS
 from Spacecrafts.Servicer import Servicer
 from Spacecrafts.UpperStage import UpperStage
 
@@ -56,7 +57,7 @@ class FleetADR(Fleet):
             while len(unassigned_satellites)>0 and execution_count <= execution_limit:
                 # Create UpperStage
                 upperstage_count += 1
-                upperstage = UpperStage(f"UpperStage_{upperstage_count:04d}",self.scenario)
+                upperstage = self.create_upperstage(f"UpperStage_{upperstage_count:04d}")
                 upperstage_converged = False
 
                 # Instanciate assigned_servicers list
@@ -66,7 +67,7 @@ class FleetADR(Fleet):
                 while not(upperstage_converged):
                     # Create Servicer
                     servicer_count += 1
-                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario)
+                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_DRY_MASS)
 
                     # Assign the servicer
                     assigned_servicers.append(current_servicer)
