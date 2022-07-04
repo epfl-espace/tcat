@@ -1,9 +1,7 @@
-"""
-Created:        28.06.2022
-Last Revision:  28.06.2022
-Author:         Malo Goury
-Description:    Scenario for constellation deployment
-"""
+# Created:        28.06.2022
+# Last Revision:  28.06.2022
+# Author:         Malo Goury
+# Description:    Scenario for Active Debris Removal (ADR) missions
 
 # Import Class
 from Scenarios.Scenario import *
@@ -11,6 +9,10 @@ from Fleets.FleetADR import FleetADR
 
 # Class definition
 class ScenarioADR(Scenario):
+    """ Inherit from :class:`~Scenarios.Scenario.Scenario`.
+
+    Scenario for Active Debris Removal (ADR) mission.
+    """
     def __init__(self, scenario_id, json):
         self.general_fields.extend(['sats_reliability',
                                     'seed_random_sats_failure',
@@ -35,7 +37,10 @@ class ScenarioADR(Scenario):
         self.servicer_disposal_orbit = None
 
     def define_constellation_orbits(self):
-        """ Define orbits needed for constellation and satellites definition.
+        """ Define orbits needed for :class:`~Constellations.Constellation.Constellation` 
+        and :class:`~Spacecrafts.Satellite.Satellite` definition.
+
+        Only operational and disposal orbit are required for this Scenario.
         """
         self.sat_insertion_orbit = None
 
@@ -63,10 +68,15 @@ class ScenarioADR(Scenario):
         self.sat_default_orbit = self.sat_operational_orbit
 
     def define_fleet_orbits(self):
+        """ In addition to :meth:`super()<Scenarios.Scenario.Scenario.define_fleet_orbits>`, 
+        define the :class:`~Spacecrafts.Servicer.Servicer` orbits.
+        """
         super().define_fleet_orbits()
         self.define_servicer_orbits()
 
     def define_servicer_orbits(self):
+        """ Define the :class:`~Spacecrafts.Servicer.Servicer` orbits.
+        """
         a_servicer_insertion_orbit = (self.apogee_servicer_insertion + self.perigee_servicer_insertion)/2 + Earth.R
         e_servicer_insertion_orbit = ((self.apogee_servicer_insertion + Earth.R)/a_servicer_insertion_orbit - 1)*u.one
         self.servicer_insertion_orbit = Orbit.from_classical(Earth,
@@ -91,9 +101,15 @@ class ScenarioADR(Scenario):
                                                             self.starting_epoch)
     
     def create_fleet(self):
+        """ Create the :class:`~Fleets.FleetADR.FleetADR` object.
+        """
         self.fleet = FleetADR('UpperStages',self)
 
     def define_constellation(self):
+        """ In addition to :meth:`super()<Scenarios.Scenario.Scenario.define_constellation>`, 
+        remove default :class:`~Spacecrafts.Satellite.Satellite` 
+        from :class:`~Constellations.Constellation.Constellation`.
+        """
         super().define_constellation()
         self.constellation.set_sats_reliability(self.sats_reliability)
         self.constellation.set_seed_for_random_sats_failure(self.seed_random_sats_failure)
