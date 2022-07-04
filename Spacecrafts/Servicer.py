@@ -16,27 +16,29 @@ from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 
 class Servicer(ActiveSpacecraft):
-    """ TO BE FILLED
-    """
+    """ UpperStage acts ase a child Class implementing all necessary attributes relative upperstages.
 
+    :param servicer_id: Servicer identification name
+    :type servicer_id: str
+    :param scenario: Scenario
+    :type scenario: :class:`~Scenarios.Scenario.Scenario`
+    :param additional_dry_mass: Additionnal dry mass
+    :type additional_dry_mass: u*kg
+    :param mass_contingency: Mass contingency
+    :type mass_contingency: float
     """
-    Init
-    """
-    def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.0):
+    def __init__(self,servicer_id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.0):
         # Init ActiveSpacecraft
-        super(Servicer, self).__init__(id,"servicer",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
+        super(Servicer, self).__init__(servicer_id,"servicer",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
 
         # Design the launcher
         self.design()
-    """
-    Methods
-    """
-    def execute(self,assigned_satellites):
-        """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
 
-        Args:
-            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
-            upperstage_cur_sat_allowance: allowance to assign to the launcher (for iterative purpose)
+    def execute(self,assigned_satellites):
+        """ Reset, design and compute plan based on a list of assigned satellites
+
+        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         """
         # Perform initial setup (mass and volume available)
         self.reset()
@@ -54,7 +56,7 @@ class Servicer(ActiveSpacecraft):
         self.execute_plan()
 
     def design(self):
-        """ Design the servicer
+        """ Design the servicer main modules
         """
         # Add dispenser as CaptureModule
         dispenser = CaptureModule(self.id + '_Dispenser',
@@ -74,11 +76,7 @@ class Servicer(ActiveSpacecraft):
         self.set_main_propulsion_module(mainpropulsion)
 
     def define_mission_profile(self):
-        """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
-
-        Args:
-            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
-            precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
+        """ Compute mission profile based on a basic canvas
         """
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation
         # TODO : implement a launch optimizer
@@ -230,6 +228,8 @@ class Servicer(ActiveSpacecraft):
         return 1
 
     def print_report(self):
+        """ Print the report
+        """
         print(f"-"*72
         + "\nActiveSpacecraft.Servicer:"
         + f"\n\tSpacecraft id: {self.get_id()}"

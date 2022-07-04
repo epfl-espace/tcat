@@ -19,7 +19,7 @@ from poliastro.twobody import Orbit
 class UpperStage(ActiveSpacecraft):
     """ UpperStage acts ase a child Class implementing all necessary attributes relative upperstages.
 
-    :param upperstage_id: ActiveSpacecraft identification name
+    :param upperstage_id: Upperstage identification name
     :type upperstage_id: str
     :param scenario: Scenario
     :type scenario: :class:`~Scenarios.Scenario.Scenario`
