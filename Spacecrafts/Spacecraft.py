@@ -13,6 +13,19 @@ from astropy import units as u
 # Class definition
 class Spacecraft:
     """ Spacecraft acts ase a base Class implementing all necessary attributes relative to any spacecraft
+
+    :param spacecraft_id: Spacecraft identification name
+    :type spacecraft_id: str
+    :param dry_mass: Spacecraft dry mass
+    :type dry_mass: u*kg
+    :param volume: Spacecraft volume
+    :type volume: u*m**3
+    :param insertion_orbit: Insertion orbit
+    :type insertion_orbit: poliastro.twobody.Orbit
+    :param operational_orbit: Operational orbit
+    :type operational_orbit: poliastro.twobody.Orbit
+    :param disposal_orbit: Disposal orbit
+    :type disposal_orbit: poliastro.twobody.Orbit
     """
     def __init__(self, spacecraft_id, dry_mass, volume=0.*u.m**3, insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
         self.id = spacecraft_id
