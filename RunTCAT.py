@@ -26,9 +26,7 @@ original_stderr = sys.stderr  # Save a reference to the original standard error
 result = None
 log = None
 
-"""
-Methods definition
-"""
+# Methods definition
 
 def main():
     """ Script main static function
