@@ -93,7 +93,7 @@ class UpperStage(ActiveSpacecraft):
         # ensure remaining fuel is positive
         if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
             self.ratio_inc_raan_from_opti = delta_inc_low
-            self.execute(satellites,constellation_precession=constellation_precession,custom_sat_allowance=self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession)
 
         return converged
 
