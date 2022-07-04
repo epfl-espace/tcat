@@ -15,6 +15,7 @@ import warnings
 from astropy import units as u
 
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
+from Spacecrafts.UpperStage import UpperStage
 
 class Fleet:
     """ A Fleet consists of a dictionary of servicers.
@@ -52,6 +53,16 @@ class Fleet:
             verbose (boolean): if True, print convergence information
         """
         raise NotImplementedError
+
+    def create_upperstage(self,upperstage_id):
+        """ Creates a new UpperStage object.
+
+        :param upperstage_id: id for the new uppperstage
+        :type upperstage_id: str
+        :return: a new UpperStage object
+        :rtype: :class:`~Spacecrafts:UpperStage:UpperStage`
+        """
+        return UpperStage(upperstage_id,self.scenario,UPPERSTAGE_DRY_MASS)
         
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:

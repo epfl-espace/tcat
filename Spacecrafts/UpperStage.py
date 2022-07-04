@@ -93,7 +93,7 @@ class UpperStage(ActiveSpacecraft):
         # ensure remaining fuel is positive
         if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
             self.ratio_inc_raan_from_opti = delta_inc_low
-            self.execute(satellites,constellation_precession=constellation_precession,custom_sat_allowance=self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession)
 
         return converged
 
@@ -376,8 +376,8 @@ class UpperStage(ActiveSpacecraft):
         + f"\n\tLaunch vehicle name: {self.launcher_name}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
         + f"\n\tWet mass: {self.get_wet_mass():.01f}"
-        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}"
-        + f"\n\tTotal payload mass available: {self.mass_available}"
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
+        + f"\n\tTotal payload mass available: {self.mass_available:.1f}"
         + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
         + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
         + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
