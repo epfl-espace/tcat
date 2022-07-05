@@ -60,9 +60,7 @@ class Scenario:
         self.id = scenario_id
 
         # Instanciante Clients, Fleet and Plan
-        self.clients = None
         self.fleet = None
-        self.plan = None
         self.constellation = None
 
         # Flag
@@ -76,6 +74,8 @@ class Scenario:
 
         self.launcher_insertion_orbit = None
         self.launcher_disposal_orbit = None
+
+        self.reference_satellite = None
 
         self.create_attributes_from_input_json(json)
         self.launcher_name = self.launcher
