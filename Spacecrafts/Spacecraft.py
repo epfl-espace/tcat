@@ -64,6 +64,7 @@ class Spacecraft:
 
         # Reset mothership link
         self.mothership = None
+        self.state = "standby"
 
     def get_id(self):
         """Get the Spacecraft's id
@@ -171,11 +172,6 @@ class Spacecraft:
         _, other_nodal_precession_speed = nodal_precession(other_object_orbit)
         delta_nodal_precession_speed = own_nodal_precession_speed - other_nodal_precession_speed
         return (delta_nodal_precession_speed * duration).decompose()
-
-    def reset(self):
-        """ Reset spacecraft state
-        """
-        self.state = "standby"
 
     def __str__(self):
         return self.get_id()
