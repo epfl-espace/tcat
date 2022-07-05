@@ -9,7 +9,7 @@ from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Capture import Capture
 from Phases.Release import Release
-from Scenario.ScenarioParameters import *
+from Scenarios.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
 from poliastro.bodies import Earth
@@ -22,24 +22,36 @@ class Servicer(ActiveSpacecraft):
     """
     Init
     """
-    def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.2):
+    def __init__(self,id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.0):
         # Init ActiveSpacecraft
-        super(Servicer, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super(Servicer, self).__init__(id,"servicer",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
 
+        # Design the launcher
+        self.design()
     """
     Methods
     """
-    def assign_ordered_satellites(self,clients,targetperservicers=1):
-        """ Assigned remaining ordered satellites to current servicer
+    def execute(self,assigned_satellites):
+        """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
 
         Args:
             clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
+            upperstage_cur_sat_allowance: allowance to assign to the launcher (for iterative purpose)
         """
-        # Remaining satellite to be delivered
-        available_satellites = clients.get_optimized_ordered_satellites()
+        # Perform initial setup (mass and volume available)
+        self.reset()
 
-        # Assign sats
-        self.assign_spacecraft(available_satellites[0:targetperservicers])
+        # Compute servicer modules
+        self.design()
+
+        # Assign target as per mass and volume allowance
+        self.assign_spacecraft(assigned_satellites)
+
+        # Define spacecraft mission profile
+        self.define_mission_profile()
+
+        # Execute upperstage (Apply owned plan)
+        self.execute_plan()
 
     def design(self):
         """ Design the servicer
@@ -61,7 +73,7 @@ class Servicer(ActiveSpacecraft):
                                           mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
 
-    def define_mission_profile(self,precession_direction):
+    def define_mission_profile(self):
         """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
 
         Args:
@@ -91,7 +103,7 @@ class Servicer(ActiveSpacecraft):
                                                self.insertion_orbit.a - insertion_a_margin,
                                                self.insertion_orbit.ecc,
                                                self.insertion_orbit.inc,
-                                               first_target.insertion_orbit.raan - precession_direction * insertion_raan_margin,
+                                               self.insertion_orbit.raan,
                                                self.insertion_orbit.argp,
                                                self.insertion_orbit.nu,
                                                self.insertion_orbit.epoch)
@@ -108,11 +120,8 @@ class Servicer(ActiveSpacecraft):
         # Add Raising phase to plan
         raising = OrbitChange(f"({self.get_id()}) goes to first target orbit ({first_target.get_id()})",
                               self.plan,
-                              first_target.insertion_orbit,
-                              raan_specified=True,
-                              initial_orbit=insertion_orbit,
-                              raan_cutoff=raan_cutoff,
-                              raan_phasing_absolute=True,
+                              first_target.operational_orbit,
+                              raan_specified=False,
                               delta_v_contingency=delta_v_contingency)
 
         # Assign propulsion module to raising phase
@@ -122,7 +131,7 @@ class Servicer(ActiveSpacecraft):
         # Step 3: Iterate through organised assigned targets
         ##########
         # Initialise current orbit object
-        current_orbit = first_target.insertion_orbit
+        current_orbit = first_target.operational_orbit
 
         # Loop over assigned targets
         for i, current_target in enumerate(self.ordered_target_spacecraft):
@@ -130,9 +139,9 @@ class Servicer(ActiveSpacecraft):
             #print(i,current_target,current_target.insertion_orbit,current_target.current_orbit)
 
             # Check for RAAN drift
-            if abs(current_target.insertion_orbit.raan - current_orbit.raan) > insertion_raan_window:
+            if abs(current_target.operational_orbit.raan - current_orbit.raan) > insertion_raan_window:
                 # TODO Compute ideal phasing orgit
-                phasing_orbit = copy.deepcopy(current_target.insertion_orbit)
+                phasing_orbit = copy.deepcopy(current_target.operational_orbit)
                 phasing_orbit.inc += self.compute_delta_inclination_for_raan_phasing()
 
                 # Reach phasing orbit and add to plan
@@ -161,7 +170,7 @@ class Servicer(ActiveSpacecraft):
             # Step 3.1: Capture the satellite
             ##########
             # Capture the satellite
-            capture = Capture.__init__(f"Satellites ({current_target.get_id()}) captured", 
+            capture = Capture(f"Satellites ({current_target.get_id()}) captured", 
                                          self.plan,
                                          current_target,
                                          duration=20 * u.min)
@@ -221,30 +230,21 @@ class Servicer(ActiveSpacecraft):
         return 1
 
     def print_report(self):
+        print(f"-"*72
+        + "\nActiveSpacecraft.Servicer:"
+        + f"\n\tSpacecraft id: {self.get_id()}"
+        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
+        + f"\n\tWet mass: {self.get_wet_mass():.01f}"
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}"
+        + f"\n\tAssigned Satellites:")
+
+        for target in self.ordered_target_spacecraft:
+            print(f"\t\t{target}")
+
+        print("---")
         self.plan.print_report()
-        """ Print quick summary for debugging purposes."""
-        print(f"""---\n---
-Servicer:
-    ID: {self.get_id()}
-    Launch vehicle name: {self.launcher_name}
-    Dry mass: {self.get_dry_mass():.01f}
-    Wet mass: {self.get_wet_mass():.01f}
-    Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
-    Payload mass available: {self.mass_available}
-    Number of satellites: {self.sats_number}
-    Dispenser mass: {self.dispenser_mass:.1f}
-    Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
-    Dispenser volume: {self.dispenser_volume:.1f}
-    Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
-    Targets assigned to the Launch vehicle:""")
-
-        for x in range(len(self.ordered_target_spacecraft)):
-            print(f"\t\t{self.ordered_target_spacecraft[x]}")
-
         print("---")
 
         print('Modules:')
         for _, module in self.modules.items():
             print(f"\tModule ID: {module}")
-        print('\tPhasing Module ID: ' + self.main_propulsion_module.id)
-        print('\tCapture module ID : ' + self.capture_module.id)

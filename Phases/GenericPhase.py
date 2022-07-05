@@ -1,7 +1,6 @@
 import copy
 from Commons.common import convert_time_for_print
 
-import Scenario.Fleet_module
 from Phases.Common_functions import *
 from astropy.time import Time
 from Phases.Common_functions import *
@@ -42,7 +41,7 @@ class GenericPhase:
         """ Change the servicer and clients impacted by the phase when called during simulation. """
         # In inheriting phases, this method holds the method to perform the phase, then calls the update_servicer method
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
 
     def assign_module(self, assigned_module):
         """ Assigns a module of a servicer to the phase.
@@ -91,18 +90,24 @@ class GenericPhase:
         new_orbit = update_orbit(spacecraft.current_orbit, self.end_date)
         spacecraft.change_orbit(new_orbit)
 
-    def take_spacecraft_snapshot(self):
+    def build_spacecraft_snapshot_string(self):
         """ Save current assigned servicer as a snapshot for future references and post-processing. """
-        # Remove plan from spacecraft before deepcopy
+        # format duration
+        duration_print = convert_time_for_print(self.duration)
         spacecraft = self.get_assigned_spacecraft()
-        spacecraft_plan = spacecraft.plan
-        delattr(spacecraft,'plan')
 
-        # Deepcopy the spacecraft
-        self.spacecraft_snapshot = copy.deepcopy(self.get_assigned_spacecraft())
-
-        # But back the plan
-        spacecraft.plan = spacecraft_plan
+        # Build snapshot string
+        return (str(self.ID)
+        + "\n\tStarting Epoch: " + str(spacecraft.previous_orbit.epoch)
+        + "\n\tEnding Epoch: " + str(spacecraft.current_orbit.epoch)
+        + "\n\tLauncher: " + str(self.get_assigned_spacecraft().id)
+        + "\n\tAssociated Module: " + str(self.get_assigned_module().id)
+        + "\n\tTotal Duration: " + "{0:.1f}".format(duration_print)
+        + "\n\tInitial Orbit: " + orbit_string(spacecraft.previous_orbit)
+        + "\n\tFinal Orbit: " + orbit_string(spacecraft.current_orbit)
+        + "\n\tReference Satellite Orbit: " + orbit_string(update_orbit(spacecraft.constellation_reference_spacecraft.get_default_orbit(),spacecraft.current_orbit.epoch))
+        + "\n\tLauncher Mass After Phase: {0:.1f}".format(spacecraft.get_current_mass())
+        + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(spacecraft.get_main_propulsion_module().current_propellant_mass))
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on operation labour.
@@ -129,20 +134,5 @@ class GenericPhase:
         self.end_date = Time("2000-01-01 12:00:00")
 
     def __str__(self):
-        # format duration
-        duration_print = convert_time_for_print(self.duration)
-        
-        # build string
-        return (str(self.ID)
-                + "\n\tStarting Epoch: " + str(self.spacecraft_snapshot.previous_orbit.epoch)
-                + "\n\tEnding Epoch: " + str(self.spacecraft_snapshot.current_orbit.epoch)
-                + "\n\tLauncher: " + str(self.get_assigned_spacecraft().id)
-                + "\n\tAssociated Module: " + str(self.get_assigned_module().id)
-                + "\n\tTotal Duration: " + "{0:.1f}".format(duration_print)
-                + "\n\tInitial Orbit: " + orbit_string(self.spacecraft_snapshot.previous_orbit)
-                + "\n\tFinal Orbit: " + orbit_string(self.spacecraft_snapshot.current_orbit)
-                + "\n\tReference Satellite Orbit: " + orbit_string(update_orbit(self.spacecraft_snapshot.reference_satellite.insertion_orbit,self.spacecraft_snapshot.current_orbit.epoch))
-                + "\n\tLauncher Mass After Phase: {0:.1f}".format(self.spacecraft_snapshot.get_current_mass())
-                + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().current_propellant_mass)
-                #+ "\n\tLauncher Wet Mass: {0:.1f}".format(self.spacecraft_snapshot.get_wet_mass())
-                )
+        # print built spacecraft_snapshot
+        return (self.spacecraft_snapshot)

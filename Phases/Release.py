@@ -1,7 +1,6 @@
-import Scenario.Fleet_module
 from Modules.CaptureModule import *
 from Phases.GenericPhase import GenericPhase
-import logging
+import copy
 
 class Release(GenericPhase):
     """A Phase that represents release and separates the target given in argument from the servicer.
@@ -45,7 +44,10 @@ class Release(GenericPhase):
             self.get_assigned_spacecraft().separate_spacecraft(self.target)
 
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
+
+        # Update target current orbit
+        self.target.set_current_orbit(copy.deepcopy(self.get_assigned_spacecraft().get_current_orbit()))
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
@@ -59,6 +61,7 @@ class Release(GenericPhase):
         passes_cost = number_of_additional_gnd_station_passes * 100.
         return (fte_operation * cost_fte_operation * self.duration + passes_cost).decompose()
 
-    def __str__(self):
-        return ('--- \nRelease: ' + super().__str__()
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
+        return ('--- \nRelease: ' + super().build_spacecraft_snapshot_string()
                 + '\n\tSatellite: ' + str(self.target))

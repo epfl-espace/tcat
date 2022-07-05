@@ -2,99 +2,110 @@
 Code Documentation
 ==================
 
-Main Architecture
+RunTCAT.py
+==================
+TCAT tool main execution script. Based on .json input file, the script build and execute a :class:`~Scenarios.Scenario.Scenario`
+
+.. automodule:: RunTCAT
+   :members:
+
+Scenarios
+==================
+Scenario classes instantiate the :class:`~Fleets.Fleet.Fleet` and :class:`~Constellations.Constellation.Constellation` objects based on the input json.
+
+Scenario
+------------------
+.. automodule:: Scenarios.Scenario
+   :members:
+
+ScenarioConstellation
+-----------------------
+.. automodule:: Scenarios.ScenarioConstellation
+   :members:
+
+ScenarioADR
+------------------
+.. automodule:: Scenarios.ScenarioADR
+   :members:
+
+Spacecrafts
 ===================
-These classes and methods gather all major concept used in TCAT.
+These classes define the different types of spacerafts used by the Scenario
 
-Fleet Class
----------------------
-.. automodule:: Fleet_module
+Spacecraft
+------------------
+.. automodule:: Spacecrafts.Spacecraft
    :members:
 
-Plan Class
----------------------
-.. automodule:: Plan_module
+Satellite
+------------------
+.. automodule:: Spacecrafts.Satellite
    :members:
 
-Client Classes
+ActiveSpacecraft
+------------------
+.. automodule:: Spacecrafts.ActiveSpacecraft
+   :members:
+
+Servicer
+------------------
+.. automodule:: Spacecrafts.Servicer
+   :members:
+
+UpperStage
+------------------
+.. automodule:: Spacecrafts.UpperStage
+   :members:
+
+Fleet
+==================
+This class contain the different Spacecrafts and the Plan required for the Scenario execution.
+
+Fleet
+------------------
+.. automodule:: Fleets.Fleet
+   :members:
+
+FleetConstellation
+------------------
+.. automodule:: Fleets.FleetConstellation
+   :members:
+
+FleetADR
+------------------
+.. automodule:: Fleets.FleetADR
+   :members:
+
+Plan
 ===================
-This section will contain the different client classes. For now it only contains the client class dedicated to Active
-Debris Removal.
+Contains the different phases requied for the execution of the scenario
 
-ADR Client Class
----------------------
-.. automodule:: ADRClient_module
+Plan
+------------------
+.. automodule:: Plan.Plan
    :members:
 
+Constellation
+==================
+Stores the satellites targeted by the Scenario
 
-Modules
-===================
-These classes and methods describe the different types of modules used. They host mass and power models and behavioral
-models. All modules inherit from the generic module.
-
-Generic Module
----------------------
-.. automodule:: Modules.GenericModule
+Constellation
+------------------
+.. automodule:: Constellations.Constellation
    :members:
-
-Data Handling Module
----------------------
-.. automodule:: Modules.DataHandlingModule
-   :members:
-
-Communication Module
----------------------
-.. automodule:: Modules.CommunicationModule
-   :members
-
-Electrical Power System Module
----------------------
-.. automodule:: Modules.EPSModule
-   :members:
-
-Structure Module
----------------------
-.. automodule:: Modules.StructureModule
-   :members:
-
-Thermal Module
----------------------
-.. automodule:: Modules.ThermalModule
-   :members:
-
-Attitude and Orbit Control System Module
----------------------
-.. automodule:: Modules.AOCSModule
-   :members:
-
-Propulsion Module
----------------------
-.. automodule:: Modules.PropulsionModule
-   :members:
-
-Capture Module
----------------------
-.. automodule:: Modules.CaptureModule
-   :members:
-
-Approach Suite Module
----------------------
-.. automodule:: Modules.ApproachSuiteModule
-   :members:
-
 
 Phases
-===================
+==================
 These classes and methods describe the different types of phases used. They host astrodynamic models and behavioral
 models. All phases inherit from the generic module.
 
 Generic Phase
----------------------
+------------------
 .. automodule:: Phases.GenericPhase
    :members:
 
 Insertion Phase
----------------------
+------------------
 .. automodule:: Phases.Insertion
    :members:
 
@@ -104,37 +115,92 @@ Orbit Change Phase
    :members:
 
 Orbit Maintenance Phase
----------------------
+--------------------------
 .. automodule:: Phases.OrbitMaintenance
    :members:
 
 Refueling Phase
----------------------
+------------------
 .. automodule:: Phases.Refueling
    :members:
 
 Approach Phase
----------------------
+------------------
 .. automodule:: Phases.Approach
    :members:
 
 Capture Phase
----------------------
+------------------
 .. automodule:: Phases.Capture
    :members:
 
 Release Phase
----------------------
+------------------
 .. automodule:: Phases.Release
    :members:
 
 
 Release Phase
----------------------
+------------------
 .. automodule:: Phases.Release
    :members:
 
 Common Functions used in phases
------------------------------------
+--------------------------------
 .. automodule:: Phases.Common_functions
+   :members:
+
+Modules
+==================
+These classes and methods describe the different types of modules used. They host mass and power models and behavioral
+models. All modules inherit from the generic module.
+
+Generic Module
+------------------
+.. automodule:: Modules.GenericModule
+   :members:
+
+Data Handling Module
+------------------------
+.. automodule:: Modules.DataHandlingModule
+   :members:
+
+Communication Module
+-------------------------
+.. automodule:: Modules.CommunicationModule
+   :members
+
+Electrical Power System Module
+----------------------------------
+.. automodule:: Modules.EPSModule
+   :members:
+
+Structure Module
+------------------
+.. automodule:: Modules.StructureModule
+   :members:
+
+Thermal Module
+------------------
+.. automodule:: Modules.ThermalModule
+   :members:
+
+Attitude and Orbit Control System Module
+--------------------------------------------
+.. automodule:: Modules.AOCSModule
+   :members:
+
+Propulsion Module
+------------------
+.. automodule:: Modules.PropulsionModule
+   :members:
+
+Capture Module
+------------------
+.. automodule:: Modules.CaptureModule
+   :members:
+
+Approach Suite Module
+------------------------
+.. automodule:: Modules.ApproachSuiteModule
    :members:

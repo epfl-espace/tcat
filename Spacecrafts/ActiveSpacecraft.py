@@ -5,8 +5,9 @@ Author:         Malo Goury
 Description:    Parent class for all active spacecrafts
 """
 # Import class
+from numpy import isin
 from Spacecrafts.Spacecraft import Spacecraft
-from Scenario.Plan_module import Plan
+from Plan.Plan import Plan
 from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
@@ -26,8 +27,8 @@ class ActiveSpacecraft(Spacecraft):
     """
     Init
     """
-    def __init__(self,id,group,dry_mass,mass_contingency,starting_epoch,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
-        super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,initial_orbit = initial_orbit,operational_orbit = operational_orbit)
+    def __init__(self,id,group,dry_mass,mass_contingency,scenario,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+        super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
 
@@ -35,6 +36,9 @@ class ActiveSpacecraft(Spacecraft):
         self.modules = dict()
         self.main_propulsion_module = None
         self.capture_module = None
+        
+        # Keep a satellite as reference
+        self.constellation_reference_spacecraft = scenario.reference_satellite
 
         # Spacecraft dict and ordered list
         self.initial_spacecraft = dict()
@@ -44,10 +48,10 @@ class ActiveSpacecraft(Spacecraft):
         self.mass_contingency = mass_contingency
 
         # Disposal orbit triggered at end of mission
-        self.disposal_orbit = disposal_orbit
+        self.initial_orbit = initial_orbit
 
         # Instanciate Plan
-        self.plan = Plan(f"Plan_{self.id}",starting_epoch)
+        self.plan = Plan(f"Plan_{self.id}",scenario.starting_epoch)
 
     """
     Methods
@@ -74,7 +78,9 @@ class ActiveSpacecraft(Spacecraft):
         Args:
             targets_assigned_to_servicer:
         """
-        # TODO: check if can be put into scenario
+        if not isinstance(spacecraft_to_assign,list):
+            spacecraft_to_assign = [spacecraft_to_assign]
+
         for target in spacecraft_to_assign:
             if target in self.current_spacecraft:
                 warnings.warn('Satellite ', target.get_id(), ' already in Servicer ', self.id, '.', UserWarning)
@@ -121,6 +127,7 @@ class ActiveSpacecraft(Spacecraft):
         """
         # Reset Spacecraft
         super().reset()
+        self.current_orbit = self.get_initial_orbit()
 
         # Empty the plan
         self.empty_plan()
@@ -217,6 +224,14 @@ class ActiveSpacecraft(Spacecraft):
 
         # Return current mass
         return current_mass
+
+    def get_initial_orbit(self):
+        """ Get the initial orbit
+
+        Returns:
+            (poliastro.twobody.Orbit): initial orbit
+        """
+        return self.initial_orbit
 
     def get_initial_prop_mass(self):
         """ Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
@@ -318,7 +333,3 @@ class ActiveSpacecraft(Spacecraft):
 
     def print_report(self):
         print(f"Built-in function print report not defined for Class: {type(self)}")
-
-    def __str__(self):
-        return (super().__str__()
-                + "\n\t  dry mass: " + '{:.01f}'.format(self.get_dry_mass())) 

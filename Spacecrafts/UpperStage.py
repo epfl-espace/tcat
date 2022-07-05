@@ -8,8 +8,8 @@ from Modules.PropulsionModule import PropulsionModule
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
-from Scenario.Interpolation import get_launcher_fairing, get_launcher_performance
-from Scenario.ScenarioParameters import *
+from Commons.Interpolation import get_launcher_fairing, get_launcher_performance
+from Scenarios.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
 from poliastro.bodies import Earth
@@ -26,13 +26,10 @@ class UpperStage(ActiveSpacecraft):
     """
     def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario.starting_epoch,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
-
-        # Keep a satellite as reference
-        self.reference_satellite = scenario.reference_satellite
 
         # Set mass, volumes and filling ratio
         self.volume_available = None
@@ -53,7 +50,7 @@ class UpperStage(ActiveSpacecraft):
     """
     Methods
     """
-    def execute_with_fuel_usage_optimisation(self,clients):
+    def execute_with_fuel_usage_optimisation(self,satellites,constellation_precession=0):
         # check default cases
         if self.main_propulsion_module.get_current_prop_mass() < 0.:
             logging.info(f"Remaining fuel is negative, remove a satellite")
@@ -80,7 +77,7 @@ class UpperStage(ActiveSpacecraft):
 
             # compute remaining fuel for new inclination change
             self.ratio_inc_raan_from_opti = (delta_inc_up+delta_inc_low)/2
-            self.execute(clients,self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession)
 
             # define new inclination's range
             if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
@@ -96,11 +93,11 @@ class UpperStage(ActiveSpacecraft):
         # ensure remaining fuel is positive
         if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
             self.ratio_inc_raan_from_opti = delta_inc_low
-            self.execute(clients,self.satellites_allowance)
+            self.execute(satellites,constellation_precession=constellation_precession)
 
         return converged
 
-    def execute(self,clients,custom_sat_allowance):
+    def execute(self,assigned_satellites,constellation_precession=0):
         """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
 
         Args:
@@ -111,13 +108,13 @@ class UpperStage(ActiveSpacecraft):
         self.reset()
 
         # Compute launcher design for custom satellite allowance
-        self.design(custom_sat_allowance=custom_sat_allowance)
+        self.design(assigned_satellites)
 
         # Assign target as per mass and volume allowance
-        self.assign_ordered_satellites(clients)
+        self.assign_spacecraft(assigned_satellites)
 
         # Define spacecraft mission profile
-        self.define_mission_profile(clients.get_global_precession_rotation())
+        self.define_mission_profile(constellation_precession)
 
         # Execute upperstage (Apply owned plan)
         self.execute_plan()
@@ -137,21 +134,17 @@ class UpperStage(ActiveSpacecraft):
         # Empty targets
         self.sats_number = 0
     
-    def design(self,custom_sat_allowance=None,tech_level=1):
+    def design(self,assigned_satellites,tech_level=1):
         """ Design the upperstage based on allowance, tech_level and current performances
 
         Args:
             custom_sat_allowance: allowance to assign to the launcher (for iterative purpose)
             tech_level: dispenser technology level
         """
-        # If custom_sat_allowance provided, update upperstage allowance
-        if not(custom_sat_allowance == None):
-            self.satellites_allowance = custom_sat_allowance
-
         # Compute filling ratio and disp mass and volume
-        self.total_satellites_mass = self.satellites_allowance * self.reference_satellite.get_initial_mass()
+        self.total_satellites_mass = sum([satellite.get_initial_mass() for satellite in assigned_satellites])
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
-        self.volume_filling_ratio = (self.satellites_allowance * self.reference_satellite.get_volume()) / self.volume_available
+        self.volume_filling_ratio = sum([satellite.get_initial_volume() for satellite in assigned_satellites]) / self.volume_available
 
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
@@ -170,18 +163,6 @@ class UpperStage(ActiveSpacecraft):
                                           propellant_contingency=UPPERSTAGE_FUEL_CONTINGENCY, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
                                           mass_contingency=UPPERSTAGE_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
-
-    def assign_ordered_satellites(self,clients):
-        """ Assigned remaining ordered satellites to current launcher within allowance
-
-        Args:
-            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
-        """
-        # Remaining satellite to be delivered
-        available_satellites = clients.get_optimized_ordered_satellites()
-
-        # Assign sats
-        self.assign_spacecraft(available_satellites[0:self.satellites_allowance])
 
     def compute_upperstage(self,scenario):
         """ Compute upperstage initial capacities
@@ -246,10 +227,10 @@ class UpperStage(ActiveSpacecraft):
         """ Compute satellites allowance based on reference satellite dimensions and capacities
         """
         # Compute limit in mass terms
-        limit_mass = math.floor(self.mass_available/self.reference_satellite.get_initial_mass())
+        limit_mass = math.floor(self.mass_available/self.constellation_reference_spacecraft.get_initial_mass())
 
         # Compute limit in volume terms
-        limit_volume = math.floor(self.volume_available/self.reference_satellite.get_volume())
+        limit_volume = math.floor(self.volume_available/self.constellation_reference_spacecraft.get_current_volume())
 
         # Minimal value is of interest
         self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
@@ -392,30 +373,26 @@ class UpperStage(ActiveSpacecraft):
         removal.assign_module(self.get_main_propulsion_module())
 
     def print_report(self):
+        print(f"-"*72
+        + "\nActiveSpacecraft.UpperStage:"
+        + f"\n\tSpacecraft id: {self.get_id()}"
+        + f"\n\tLaunch vehicle name: {self.launcher_name}"
+        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
+        + f"\n\tWet mass: {self.get_wet_mass():.01f}"
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
+        + f"\n\tTotal payload mass available: {self.mass_available:.1f}"
+        + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
+        + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
+        + f"\n\tNumber of spacecrafts onboard: {self.sats_number}"
+        + f"\n\tAssigned Spacecrafts:")
+
+        for target in self.ordered_target_spacecraft:
+            print(f"\t\t{target}")
+
+        print("---")
         self.plan.print_report()
-        """ Print quick summary for debugging purposes."""
-        print(f"""---\n---
-Upperstage:
-    ID: {self.get_id()}
-    Launch vehicle name: {self.launcher_name}
-    Dry mass: {self.get_dry_mass():.01f}
-    Wet mass: {self.get_wet_mass():.01f}
-    Fuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}
-    Payload mass available: {self.mass_available}
-    Number of satellites: {self.sats_number}
-    Dispenser mass: {self.dispenser_mass:.1f}
-    Mass filling ratio: {self.mass_filling_ratio * 100:.1f}%
-    Dispenser volume: {self.dispenser_volume:.1f}
-    Volume filling ratio: {self.volume_filling_ratio * 100:.1f}%
-    Targets assigned to the Launch vehicle:""")
-
-        for x in range(len(self.ordered_target_spacecraft)):
-            print(f"\t\t{self.ordered_target_spacecraft[x]}")
-
         print("---")
 
         print('Modules:')
         for _, module in self.modules.items():
             print(f"\tModule ID: {module}")
-        print('\tPhasing Module ID: ' + self.main_propulsion_module.id)
-        print('\tCapture module ID : ' + self.capture_module.id)
