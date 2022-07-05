@@ -26,6 +26,8 @@ class Spacecraft:
     :type operational_orbit: poliastro.twobody.Orbit
     :param disposal_orbit: Disposal orbit
     :type disposal_orbit: poliastro.twobody.Orbit
+    :param state: Spacecraft actual state
+    :type state: str
     """
     def __init__(self, spacecraft_id, dry_mass, volume=0.*u.m**3, insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
         self.id = spacecraft_id
