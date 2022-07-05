@@ -32,8 +32,7 @@ CONFIG_FOLDER = os.path.join(BASE_FOLDER, 'configs/')
 TCAT_DATA = os.path.join(BASE_FOLDER, 'tcat-data/')
 TCAT_DIR = os.getenv('TCAT_DIR')
 TCAT_PYTHON_EXE = os.getenv('TCAT_PYTHON_EXE')
-TCAT_CONSTELLATION_RUN_FILE = os.path.join(TCAT_DIR, os.getenv('TCAT_CONSTELLATION_RUN_FILE'))
-TCAT_ADR_RUN_FILE = os.path.join(TCAT_DIR, os.getenv('TCAT_ADR_RUN_FILE'))
+TCAT_RUN_FILE = os.path.join(TCAT_DIR, os.getenv('TCAT_RUN_FILE'))
 ALLOWED_EXTENSIONS = os.getenv('ALLOWED_EXTENSIONS').split(',')
 PLOT_IMAGE_NAMES = os.getenv('PLOT_IMAGE_NAMES').split(',')
 LOG_FILENAME = os.getenv('LOG_FILENAME')
@@ -399,12 +398,7 @@ def run_configuration(conf_scenario):
 
         os.makedirs(get_data_path(scenario_id, config_run_id), exist_ok=True)
 
-        run_file = TCAT_CONSTELLATION_RUN_FILE
-
-        if scenario == 'adr':
-            run_file = TCAT_ADR_RUN_FILE
-
-        args = [TCAT_PYTHON_EXE, run_file, filename]
+        args = [TCAT_PYTHON_EXE, TCAT_RUN_FILE, filename]
         popen_and_call(finished_config_run, failed_config_run, config_run.id, TCAT_DIR, args)
 
     response = dict()
