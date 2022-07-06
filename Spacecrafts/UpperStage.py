@@ -17,16 +17,20 @@ from poliastro.twobody import Orbit
 
 
 class UpperStage(ActiveSpacecraft):
-    """ TO BE FILLED
-    """
+    """ UpperStage acts ase a child Class implementing all necessary attributes relative upperstages.
 
-
+    :param upperstage_id: Upperstage identification name
+    :type upperstage_id: str
+    :param scenario: Scenario
+    :type scenario: :class:`~Scenarios.Scenario.Scenario`
+    :param additional_dry_mass: Additionnal dry mass
+    :type additional_dry_mass: u*kg
+    :param mass_contingency: Mass contingency
+    :type mass_contingency: float
     """
-    Init
-    """
-    def __init__(self,id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+    def __init__(self,upperstage_id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(UpperStage, self).__init__(id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super(UpperStage, self).__init__(upperstage_id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
@@ -47,10 +51,16 @@ class UpperStage(ActiveSpacecraft):
         # Compute initial performances
         self.compute_upperstage(scenario)
 
-    """
-    Methods
-    """
     def execute_with_fuel_usage_optimisation(self,satellites,constellation_precession=0):
+        """ Iteratively reduce total mission time by using all propellant mass
+
+        :param satellites: Spacecraft assigned to the upperstage
+        :type satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
+        :param constellation_precession: Reference satellite precession speed
+        :type constellation_precession: float
+        :return: convergence flag
+        :rtype: bool
+        """
         # check default cases
         if self.main_propulsion_module.get_current_prop_mass() < 0.:
             logging.info(f"Remaining fuel is negative, remove a satellite")
@@ -98,11 +108,12 @@ class UpperStage(ActiveSpacecraft):
         return converged
 
     def execute(self,assigned_satellites,constellation_precession=0):
-        """ Reset, redesign and compute the upperstage plan based on clients and satellite allowance
+        """ Reset, design and compute plan based on a list of assigned satellites
 
-        Args:
-            clients (Scenario.ConstellationSatellite.Constellation): clients/constellation to consider
-            upperstage_cur_sat_allowance: allowance to assign to the launcher (for iterative purpose)
+        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
+        :param constellation_precession: Reference satellite precession speed
+        :type constellation_precession: float
         """
         # Perform initial setup (mass and volume available)
         self.reset()
@@ -134,9 +145,10 @@ class UpperStage(ActiveSpacecraft):
     def design(self,assigned_satellites,tech_level=1):
         """ Design the upperstage based on allowance, tech_level and current performances
 
-        Args:
-            custom_sat_allowance: allowance to assign to the launcher (for iterative purpose)
-            tech_level: dispenser technology level
+        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
+        :param tech_level: Dispenser tech level (0-1)
+        :type tech_level: float
         """
         # Compute filling ratio and disp mass and volume
         self.total_satellites_mass = sum([satellite.get_current_mass() for satellite in assigned_satellites])
@@ -162,10 +174,10 @@ class UpperStage(ActiveSpacecraft):
         self.set_main_propulsion_module(mainpropulsion)
 
     def compute_upperstage(self,scenario):
-        """ Compute upperstage initial capacities
+        """ Compute upperstage available mass and volume based on launcher type
 
-        Args:
-            scenario (Scenario.ScenarioConstellation): encapsulating scenario
+        :param scenario: Scenario
+        :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
         # Interpolate launcher performance + correction
         self.compute_mass_available(scenario)
@@ -174,10 +186,10 @@ class UpperStage(ActiveSpacecraft):
         self.compute_volume_available(scenario)
 
     def compute_mass_available(self,scenario):
-        """ Compute the satellite performance
+        """ Compute upperstage available mass based on launcher type
 
-        Args:
-            scenario (Scenario.ScenarioConstellation): encapsulating scenario
+        :param scenario: Scenario
+        :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
         # Check for custom launcher_name values
         if scenario.custom_launcher_name is None:
@@ -202,10 +214,10 @@ class UpperStage(ActiveSpacecraft):
             self.mass_available = scenario.custom_launcher_performance
 
     def compute_volume_available(self,scenario):
-        """ Estimate the satellite volume based on mass
+        """ Compute upperstage available volume based on launcher type
 
-        Args:
-            scenario (Scenario.ScenarioConstellation): encapsulating scenario
+        :param scenario: Scenario
+        :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
         # Check for custom launcher_name values
         if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
@@ -221,7 +233,12 @@ class UpperStage(ActiveSpacecraft):
             self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
     
     def compute_allowance(self,unassigned_satellites):
-        """ Compute satellites allowance based on reference satellite dimensions and capacities
+        """ Reset, design and compute plan based on a list of assigned satellites
+
+        :param unassigned_satellites: Spacecraft unassigned to an upperstage
+        :type unassigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
+        :return: satellites allowance
+        :rtype: int
         """
         # Compute limit in mass terms
         limit_mass = math.floor(self.mass_available/self.constellation_reference_spacecraft.get_initial_mass())
@@ -237,24 +254,29 @@ class UpperStage(ActiveSpacecraft):
 
     def get_satellites_allowance(self):
         """ Return maximum allowable of the upperstage
+
+        :return: satellites allowance
+        :rtype: int
         """
         return self.satellites_allowance
 
     def compute_delta_inclination_for_raan_phasing(self):
-        """ Computes the inclination change for RAAN phasing basd on two ratios:
-        self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
-        self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
+        """ Computes the inclination change for RAAN phasing based on two ratios: 
+            1) self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
+            2) self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
+
+        :return: phasing inclination
+        :rtype: u.deg
         """
         total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
         range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
         return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
 
     def define_mission_profile(self,precession_direction):
-        """ Define launcher profile by creating and assigning adequate phases for a typical servicer_group profile.
+        """ Compute mission profile based on a basic canvas
 
-        Args:
-            launcher (Fleet_module.UpperStage): launcher to which the profile will be assigned
-            precession_direction (int): 1 if counter clockwise, -1 if clockwise (right hand convention)
+        :param precession_direction: satellite precession direction
+        :type precession_direction: u.deg /u.s
         """
         # Update insertion raan, supposing each target can be sent to an ideal raan for operation
         # TODO : implement a launch optimizer
@@ -370,6 +392,8 @@ class UpperStage(ActiveSpacecraft):
         removal.assign_module(self.get_main_propulsion_module())
 
     def print_report(self):
+        """ Print the report
+        """
         print(f"-"*72
         + "\nActiveSpacecraft.UpperStage:"
         + f"\n\tSpacecraft id: {self.get_id()}"

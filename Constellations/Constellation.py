@@ -266,7 +266,7 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.get_operational_orbit().raan.to(u.deg).value, tgt.get_operational_orbit().nu.to(u.deg).value, 'ok')
+                axes.plot(tgt.get_default_orbit().raan.to(u.deg).value, tgt.get_default_orbit().nu.to(u.deg).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('anomaly spacing [°]')
 
@@ -284,8 +284,8 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.get_operational_orbit().raan.to(u.deg).value,
-                             (tgt.get_operational_orbit().a - tgt.get_operational_orbit().attractor.R).to(u.km).value, 'ok')
+                axes.plot(tgt.get_default_orbit().raan.to(u.deg).value,
+                             (tgt.get_default_orbit().a - tgt.get_default_orbit().attractor.R).to(u.km).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('altitude [km]')
 
@@ -318,12 +318,12 @@ class Constellation:
         for _, target in self.satellites.items():
             i += 1
             if i < len(self.satellites):
-                fig.plot(target.get_operational_orbit())
+                fig.plot(target.get_default_orbit())
             else:
                 if save_folder and save:
-                    fig.plot(target.get_operational_orbit()).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
+                    fig.plot(target.get_default_orbit()).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
                 else:
-                    fig.plot(target.get_operational_orbit()).show(render_mode='webgl')
+                    fig.plot(target.get_default_orbit()).show(render_mode='webgl')
 
     def print_KPI(self):
         """ Print KPI related to the constellation"""

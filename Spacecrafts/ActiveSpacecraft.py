@@ -20,15 +20,29 @@ from astropy import units as u
 # Import methods
 
 class ActiveSpacecraft(Spacecraft):
-    """
-    General Attributs
-    """
+    """ ActiveSpacecraft acts ase a child Class implementing all necessary attributes relative to active spacercraft such as upperstages and servicers.
 
+    :param activespacecraft_id: ActiveSpacecraft identification name
+    :type activespacecraft_id: str
+    :param group: Group name
+    :type group: str
+    :param dry_mass: ActiveSpacecraft dry mass
+    :type dry_mass: u*kg
+    :param mass_contingency: ActiveSpacecraft mass contingency
+    :type mass_contingency: float
+    :param scenario: Scenario
+    :type scenario: :class:`~Scenarios.Scenario.Scenario`
+    :param insertion_orbit: Insertion orbit
+    :type insertion_orbit: poliastro.twobody.Orbit
+    :param initial_orbit: Initial orbit
+    :type initial_orbit: poliastro.twobody.Orbit
+    :param operational_orbit: Operational orbit
+    :type operational_orbit: poliastro.twobody.Orbit
+    :param disposal_orbit: Disposal orbit
+    :type disposal_orbit: poliastro.twobody.Orbit
     """
-    Init
-    """
-    def __init__(self,id,group,dry_mass,mass_contingency,scenario,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
-        super().__init__(id,dry_mass,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
+    def __init__(self,activespacecraft_id,group,dry_mass,mass_contingency,scenario,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+        super().__init__(activespacecraft_id,dry_mass,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
 
@@ -57,15 +71,15 @@ class ActiveSpacecraft(Spacecraft):
     Methods
     """
     def empty_plan(self):
-        """ Reset plan for next iteration
+        """ Empty own plan before restart
         """
         self.plan.empty()
 
     def add_module(self, module):
-        """  Adds module to the list
+        """ Add a module to its list
 
-        Args:
-            module (GenericModule): module to be added
+        :param module: new module
+        :type module: :class:`~Modules.GenericModule.GenericModule`
         """
         if module in self.modules:
             warnings.warn('Module ', module.id, ' already in servicer ', self.id, '.', UserWarning)
@@ -73,10 +87,10 @@ class ActiveSpacecraft(Spacecraft):
             self.modules[module.id] = module
 
     def assign_spacecraft(self, spacecraft_to_assign):
-        """ Adds satellites to the Servicer as Target. The Servicer becomes the sat's mothership.
+        """ Assign a list of spacecrafts as targets
 
-        Args:
-            targets_assigned_to_servicer:
+        :param spacecraft_to_assign: list of spacecrafts or child class instances
+        :type spacecraft_to_assign: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         """
         if not isinstance(spacecraft_to_assign,list):
             spacecraft_to_assign = [spacecraft_to_assign]
@@ -93,11 +107,10 @@ class ActiveSpacecraft(Spacecraft):
         self.capture_module.add_captured_spacecrafts(spacecraft_to_assign)
 
     def separate_spacecraft(self, satellite):
-        """ Separate a sat from the launcher. This is used during simulation.
-            The sat is still assigned to the launcher and will be linked if the launcher is reset.
+        """ Remove a satellite from current spacecraft list when released
 
-        Args:
-            sat (Client): sat to be removed from launcher
+        :param satellite: spacecraft to be removed
+        :type satellite: :class:`~Spacecrafts.Spacecraft.Spacecraft`
         """
         if satellite.get_id() in self.current_spacecraft:
             del self.current_spacecraft[satellite.get_id()]
@@ -105,11 +118,10 @@ class ActiveSpacecraft(Spacecraft):
             logging.warning('No sat '+ satellite.get_id() +' in '+ self.id+ '.')
     
     def add_spacecraft(self, satellite):
-        """ Captured a sat by the launcher. This is used during simulation.
-            The sat is still assigned to the launcher and will be linked if the launcher is reset.
+        """ Add a satellite to current spacecraft list when captured or taken as payload
 
-        Args:
-            sat (Client): sat to be added to launcher
+        :param satellite: spacecraft to be removed
+        :type satellite: :class:`~Spacecrafts.Spacecraft.Spacecraft`
         """
         if satellite.get_id() in self.current_spacecraft:
             logging.warning('Sat '+ satellite.get_id() +' already in '+ self.id+ '.')
@@ -123,7 +135,7 @@ class ActiveSpacecraft(Spacecraft):
         self.plan.apply()
 
     def reset(self):
-        """ Reset the object to inital parameters. Empty the plan
+        """ Reset the Activespacecraft to initial parameters. Ready for a restart
         """
         # Reset Spacecraft
         super().reset()
@@ -136,10 +148,10 @@ class ActiveSpacecraft(Spacecraft):
         self.ordered_target_spacecraft = []
 
     def change_orbit(self, orbit):
-        """ Changes the current_orbit of the servicer and linked objects.
+        """ Change current orbit to supplied orbit
 
-        Args:
-            orbit (poliastro.twobody.Orbit): orbit where the servicer will be after update
+        :param orbit: new current orbit
+        :type orbit: poliastro.twobody.Orbit
         """
         # Spacecraft orbit
         super().change_orbit(orbit)
@@ -151,10 +163,10 @@ class ActiveSpacecraft(Spacecraft):
             capture_module.get_captured_spacecrafts()[key].change_orbit(orbit)
 
     def set_capture_module(self,module):
-        """ Returns default capture module of servicer. Used to simplify scenario creation.
+        """ Set the capture module
 
-        Args:
-            (Module): module
+        :param module: capture module
+        :type module: :class:`~Modules.CaptureModule.CaptureModule`
         """
         # Assign capture_module
         self.capture_module = module
@@ -163,10 +175,10 @@ class ActiveSpacecraft(Spacecraft):
         self.add_module(module)
 
     def set_main_propulsion_module(self,module):
-        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
+        """ Set the main propulsion module
 
-        Args:
-            (Module): module
+        :param module: propulsion module
+        :type module: :class:`~Modules.PropulsionModule.PropulsionModule`
         """
         # Assign main_propulsion_module
         self.main_propulsion_module = module
@@ -175,19 +187,18 @@ class ActiveSpacecraft(Spacecraft):
         self.add_module(module)
 
     def get_ordered_target_spacecraft(self):
-        """ Return list of ordered spacecraft target
+        """ Get the list of ordered spacecraft target
 
-        Return:
-            (List[Spacecraft]): self.ordered_target_spacecraft
+        :return: ordered targets
+        :rtype: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         """
-
         return self.ordered_target_spacecraft
 
     def get_capture_module(self):
-        """ Returns default capture module of servicer. Used to simplify scenario creation.
+        """ Get the capture module
 
-        Return:
-            (Module): module
+        :return: capture module
+        :rtype: :class:`~Modules.CaptureModule.CaptureModule`
         """
         try:
             return self.capture_module
@@ -195,10 +206,10 @@ class ActiveSpacecraft(Spacecraft):
             return False
 
     def get_main_propulsion_module(self):
-        """ Returns default main propulsion module of servicer. Used to simplify scenario creation.
+        """ Get the main propulsion module
 
-        Return:
-            (Module): module
+        :return: capture module
+        :rtype: :class:`~Modules.PropulsionModule.PropulsionModule`
         """
         try:
             return self.main_propulsion_module
@@ -206,9 +217,10 @@ class ActiveSpacecraft(Spacecraft):
             return None
 
     def get_current_mass(self):
-        """ Returns the total mass ActiveSpacecraft including module and related satellites
-        Return:
-            (u.kg): current mass, including kits
+        """ Get the current mass.
+
+        :return: current mass
+        :rtype: (u.kg)
         """
         # Instanciate current mass
         current_mass = 0
@@ -228,35 +240,32 @@ class ActiveSpacecraft(Spacecraft):
     def get_initial_orbit(self):
         """ Get the initial orbit
 
-        Returns:
-            (poliastro.twobody.Orbit): initial orbit
+        :return: initial orbit
+        :rtype orbit: poliastro.twobody.Orbit
         """
         return self.initial_orbit
 
     def get_initial_prop_mass(self):
-        """ Returns the total mass of propellant inside the servicer at launch. Does not include kits propellant.
+        """ Get the initial propulsion mass.
 
-        Return:
-            (u.kg): initial propellant mass
+        :return: initial propulsion mass
+        :rtype: (u.kg)
         """
         return self.main_propulsion_module.get_initial_prop_mass()
 
-    def get_wet_mass(self, contingency=True):
-        """ Returns the wet mass of the servicer at launch. Does not include kits.
+    def get_wet_mass(self):
+        """ Get the wet mass.
 
-        Args:
-            contingency (boolean): if True, apply contingencies
-
-        Return:
-              (u.kg): total wet mass
+        :return: wet mass
+        :rtype: (u.kg)
         """
         return self.get_dry_mass() + self.get_initial_prop_mass()
 
     def get_hardware_recurring_cost(self):
-        """ Returns the recurring cost of the servicer, including all modules and current_kits.
+        """ Get hardware recurring cost.
 
-        Return:
-            (float): cost in Euros
+        :return: recurring cost
+        :rtype: float
         """
         recurring_cost = 0.
         # modules cost
@@ -265,11 +274,10 @@ class ActiveSpacecraft(Spacecraft):
         return recurring_cost
 
     def get_development_cost(self):
-        """ Returns the non recurring cost of the servicer development, including all modules and the development
-            cost among kits for each groups present among kits (this assumes).
+        """ Get developpement recurring cost.
 
-        Return:
-            (float): cost in Euros
+        :return: development cost
+        :rtype: float
         """
         non_recurring_cost = 0.
         # modules non recurring cost
@@ -280,13 +288,12 @@ class ActiveSpacecraft(Spacecraft):
         return non_recurring_cost
 
     def get_phases(self, plan):
-        """ Returns all phases from the plan the servicer is assigned to.
+        """ Get all phases assigned to this ActiveSpacecraft
 
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-
-        Return:
-            ([Phase]): list of phases
+        :param plan: propulsion module
+        :type plan: :class:`~Plan.Plan.Plan`
+        :return: phases
+        :rtype: list(:class:`~Phases.GenericPhase.GenericPhase`)
         """
         servicer_phases = []
         for phase in plan.phases:
@@ -299,13 +306,14 @@ class ActiveSpacecraft(Spacecraft):
             - maximum delta v among maneuvers (used to dimension the main propulsion system
             - total mass of propellant used during approaches (used to dimension the rcs propulsion system)
 
-        Args:
-            plan (Plan): plan for which the fleet needs to be designed
-            module (GenericModule): module to be added
-
-        Return:
-            (u.m/u.s): delta v
-            (u.kg): rcs propellant mass
+        :param plan: propulsion module
+        :type plan: :class:`~Plan.Plan.Plan`
+        :param module: module
+        :type module: :class:`~Modules.GenericModule.GenericModule`
+        :return: reference detla v
+        :rtype: u.m / u.s
+        :return: rcs prop mass
+        :rtype: u.kg
         """
         reference_delta_v = 0. * u.m / u.s
         rcs_prop_mass = 0. * u.kg
@@ -320,11 +328,10 @@ class ActiveSpacecraft(Spacecraft):
         return reference_delta_v.to(u.m / u.s), rcs_prop_mass
 
     def get_reference_power(self):
-        """ Returns a reference power used as input for different models. This reference represents the mean power
-            conditioned by the servicer during nominal operations.
+        """ Get the reference power
 
-        Return:
-            (u.W): mean servicer power drawn
+        :return: nominal_power_draw
+        :rtype: u.W
         """
         nominal_power_draw = 0. * u.W
         for _, module in self.modules.items():
@@ -332,4 +339,6 @@ class ActiveSpacecraft(Spacecraft):
         return nominal_power_draw
 
     def print_report(self):
+        """ Print the report
+        """
         print(f"Built-in function print report not defined for Class: {type(self)}")
