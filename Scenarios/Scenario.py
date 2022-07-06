@@ -191,8 +191,8 @@ class Scenario:
         # Plot if verbose
         if self.verbose:
             logging.info("Start plotting Clients...")
-            self.satellites.plot_3D_distribution(save="3D_plot", save_folder=self.data_path)
-            self.satellites.plot_distribution(save="2D_plot", save_folder=self.data_path)
+            self.constellation.plot_3D_distribution(save="3D_plot", save_folder=self.data_path)
+            self.constellation.plot_distribution(save="2D_plot", save_folder=self.data_path)
             logging.info("Finish plotting Clients...")
 
     def define_fleet(self):
