@@ -1,10 +1,11 @@
 Welcome to Sphinx doc 101:
 
 1. comment your code following Sphinx template:
-    - comments in the code must follow sphinx template: - for more info on comments formatting: https://www.sphinx-doc.org/en/master/tutorial/describing-code.html#documenting-python-objects
+    - comments in the code must follow sphinx template: 
+        - for more info on comments formatting: https://www.sphinx-doc.org/en/master/tutorial/describing-code.html#documenting-python-objects
     - Visual Studio Code have powerfull tool to help formating comments:
         - download autoDocstring extension for VSCode
-        - in VSCode settings.json (use ctr+p tofind file), add: "autoDocstring.docstringFormat": "sphinx",
+        - in VSCode settings.json (use ctr+p to find file), add: "autoDocstring.docstringFormat": "sphinx",
         - in your code, right under a function definition, right-click --> generate_docstring
     
 2. install required pyhon package:
