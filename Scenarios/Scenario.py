@@ -337,11 +337,11 @@ class Scenario:
     def print_results(self):
         """ Print results summary in results medium.
         """
-        # Print general report
-        self.print_report()
-
         # Print general KPI
         self.print_KPI()
+        print("\n")
+        # Print general report
+        self.print_report()
 
     def print_report(self):
         # Print flag
@@ -358,7 +358,7 @@ class Scenario:
         """ Print mission KPI.
         """
         # Print flag
-        print("\n"*3+"="*72)
+        print("="*72)
         print("KPI")
         print("="*72)
 
