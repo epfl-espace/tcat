@@ -41,8 +41,8 @@ class ActiveSpacecraft(Spacecraft):
     :param disposal_orbit: Disposal orbit
     :type disposal_orbit: poliastro.twobody.Orbit
     """
-    def __init__(self,activespacecraft_id,group,dry_mass,mass_contingency,scenario,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
-        super().__init__(activespacecraft_id,dry_mass,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
+    def __init__(self,activespacecraft_id,group,dry_mass,mass_contingency,scenario,volume=0.*u.m**3,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+        super().__init__(activespacecraft_id,dry_mass,volume=volume,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
 
