@@ -6,9 +6,9 @@ Description:    Parent class for all active spacecrafts
 """
 # Import class
 from numpy import isin
+from Phases.Common_functions import orbit_string, update_orbit
 from Spacecrafts.Spacecraft import Spacecraft
 from Plan.Plan import Plan
-from Modules.PropulsionModule import PropulsionModule
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
 

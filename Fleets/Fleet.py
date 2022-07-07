@@ -14,7 +14,6 @@ from Plan.Plan import *
 import warnings
 from astropy import units as u
 
-from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from Spacecrafts.UpperStage import UpperStage
 
 class Fleet:
