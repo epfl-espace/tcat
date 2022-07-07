@@ -169,8 +169,7 @@ class Scenario:
                                              operational_orbit=self.sat_operational_orbit,
                                              disposal_orbit=self.sat_disposal_orbit,
                                              state='standby',
-                                             default_orbit=self.sat_default_orbit,
-                                             is_stackable=False)
+                                             default_orbit=self.sat_default_orbit)
 
         # Instanciate ConstellationSatellites object
         logging.info("Instanciating the constellation...")
