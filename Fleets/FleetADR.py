@@ -65,7 +65,7 @@ class FleetADR(Fleet):
                 while not(upperstage_converged):
                     # Create Servicer
                     servicer_count += 1
-                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_DRY_MASS,volume=SERVICER_DEFAULT_VOLUME)
+                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_STRUCT_MASS,volume=SERVICER_DEFAULT_VOLUME)
 
                     # Assign the servicer
                     assigned_servicers.append(current_servicer)

@@ -62,7 +62,7 @@ class Fleet:
         :return: a new UpperStage object
         :rtype: :class:`~Spacecrafts:UpperStage:UpperStage`
         """
-        return UpperStage(upperstage_id,self.scenario,UPPERSTAGE_DRY_MASS)
+        return UpperStage(upperstage_id,self.scenario,UPPERSTAGE_STRUCT_MASS)
         
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:
@@ -246,7 +246,7 @@ class Fleet:
         servicers_id_list = []
         for _, servicer in self.servicers.items():
             servicers_id_list.append(servicer.ID)
-            launch_mass_list.append(servicer.get_wet_mass(contingency=True))
+            launch_mass_list.append(servicer.get_initial_wet_mass())
         return launch_mass_list, servicers_id_list
 
     def get_mass_summary(self, rm_duplicates=False):
@@ -478,7 +478,7 @@ class Fleet:
             print(f"UpperStage: {Nb_UpperStage}")
 
         # Print total launcher mass accros the fleet
-        launchers_mass = [self.upperstages[key].get_initial_mass() for key in self.upperstages.keys()]
+        launchers_mass = [self.upperstages[key].get_initial_wet_mass() for key in self.upperstages.keys()]
         print(F"Total mass launched in space: {sum(launchers_mass):.2f}")
 
     def __str__(self):
