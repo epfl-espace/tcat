@@ -117,7 +117,7 @@ class Spacecraft:
         :rtype: (u.kg)
         """
         mass = 0.
-        for _,module in self.modules:
+        for module in self.modules.values():
             mass += module.get_dry_mass()
         return mass
 
@@ -128,7 +128,7 @@ class Spacecraft:
         :rtype: (u.kg)
         """
         mass = 0.
-        for _,module in self.modules:
+        for module in self.modules.values():
             mass += module.get_current_mass()
         return mass
 
@@ -139,7 +139,7 @@ class Spacecraft:
         :rtype: (u.kg)
         """
         mass = 0.
-        for _,module in self.modules:
+        for module in self.modules.values():
             mass += module.get_initial_wet_mass()
         return mass
 
