@@ -91,8 +91,6 @@ class ActiveSpacecraft(Spacecraft):
                 self.current_spacecraft[target.get_id()] = target
                 target.mothership = self
             self.ordered_target_spacecraft.append(target)
-        
-        self.capture_module.add_captured_spacecrafts(spacecraft_to_assign)
 
     def separate_spacecraft(self, satellite):
         """ Remove a satellite from current spacecraft list when released

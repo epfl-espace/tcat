@@ -130,6 +130,7 @@ class UpperStage(ActiveSpacecraft):
         # Execute upperstage (Apply owned plan)
         self.execute_plan()
 
+
     def reset(self):
         """ Reset the object to inital parameters. Empty the plan
         """
@@ -172,6 +173,15 @@ class UpperStage(ActiveSpacecraft):
                                           propellant_contingency=UPPERSTAGE_FUEL_CONTINGENCY, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
                                           mass_contingency=UPPERSTAGE_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
+
+    def assign_spacecraft(self, spacecraft_to_assign):
+        """ Assign a list of spacecrafts as targets
+
+        :param spacecraft_to_assign: list of spacecrafts or child class instances
+        :type spacecraft_to_assign: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
+        """
+        super().assign_spacecraft(spacecraft_to_assign)
+        self.capture_module.add_captured_spacecrafts(spacecraft_to_assign)
 
     def compute_upperstage(self,scenario):
         """ Compute upperstage available mass and volume based on launcher type
