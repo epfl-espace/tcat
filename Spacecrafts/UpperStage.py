@@ -401,11 +401,12 @@ class UpperStage(ActiveSpacecraft):
         # Assign propulsion module to OrbitChange phase
         removal.assign_module(self.get_main_propulsion_module())
 
-    def print_report(self):
-        """ Print the report
-        """
-        print(f"-"*72
-        + "\nActiveSpacecraft.UpperStage:"
+    def generate_snapshot_string(self):
+        return super().generate_snapshot_string("UpperStage")
+
+    def print_metadata(self):
+        print(f""
+        + f"Metadata:"
         + f"\n\tSpacecraft id: {self.get_id()}"
         + f"\n\tLaunch vehicle name: {self.launcher_name}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
@@ -416,14 +417,3 @@ class UpperStage(ActiveSpacecraft):
         + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
         + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
         + f"\n\tAssigned Spacecrafts:")
-
-        for target in self.ordered_target_spacecraft:
-            print(f"\t\t{target}")
-
-        print("---")
-        self.plan.print_report()
-        print("---")
-
-        print('Modules:')
-        for _, module in self.modules.items():
-            print(f"\tModule ID: {module}")

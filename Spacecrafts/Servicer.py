@@ -227,24 +227,15 @@ class Servicer(ActiveSpacecraft):
         # Return 1 if success
         return 1
 
-    def print_report(self):
-        """ Print the report
-        """
-        print(f"-"*72
-        + "\nActiveSpacecraft.Servicer:"
+    def generate_snapshot_string(self):
+        return super().generate_snapshot_string("Servicer")
+
+    def print_metadata(self):
+        print(f""
+        + f"Metadata:"
         + f"\n\tSpacecraft id: {self.get_id()}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
         + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
-        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}"
-        + f"\n\tAssigned Satellites:")
-
-        for target in self.ordered_target_spacecraft:
-            print(f"\t\t{target}")
-
-        print("---")
-        self.plan.print_report()
-        print("---")
-
-        print('Modules:')
-        for _, module in self.modules.items():
-            print(f"\tModule ID: {module}")
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
+        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
+        + f"\n\tAssigned Spacecrafts:")

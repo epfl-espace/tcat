@@ -284,6 +284,17 @@ class ActiveSpacecraft(Spacecraft):
                     rcs_prop_mass += phase.propellant
         return reference_delta_v.to(u.m / u.s), rcs_prop_mass
 
+    def generate_snapshot_string(self,spacecraft_type_str="Spacecraft"):
+        return (str("")
+        + "\n\tStarting Epoch: " + str(self.previous_orbit.epoch)
+        + "\n\tEnding Epoch: " + str(self.current_orbit.epoch)
+        + "\n\t" + spacecraft_type_str + ": " + str(self.get_id())
+        + "\n\tInitial Orbit: " + orbit_string(self.previous_orbit)
+        + "\n\tFinal Orbit: " + orbit_string(self.current_orbit)
+        + "\n\tReference Satellite Orbit: " + orbit_string(update_orbit(self.constellation_reference_spacecraft.get_default_orbit(),self.current_orbit.epoch))
+        + "\n\t" + spacecraft_type_str + " Mass After Phase: {0:.1f}".format(self.get_current_mass())
+        + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(self.get_main_propulsion_module().current_propellant_mass))
+
     def get_reference_power(self):
         """ Get the reference power
 
@@ -295,7 +306,24 @@ class ActiveSpacecraft(Spacecraft):
             nominal_power_draw = nominal_power_draw + module.get_reference_power()
         return nominal_power_draw
 
+    def print_metadata(self):
+        raise NotImplementedError
+
     def print_report(self):
         """ Print the report
         """
-        print(f"Built-in function print report not defined for Class: {type(self)}")
+        print("")
+        print(self.get_id())
+        print("="*72)
+        self.print_metadata()
+
+        for target in self.ordered_target_spacecraft:
+            print(f"\t\t{target}")
+
+        print(f"-"*72)
+        print('Modules:')
+        for _, module in self.modules.items():
+            print(f"\tModule ID: {module}")
+
+        print(f"-"*72)
+        self.plan.print_report()
