@@ -94,20 +94,12 @@ class GenericPhase:
         """ Save current assigned servicer as a snapshot for future references and post-processing. """
         # format duration
         duration_print = convert_time_for_print(self.duration)
-        spacecraft = self.get_assigned_spacecraft()
 
         # Build snapshot string
         return (str(self.ID)
-        + "\n\tStarting Epoch: " + str(spacecraft.previous_orbit.epoch)
-        + "\n\tEnding Epoch: " + str(spacecraft.current_orbit.epoch)
-        + "\n\tLauncher: " + str(self.get_assigned_spacecraft().id)
         + "\n\tAssociated Module: " + str(self.get_assigned_module().id)
         + "\n\tTotal Duration: " + "{0:.1f}".format(duration_print)
-        + "\n\tInitial Orbit: " + orbit_string(spacecraft.previous_orbit)
-        + "\n\tFinal Orbit: " + orbit_string(spacecraft.current_orbit)
-        + "\n\tReference Satellite Orbit: " + orbit_string(update_orbit(spacecraft.constellation_reference_spacecraft.get_default_orbit(),spacecraft.current_orbit.epoch))
-        + "\n\tLauncher Mass After Phase: {0:.1f}".format(spacecraft.get_current_mass())
-        + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(spacecraft.get_main_propulsion_module().current_propellant_mass))
+        + self.get_assigned_spacecraft().generate_snapshot_string())
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on operation labour.
