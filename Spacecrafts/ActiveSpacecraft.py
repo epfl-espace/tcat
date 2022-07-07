@@ -41,13 +41,12 @@ class ActiveSpacecraft(Spacecraft):
     :param disposal_orbit: Disposal orbit
     :type disposal_orbit: poliastro.twobody.Orbit
     """
-    def __init__(self,activespacecraft_id,group,dry_mass,mass_contingency,scenario,volume=0.*u.m**3,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
-        super().__init__(activespacecraft_id,dry_mass,volume=volume,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
+    def __init__(self,activespacecraft_id,group,structure_mass,mass_contingency,scenario,volume=0.*u.m**3,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+        super().__init__(activespacecraft_id,structure_mass,volume=volume,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
 
         # Instanciate modules
-        self.modules = dict()
         self.main_propulsion_module = None
         self.capture_module = None
         
@@ -74,17 +73,6 @@ class ActiveSpacecraft(Spacecraft):
         """ Empty own plan before restart
         """
         self.plan.empty()
-
-    def add_module(self, module):
-        """ Add a module to its list
-
-        :param module: new module
-        :type module: :class:`~Modules.GenericModule.GenericModule`
-        """
-        if module in self.modules:
-            warnings.warn('Module ', module.id, ' already in servicer ', self.id, '.', UserWarning)
-        else:
-            self.modules[module.id] = module
 
     def assign_spacecraft(self, spacecraft_to_assign):
         """ Assign a list of spacecrafts as targets
@@ -216,27 +204,6 @@ class ActiveSpacecraft(Spacecraft):
         except KeyError:
             return None
 
-    def get_current_mass(self):
-        """ Get the current mass.
-
-        :return: current mass
-        :rtype: (u.kg)
-        """
-        # Instanciate current mass
-        current_mass = 0
-
-        # Instanciate current mass
-        current_mass += super().get_current_mass()
-
-        # Add propulsion current mass
-        current_mass += self.main_propulsion_module.get_current_mass()
-
-        # Add capture module mass (including linked satellite)
-        current_mass += self.capture_module.get_current_mass()
-
-        # Return current mass
-        return current_mass
-
     def get_initial_orbit(self):
         """ Get the initial orbit
 
@@ -252,14 +219,6 @@ class ActiveSpacecraft(Spacecraft):
         :rtype: (u.kg)
         """
         return self.main_propulsion_module.get_initial_prop_mass()
-
-    def get_wet_mass(self):
-        """ Get the wet mass.
-
-        :return: wet mass
-        :rtype: (u.kg)
-        """
-        return self.get_dry_mass() + self.get_initial_prop_mass()
 
     def get_hardware_recurring_cost(self):
         """ Get hardware recurring cost.

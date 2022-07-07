@@ -27,9 +27,9 @@ class Servicer(ActiveSpacecraft):
     :param mass_contingency: Mass contingency
     :type mass_contingency: float
     """
-    def __init__(self,servicer_id,scenario,additional_dry_mass = 0. * u.kg, mass_contingency = 0.0,volume=0.*u.m**3):
+    def __init__(self,servicer_id,scenario,structure_mass=0. * u.kg, mass_contingency = 0.0,volume=0.*u.m**3):
         # Init ActiveSpacecraft
-        super(Servicer, self).__init__(servicer_id,"servicer",additional_dry_mass,mass_contingency,scenario,volume=volume,disposal_orbit=scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
+        super(Servicer, self).__init__(servicer_id,"servicer",structure_mass,mass_contingency,scenario,volume=volume,disposal_orbit=scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
 
         # Design the launcher
         self.design()
@@ -234,7 +234,7 @@ class Servicer(ActiveSpacecraft):
         + "\nActiveSpacecraft.Servicer:"
         + f"\n\tSpacecraft id: {self.get_id()}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        + f"\n\tWet mass: {self.get_wet_mass():.01f}"
+        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
         + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.2f}"
         + f"\n\tAssigned Satellites:")
 

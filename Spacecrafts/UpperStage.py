@@ -28,9 +28,9 @@ class UpperStage(ActiveSpacecraft):
     :param mass_contingency: Mass contingency
     :type mass_contingency: float
     """
-    def __init__(self,upperstage_id,scenario,additional_dry_mass=0. * u.kg,mass_contingency=0.2):
+    def __init__(self,upperstage_id,scenario,structure_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(UpperStage, self).__init__(upperstage_id,"upperstage",additional_dry_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super(UpperStage, self).__init__(upperstage_id,"upperstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
@@ -158,9 +158,9 @@ class UpperStage(ActiveSpacecraft):
         # Add dispenser as CaptureModule
         dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
         dispenser = CaptureModule(self.id + '_Dispenser',
-                                            self,
-                                            mass_contingency=0.0,
-                                            dry_mass_override=dispenser_mass)
+                                self,
+                                mass_contingency=0.0,
+                                dry_mass_override=dispenser_mass)
 
         self.set_capture_module(dispenser)
 
@@ -241,7 +241,7 @@ class UpperStage(ActiveSpacecraft):
         :rtype: int
         """
         # Compute limit in mass terms
-        limit_mass = math.floor(self.mass_available/self.constellation_reference_spacecraft.get_initial_mass())
+        limit_mass = math.floor(self.mass_available/self.constellation_reference_spacecraft.get_initial_wet_mass())
 
         # Compute limit in volume terms
         limit_volume = math.floor(self.volume_available/self.constellation_reference_spacecraft.get_current_volume())
@@ -399,7 +399,7 @@ class UpperStage(ActiveSpacecraft):
         + f"\n\tSpacecraft id: {self.get_id()}"
         + f"\n\tLaunch vehicle name: {self.launcher_name}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        + f"\n\tWet mass: {self.get_wet_mass():.01f}"
+        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
         + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
         + f"\n\tTotal payload mass available: {self.mass_available:.1f}"
         + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"

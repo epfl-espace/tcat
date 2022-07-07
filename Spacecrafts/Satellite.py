@@ -23,7 +23,7 @@ class Satellite(Spacecraft):
     :type default_orbit: poliastro.twobody.Orbit
     """
     def __init__(self, satellite_id, initial_mass, volume, insertion_orbit=None, operational_orbit=None, disposal_orbit=None, state="standby", default_orbit=None):
-        super().__init__(satellite_id, initial_mass, volume,insertion_orbit=insertion_orbit,operational_orbit=operational_orbit, disposal_orbit=disposal_orbit,state=state)
+        super().__init__(satellite_id,initial_mass, volume,insertion_orbit=insertion_orbit,operational_orbit=operational_orbit, disposal_orbit=disposal_orbit,state=state)
         self.default_orbit = default_orbit
 
     def get_default_orbit(self):

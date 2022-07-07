@@ -5,10 +5,14 @@
 # Description:      Base class of the Spacecrafts classes
 
 # Import methods
+from Modules.StructureModule import StructureModule
 from Phases.Common_functions import nodal_precession
 
 # Import libraries
 from astropy import units as u
+import warnings
+
+from Scenarios.ScenarioParameters import *
 
 # Class definition
 class Spacecraft:
@@ -29,11 +33,10 @@ class Spacecraft:
     :param state: Spacecraft actual state
     :type state: str
     """
-    def __init__(self, spacecraft_id, dry_mass, volume=0.*u.m**3, insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
+    def __init__(self, spacecraft_id, structure_mass=0.*u.kg, volume=0.*u.m**3, insertion_orbit=None, operational_orbit=None, disposal_orbit=None,state="standby"):
         self.id = spacecraft_id
         self.state = state
 
-        self.dry_mass = dry_mass
         self.initial_volume = volume
         self.current_volume = volume
 
@@ -44,6 +47,23 @@ class Spacecraft:
         self.previous_orbit = None
 
         self.mothership = None
+
+        self.modules = dict()
+        self.structure_module = StructureModule(self.id + '_Structure',
+                                                self,
+                                                mass_contingency=0.0,
+                                                dry_mass_override=structure_mass)
+
+    def add_module(self, module):
+        """ Add a module to its list
+
+        :param module: new module
+        :type module: :class:`~Modules.GenericModule.GenericModule`
+        """
+        if module in self.modules:
+            warnings.warn('Module ', module.id, ' already in servicer ', self.id, '.', UserWarning)
+        else:
+            self.modules[module.id] = module
 
     def change_orbit(self, orbit):
         """ Update current orbit. Save previous orbit
@@ -96,7 +116,10 @@ class Spacecraft:
         :return: dry mass
         :rtype: (u.kg)
         """
-        return self.dry_mass
+        mass = 0.
+        for _,module in self.modules:
+            mass += module.get_dry_mass()
+        return mass
 
     def get_current_mass(self):
         """ Get the current mass. Alias to :meth:`~Spacecrafts.Spacecraft.Spacecraft.get_dry_mass`
@@ -104,15 +127,21 @@ class Spacecraft:
         :return: current mass
         :rtype: (u.kg)
         """
-        return self.get_dry_mass()
+        mass = 0.
+        for _,module in self.modules:
+            mass += module.get_current_mass()
+        return mass
 
-    def get_initial_mass(self):
+    def get_initial_wet_mass(self):
         """ Get the initial mass. Alias to :meth:`~Spacecrafts.Spacecraft.Spacecraft.get_dry_mass`
 
         :return: dry mass
         :rtype: (u.kg)
         """
-        return self.get_dry_mass()
+        mass = 0.
+        for _,module in self.modules:
+            mass += module.get_initial_wet_mass()
+        return mass
 
     def get_current_orbit(self):
         """ Get the current orbit
