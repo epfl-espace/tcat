@@ -63,6 +63,12 @@ class Fleet:
         """
         return UpperStage(upperstage_id,self.scenario,UPPERSTAGE_STRUCT_MASS)
         
+    def get_starting_epoch(self):
+        return min([spacecraft.get_starting_epoch() for spacecraft in self.activespacecrafts.values()])    
+
+    def get_ending_epoch(self):
+        return max([spacecraft.get_ending_epoch() for spacecraft in self.activespacecrafts.values()]) 
+
     def get_graph_status(self):
         if self.is_performance_graph_already_generated:
             return True
@@ -469,6 +475,14 @@ class Fleet:
 
     def print_KPI(self):
         """ Print KPI related to the fleet"""
+        # Mission duration
+        print("")
+        print(f"Starting epoch: {self.get_starting_epoch()}")
+        print(f"Ending epoch: {self.get_ending_epoch()}")
+        duration = self.get_ending_epoch() - self.get_starting_epoch()
+        print(f"Mission duration: {convert_time_for_print(duration):.2f}")
+        print("")
+
         # Number of launcher
         Nb_UpperStage = len(self.upperstages)
         if Nb_UpperStage > 1:

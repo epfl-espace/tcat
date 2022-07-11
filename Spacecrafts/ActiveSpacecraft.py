@@ -172,6 +172,12 @@ class ActiveSpacecraft(Spacecraft):
         # Add the module to the list
         self.add_module(module)
 
+    def get_starting_epoch(self):
+        return self.plan.get_starting_epoch()
+
+    def get_ending_epoch(self):
+        return self.plan.get_ending_epoch()
+
     def get_ordered_target_spacecraft(self):
         """ Get the list of ordered spacecraft target
 
