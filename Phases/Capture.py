@@ -1,9 +1,7 @@
 from astropy import units as u
 
-import Scenario.Fleet_module
 from Phases.GenericPhase import GenericPhase
 from Modules.CaptureModule import *
-
 
 class Capture(GenericPhase):
     """A Phase that represents capture and links an object given in argument to the servicer for subsequent phases.
@@ -40,20 +38,16 @@ class Capture(GenericPhase):
          Calls generic function to update orbit raan and epoch.
          """
         # assign capture object to the appropriate module
-        self.get_assigned_module().captured_object = self.captured_object
+        self.get_assigned_module().add_captured_spacecrafts(self.captured_object)
 
         # in case the architecture is mothership and current_kits, separate kit
-        if self.get_assigned_spacecraft().mothership:
-            # the mothership's orbit is updated (not just the kit's)
-            self.update_spacecraft(servicer=self.get_assigned_spacecraft().mothership)
-            # the kit is separated and updated
-            self.get_assigned_spacecraft().mothership.separate_kit(self.get_assigned_spacecraft())
-            self.update_spacecraft()
-            self.take_spacecraft_snapshot()
+        if self.captured_object.mothership:
+            # the sat is separated and updated
+            self.get_assigned_spacecraft().add_spacecraft(self.captured_object)
 
         # if not, then simply update the servicer
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
@@ -67,6 +61,7 @@ class Capture(GenericPhase):
         passes_cost = number_of_additional_gnd_station_passes * 100.  # Euros
         return (fte_operation * cost_fte_operation * self.duration + passes_cost).decompose()
 
-    def __str__(self):
-        return ('--- \nCapture: ' + super().__str__()
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
+        return ('--- \nCapture: ' + super().build_spacecraft_snapshot_string()
                 + '\n\tOf ' + str(self.captured_object))

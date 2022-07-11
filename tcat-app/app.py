@@ -1,28 +1,27 @@
+import base64
 import io
-import os
 import json
+import mimetypes
+import os
 import re
 import subprocess
 import threading
 import time
+import uuid
 import zipfile
+from datetime import datetime
 from operator import and_, or_
 from time import sleep
-from datetime import datetime
-import uuid
-import base64
-import mimetypes
 
+from dotenv import load_dotenv
 from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for
 from flask_oidc import OpenIDConnect
-
-import inputparams
-from models import db, Configuration, ConfigurationRun
 from sqlalchemy import desc
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from dotenv import load_dotenv
+import inputparams
+from models import db, Configuration, ConfigurationRun
 
 load_dotenv()  # sets values from .env file as environment vars, *.env files are ignored when creating the docker
 # image. so the values for the docker image come from the dockerfile and the provided arguments
@@ -120,8 +119,8 @@ def get_user_info():
     return oidc.user_getinfo(['email'])['email']
 
 
-def valid_configuration(configuration):
-    flat_validation_params = [item for sublist in inputparams.params.values() for item in sublist]
+def valid_configuration(configuration, params):
+    flat_validation_params = [item for sublist in params.values() for item in sublist]
     validation_errors = {}
     valid = True
     for param in flat_validation_params:
@@ -272,9 +271,7 @@ def result_stream(config_run_id):
     return app.response_class(generate(config_run_id, RESULT_FILENAME), mimetype='text/plain')
 
 
-@app.route('/configure', methods=['GET', 'POST'])
-@oidc.require_login
-def configure():
+def configure(current_scenario, template, params):
     current_user_email = get_user_info()
     last_configuration = None
     last_run_for_configuration = None
@@ -282,7 +279,9 @@ def configure():
 
     if request.method == 'POST':
         uploaded_configuration = dict(request.form)
-        validation = valid_configuration(uploaded_configuration)
+        validation = valid_configuration(uploaded_configuration, params)
+
+        uploaded_configuration['scenario'] = current_scenario
 
         if not validation[0]:
             flash(f'Invalid form data: {validation[1]}', 'error')
@@ -291,21 +290,34 @@ def configure():
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
+        last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
+                                                           Configuration.scenario == current_scenario)).order_by(
             desc(Configuration.created_date)).first()
         if last_config_item is not None:
             last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
             last_configuration = json.loads(last_config_item.configuration)
 
-    return render_template('configure.html', last_configuration=last_configuration,
+    return render_template(template, last_configuration=last_configuration,
                            last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
+
+
+@app.route('/configure-adr', methods=['GET', 'POST'])
+@oidc.require_login
+def configure_adr():
+    return configure('adr', 'configure_adr.html', inputparams.adr_mission_params)
+
+
+@app.route('/configure-constellation-deployment', methods=['GET', 'POST'])
+@oidc.require_login
+def configure_constellation_deployment():
+    return configure('constellation_deployment', 'configure_constellation_deployment.html',
+                     inputparams.constellation_mission_params)
 
 
 def store_configuration(conf, current_user_email):
     configuration = Configuration(creator_email=current_user_email)
-    scenario_id = str(uuid.uuid4())
-    conf['scenario_id'] = scenario_id
-    configuration.scenario_id = scenario_id
+    configuration.scenario_id = str(uuid.uuid4())
+    configuration.scenario = conf['scenario']
     configuration.scenario_name = conf['constellation_name']
     configuration.configuration = json.dumps(conf)
     db.session.add(configuration)
@@ -319,6 +331,7 @@ def configure_from_file():
     if 'file' not in request.files:
         flash('No file part')
         return redirect(request.url)
+    scenario = 'constellation_deployment'
     file = request.files['file']
     current_user_email = get_user_info()
     if file is None:
@@ -331,7 +344,14 @@ def configure_from_file():
             file.seek(0)
             file_content = file.stream.read()
             uploaded_config = json.loads(file_content.decode('utf-8'))
-            valid = valid_configuration(uploaded_config)
+
+            if uploaded_config['scenario'] is None:
+                flash('No scenario specified', 'error')
+                return redirect(request.url)
+
+            scenario = uploaded_config['scenario']
+            valid = valid_configuration(uploaded_config, inputparams.adr_mission_params) if scenario == 'adr' else valid_configuration(uploaded_config, inputparams.constellation_mission_params)
+
             if valid[0]:
                 store_configuration(uploaded_config, current_user_email)
             else:
@@ -342,20 +362,20 @@ def configure_from_file():
         else:
             flash('File not supported', 'error')
 
-    return redirect(url_for('configure'))
+    return redirect(url_for('configure_adr') if scenario == 'adr' else url_for('configure_constellation_deployment'))
 
 
-@app.route('/configure/run', methods=['GET'])
-@oidc.require_login
-def run_configuration():
+def run_configuration(conf_scenario):
     current_user_email = get_user_info()
-    last_config_item = Configuration.query.filter_by(creator_email=current_user_email).order_by(
+    last_config_item = Configuration.query.filter(
+        and_(Configuration.creator_email == current_user_email, Configuration.scenario == conf_scenario)).order_by(
         desc(Configuration.created_date)).first()
     scenario_id = None
     config_run_id = None
 
     if last_config_item is not None:
         scenario_id = last_config_item.scenario_id
+        scenario = last_config_item.scenario
         filename = os.path.join(CONFIG_FOLDER, current_user_email,
                                 datetime.today().strftime('%Y-%m-%d-%H-%M-%S-%f') + '_config_run.json')
         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -386,6 +406,18 @@ def run_configuration():
     response['config_run_id'] = config_run_id
 
     return response
+
+
+@app.route('/configure/run/adr', methods=['GET'])
+@oidc.require_login
+def run_adr():
+    return run_configuration('adr')
+
+
+@app.route('/configure/run/constellation-deployment', methods=['GET'])
+@oidc.require_login
+def run_constellation_deployment():
+    return run_configuration('constellation_deployment')
 
 
 @app.route('/configure/run/plot/<string:scenario_id>/<int:config_run_id>', methods=['GET'])
@@ -440,6 +472,11 @@ def download_run_data(scenario_id, config_run_id):
         return 'No configuration run found with the provided scenario_id and config_run_id'
 
     files_path = get_data_path(scenario_id, config_run_id)
+
+    f = open(os.path.join(files_path, f'{scenario_id}-configuration.json'), "w")
+    f.write(config.configuration)
+    f.close()
+
     files = os.listdir(files_path)
     file_obj = io.BytesIO()
 
@@ -457,7 +494,7 @@ def download_run_data(scenario_id, config_run_id):
     return send_file(file_obj, attachment_filename=f'{scenario_id}.zip', as_attachment=True)
 
 
-app.jinja_env.globals.update(inputparams=inputparams.params)
+app.jinja_env.globals.update(inputparams=inputparams)
 
 if __name__ == '__main__':
     app.run()

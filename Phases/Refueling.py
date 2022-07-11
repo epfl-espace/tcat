@@ -51,8 +51,8 @@ class Refueling(GenericPhase):
         """
         # find all possible captured objects that have propulsion modules
         propulsion_modules = dict()
-        for _, module in self.get_assigned_spacecraft().get_capture_modules().items():
-            propulsion_modules = {**propulsion_modules, **module.captured_object.get_refueling_modules()}
+        module = self.get_assigned_spacecraft().get_capture_module()
+        propulsion_modules = {**propulsion_modules, **module.captured_object.get_refueling_modules()}
         if not propulsion_modules:
             raise Exception('Found no assigned_tanker for '+str(self.ID)+'.')
 

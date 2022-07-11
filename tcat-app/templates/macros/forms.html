@@ -1,37 +1,31 @@
 {% macro checkbox(name, checked) -%}
-    <div class="flex items-center">
-        <input type="checkbox" name="{{ name }}" {{ checked }} class="checkboxes opacity-0 absolute h-8 w-8" />
-        <div class="bg-white dark:bg-gray-900 border-2 rounded-lg border-blue-400 dark:border-blue-200 h-8 w-8 flex flex-shrink-0 justify-center items-center">
-            <svg class="fill-current hidden w-4 h-4 pointer-events-none" viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg">
-                <g fill="none" fill-rule="evenodd">
-                    <g transform="translate(-9 -11)" fill="#1F73F1" fill-rule="nonzero">
-                        <path d="m25.576 11.414c0.56558 0.55188 0.56558 1.4439 0 1.9961l-9.404 9.176c-0.28213 0.27529-0.65247 0.41385-1.0228 0.41385-0.37034 0-0.74068-0.13855-1.0228-0.41385l-4.7019-4.588c-0.56584-0.55188-0.56584-1.4442 0-1.9961 0.56558-0.55214 1.4798-0.55214 2.0456 0l3.679 3.5899 8.3812-8.1779c0.56558-0.55214 1.4798-0.55214 2.0456 0z" />
-                    </g>
-                </g>
-            </svg>
-        </div>
-    </div>
+    <input type="checkbox" name="{{ name }}" {{ checked }} class="checkbox"/>
 {%- endmacro %}
 
 {% macro select(name, selectedValue, values) -%}
-    <select class="select-input-value bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" name="{{ name }}" data-selected="{{ selectedValue }}">
-    {% for val in values %}
-        <option value="{{ val }}">{{ val }}</option>
-    {% endfor %}
+    <select class="select select-sm select-bordered max-w-xs" name="{{ name }}" data-selected="{{ selectedValue }}">
+        {% for val in values %}
+            <option value="{{ val }}">{{ val }}</option>
+        {% endfor %}
     </select>
 {%- endmacro %}
 
 {% macro input(name, type, value, required, validation, error) -%}
     <div class="flex flex-col gap-2">
-    {% if error != None %}
-        <p class="text-red-700 dark:text-red-300">{{ error }}</p>
-    {% endif %}
-    {% if type == 'number' %}
-        <input class="flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" min="{{ validation[0] }}" max="{{ validation[1] }}" value="{{ value }}" {{ required }}>
-    {% elif type == 'datetime-local' %}
-        <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} min="{{ validation[0] }}" max="{{ validation[1] }}"  {% endif %} {{ required }}>
-    {% else %}
-        <input class="text-input-validated flex-grow-0 bg-white dark:bg-gray-900 text-black dark:text-gray-300 rounded-lg px-2" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if validation != None %} data-validation="{{ validation }}" {% endif %} {{ required }}>
-    {% endif %}
+        {% if error != None %}
+            <p class="text-red-700 dark:text-red-300">{{ error }}</p>
+        {% endif %}
+        {% if type == 'number' %}
+            <input class="flex-grow-0 input input-bordered " type="{{ type }}" name="{{ name }}"
+                   min="{{ validation[0] }}" max="{{ validation[1] }}" value="{{ value }}" {{ required }}>
+        {% elif type == 'datetime-local' %}
+            <input class="text-input-validated flex-grow-0 input input-bordered" type="{{ type }}" name="{{ name }}"
+                   value="{{ value }}" {% if validation != None %} min="{{ validation[0] }}"
+                   max="{{ validation[1] }}"  {% endif %} {{ required }}>
+        {% else %}
+            <input class="text-input-validated flex-grow-0 input input-bordered" type="{{ type }}" name="{{ name }}"
+                   value="{{ value }}" {% if validation != None %}
+                   data-validation="{{ validation }}" {% endif %} {{ required }}>
+        {% endif %}
     </div>
 {%- endmacro %}

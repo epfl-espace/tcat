@@ -1,3 +1,4 @@
+from typing import List
 from astropy import units as u
 from Modules.GenericModule import GenericModule
 
@@ -22,14 +23,67 @@ class CaptureModule(GenericModule):
                          mass_contingency=mass_contingency,
                          recurring_cost_override=recurring_cost_override,
                          non_recurring_cost_override=non_recurring_cost_override)
-        self.captured_object = None
-    
-    def define_as_capture_default(self):
-        """ Make module default capture module for its servicer.
-        Used in automatic generation of planning and servicers in case of multiple capture modules per servicer.
+
+        # Capture spacecrafts
+        self.captured_spacecrafts = dict()
+
+    def add_captured_spacecrafts(self,spacecrafts):
+        """ Populate all spacecraft with
+
+        Args:
+            spacecrafts (List[Spacecraft] or Spacecraft): captured spacecrafts
         """
-        # if
-        self.spacecraft.capture_module_ID = self.id
+        if isinstance(spacecrafts, list):
+            for spacecraft in spacecrafts:
+                self.captured_spacecrafts[spacecraft.get_id()] = spacecraft
+        else:
+            self.captured_spacecrafts[spacecrafts.get_id()] = spacecrafts
+
+    def release_single_spacecraft(self,spacecraft):
+        """ Release a single spacecraft at a time
+
+        Args:
+            spacecraft (Spacecraft): captured spacecraft to be released
+        """
+        if spacecraft.get_id() in self.captured_spacecrafts.keys():
+            del self.captured_spacecrafts[spacecraft.get_id()]
+    
+    def release_all_spacecrafts(self):
+        """ Release all spacecraft at a time
+        """
+        self.reset()
+
+    def get_captured_spacecrafts(self):
+        """ Set the capture object to a specified spacecraft
+
+        Return:
+            self.captured_spacecrafts (Spacecraft): captured spacecraft
+        """
+        return self.captured_spacecrafts
+
+    def get_dry_mass(self):
+        """Returns the dry mass of the module
+
+        Return:
+            (u.kg): dry mass
+        """
+        return self.dry_mass
+
+    def get_captured_mass(self):
+        """Returns the captured mass of the modules
+
+        Return:
+            (u.kg): dry mass
+        """
+        return sum([self.captured_spacecrafts[key].get_current_mass() for key in self.captured_spacecrafts.keys()])
+
+    def get_current_mass(self):
+        """Returns the total mass of the modules
+
+        Return:
+            (u.kg): dry mass
+        """
+        return self.get_dry_mass() + self.get_captured_mass()
 
     def is_capture_default(self):
         """ Check if module is default capture module for its servicer."""
@@ -37,4 +91,5 @@ class CaptureModule(GenericModule):
 
     def reset(self):
         """ Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence."""
-        self.captured_object = None
+        self.captured_spacecrafts = dict()
+        self.history_captured_spacecrafts = dict()

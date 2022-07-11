@@ -318,12 +318,6 @@ class PropulsionModule(GenericModule):
         else:
             self.non_recurring_cost = 1700 * 1000
         return self.non_recurring_cost
-        
-    def define_as_main_propulsion(self):
-        """ Make module default phasing module for its servicer.
-        Used in automatic generation of planning and servicers.
-        """
-        self.spacecraft.main_propulsion_module_ID = self.id
 
     def is_main_propulsion(self):
         """ Check if module is default phasing for its servicer."""
@@ -422,6 +416,14 @@ class PropulsionModule(GenericModule):
         """
         return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
 
+    def get_current_mass(self, contingency=True):
+        """Returns the current wet mass of the module (including contingencies by default).
+
+        Return:
+            (u.kg): current wet mass
+        """
+        return self.get_dry_mass(contingency=contingency) + self.get_current_prop_mass()
+
     def get_minimal_propellant_mass(self, plan):
         """ Returns the lowest fuel state of the module over a plan. Used for convergence of fleet.
 
@@ -448,6 +450,14 @@ class PropulsionModule(GenericModule):
         self.previous_initial_propellant_mass = self.initial_propellant_mass
         self.previous_minimal_propellant_mass = self.get_minimal_propellant_mass(plan)
         self.initial_propellant_mass = new_propellant_mass
+
+    def get_initial_mass(self, contingency=False):
+        """Returns the initial mass of the module.
+
+        Return:
+            (u.kg): dry mass with contingency
+        """
+        return self.get_wet_mass(contingency=contingency)
 
     def reset(self):
         """" Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence_margin.

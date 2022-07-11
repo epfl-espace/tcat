@@ -1,10 +1,9 @@
 from astropy.time import Time
 
-import Scenario.Fleet_module
 from Modules.PropulsionModule import *
 from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
-import logging
+from poliastro.bodies import Earth
 
 
 class OrbitChange(GenericPhase):
@@ -106,7 +105,7 @@ class OrbitChange(GenericPhase):
 
         # update servicer according to computed orbits and duration
         self.update_spacecraft()
-        self.take_spacecraft_snapshot()
+        self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
     
     def apply_delta_v(self):
         """ Compute the delta v for the maneuver and possible orbit maintenance during phasing.
@@ -173,10 +172,7 @@ class OrbitChange(GenericPhase):
         """
         # retrieve required module attributes
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
-                mass = self.get_assigned_spacecraft().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -261,9 +257,6 @@ class OrbitChange(GenericPhase):
         if orbit2 is None:
             orbit2 = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
                 mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
@@ -313,10 +306,7 @@ class OrbitChange(GenericPhase):
         if final_orbit is None:
             final_orbit = self.final_orbit
         if mass is None:
-            if isinstance(self.assigned_module.spacecraft, Scenario.Fleet_module.Servicer):
-                mass = self.get_assigned_spacecraft().get_current_mass()
-            else:
-                mass = self.get_assigned_spacecraft().get_current_mass()
+            mass = self.get_assigned_spacecraft().get_current_mass()
         if thrust is None:
             thrust = self.get_assigned_module().reference_thrust
         if isp is None:
@@ -341,9 +331,7 @@ class OrbitChange(GenericPhase):
                 delta_raan = delta_raan - 360. * u.deg
             if delta_raan < -180. * u.deg:
                 delta_raan = delta_raan + 360. * u.deg
-
-            logging.log(21, f"Orbit_change delta RAAN: {delta_raan}; final orbit RAAN: {final_orbit.raan}; initial orbit RAAN: {initial_orbit.raan}; maneuver delta RAAN: {maneuver_delta_raan}")
-            
+ 
             # Check if phasing can be avoided to the benefit of direct raan change manoeuvre
             if abs(delta_raan) < self.raan_cutoff:
                 phasing_duration = 0. * u.day
@@ -415,16 +403,15 @@ class OrbitChange(GenericPhase):
         # reset the initial orbit
         self.initial_orbit = self.planned_initial_orbit
 
-    def __str__(self):
+    def build_spacecraft_snapshot_string(self):
+        """ Save current assigned servicer as a snapshot for future references and post-processing. """
         # Combine all manoeuvres into a single string
         manoeuvres_string = ""
         for manoeuvre in self.manoeuvres:
             manoeuvres_string += ("\t\t" + str(manoeuvre) + " \n")
 
-        # Build return string
-        return ('--- \nOrbit change: ' + super().__str__()
-                + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
-                + "\n\t\u0394m: " + "{0:.1f}".format(self.spacecraft_snapshot.get_main_propulsion_module().delta_mass)
-                + "\n\tManoeuvres: \n " + manoeuvres_string[:-2]
-                )
+        return('--- \nOrbit change: ' + super().build_spacecraft_snapshot_string()
+        + '\n\t\u0394V: ' + "{0:.1f}".format(self.get_delta_v() * (1 + self.delta_v_contingency))
+        + "\n\t\u0394m: " + "{0:.1f}".format(self.get_assigned_spacecraft().get_main_propulsion_module().delta_mass)
+        + "\n\tManoeuvres: \n " + manoeuvres_string[:-2])
 

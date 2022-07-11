@@ -1,0 +1,31 @@
+{% macro navigation() -%}
+    <nav class="navbar font-sans bg-base-200 lg:rounded-b-lg">
+        <div class="flex-1">
+            <a class="btn btn-link text-base-content normal-case text-xl md:text-xl lg:text-3xl"
+               href="/index">TCAT App</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal p-0">
+                <li>
+                    <a class="btn btn-link" href="/overview">Overview</a>
+                </li>
+                <li>
+                    <a class="btn btn-link">
+                        Configure
+                    </a>
+                    <ul class="p-2 bg-base-300 rounded-md">
+                        <li><a class="btn btn-link" href="/configure-constellation-deployment">Constellation
+                            Deployment</a></li>
+                        <li><a class="btn btn-link" href="/configure-adr">ADR</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/status">Status</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+{%- endmacro %}

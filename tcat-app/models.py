@@ -1,11 +1,13 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 
 class Configuration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    scenario = db.Column(db.String(128), nullable=False)
     scenario_id = db.Column(db.String(128), nullable=False, unique=True)
     scenario_name = db.Column(db.String(2048), nullable=False)
     creator_email = db.Column(db.String(128), nullable=False)

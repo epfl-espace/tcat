@@ -1,6 +1,7 @@
+import json
 import os
 import sys
-import json
+
 from dotenv import load_dotenv
 
 if len(sys.argv) > 2:

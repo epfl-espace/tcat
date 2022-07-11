@@ -1,0 +1,156 @@
+{% macro configure(action_url, action_from_file_url, inputparams, forms, last_configuration, last_run_for_configuration, validation_errors) -%}
+    <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
+        <div class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2 bg-base-200 shadow-xl p-2 md:p-4 lg:p-6 rounded-lg">
+            <h2 class="font-bold text-lg">Configure</h2>
+            <form id="config-form" method="post" action="{{ action_url }}" enctype="multipart/form-data"
+                  class="flex-grow rounded-lg">
+                {% for key in inputparams.keys() %}
+                    <div class="group flex flex-col p-2 lg:p-6">
+                        <p class="flex-grow-0 text-base lg:text-lg">{{ key[1] }}</p>
+                        <div class="flex flex-col gap-2">
+                            {% for input in inputparams[key] %}
+                                <div class="flex-grow md:flex-grow-0 flex flex-row m-2 gap-2">
+                                    {% set fs = 'italic font-light' if (input[4] == None) else 'font-semibold' %}
+                                    {% set required = '' if (input[4] == None) else 'required' %}
+                                    {% set last_value = None if last_configuration == None else last_configuration[input[2]] %}
+                                    {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
+                                    {% set error = None if (validation_errors == None or input[2] not in validation_errors) else validation_errors[input[2]] %}
+                                    <label for="{{ input[2] }}"
+                                           class="flex-grow {{ fs }}">{{ input[3] }}</label>
+                                    {% if input[0] == 'input' %}
+                                        {{ forms.input(input[2], input[1], value, required, input[5], error) }}
+                                    {% elif input[0] == 'select' %}
+                                        {{ forms.select(input[2], value, input[5]) }}
+                                    {% elif input[0] == 'checkbox' %}
+                                        {% set checked = 'checked' if value == True else '' %}
+                                        {{ forms.checkbox(input[2], checked) }}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </form>
+            <div class="flex-grow-0 flex flex-col md:flex-row justify-between gap-4 md:gap-8">
+                <form id="file-select-form" method="post" action="{{ action_from_file_url }}"
+                      enctype="multipart/form-data"
+                      class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
+                    <input class="hidden file-input cursor-pointer" type="file" id="file" name="file">
+                    <label for="file" class="text-center font-semibold cursor-pointer">Select
+                        file</label>
+                </form>
+                <button id="upload-data" class="btn btn-active btn-primary">Upload</button>
+            </div>
+        </div>
+        <div class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2 bg-base-200 shadow-xl p-2 md:p-4 lg:p-6 rounded-lg">
+            <div class="flex flex-row justify-between align-center"><h2 class="font-bold text-lg flex flex-col justify-center">Results</h2><a class="btn" href="/status">See detailed results</a></div>
+            <div class="flex-grow flex flex-col gap-2 md:gap-4 rounded-lg">
+                <button id="loading-spinner" class="hidden btn loading">loading</button>
+                <div id="image-container" class="hidden flex-grow flex flex-col gap-4 p-4"></div>
+            </div>
+            <div class="flex-grow md:flex-grow-0 flex flex-row gap-2 justify-center md:justify-end">
+                {% set enabled = 'disabled' if last_configuration == None else '' %}
+                <button id="run-config" class="btn btn-active btn-primary" {{ enabled }}>Run</button>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro configure_script(scenario, last_run_for_configuration) -%}
+    <script>
+        const fileInput = document.querySelector('.file-input');
+        const fileSelectForm = document.querySelector('#file-select-form');
+        const validatedTextInputs = document.querySelectorAll('.text-input-validated');
+        const selectInputValue = document.querySelectorAll('.select-input-value');
+        const uploadData = document.querySelector('#upload-data');
+        const configForm = document.querySelector('#config-form');
+        const loadingSpinner = document.querySelector('#loading-spinner');
+        const runConfig = document.querySelector('#run-config');
+        const inputs = document.querySelectorAll('input, select');
+        const alreadyRunConfig = {{ 'true' if last_run_for_configuration != None else 'false' }};
+
+        let changed = false;
+        uploadData.disabled = true;
+
+        if (location.hash === '#runconfig') {
+            location.hash = '';
+            confirmRerunConfig(undefined);
+        }
+
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('change', enableUpload);
+        }
+
+        if (selectInputValue && selectInputValue.length > 0) {
+            for (let i = 0; i < selectInputValue.length; i++) {
+                selectInputValue[i].value = selectInputValue[i].dataset.selected;
+            }
+        }
+
+        if (validatedTextInputs && validatedTextInputs.length > 0) {
+            for (let i = 0; i < validatedTextInputs.length; i++) {
+                validatedTextInputs[i].addEventListener('input', (e => {
+                    let regex = new RegExp(e.target.dataset.validation, 'g');
+                    let validInput = regex.test(e.target.value);
+                    if (validInput) e.target.classList.remove('text-red-700', 'dark:text-red-300');
+                    else e.target.classList.add('text-red-700', 'dark:text-red-300');
+                }));
+            }
+        }
+
+        fileInput.addEventListener('change', (e => {
+            fileSelectForm.submit();
+        }));
+
+        uploadData.addEventListener('click', (e => {
+            uploadConfiguration();
+            e.preventDefault();
+        }));
+
+        runConfig.addEventListener('click', (e => {
+            if (alreadyRunConfig && !changed) {
+                openModal('Rerun configuration?', 'You already executed the entered configuration. If you want to execute it again, please confirm.', confirmRerunConfig)
+            } else if (changed) {
+                openModal('Upload configuration first', 'You made changes to the configuration. In order to apply these changes upload the configuration. Please confirm to upload the configuration.', (e) => {
+                    location.hash = '#runconfig';
+                    uploadConfiguration();
+                })
+            } else {
+                confirmRerunConfig(undefined)
+            }
+            e.preventDefault();
+        }));
+
+        function uploadConfiguration() {
+            configForm.submit();
+        }
+
+        function confirmRerunConfig(e) {
+            //imageContainer comes from imageloader.js!
+            imageContainer.innerHTML = '';
+            imageContainer.classList.add('hidden');
+            clearInterval(checkForPlotImagesInterval);
+            let request = new XMLHttpRequest();
+            request.addEventListener('load', (e) => {
+                let response = JSON.parse(e.currentTarget.response);
+                loadingSpinner.classList.remove('hidden');
+                //checkForPlotImagesInterval comes from imageloader.js
+                checkForPlotImagesInterval = setInterval(() => checkForPlotImages(response.scenario_id, response.config_run_id, () => {
+                    runConfig.disabled = false;
+                    loadingSpinner.classList.add('hidden');
+                }), 1000);
+            });
+            request.open('GET', '{{ url_for('run_' + scenario) }}');
+            request.send();
+            runConfig.disabled = true;
+        }
+
+        function enableUpload(e) {
+            changed = true;
+            uploadData.disabled = false;
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].removeEventListener('change', enableUpload);
+            }
+        }
+    </script>
+{%- endmacro %}
