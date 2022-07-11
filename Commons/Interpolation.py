@@ -210,7 +210,7 @@ def interpolate_launcher_data(fleet, launcher_data, param_one, param_two, interp
         if not fleet.get_graph_status():
             if save_folder and save:
 
-                fig.savefig(os.path.join(save_folder, save, '.png'), bbox_inches='tight', dpi=100, engine="kaleido")
+                fig.savefig(save_folder + '/' + save + '.png', bbox_inches='tight', dpi=100, engine="kaleido")
 
                 if create_gif:
                     def rotate(angle):
