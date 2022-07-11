@@ -401,6 +401,16 @@ class UpperStage(ActiveSpacecraft):
         # Assign propulsion module to OrbitChange phase
         removal.assign_module(self.get_main_propulsion_module())
 
+    def get_initial_wet_mass(self):
+        """Return the wet mass including payload mass.
+
+        :return: dry mass + propellant mass + payload mass
+        :rtype: flt (u.kg)
+        """
+        wet_mass = super().get_initial_wet_mass()
+        wet_mass += sum([satellite.get_dry_mass() for satellite in self.initial_spacecraft.values()])
+        return wet_mass
+
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("UpperStage")
 
