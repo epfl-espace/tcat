@@ -132,6 +132,9 @@ class Constellation:
             temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.get_default_orbit())[1].value)
         return int(np.sign(temp_rotation))
 
+    def get_sum_of_sats_mass(self):
+        return sum([sat.get_dry_mass() for sat in self.satellites.values()])
+
     def reset(self):
         """ Calls the reset function for each satellite.
             This function is used to reset the mass and orbits of targets after a simulation.
@@ -144,8 +147,8 @@ class Constellation:
         and self.seed_for_random_sats_failure.
         """
         random.seed(self.seed_for_random_sats_failure)
-        nb_sat_dead = int(np.round(self.get_number_satellites()*(1-self.sats_reliability)))
-        for key in random.sample(self.satellites.keys(),nb_sat_dead):
+        nb_sat_operational = int(np.round(self.get_number_satellites()*(self.sats_reliability)))
+        for key in random.sample(self.satellites.keys(),nb_sat_operational):
             del self.satellites[key]
 
     def populate_standard_constellation(self, constellation_name, reference_satellite, number_of_planes=2, sat_per_plane=10, plane_distribution_angle=180, altitude_offset = 10*u.km):
@@ -266,7 +269,7 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.get_operational_orbit().raan.to(u.deg).value, tgt.get_operational_orbit().nu.to(u.deg).value, 'ok')
+                axes.plot(tgt.get_default_orbit().raan.to(u.deg).value, tgt.get_default_orbit().nu.to(u.deg).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('anomaly spacing [°]')
 
@@ -284,8 +287,8 @@ class Constellation:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 5))
         for _, tgt in self.satellites.items():
             if tgt.state == 'standby':
-                axes.plot(tgt.get_operational_orbit().raan.to(u.deg).value,
-                             (tgt.get_operational_orbit().a - tgt.get_operational_orbit().attractor.R).to(u.km).value, 'ok')
+                axes.plot(tgt.get_default_orbit().raan.to(u.deg).value,
+                             (tgt.get_default_orbit().a - tgt.get_default_orbit().attractor.R).to(u.km).value, 'ok')
         axes.set_xlabel('raan spacing [°]')
         axes.set_ylabel('altitude [km]')
 
@@ -318,12 +321,12 @@ class Constellation:
         for _, target in self.satellites.items():
             i += 1
             if i < len(self.satellites):
-                fig.plot(target.get_operational_orbit())
+                fig.plot(target.get_default_orbit())
             else:
                 if save_folder and save:
-                    fig.plot(target.get_operational_orbit()).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
+                    fig.plot(target.get_default_orbit()).write_image(file=save_folder + "/"+ save+".png", format="png", scale="2", engine="kaleido")
                 else:
-                    fig.plot(target.get_operational_orbit()).show(render_mode='webgl')
+                    fig.plot(target.get_default_orbit()).show(render_mode='webgl')
 
     def print_KPI(self):
         """ Print KPI related to the constellation"""

@@ -70,34 +70,34 @@ class GenericModule:
                 servicer_phases.append(phase)
         return servicer_phases
 
-    def get_initial_mass(self, contingency=False):
+    def get_initial_wet_mass(self, with_contingency=False):
         """Returns the initial mass of the module.
 
         Return:
             (u.kg): dry mass with contingency
         """
-        return self.get_dry_mass(contingency=contingency)
+        return self.get_dry_mass(with_contingency=with_contingency)
 
-    def get_dry_mass(self, contingency=True):
+    def get_dry_mass(self, with_contingency=False):
         """Returns the dry mass of the module (including contingencies by default).
 
         Return:
             (u.kg): dry mass with contingency
         """
-        if not self.dry_mass:
+        if self.dry_mass is None:
             return 0. * u.kg
-        if contingency:
-            return self.dry_mass * (1 + self.mass_contingency)
-        else:
+        if with_contingency is False:
             return self.dry_mass
+        else:
+            return self.dry_mass * (1 + self.mass_contingency)
 
-    def get_wet_mass(self, contingency=True):
-        """Returns the initial wet mass of the module at launch (including contingencies by default).
+    def get_current_mass(self, with_contingency=False):
+        """Returns the current wet mass of the module.
 
         Return:
             (u.kg): initial wet mass
         """
-        return self.get_dry_mass(contingency=contingency)
+        return self.get_dry_mass(with_contingency=with_contingency)
 
     def get_reference_power(self):
         """ Returns the reference power of the module.

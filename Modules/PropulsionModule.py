@@ -137,7 +137,7 @@ class PropulsionModule(GenericModule):
         ref_delta_v, rcs_prop_mass = self.spacecraft.get_reference_manoeuvres(plan, self)
         # for phasing
         if ref_delta_v > 0. * u.m / u.s:
-            reference_servicer_mass = self.spacecraft.get_wet_mass()
+            reference_servicer_mass = self.spacecraft.get_initial_wet_mass()
             if self.prop_type in ['mono-propellant', 'water', 'solid', "bi-propellant"]:
                 reference_time = 20. * u.minute
                 main_thrust = (reference_servicer_mass * ref_delta_v / reference_time).to(u.N)
@@ -263,7 +263,7 @@ class PropulsionModule(GenericModule):
             thruster_mass += 3.2 * u.kg / 8 * n_of_rdv_thrusters * n_of_rdv_sets
             max_continuous_delta_v = max(0. * u.m / u.s, phasing_delta_v)
             # compute tanks for hydrolyzed H2 and O2
-            hydrolyzed_mass = (self.spacecraft.get_wet_mass()
+            hydrolyzed_mass = (self.spacecraft.get_initial_wet_mass()
                                * (1 - 1 / np.exp((max_continuous_delta_v / self.isp / const.g0).decompose().value)))
             n_h2 = hydrolyzed_mass / (18. * u.g / u.mol)
             n_o2 = hydrolyzed_mass / (36. * u.g / u.mol)
@@ -408,21 +408,21 @@ class PropulsionModule(GenericModule):
         """
         return self.current_propellant_mass
 
-    def get_wet_mass(self, contingency=True):
+    def get_initial_wet_mass(self):
         """Returns the initial wet mass of the module at launch (including contingencies by default).
 
         Return:
             (u.kg): initial wet mass
         """
-        return self.get_dry_mass(contingency=contingency) + self.get_initial_prop_mass()
+        return super().get_initial_wet_mass() + self.get_initial_prop_mass()
 
-    def get_current_mass(self, contingency=True):
+    def get_current_mass(self):
         """Returns the current wet mass of the module (including contingencies by default).
 
         Return:
             (u.kg): current wet mass
-        """
-        return self.get_dry_mass(contingency=contingency) + self.get_current_prop_mass()
+        """ 
+        return  super().get_current_mass() + self.get_current_prop_mass()
 
     def get_minimal_propellant_mass(self, plan):
         """ Returns the lowest fuel state of the module over a plan. Used for convergence of fleet.
@@ -450,14 +450,6 @@ class PropulsionModule(GenericModule):
         self.previous_initial_propellant_mass = self.initial_propellant_mass
         self.previous_minimal_propellant_mass = self.get_minimal_propellant_mass(plan)
         self.initial_propellant_mass = new_propellant_mass
-
-    def get_initial_mass(self, contingency=False):
-        """Returns the initial mass of the module.
-
-        Return:
-            (u.kg): dry mass with contingency
-        """
-        return self.get_wet_mass(contingency=contingency)
 
     def reset(self):
         """" Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence_margin.
