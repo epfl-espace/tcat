@@ -60,9 +60,7 @@ class Scenario:
         self.id = scenario_id
 
         # Instanciante Clients, Fleet and Plan
-        self.clients = None
         self.fleet = None
-        self.plan = None
         self.constellation = None
 
         # Flag
@@ -76,6 +74,8 @@ class Scenario:
 
         self.launcher_insertion_orbit = None
         self.launcher_disposal_orbit = None
+
+        self.reference_satellite = None
 
         self.create_attributes_from_input_json(json)
         self.launcher_name = self.launcher
@@ -129,6 +129,9 @@ class Scenario:
             self.constellation.reset()
         logging.info("Finish defining Clients...")
 
+        if self.constellation.get_number_satellites() == 0:
+            raise Exception("Empty constellation, cannot execute a scenario")
+
         # Define fleet based on attributes
         logging.info("Start defining Fleet...")
         self.define_fleet()
@@ -169,8 +172,7 @@ class Scenario:
                                              operational_orbit=self.sat_operational_orbit,
                                              disposal_orbit=self.sat_disposal_orbit,
                                              state='standby',
-                                             default_orbit=self.sat_default_orbit,
-                                             is_stackable=False)
+                                             default_orbit=self.sat_default_orbit)
 
         # Instanciate ConstellationSatellites object
         logging.info("Instanciating the constellation...")
@@ -338,11 +340,11 @@ class Scenario:
     def print_results(self):
         """ Print results summary in results medium.
         """
-        # Print general report
-        self.print_report()
-
         # Print general KPI
         self.print_KPI()
+        print("\n")
+        # Print general report
+        self.print_report()
 
     def print_report(self):
         # Print flag
@@ -359,7 +361,7 @@ class Scenario:
         """ Print mission KPI.
         """
         # Print flag
-        print("\n"*3+"="*72)
+        print("="*72)
         print("KPI")
         print("="*72)
 
@@ -371,6 +373,3 @@ class Scenario:
 
         # Print Fleet related KPI
         self.fleet.print_KPI()
-
-        # Print Constellation related KPI
-        self.constellation.print_KPI()
