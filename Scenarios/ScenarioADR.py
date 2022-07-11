@@ -120,4 +120,4 @@ class ScenarioADR(Scenario):
     def print_KPI(self):
         super().print_KPI()
 
-        print(f"Total debris mass removed: {self.constellation.get_sum_of_sats_mass()}:.2f")
+        print(f"Total debris mass removed: {self.constellation.get_sum_of_sats_mass():.1f}")
