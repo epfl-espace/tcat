@@ -132,6 +132,9 @@ class Constellation:
             temp_rotation = temp_rotation + np.sign(nodal_precession(satellite.get_default_orbit())[1].value)
         return int(np.sign(temp_rotation))
 
+    def get_sum_of_sats_mass(self):
+        return sum([sat.get_dry_mass() for sat in self.satellites.values()])
+
     def reset(self):
         """ Calls the reset function for each satellite.
             This function is used to reset the mass and orbits of targets after a simulation.

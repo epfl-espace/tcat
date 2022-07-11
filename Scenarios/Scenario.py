@@ -373,6 +373,3 @@ class Scenario:
 
         # Print Fleet related KPI
         self.fleet.print_KPI()
-
-        # Print Constellation related KPI
-        self.constellation.print_KPI()

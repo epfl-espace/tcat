@@ -117,3 +117,7 @@ class ScenarioADR(Scenario):
         if self.constellation.get_number_satellites() == 0:
             raise Exception("Empty constellation, decrease constellation reliability")
 
+    def print_KPI(self):
+        super().print_KPI()
+
+        print(f"Total debris mass removed: {self.constellation.get_sum_of_sats_mass()}:.2f")

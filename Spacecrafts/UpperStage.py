@@ -408,8 +408,11 @@ class UpperStage(ActiveSpacecraft):
         :rtype: flt (u.kg)
         """
         wet_mass = super().get_initial_wet_mass()
-        wet_mass += sum([satellite.get_dry_mass() for satellite in self.initial_spacecraft.values()])
+        wet_mass += self.get_initial_payload_mass()
         return wet_mass
+
+    def get_initial_payload_mass(self):
+        return sum([satellite.get_dry_mass() for satellite in self.initial_spacecraft.values()])
 
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("UpperStage")

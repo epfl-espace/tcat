@@ -493,6 +493,9 @@ class Fleet:
         # Print total launcher mass accros the fleet
         launchers_mass = [self.upperstages[key].get_initial_wet_mass() for key in self.upperstages.keys()]
         print(F"Total mass launched in space: {sum(launchers_mass):.2f}")
+        payload_mass = [upperstage.get_initial_payload_mass() for upperstage in self.upperstages.values()]
+        print(f"Total payload mass released in space: {sum(payload_mass):.2f}")
+
 
     def __str__(self):
         temp = self.id
