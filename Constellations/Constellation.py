@@ -144,8 +144,8 @@ class Constellation:
         and self.seed_for_random_sats_failure.
         """
         random.seed(self.seed_for_random_sats_failure)
-        nb_sat_dead = int(np.round(self.get_number_satellites()*(1-self.sats_reliability)))
-        for key in random.sample(self.satellites.keys(),nb_sat_dead):
+        nb_sat_operational = int(np.round(self.get_number_satellites()*(self.sats_reliability)))
+        for key in random.sample(self.satellites.keys(),nb_sat_operational):
             del self.satellites[key]
 
     def populate_standard_constellation(self, constellation_name, reference_satellite, number_of_planes=2, sat_per_plane=10, plane_distribution_angle=180, altitude_offset = 10*u.km):
