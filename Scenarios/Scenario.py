@@ -129,6 +129,9 @@ class Scenario:
             self.constellation.reset()
         logging.info("Finish defining Clients...")
 
+        if self.constellation.get_number_satellites() == 0:
+            raise Exception("Empty constellation, cannot execute a scenario")
+
         # Define fleet based on attributes
         logging.info("Start defining Fleet...")
         self.define_fleet()

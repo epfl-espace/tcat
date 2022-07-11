@@ -114,3 +114,6 @@ class ScenarioADR(Scenario):
         self.constellation.set_sats_reliability(self.sats_reliability)
         self.constellation.set_seed_for_random_sats_failure(self.seed_random_sats_failure)
         self.constellation.perform_random_sat_failure()
+        if self.constellation.get_number_satellites() == 0:
+            raise Exception("Empty constellation, decrease constellation reliability")
+
