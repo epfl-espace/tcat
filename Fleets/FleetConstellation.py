@@ -7,8 +7,7 @@ Description:    FleetConstellation related class
 
 # Import Classes
 from Fleets.Fleet import Fleet
-from Scenarios.ScenarioParameters import UPPERSTAGE_DRY_MASS
-from Spacecrafts.UpperStage import UpperStage
+from Scenarios.ScenarioParameters import *
 
 # Import libraries
 import math

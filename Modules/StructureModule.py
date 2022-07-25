@@ -13,9 +13,9 @@ class StructureModule(GenericModule):
     Attributes:
         c.f. GenericModule
     """
-    def __init__(self, module_id, servicer, dry_mass_override=None, reference_power_override=0.*u.W,
+    def __init__(self, module_id, spacecraft, dry_mass_override=None, reference_power_override=0.*u.W,
                  mass_contingency=0.1, recurring_cost_override=None, non_recurring_cost_override=None):
-        super().__init__(module_id, servicer, dry_mass_override=dry_mass_override,
+        super().__init__(module_id, spacecraft, dry_mass_override=dry_mass_override,
                          reference_power_override=reference_power_override,
                          mass_contingency=mass_contingency,
                          recurring_cost_override=recurring_cost_override,

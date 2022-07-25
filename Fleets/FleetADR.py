@@ -7,13 +7,11 @@ Description:    FleetADR related class
 
 # Import Classes
 from Fleets.Fleet import Fleet
-from Scenarios.ScenarioParameters import SERVICER_DRY_MASS
+from Scenarios.ScenarioParameters import *
 from Spacecrafts.Servicer import Servicer
-from Spacecrafts.UpperStage import UpperStage
 
 # Import libraries
 import warnings
-import copy
 
 class FleetADR(Fleet):
     """ A Fleet consists of a dictionary of servicers.
@@ -67,7 +65,7 @@ class FleetADR(Fleet):
                 while not(upperstage_converged):
                     # Create Servicer
                     servicer_count += 1
-                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_DRY_MASS)
+                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_STRUCT_MASS,volume=SERVICER_DEFAULT_VOLUME)
 
                     # Assign the servicer
                     assigned_servicers.append(current_servicer)
@@ -79,6 +77,7 @@ class FleetADR(Fleet):
                     if upperstage_main_propulsion_module.get_current_prop_mass() < 0:
                         # Remove last
                         del assigned_servicers[-1]
+                        servicer_count -= 1
 
                         # Upperstage has converged if last servicers is discared
                         upperstage_converged = True

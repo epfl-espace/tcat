@@ -81,10 +81,12 @@ def convert_time_for_print(dt):
     Args:
         dt (u.sec, u.minute, u.day, etc...): duration to covert in a printable unit
     """
-    if dt > 30. * u.day:
+    if dt > 1. * u.year:
         dt = dt.to(u.year)
     elif dt > 1. * u.day:
         dt = dt.to(u.day)
+    elif dt > 1 * u.hour:
+        dt = dt.to(u.hour)
     elif dt > 1 * u.minute:
         dt = dt.to(u.minute)
     elif dt > 1 * u.s:
