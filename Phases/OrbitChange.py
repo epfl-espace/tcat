@@ -50,7 +50,6 @@ class OrbitChange(GenericPhase):
         self.raan_phasing_absolute = raan_phasing_absolute
         self.raan_cutoff = raan_cutoff
         self.raan_drift = 0. * u.deg
-        self.manoeuvres = []
         # TODO: add duration override? add planned delta v?
 
     def assign_module(self, assigned_module):
