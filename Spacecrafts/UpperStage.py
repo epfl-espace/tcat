@@ -417,16 +417,8 @@ class UpperStage(ActiveSpacecraft):
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("UpperStage")
 
-    def print_metadata(self):
-        print(f""
-        + f"Metadata:"
-        + f"\n\tSpacecraft id: {self.get_id()}"
-        + f"\n\tLaunch vehicle name: {self.launcher_name}"
-        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
-        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
-        + f"\n\tTotal payload mass available: {self.mass_available:.1f}"
+    def print_spacecraft_specific_data(self):
+        print(f"\tTotal payload mass available: {self.mass_available:.1f}"
         + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
         + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
-        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
-        + f"\n\tAssigned Spacecrafts:")
+        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}")
