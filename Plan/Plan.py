@@ -97,6 +97,25 @@ class Plan:
         duration = end_date - start_date
         return duration.to(u.day)
 
+    def get_nb_manoeuvers(self):
+        """ Loop through the phases of the plan and computes the total number of manoeuvers
+
+        :return: total number of manoeuvers
+        :rtype: int
+        """
+        n_manoeuvres = 0
+        for phase in self.phases:
+            n_manoeuvres += phase.get_nb_manoeuvers()
+        return n_manoeuvres
+
+    def get_nb_phases(self):
+        """ Computed the number of phases
+
+        :return: number of phases
+        :rtype: int
+        """
+        return len(self.phases)
+
     def get_total_cost(self, fleet):
         """ Returns total operation costs. The simulation must have run to compute this.
 
