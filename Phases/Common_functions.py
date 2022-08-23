@@ -281,7 +281,7 @@ def high_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, init
     d_inc_ratio = np.sin(mean_inc.to(u.rad))
     delta_v = np.pi / 2 * vel * d_inc_ratio * abs(delta_raan.to(u.rad).value)
 
-    manoeuvre = Manoeuvre(delta_v)
+    manoeuvre = Manoeuvre(delta_v,id="high trust direct raan change")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     transfer_duration = (final_orbit.period / 2).to(u.day)
 
@@ -299,7 +299,7 @@ def low_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, initi
     delta_v = np.pi / 2 * (np.sqrt(initial_orbit.attractor.k / mean_a) * np.sin(mean_inc.to(u.rad).value)
                            * abs(delta_raan.to(u.rad).value))
 
-    manoeuvre = Manoeuvre(delta_v)
+    manoeuvre = Manoeuvre(delta_v,id="low trust direct raan change")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     transfer_duration = manoeuvre.get_burn_duration(duty_cycle=0.25)
 
