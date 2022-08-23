@@ -70,6 +70,7 @@ class PropulsionModule(GenericModule):
         self.previous_rendezvous_throughput = 0. * u.kg
         self.previous_phasing_throughput = 0. * u.kg
         self.last_refuel_amount = None
+        self.nb_burn = 0
 
     def design(self, plan):
         """Method called during convergence_margin to design the module given the current plan.
@@ -319,6 +320,14 @@ class PropulsionModule(GenericModule):
             self.non_recurring_cost = 1700 * 1000
         return self.non_recurring_cost
 
+    def get_nb_burn(self):
+        """ Returns the number of time a delta_v is executed
+
+        :return: number of executed dVs
+        :rtype: float
+        """
+        return self.nb_burn
+
     def is_main_propulsion(self):
         """ Check if module is default phasing for its servicer."""
         return self.spacecraft.main_propulsion_module_ID == self.id
@@ -342,6 +351,7 @@ class PropulsionModule(GenericModule):
         """
         self.delta_mass = self.compute_propellant_mass(delta_v)
         self.consume_propellant(self.delta_mass, phase=phase)
+        self.nb_burn += 1
 
     def compute_propellant_mass(self, delta_v):
         """ Compute amount of propellant to produce delta v.
@@ -465,6 +475,7 @@ class PropulsionModule(GenericModule):
         self.rendezvous_throughput = 0. * u.kg
         self.previous_phasing_throughput = self.phasing_throughput
         self.phasing_throughput = 0. * u.kg
+        self.nb_burn = 0
 
     def __str__(self):
         return (super(PropulsionModule, self).__str__()
