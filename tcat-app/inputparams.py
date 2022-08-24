@@ -12,7 +12,7 @@ constellation_mission_params = {
     ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Constellation Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
         ['input', 'number', 'sat_mass', 'Satellite Mass (kg)', 147, [0.1, 99999.9]],
-        ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', None, [0.001, 99999.9]],
+        ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', 1.3, [0.001, 99999.9]],
         ['input', 'number', 'n_planes', 'Number of orbital planes', 3, [1, 100]],
         ['input', 'number', 'n_sats_per_plane', 'Number of satellite per orbital plane', 2, [1, 1000]],
         ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [180, 360]],
@@ -74,7 +74,7 @@ adr_mission_params = {
     ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Constellation Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
         ['input', 'number', 'sat_mass', 'Satellite Mass (kg)', 147, [0.1, 99999.9]],
-        ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', None, [0.001, 99999.9]],
+        ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', 1.3, [0.001, 99999.9]],
         ['input', 'number', 'n_planes', 'Number of orbital planes', 3, [1, 100]],
         ['input', 'number', 'n_sats_per_plane', 'Number of satellite per orbital plane', 2, [1, 1000]],
         ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [180, 360]],
@@ -139,9 +139,6 @@ adr_mission_params = {
          'Servicer insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 500.0,
          [0.0, 400000.0]],
         ['input', 'number', 'inc_servicer_insertion', 'Servicer insertion orbit inclination (deg)', 87.0,
-         [-90.0, 90.0]],
-        ['input', 'number', 'raan_servicer_insertion', 'Servicer insertion orbit raan (deg)', 0.0, [-90.0, 90.0]],
-        ['input', 'number', 'arg_periapsis_servicer_insertion', 'Servicer insertion orbit arg periapsis (deg)', 0.0,
          [-90.0, 90.0]],
         ['input', 'number', 'true_anomaly_servicer_insertion', 'Servicer insertion orbit true anomaly (deg)', 0.0,
          [-90.0, 90.0]],
