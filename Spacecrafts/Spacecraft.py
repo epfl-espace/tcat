@@ -121,6 +121,17 @@ class Spacecraft:
             mass += module.get_dry_mass()
         return mass
 
+    def get_modules_dry_mass_str(self):
+        """ Outputs in a str the dry mass of each module
+
+        :return: Text listing the dry mass of each module
+        :rtype: str
+        """
+        str_mass = ""
+        for module in self.modules.values():
+            str_mass += f"\n\t\t{module.get_id()}: {module.get_dry_mass():.01f}"
+        return str_mass
+
     def get_current_mass(self):
         """ Get the current mass. Alias to :meth:`~Spacecrafts.Spacecraft.Spacecraft.get_dry_mass`
 
@@ -142,6 +153,17 @@ class Spacecraft:
         for module in self.modules.values():
             mass += module.get_initial_wet_mass()
         return mass
+
+    def get_modules_initial_wet_mass_str(self):
+        """ Outputs in a str the initial wet mass of each module
+
+        :return: Text listing the initial wet mass of each module
+        :rtype: str
+        """
+        str_mass = ""
+        for module in self.modules.values():
+            str_mass += f"\n\t\t{module.get_id()}: {module.get_initial_wet_mass():.01f}"
+        return str_mass
 
     def get_current_orbit(self):
         """ Get the current orbit
