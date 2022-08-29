@@ -83,14 +83,15 @@ class Spacecraft:
         :param new_epoch: epoch for updated orbit
         :type new_epoch: Orbit.epoch
         """
-        self.insertion_orbit = Orbit.from_classical(Earth,
-                                    self.insertion_orbit.a,
-                                    self.insertion_orbit.ecc,
-                                    self.insertion_orbit.inc,
-                                    self.insertion_orbit.raan,
-                                    self.insertion_orbit.argp,
-                                    self.insertion_orbit.nu,
-                                    new_epoch)
+        if self.insertion_orbit is not None:
+            self.insertion_orbit = Orbit.from_classical(Earth,
+                                        self.insertion_orbit.a,
+                                        self.insertion_orbit.ecc,
+                                        self.insertion_orbit.inc,
+                                        self.insertion_orbit.raan,
+                                        self.insertion_orbit.argp,
+                                        self.insertion_orbit.nu,
+                                        new_epoch)
 
     def reset(self):
         """ Reset the instance. Mothership and current orbits are cleared
