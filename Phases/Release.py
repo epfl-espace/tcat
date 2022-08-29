@@ -48,6 +48,7 @@ class Release(GenericPhase):
 
         # Update target current orbit
         self.target.set_current_orbit(copy.deepcopy(self.get_assigned_spacecraft().get_current_orbit()))
+        self.target.modify_insertion_orbit_epoch(self.get_assigned_spacecraft().get_current_orbit().epoch)
 
     def get_operational_cost(self):
         """ Returns the operational cost of the phase based on assumed FTE and associated costs. 
