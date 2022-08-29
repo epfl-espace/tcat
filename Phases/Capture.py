@@ -64,4 +64,4 @@ class Capture(GenericPhase):
     def build_spacecraft_snapshot_string(self):
         """ Save current assigned servicer as a snapshot for future references and post-processing. """
         return ('--- \nCapture: ' + super().build_spacecraft_snapshot_string()
-                + '\n\tOf ' + str(self.captured_object))
+                + '\n\tCaptured Object: ' + str(self.captured_object))

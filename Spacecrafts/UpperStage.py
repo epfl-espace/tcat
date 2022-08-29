@@ -412,21 +412,24 @@ class UpperStage(ActiveSpacecraft):
         return wet_mass
 
     def get_initial_payload_mass(self):
-        return sum([satellite.get_dry_mass() for satellite in self.initial_spacecraft.values()])
+        return sum([satellite.get_initial_wet_mass() for satellite in self.initial_spacecraft.values()])
+
+    def get_modules_initial_wet_mass_str(self):
+        """ Adds the payload mass to the list of initial wet masses
+
+        :return: Text listing all modules mass and the payload mass
+        :rtype: str
+        """
+        str_mass = super().get_modules_initial_wet_mass_str()
+        str_mass += f"\n\t\tInitial payload = {self.get_initial_payload_mass():.2f}"
+        return str_mass
 
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("UpperStage")
 
-    def print_metadata(self):
-        print(f""
-        + f"Metadata:"
-        + f"\n\tSpacecraft id: {self.get_id()}"
-        + f"\n\tLaunch vehicle name: {self.launcher_name}"
-        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
-        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
-        + f"\n\tTotal payload mass available: {self.mass_available:.1f}"
-        + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
-        + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
-        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
-        + f"\n\tAssigned Spacecrafts:")
+    def print_spacecraft_specific_data(self):
+        print(f"\tTotal payload mass available: {self.mass_available:.1f}"
+        + f"\n\tTotal initial payload = {self.get_initial_payload_mass():.1f}"
+        + f"\n\tLauncher mass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
+        + f"\n\tLauncher volume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
+        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}")
