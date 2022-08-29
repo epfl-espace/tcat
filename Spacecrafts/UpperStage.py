@@ -414,12 +414,22 @@ class UpperStage(ActiveSpacecraft):
     def get_initial_payload_mass(self):
         return sum([satellite.get_initial_wet_mass() for satellite in self.initial_spacecraft.values()])
 
+    def get_modules_initial_wet_mass_str(self):
+        """ Adds the payload mass to the list of initial wet masses
+
+        :return: Text listing all modules mass and the payload mass
+        :rtype: str
+        """
+        str_mass = super().get_modules_initial_wet_mass_str()
+        str_mass += f"\n\t\tInitial payload = {self.get_initial_payload_mass():.2f}"
+        return str_mass
 
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("UpperStage")
 
     def print_spacecraft_specific_data(self):
         print(f"\tTotal payload mass available: {self.mass_available:.1f}"
-        + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
-        + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
+        + f"\n\tTotal initial payload = {self.get_initial_payload_mass():.1f}"
+        + f"\n\tLauncher mass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
+        + f"\n\tLauncher volume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
         + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}")
