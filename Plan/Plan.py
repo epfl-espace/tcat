@@ -65,7 +65,7 @@ class Plan:
         return min([phase.starting_date for phase in self.phases])
 
     def get_ending_epoch(self):
-        return max([phase.starting_date for phase in self.phases])
+        return max([phase.end_date for phase in self.phases])
 
     def get_phases_from_type(self, phase_type):
         """ Returns all phases of a certain type as a list.
