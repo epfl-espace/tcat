@@ -10,6 +10,8 @@ from Phases.Common_functions import nodal_precession
 
 # Import libraries
 from astropy import units as u
+from poliastro.bodies import Earth
+from poliastro.twobody import Orbit
 import warnings
 
 from Scenarios.ScenarioParameters import *
@@ -74,6 +76,21 @@ class Spacecraft:
         # Update upperstage own orbit
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
+
+    def modify_insertion_orbit_epoch(self,new_epoch):
+        """ Update the epoch of the insertion orbit
+
+        :param new_epoch: epoch for updated orbit
+        :type new_epoch: Orbit.epoch
+        """
+        self.insertion_orbit = Orbit.from_classical(Earth,
+                                    self.insertion_orbit.a,
+                                    self.insertion_orbit.ecc,
+                                    self.insertion_orbit.inc,
+                                    self.insertion_orbit.raan,
+                                    self.insertion_orbit.argp,
+                                    self.insertion_orbit.nu,
+                                    new_epoch)
 
     def reset(self):
         """ Reset the instance. Mothership and current orbits are cleared
