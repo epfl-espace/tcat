@@ -320,7 +320,9 @@ class ActiveSpacecraft(Spacecraft):
         + f"Metadata:"
         + f"\n\tSpacecraft id: {self.get_id()}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
+        # + self.get_modules_dry_mass_str()
         + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
+        # + self.get_modules_initial_wet_mass_str()
         + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
         + f"\n\tNb of phases: {self.plan.get_nb_phases()}"
         + f"\n\tNb of manoeuveres: {self.plan.get_nb_manoeuvers()}")
