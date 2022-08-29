@@ -305,8 +305,7 @@ def low_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, initi
 
     return manoeuvre, transfer_duration
 
-
-def update_orbit(orbit, reference_epoch):
+def update_orbit(orbit, reference_epoch,starting_epoch=None):
     """ Update an orbit to a further reference epoch by adding raan drift, only if the main body is Earth.
 
     Args:
@@ -318,7 +317,12 @@ def update_orbit(orbit, reference_epoch):
 
     TODO: implement more complex things like altitude loses or lack of orbit maintenance
     """
-    # TODO: check validity around moon
+    if starting_epoch is not None:
+        orbit = Orbit.from_classical(orbit.attractor, orbit.a, orbit.ecc,
+                                     orbit.inc, orbit.raan,
+                                     orbit.argp, orbit.nu,
+                                     starting_epoch)
+                                     
     time_since_epoch = reference_epoch - orbit.epoch
     if time_since_epoch < 0:
         raise Exception('Error in timing propagation in Orbit Change.'
