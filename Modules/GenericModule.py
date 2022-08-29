@@ -59,6 +59,14 @@ class GenericModule:
         """
         pass
 
+    def get_id(self):
+        """ Return the id of the module
+
+        :return: Module's id
+        :rtype: str
+        """
+        return self.id
+
     def get_phases(self, plan):
         """ Returns all phases from the plan the module is assigned to.
         Args:
