@@ -412,7 +412,8 @@ class UpperStage(ActiveSpacecraft):
         return wet_mass
 
     def get_initial_payload_mass(self):
-        return sum([satellite.get_dry_mass() for satellite in self.initial_spacecraft.values()])
+        return sum([satellite.get_initial_wet_mass() for satellite in self.initial_spacecraft.values()])
+
 
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("UpperStage")
