@@ -73,7 +73,7 @@ class Spacecraft:
         :param orbit: new orbit
         :type orbit: poliastro.twobody.Orbit
         """
-        # Update upperstage own orbit
+        # Update kickstage own orbit
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
 
