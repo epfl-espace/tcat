@@ -221,9 +221,9 @@ class Scenario:
         raise NotImplementedError()
 
     def define_fleet_orbits(self):
-        """ Define the :class:`~Spacecrafts.UpperStage.UpperStage` orbits based on input json.
+        """ Define the :class:`~Spacecrafts.KickStage.KickStage` orbits based on input json.
         """
-        self.define_upperstages_orbits()
+        self.define_kickstages_orbits()
 
     def create_fleet(self):
         """ Create the :class:`~Fleets.Fleet.Fleet` object.
@@ -232,8 +232,8 @@ class Scenario:
         """
         raise NotImplementedError()
 
-    def define_upperstages_orbits(self):
-        """ Define orbits needed for :class:`~Spacecrafts.UpperStage.UpperStage` definition based on input json.
+    def define_kickstages_orbits(self):
+        """ Define orbits needed for :class:`~Spacecrafts.KickStage.KickStage` definition based on input json.
         """
         # launcher insertion orbit
         a_launcher_insertion_orbit = (self.apogee_launcher_insertion + self.perigee_launcher_insertion)/2 + Earth.R
