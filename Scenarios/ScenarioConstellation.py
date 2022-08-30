@@ -46,4 +46,4 @@ class ScenarioConstellation(Scenario):
     def create_fleet(self):
         """ Create the :class:`~Fleets.FleetConstellation.FleetConstellation` object.
         """
-        self.fleet = FleetConstellation('UpperStages',self)
+        self.fleet = FleetConstellation('KickStages',self)
