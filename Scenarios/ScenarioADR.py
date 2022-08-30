@@ -103,7 +103,7 @@ class ScenarioADR(Scenario):
     def create_fleet(self):
         """ Create the :class:`~Fleets.FleetADR.FleetADR` object.
         """
-        self.fleet = FleetADR('UpperStages',self)
+        self.fleet = FleetADR('KickStage',self)
 
     def define_constellation(self):
         """ In addition to :meth:`super()<Scenarios.Scenario.Scenario.define_constellation>`, 
