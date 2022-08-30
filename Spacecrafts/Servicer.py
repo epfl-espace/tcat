@@ -16,7 +16,7 @@ from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 
 class Servicer(ActiveSpacecraft):
-    """ UpperStage acts ase a child Class implementing all necessary attributes relative upperstages.
+    """ KickStage acts ase a child Class implementing all necessary attributes relative kickstages.
 
     :param servicer_id: Servicer identification name
     :type servicer_id: str
@@ -37,7 +37,7 @@ class Servicer(ActiveSpacecraft):
     def execute(self,assigned_satellites):
         """ Reset, design and compute plan based on a list of assigned satellites
 
-        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :param assigned_satellites: Spacecraft assigned to the kickstage
         :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         """
         # Perform initial setup (mass and volume available)
@@ -52,7 +52,7 @@ class Servicer(ActiveSpacecraft):
         # Define spacecraft mission profile
         self.define_mission_profile()
 
-        # Execute upperstage (Apply owned plan)
+        # Execute kickstage (Apply owned plan)
         self.execute_plan()
 
     def design(self):
