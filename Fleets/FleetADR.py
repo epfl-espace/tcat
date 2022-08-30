@@ -130,3 +130,17 @@ class FleetADR(Fleet):
             (int): length of self.upperstages
         """
         return len(self.servicers)
+
+    def get_number_of_assigned_debris(self):
+        nb_debris = 0
+        for servicer in self.servicers.values():
+            nb_debris += servicer.get_nb_target_spacecraft()
+        return nb_debris
+
+    def print_nb_fleet_spacecraft(self):
+        super().print_nb_fleet_spacecraft()
+        if self.get_number_servicers() > 1:
+            print(f"Servicers: {self.get_number_servicers()}")
+        else:
+            print(f"Servicer: {self.get_number_servicers()}")
+        print(f"Removed debris: {self.get_number_of_assigned_debris()}")
