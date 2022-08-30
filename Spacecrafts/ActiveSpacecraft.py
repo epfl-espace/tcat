@@ -186,6 +186,14 @@ class ActiveSpacecraft(Spacecraft):
         """
         return self.ordered_target_spacecraft
 
+    def get_nb_target_spacecraft(self):
+        """ Get the number of spacecraft assigned to this servicer
+
+        :return: number of spacecraft assigned to this servicer
+        :rtype: int
+        """
+        return len(self.get_ordered_target_spacecraft())
+
     def get_capture_module(self):
         """ Get the capture module
 
