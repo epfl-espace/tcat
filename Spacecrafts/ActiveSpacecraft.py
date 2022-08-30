@@ -20,7 +20,7 @@ from astropy import units as u
 # Import methods
 
 class ActiveSpacecraft(Spacecraft):
-    """ ActiveSpacecraft acts ase a child Class implementing all necessary attributes relative to active spacercraft such as upperstages and servicers.
+    """ ActiveSpacecraft acts ase a child Class implementing all necessary attributes relative to active spacercraft such as kickstages and servicers.
 
     :param activespacecraft_id: ActiveSpacecraft identification name
     :type activespacecraft_id: str
