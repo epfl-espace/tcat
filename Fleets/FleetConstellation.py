@@ -47,59 +47,59 @@ class FleetConstellation(Fleet):
 
         # Start execution loop
         while len(unassigned_satellites)>0 and execution_count <= execution_limit:
-            # Instanciate upperstage execution limit
-            upperstage_execution_limit = 20
-            upperstage_execution_count = 0
-            upperstage_converged = False
+            # Instanciate kickstage execution limit
+            kickstage_execution_limit = 20
+            kickstage_execution_count = 0
+            kickstage_converged = False
 
-            # Create UpperStage
+            # Create KickStage
             spacecraft_count += 1
-            upperstage = self.create_upperstage(f"UpperStage_{spacecraft_count:04d}")
-            upperstage_low_sat_allowance = 0
-            upperstage_up_sat_allowance = upperstage.compute_allowance(unassigned_satellites)
+            kickstage = self.create_kickstage(f"KickStage_{spacecraft_count:04d}")
+            kickstage_low_sat_allowance = 0
+            kickstage_up_sat_allowance = kickstage.compute_allowance(unassigned_satellites)
 
-            # Iterate until upperstage allowance is converged
-            while upperstage_execution_count <= upperstage_execution_limit and not(upperstage_converged):
+            # Iterate until kickstage allowance is converged
+            while kickstage_execution_count <= kickstage_execution_limit and not(kickstage_converged):
                 # Check if converged
-                if upperstage_low_sat_allowance == upperstage_up_sat_allowance:
+                if kickstage_low_sat_allowance == kickstage_up_sat_allowance:
                     # exit loop flat
-                    upperstage_converged = True
+                    kickstage_converged = True
 
                 # Compute new current allowance
-                upperstage_cur_sat_allowance = math.ceil((upperstage_low_sat_allowance+upperstage_up_sat_allowance)/2)
+                kickstage_cur_sat_allowance = math.ceil((kickstage_low_sat_allowance+kickstage_up_sat_allowance)/2)
 
-                # Execute upperstage
-                assigned_satellites = unassigned_satellites[0:upperstage_cur_sat_allowance]
-                upperstage.execute(assigned_satellites,constellation_precession=clients.get_global_precession_rotation())
-                upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
+                # Execute kickstage
+                assigned_satellites = unassigned_satellites[0:kickstage_cur_sat_allowance]
+                kickstage.execute(assigned_satellites,constellation_precession=clients.get_global_precession_rotation())
+                kickstage_main_propulsion_module = kickstage.get_main_propulsion_module()
 
                 # Check for exit condition
-                if upperstage_up_sat_allowance - upperstage_low_sat_allowance <= 1:
+                if kickstage_up_sat_allowance - kickstage_low_sat_allowance <= 1:
                     # If fuel mass > 0 and cur == up, then up is the solution
-                    if upperstage_main_propulsion_module.get_current_prop_mass() > 0 and upperstage_cur_sat_allowance == upperstage_up_sat_allowance:
-                        upperstage_low_sat_allowance = upperstage_up_sat_allowance
+                    if kickstage_main_propulsion_module.get_current_prop_mass() > 0 and kickstage_cur_sat_allowance == kickstage_up_sat_allowance:
+                        kickstage_low_sat_allowance = kickstage_up_sat_allowance
                     # If fuel mass < 0 then low is the solution for sure, hoping it is not zero.
                     else:
-                        upperstage_up_sat_allowance = upperstage_low_sat_allowance
+                        kickstage_up_sat_allowance = kickstage_low_sat_allowance
 
                 # Apply dichotomia to remaining values
                 else:
-                    if upperstage_main_propulsion_module.get_current_prop_mass() > 0:
+                    if kickstage_main_propulsion_module.get_current_prop_mass() > 0:
                         # If extra fuel, increase lower bound
-                        upperstage_low_sat_allowance = upperstage_cur_sat_allowance
+                        kickstage_low_sat_allowance = kickstage_cur_sat_allowance
 
                     else:
                         # If lacking fuel, decrease upper bound
-                        upperstage_up_sat_allowance = upperstage_cur_sat_allowance
+                        kickstage_up_sat_allowance = kickstage_cur_sat_allowance
 
-            # Iterate until upperstage total deployment time is computed (If phasing existing)
-            upperstage.execute_with_fuel_usage_optimisation(assigned_satellites,constellation_precession=clients.get_global_precession_rotation())
+            # Iterate until kickstage total deployment time is computed (If phasing existing)
+            kickstage.execute_with_fuel_usage_optimisation(assigned_satellites,constellation_precession=clients.get_global_precession_rotation())
                          
-            # Add converged UpperStage and remove newly assigned satellite
-            self.add_upperstage(upperstage)
+            # Add converged KickStage and remove newly assigned satellite
+            self.add_kickstage(kickstage)
             
             # Remove latest assigned satellites
-            clients.remove_in_ordered_satellites(upperstage.get_ordered_target_spacecraft())
+            clients.remove_in_ordered_satellites(kickstage.get_ordered_target_spacecraft())
             
             # Check remaining satellites to be assigned
             unassigned_satellites = clients.get_optimized_ordered_satellites()
