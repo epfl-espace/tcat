@@ -30,7 +30,7 @@ class KickStage(ActiveSpacecraft):
     """
     def __init__(self,kickstage_id,scenario,structure_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(KickStage, self).__init__(kickstage_id,"kickstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super().__init__(kickstage_id,"kickstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
@@ -238,9 +238,9 @@ class KickStage(ActiveSpacecraft):
                 self.volume_available = get_launcher_fairing(self.launcher_name)
         else:
             logging.info(f"Using custom Launch Vehicle's fairing size...")
-            cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
-            cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
-            self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+            cylinder_volume = np.pi * (scenario.fairing_diameter/ 2) ** 2 * scenario.fairing_cylinder_height
+            cone_volume = np.pi * (scenario.fairing_diameter/ 2) ** 2 * (scenario.fairing_total_height - scenario.fairing_cylinder_height)
+            self.volume_available = cylinder_volume + cone_volume
     
     def compute_allowance(self,unassigned_satellites):
         """ Reset, design and compute plan based on a list of assigned satellites
