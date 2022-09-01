@@ -72,7 +72,7 @@ class FleetADR(Fleet):
                     assigned_servicers.append(current_servicer)
 
                     # Compute kickstage based on servicer assigned to this kickstage
-                    kickstage.execute(assigned_servicers,constellation_precession=0) # No RAAN margin and a single servicer per kickstage
+                    kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation()) # No RAAN margin and a single servicer per kickstage
                     kickstage_main_propulsion_module = kickstage.get_main_propulsion_module()
 
                     if kickstage_main_propulsion_module.get_current_prop_mass() < 0:
@@ -88,7 +88,7 @@ class FleetADR(Fleet):
                         kickstage_converged = True
 
                 # If converged, execute with updated assigned servicers
-                kickstage.execute(assigned_servicers,constellation_precession=0)
+                kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
 
                 # Add kickstage to fleet
                 self.add_kickstage(kickstage)
