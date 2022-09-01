@@ -35,14 +35,14 @@
   "inc_launcher_disposal": 87.0,
   "apogee_servicer_insertion": 500,
   "perigee_servicer_insertion": 500.0,
-  "inc_servicer_insertion": 87.0,
+  "inc_servicer_insertion": 85.0,
   "raan_servicer_insertion": 0.0,
   "arg_periapsis_servicer_insertion": 90.0,
   "true_anomaly_servicer_insertion": 0.0,
   "apogee_servicer_disposal": 1800,
   "perigee_servicer_disposal": 1800.0,
-  "inc_servicer_disposal": 87.0,
+  "inc_servicer_disposal": 85.0,
   "starting_epoch":"2025-01-01 12:00:00",
   "data_path": "./Results",
-  "mission_cash_limitor": 0.01
+  "mission_cash_limitor": 0.9
 }
