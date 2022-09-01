@@ -130,9 +130,6 @@ class ActiveSpacecraft(Spacecraft):
         # Empty the plan
         self.empty_plan()
 
-        # Empty spacecrafts
-        self.ordered_target_spacecraft = []
-
     def change_orbit(self, orbit):
         """ Change current orbit to supplied orbit
 

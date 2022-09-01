@@ -427,6 +427,12 @@ class KickStage(ActiveSpacecraft):
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("KickStage")
 
+    def reset(self):
+        super().reset()
+
+        # Empty spacecrafts
+        self.ordered_target_spacecraft = []
+
     def print_spacecraft_specific_data(self):
         print(f"\tTotal payload mass available: {self.mass_available:.1f}"
         + f"\n\tTotal initial payload = {self.get_initial_payload_mass():.1f}"
