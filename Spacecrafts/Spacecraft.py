@@ -77,6 +77,16 @@ class Spacecraft:
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
 
+    def set_insertion_orbit(self,new_orbit):
+        self.insertion_orbit = Orbit.from_classical(Earth,
+                                    new_orbit.a,
+                                    new_orbit.ecc,
+                                    new_orbit.inc,
+                                    new_orbit.raan,
+                                    new_orbit.argp,
+                                    new_orbit.nu,
+                                    new_orbit.epoch)
+
     def modify_insertion_orbit_epoch(self,new_epoch):
         """ Update the epoch of the insertion orbit
 
