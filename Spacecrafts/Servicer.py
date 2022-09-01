@@ -227,5 +227,9 @@ class Servicer(ActiveSpacecraft):
         # Return 1 if success
         return 1
 
+    def assign_spacecraft(self, spacecraft_to_assign):
+        super().assign_spacecraft(spacecraft_to_assign)
+        self.set_insertion_orbit(spacecraft_to_assign.get_operational_orbit())
+
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("Servicer")
