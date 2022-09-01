@@ -66,6 +66,7 @@ class FleetADR(Fleet):
                     # Create Servicer
                     servicer_count += 1
                     current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_STRUCT_MASS,volume=SERVICER_DEFAULT_VOLUME)
+                    current_servicer.assign_spacecraft(unassigned_satellites[len(assigned_servicers)])
 
                     # Assign the servicer
                     assigned_servicers.append(current_servicer)
@@ -93,9 +94,9 @@ class FleetADR(Fleet):
                 self.add_kickstage(kickstage)
 
                 # Execute all servicers
-                for i,servicer in enumerate(assigned_servicers):
+                for servicer in assigned_servicers:
                     # Execute servicer
-                    servicer.execute(unassigned_satellites[i])
+                    servicer.execute()
                     clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
 
                     # Add servicer to fleet
