@@ -129,7 +129,7 @@ class Servicer(ActiveSpacecraft):
         # Step 3: Iterate through organised assigned targets
         ##########
         # Initialise current orbit object
-        current_orbit = first_target.operational_orbit
+        current_orbit = self.get_insertion_orbit()
 
         # Loop over assigned targets
         for i, current_target in enumerate(self.ordered_target_spacecraft):
@@ -155,7 +155,7 @@ class Servicer(ActiveSpacecraft):
                 # Change orbit back to target orbit and add to plan
                 raising = OrbitChange(f"({self.id}) goes to next target ({current_target.get_id()})",
                                       self.plan,
-                                      current_target.insertion_orbit,
+                                      current_target.operational_orbit,
                                       raan_specified=True,
                                       initial_orbit=phasing_orbit,
                                       delta_v_contingency=delta_v_contingency,
