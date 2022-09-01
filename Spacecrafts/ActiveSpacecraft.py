@@ -11,6 +11,7 @@ from Spacecrafts.Spacecraft import Spacecraft
 from Plan.Plan import Plan
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
+from Scenarios.ScenarioParameters import *
 
 # Import libraries
 import logging
@@ -59,6 +60,10 @@ class ActiveSpacecraft(Spacecraft):
         self.ordered_target_spacecraft = []
 
         self.mass_contingency = mass_contingency
+
+        # Init ratio of inclination change in raan drift model
+        self.ratio_inc_raan_from_scenario = scenario.mission_cash_limitor
+        self.ratio_inc_raan_from_opti = 0.
 
         # Disposal orbit triggered at end of mission
         self.initial_orbit = initial_orbit
@@ -119,6 +124,18 @@ class ActiveSpacecraft(Spacecraft):
         """
         # Apply plan
         self.plan.apply()
+
+    def compute_delta_inclination_for_raan_phasing(self):
+        """ Computes the inclination change for RAAN phasing based on two ratios: 
+            1) self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
+            2) self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
+
+        :return: phasing inclination
+        :rtype: u.deg
+        """
+        total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
+        range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
+        return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
 
     def reset(self):
         """ Reset the Activespacecraft to initial parameters. Ready for a restart

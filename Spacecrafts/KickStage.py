@@ -44,10 +44,6 @@ class KickStage(ActiveSpacecraft):
         self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
 
-        # Init ratio of inclination change in raan drift model
-        self.ratio_inc_raan_from_scenario = scenario.mission_cash_limitor
-        self.ratio_inc_raan_from_opti = 0.
-
         # Compute initial performances
         self.compute_kickstage(scenario)
 
@@ -269,18 +265,6 @@ class KickStage(ActiveSpacecraft):
         :rtype: int
         """
         return self.satellites_allowance
-
-    def compute_delta_inclination_for_raan_phasing(self):
-        """ Computes the inclination change for RAAN phasing based on two ratios: 
-            1) self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
-            2) self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
-
-        :return: phasing inclination
-        :rtype: u.deg
-        """
-        total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
-        range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
-        return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
 
     def define_mission_profile(self,precession_direction):
         """ Compute mission profile based on a basic canvas
