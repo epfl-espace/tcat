@@ -34,7 +34,7 @@ class Servicer(ActiveSpacecraft):
         # Design the launcher
         self.design()
 
-    def execute(self,assigned_satellites):
+    def execute(self):
         """ Reset, design and compute plan based on a list of assigned satellites
 
         :param assigned_satellites: Spacecraft assigned to the kickstage
@@ -47,7 +47,7 @@ class Servicer(ActiveSpacecraft):
         self.design()
 
         # Assign target as per mass and volume allowance
-        self.assign_spacecraft(assigned_satellites)
+        # self.assign_spacecraft(assigned_satellites)
 
         # Define spacecraft mission profile
         self.define_mission_profile()
