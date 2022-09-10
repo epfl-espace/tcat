@@ -4,6 +4,7 @@
   "propulsion_type": "electrical",
   "verbose": false,
   "constellation_name": "OneWeb",
+  
   "sat_mass": 147.0,
   "sat_volume": 1.3,
   "n_planes": 3,
@@ -44,5 +45,5 @@
   "inc_servicer_disposal": 85.0,
   "starting_epoch":"2025-01-01 12:00:00",
   "data_path": "./Results",
-  "mission_cash_limitor": 0.9
+  "mission_cash_limitor": 0.1
 }
