@@ -238,6 +238,14 @@ class ActiveSpacecraft(Spacecraft):
         """
         return self.initial_orbit
 
+    def set_initial_orbit(self,new_orbit):
+        """ Set the initial orbit
+
+        :param new_orbit: new initial orbit
+        :type new_orbit: poliastro.twobody.Orbit
+        """
+        self.initial_orbit = new_orbit
+
     def get_initial_prop_mass(self):
         """ Get the initial propulsion mass.
 
