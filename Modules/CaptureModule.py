@@ -83,5 +83,6 @@ class CaptureModule(GenericModule):
 
     def reset(self):
         """ Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence."""
+        super().reset()
         self.captured_spacecrafts = dict()
         self.history_captured_spacecrafts = dict()
