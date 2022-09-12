@@ -57,6 +57,16 @@ def get_launcher_fairing(launcher):
     else:
         raise ValueError(f"The launcher {launcher} is not valid.")
 
+def get_launcher_fairing_dimensions(launcher):
+    supported_launchers = get_supported_launchers()
+
+    if launcher in supported_launchers.keys():
+        fairing_diameter = supported_launchers[launcher][2] * u.m
+        fairing_cylinder_height = supported_launchers[launcher][3] * u.m
+        fairing_total_height = supported_launchers[launcher][4] * u.m
+    
+    return fairing_diameter,fairing_cylinder_height,fairing_total_height
+    
 
 def get_launcher_data(launcher, launch_site, orbit_type):
     """
