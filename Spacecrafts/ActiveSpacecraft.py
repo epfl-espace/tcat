@@ -62,7 +62,7 @@ class ActiveSpacecraft(Spacecraft):
         self.mass_contingency = mass_contingency
 
         # Init ratio of inclination change in raan drift model
-        self.ratio_inc_raan_from_scenario = scenario.mission_cash_limitor
+        self.ratio_inc_raan_from_scenario = scenario.tradeoff_mission_price_vs_duration
         self.ratio_inc_raan_from_opti = 0.
 
         # Disposal orbit triggered at end of mission

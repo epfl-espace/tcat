@@ -67,6 +67,12 @@ class Spacecraft:
         else:
             self.modules[module.id] = module
 
+    def reset_modules(self):
+        """resets all spacecraft modules
+        """
+        for module in self.modules.values():
+            module.reset()
+
     def change_orbit(self, orbit):
         """ Update current orbit. Save previous orbit
 

@@ -51,7 +51,7 @@ class FleetADR(Fleet):
         execution_count = 1
 
         # Strategy depend on architecture
-        if self.scenario.architecture == "single_picker":
+        if self.scenario.mission_architecture == "single_picker":
             while len(unassigned_satellites)>0 and execution_count <= execution_limit:
                 # Create KickStage
                 kickstage_count += 1
@@ -65,7 +65,7 @@ class FleetADR(Fleet):
                 while not(kickstage_converged):
                     # Create Servicer
                     servicer_count += 1
-                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_STRUCT_MASS,volume=SERVICER_DEFAULT_VOLUME)
+                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,self.scenario.servicer_struct_mass,volume=self.scenario.servicer_default_volume)
                     current_servicer.assign_spacecraft(unassigned_satellites[len(assigned_servicers)])
 
                     # Assign the servicer

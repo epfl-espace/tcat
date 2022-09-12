@@ -16,8 +16,17 @@ class ScenarioADR(Scenario):
     def __init__(self, scenario_id, json):
         self.general_fields.extend(['sats_reliability',
                                     'seed_random_sats_failure',
-                                    'architecture'])
-        self.scalable_field.extend([('apogee_sats_operational', u.km),
+                                    'mission_architecture',
+                                    'servicer.servicer_propulsion_type'])
+        self.scalable_field.extend([('servicer_initial_fuel_mass',u.kg),
+                                    ('servicer_capture_module_dry_mass',u.kg),
+                                    ('servicer_prop_thrust',u.N),
+                                    ('servicer_prop_isp',u.s),
+                                    ('servicer_propulsion_dry_mass',u.kg),
+                                    ('servicer_struct_mass',u.kg),
+                                    ('servicer_default_volume',u.m**3),
+            
+                                    ('apogee_sats_operational', u.km),
                                     ('perigee_sats_operational', u.km), 
                                     ('inc_sats_operational', u.deg),
                                     ('apogee_sats_disposal', u.km),

@@ -43,9 +43,32 @@ class KickStage(ActiveSpacecraft):
         self.dispenser_mass = 0. * u.kg
         self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
+        self.fuel_margin = scenario.kickstage_remaining_fuel_margin
 
         # Compute initial performances
         self.compute_kickstage(scenario)
+
+        # Add dispenser as CaptureModule
+        dispenser = CaptureModule(self.id + '_Dispenser',
+                                self,
+                                mass_contingency=0.0,
+                                dry_mass_override=scenario.kickstage_dispenser_dry_mass)
+
+        self.set_capture_module(dispenser)
+
+        # Add propulsion as PropulsionModule
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                          self, scenario.kickstage_propulsion_type, 
+                                          scenario.kickstage_prop_thrust,
+                                          scenario.kickstage_prop_thrust, 
+                                          scenario.kickstage_prop_isp, 
+                                          scenario.kickstage_initial_fuel_mass,
+                                          KICKSTAGE_MAXTANK_CAPACITY, 
+                                          reference_power_override=0 * u.W,
+                                          propellant_contingency=KICKSTAGE_FUEL_CONTINGENCY, 
+                                          dry_mass_override=scenario.kickstage_propulsion_dry_mass,
+                                          mass_contingency=KICKSTAGE_PROP_MODULE_MASS_CONTINGENCY)
+        self.set_main_propulsion_module(mainpropulsion)
 
     def execute_with_fuel_usage_optimisation(self,satellites,constellation_precession=0):
         """ Iteratively reduce total mission time by using all propellant mass
@@ -86,7 +109,7 @@ class KickStage(ActiveSpacecraft):
             self.execute(satellites,constellation_precession=constellation_precession)
 
             # define new inclination's range
-            if self.main_propulsion_module.get_current_prop_mass()-KICKSTAGE_REMAINING_FUEL_MARGIN >= 0:
+            if self.main_propulsion_module.get_current_prop_mass()-self.fuel_margin >= 0:
                 delta_inc_low = self.ratio_inc_raan_from_opti
             else:
                 delta_inc_up = self.ratio_inc_raan_from_opti
@@ -97,7 +120,7 @@ class KickStage(ActiveSpacecraft):
                 converged = True
 
         # ensure remaining fuel is positive
-        if self.main_propulsion_module.get_current_prop_mass()-KICKSTAGE_REMAINING_FUEL_MARGIN < 0.:
+        if self.main_propulsion_module.get_current_prop_mass()-self.fuel_margin < 0.:
             self.ratio_inc_raan_from_opti = delta_inc_low
             self.execute(satellites,constellation_precession=constellation_precession)
 
@@ -152,23 +175,7 @@ class KickStage(ActiveSpacecraft):
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
         self.volume_filling_ratio = sum([satellite.get_current_volume() for satellite in assigned_satellites]) / self.volume_available
 
-        # Add dispenser as CaptureModule
-        dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
-        dispenser = CaptureModule(self.id + '_Dispenser',
-                                self,
-                                mass_contingency=0.0,
-                                dry_mass_override=dispenser_mass)
-
-        self.set_capture_module(dispenser)
-
-        # Add propulsion as PropulsionModule
-        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
-                                          self, 'bi-propellant', KICKSTAGE_MAX_THRUST,
-                                          KICKSTAGE_MIN_THRUST, KICKSTAGE_ISP_THRUST, KICKSTAGE_INITIAL_FUEL_MASS,
-                                          KICKSTAGE_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
-                                          propellant_contingency=KICKSTAGE_FUEL_CONTINGENCY, dry_mass_override=KICKSTAGE_PROPULSION_DRY_MASS,
-                                          mass_contingency=KICKSTAGE_PROP_MODULE_MASS_CONTINGENCY)
-        self.set_main_propulsion_module(mainpropulsion)
+        self.reset_modules()
 
     def assign_spacecraft(self, spacecraft_to_assign):
         """ Assign a list of spacecrafts as targets
@@ -198,26 +205,26 @@ class KickStage(ActiveSpacecraft):
         :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
         # Check for custom launcher_name values
-        if scenario.custom_launcher_name is None:
+        if scenario.launcher_use_database is True:
             logging.info(f"Gathering Launch Vehicle performance from database...")
             # Compute launcher capabilities to deliver into orbit
             launcher_performance = get_launcher_performance(scenario.fleet,
                                                             scenario.launcher_name,
-                                                            scenario.launch_site,
+                                                            scenario.launcher_launch_site,
                                                             self.insertion_orbit.inc.value,
                                                             scenario.apogee_launcher_insertion.value,
                                                             scenario.perigee_launcher_insertion.value,
-                                                            scenario.orbit_type,
-                                                            method=scenario.interpolation_method,
+                                                            scenario.launcher_orbit_type,
+                                                            method=scenario.launcher_perf_interpolation_method,
                                                             verbose=scenario.verbose,
                                                             save="InterpolationGraph",
-                                                            save_folder=scenario.data_path)
+                                                            save_folder=scenario.dir_path_for_output_files)
 
             # Substract KickStage mass
             self.mass_available = launcher_performance
         else:
             logging.info(f"Using custom Launch Vehicle performance...")
-            self.mass_available = scenario.custom_launcher_performance
+            self.mass_available = scenario.launcher_performance
 
     def compute_volume_available(self,scenario):
         """ Compute kickstage available volume based on launcher type

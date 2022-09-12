@@ -25,28 +25,44 @@ class Scenario:
     - print the result
     """    
     general_fields = ['scenario',
-                      'propulsion_type',
                       'verbose',
+                      'starting_epoch',
+                      'dir_path_for_output_files',
+                      'tradeoff_mission_price_vs_duration',
+
                       'constellation_name',
                       'n_planes',
                       'n_sats_per_plane',
                       'plane_distribution_angle',
-                      'launcher',
-                      'launch_site',
-                      'orbit_type',
-                      'dispenser_tech_level',
-                      'custom_launcher_name',
-                      'interpolation_method',
-                      'starting_epoch',
-                      'data_path',
-                      'mission_cash_limitor']
+
+                      'launcher_use_database',
+                      'launcher_name',
+                      'launcher_launch_site',
+                      'launcher_orbit_type',
+                      'launcher_perf_interpolation_method',
+
+                      'kickstage_use_database',
+                      'kickstage_name',
+                      'kickstage_propulsion_type']
 
     scalable_field = [('sat_mass', u.kg),
                       ('sat_volume', u.m ** 3),
-                      ('custom_launcher_performance', u.kg),
-                      ('fairing_diameter', u.m),
-                      ('fairing_cylinder_height', u.m),
-                      ('fairing_total_height', u.m),
+
+                      ('launcher_performance', u.kg),
+                      ('launcher_fairing_diameter', u.m),
+                      ('launcher_fairing_cylinder_height', u.m),
+                      ('launcher_fairing_total_height', u.m),
+
+                      ('kickstage_height',u.m),
+                      ('kickstage_diameter',u.m),
+                      ('kickstage_initial_fuel_mass',u.kg),
+                      ('kickstage_prop_thrust',u.N),
+                      ('kickstage_prop_isp',u.s),
+                      ('kickstage_propulsion_dry_mass',u.kg),
+                      ('kickstage_dispenser_dry_mass',u.kg),
+                      ('kickstage_struct_mass',u.kg),
+                      ('kickstage_remaining_fuel_margin',u.kg),
+                      
                       ('apogee_launcher_insertion', u.km),
                       ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
@@ -78,7 +94,6 @@ class Scenario:
         self.reference_satellite = None
 
         self.create_attributes_from_input_json(json)
-        self.launcher_name = self.launcher
 
         # Instanciate epoch
         self.starting_epoch = Time(self.starting_epoch, scale="tdb")
@@ -193,8 +208,8 @@ class Scenario:
         # Plot if verbose
         if self.verbose:
             logging.info("Start plotting Clients...")
-            self.constellation.plot_3D_distribution(save="3D_plot", save_folder=self.data_path)
-            self.constellation.plot_distribution(save="2D_plot", save_folder=self.data_path)
+            self.constellation.plot_3D_distribution(save="3D_plot", save_folder=self.dir_path_for_output_files)
+            self.constellation.plot_distribution(save="2D_plot", save_folder=self.dir_path_for_output_files)
             logging.info("Finish plotting Clients...")
 
     def define_fleet(self):

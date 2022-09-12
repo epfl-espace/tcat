@@ -30,9 +30,27 @@ class Servicer(ActiveSpacecraft):
     def __init__(self,servicer_id,scenario,structure_mass=0. * u.kg, mass_contingency = 0.0,volume=0.*u.m**3):
         # Init ActiveSpacecraft
         super(Servicer, self).__init__(servicer_id,"servicer",structure_mass,mass_contingency,scenario,volume=volume,disposal_orbit=scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
+        # Add dispenser as CaptureModule
+        dispenser = CaptureModule(self.id + '_Dispenser',
+                                  self,
+                                  mass_contingency=0.0,
+                                  dry_mass_override=scenario.servicer_capture_module_dry_mass)
 
-        # Design the launcher
-        self.design()
+        self.set_capture_module(dispenser)
+
+        # Add propulsion as PropulsionModule
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                          self, scenario.servicer_propulsion_type, 
+                                          scenario.servicer_prop_thrust,
+                                          scenario.servicer_prop_thrust, 
+                                          scenario.servicer_prop_isp, 
+                                          scenario.servicer_initial_fuel_mass,
+                                          SERVICER_MAXTANK_CAPACITY, 
+                                          reference_power_override=0 * u.W,
+                                          propellant_contingency=SERVICER_FUEL_CONTINGENCY, 
+                                          dry_mass_override=scenario.servicer_propulsion_dry_mass,
+                                          mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
+        self.set_main_propulsion_module(mainpropulsion)
 
     def execute(self):
         """ Reset, design and compute plan based on a list of assigned satellites
@@ -58,22 +76,7 @@ class Servicer(ActiveSpacecraft):
     def design(self):
         """ Design the servicer main modules
         """
-        # Add dispenser as CaptureModule
-        dispenser = CaptureModule(self.id + '_Dispenser',
-                                  self,
-                                  mass_contingency=0.0,
-                                  dry_mass_override=SERVICER_CAPTURE_DRY_MASS)
-
-        self.set_capture_module(dispenser)
-
-        # Add propulsion as PropulsionModule
-        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
-                                          self, 'bi-propellant', SERVICER_MAX_THRUST,
-                                          SERVICER_MIN_THRUST, SERVICER_ISP_THRUST, SERVICER_INITIAL_FUEL_MASS,
-                                          SERVICER_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
-                                          propellant_contingency=SERVICER_FUEL_CONTINGENCY, dry_mass_override=SERVICER_PROPULSION_DRY_MASS,
-                                          mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
-        self.set_main_propulsion_module(mainpropulsion)
+        self.reset_modules()
 
     def define_mission_profile(self):
         """ Compute mission profile based on a basic canvas

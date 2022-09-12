@@ -61,7 +61,7 @@ class Fleet:
         :return: a new KickStage object
         :rtype: :class:`~Spacecrafts:KickStage:KickStage`
         """
-        return KickStage(kickstage_id,self.scenario,KICKSTAGE_STRUCT_MASS)
+        return KickStage(kickstage_id,self.scenario,self.scenario.kickstage_struct_mass)
         
     def get_starting_epoch(self):
         return min([spacecraft.get_starting_epoch() for spacecraft in self.activespacecrafts.values()])    

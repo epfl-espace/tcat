@@ -34,7 +34,7 @@ def main():
     json = open_input_json()
     if(json is None): exit() 
 
-    results_dir_path = json["data_path"]
+    results_dir_path = json["dir_path_for_output_files"]
     create_results_dir(results_dir_path)
 
     set_sys_std_dir(PRINT_IN_FILES,results_dir_path)
