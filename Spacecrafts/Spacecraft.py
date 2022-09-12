@@ -51,10 +51,12 @@ class Spacecraft:
         self.mothership = None
 
         self.modules = dict()
+
         self.structure_module = StructureModule(self.id + '_Structure',
                                                 self,
                                                 mass_contingency=0.0,
                                                 dry_mass_override=structure_mass)
+        self.add_module(self.structure_module)
 
     def add_module(self, module):
         """ Add a module to its list
