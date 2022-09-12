@@ -8,7 +8,7 @@ from Modules.PropulsionModule import PropulsionModule
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
-from Commons.Interpolation import get_launcher_fairing, get_launcher_performance
+from Commons.Interpolation import get_launcher_fairing_dimensions, get_launcher_performance
 from Scenarios.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
@@ -232,17 +232,26 @@ class KickStage(ActiveSpacecraft):
         :param scenario: Scenario
         :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
+        fairing_diameter = 0 * u.m
+        fairing_cylinder_height = 0 *u.m
+        fairing_total_height = 0*u.m
+
         # Check for custom launcher_name values
-        if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
-            if scenario.custom_launcher_name is not None or scenario.custom_launcher_performance is not None:
-                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
-            else:
-                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
-                self.volume_available = get_launcher_fairing(self.launcher_name)
+        if scenario.launcher_use_database is True:
+            fairing_diameter,fairing_cylinder_height,fairing_total_height = get_launcher_fairing_dimensions(self.launcher_name) 
         else:
-            logging.info(f"Using custom Launch Vehicle's fairing size...")
-            cylinder_volume = np.pi * (scenario.fairing_diameter/ 2) ** 2 * scenario.fairing_cylinder_height
-            cone_volume = np.pi * (scenario.fairing_diameter/ 2) ** 2 * (scenario.fairing_total_height - scenario.fairing_cylinder_height)
+            fairing_diameter = scenario.launcher_fairing_diameter
+            fairing_cylinder_height = scenario.launcher_fairing_cylinder_height
+            fairing_total_height = scenario.launcher_fairing_total_height
+
+        if scenario.kickstage_height >= fairing_cylinder_height:
+            self.volume_available = 0 *u.m**3
+            print("Kickstage is taller than launcher's fairing")
+            
+        else:
+            fairing_cylinder_height -= scenario.kickstage_height
+            cylinder_volume = np.pi * (fairing_diameter/ 2) ** 2 * fairing_cylinder_height
+            cone_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_total_height - fairing_cylinder_height)
             self.volume_available = cylinder_volume + cone_volume
     
     def compute_allowance(self,unassigned_satellites):
