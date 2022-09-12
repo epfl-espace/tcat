@@ -147,6 +147,11 @@ class ActiveSpacecraft(Spacecraft):
         # Empty the plan
         self.empty_plan()
 
+    def design(self):
+        """ Resets all modules
+        """
+        self.reset_modules()
+
     def change_orbit(self, orbit):
         """ Change current orbit to supplied orbit
 
