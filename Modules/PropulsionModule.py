@@ -71,6 +71,7 @@ class PropulsionModule(GenericModule):
         self.previous_phasing_throughput = 0. * u.kg
         self.last_refuel_amount = None
         self.nb_burn = 0
+        self.delta_mass = 0 * u.kg
 
     def design(self, plan):
         """Method called during convergence_margin to design the module given the current plan.
@@ -464,6 +465,7 @@ class PropulsionModule(GenericModule):
     def reset(self):
         """" Resets the module to a state equivalent to servicer_group start. Used in simulation and convergence_margin.
         """
+        super().reset()
         if self.last_refuel_amount is not None:
             self.last_refuel_amount = (self.last_refuel_amount - self.current_propellant_mass
                                        + self.initial_propellant_mass * self.propellant_contingency)
@@ -476,6 +478,7 @@ class PropulsionModule(GenericModule):
         self.previous_phasing_throughput = self.phasing_throughput
         self.phasing_throughput = 0. * u.kg
         self.nb_burn = 0
+        self.delta_mass = 0 * u.kg
 
     def __str__(self):
         return (super(PropulsionModule, self).__str__()
