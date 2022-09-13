@@ -1,2 +1,0 @@
-﻿#units,m,m,kg,N,s,kg,kg,kg,(bi-propellant;mono-propellant;water;solid;electrical)
-name,height,diameter,initial_fuel_mass,prop_thrust,prop_isp,prop_dry_mass,dispenser_dry_mass,struct_mass,prop_type
