@@ -8,6 +8,11 @@ Description:    Regroups all user parameter for the senario (margins, contingenc
 
 from astropy import units as u
 
+# Path to database
+PATH_DB_LAUNCHERS = "SpacecraftDatabase/LauncherDatabase/"
+PATH_DB_KICKSTAGE = "SpacecraftDatabase/"
+KICKSTAGE_DATABASE = "kickstage_db.csv"
+
 # Atmosphere limit
 ALTITUDE_ATMOSPHERE_LIMIT = 80 * u.km
 
