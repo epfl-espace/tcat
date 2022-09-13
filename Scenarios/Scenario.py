@@ -5,6 +5,8 @@
 # Description:      Parent class for the different implemented scenarios
 
 # Import Class
+from Scenarios.ScenarioParameters import KICKSTAGE_DATABASE, PATH_DB_KICKSTAGE
+from SpacecraftDatabase.KickstageDatabaseReader import KickstageDatabaseReader
 from Spacecrafts.Satellite import Satellite
 from Plan.Plan import *
 from Constellations.Constellation import Constellation
@@ -217,16 +219,30 @@ class Scenario:
         create the :class:`~Fleets.Fleet.Fleet` object,
         and organise the targeted :class:`~Constellations.Constellation.Constellation`.
         """
+        self.define_kickstage_parameters()
+
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
         self.define_fleet_orbits()
-
         # Define fleet
         logging.info("Instanciate Fleet object...")
         self.create_fleet()
 
         # Compute optimal order to release once spacecraft is known
         self.organise_satellites()
+
+    def define_kickstage_parameters(self):
+        if self.kickstage_use_database is True:
+            ks_db = KickstageDatabaseReader(PATH_DB_KICKSTAGE+KICKSTAGE_DATABASE)
+            self.kickstage_height = ks_db.get_kickstage_height(self.kickstage_name)
+            self.kickstage_diameter = ks_db.get_kickstage_diameter(self.kickstage_name)
+            self.kickstage_initial_fuel_mass = ks_db.get_kickstage_initial_fuel_mass(self.kickstage_name)
+            self.kickstage_prop_thrust = ks_db.get_kickstage_prop_thrust(self.kickstage_name)
+            self.kickstage_prop_isp = ks_db.get_kickstage_prop_isp(self.kickstage_name)
+            self.kickstage_propulsion_dry_mass = ks_db.get_kickstage_prop_dry_mass(self.kickstage_name)
+            self.kickstage_dispenser_dry_mass = ks_db.get_kickstage_dispenser_dry_mass(self.kickstage_name)
+            self.kickstage_struct_mass = ks_db.get_kickstage_struct_mass(self.kickstage_name)
+            self.kickstage_propulsion_type = ks_db.get_kickstage_prop_type(self.kickstage_name)
 
     def define_constellation_orbits(self):
         """ Define orbits needed for :class:`~Constellations.Constellation.Constellation` and :class:`~Spacecrafts.Satellite.Satellite` definition.
