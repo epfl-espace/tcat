@@ -6,7 +6,7 @@ Description:    Fleet,Spacecraft,Servicer and KickStage Classes definition
 """
 
 # Import Classes
-from SpacecraftDatabase.Interpolation import get_launcher_performance, get_launcher_fairing
+from SpacecraftDatabase.LauncherDatabaseReader import get_launcher_performance, get_launcher_fairing
 from Scenarios.ScenarioParameters import *
 from Plan.Plan import *
 
