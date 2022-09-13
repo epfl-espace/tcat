@@ -10,6 +10,7 @@ import logging
 """Input data"""
 
 launch_pad = "ELA-4"
+path_to_launcher_db = "SpacecraftDatabase/LauncherDatabase/"
 
 
 def get_supported_launchers():
@@ -94,14 +95,14 @@ def get_launcher_data(launcher, launch_site, orbit_type):
             f"The launch site {launch_site} is not valid for {launcher}. The only available launch site is {supported_launchers[launcher][0]}")
 
     elif orbit_type in ["LEO", "SSO", "LPEO", "Polar"]:
-        launcher_data = np.genfromtxt(f'Launchers/{launcher}_LEO.csv', delimiter=";", skip_header=2)
+        launcher_data = np.genfromtxt(f'{path_to_launcher_db}{launcher}_LEO.csv', delimiter=";", skip_header=2)
         return launcher_data, min_inc
 
     elif orbit_type == "MTO":
-        launcher_data = np.genfromtxt(f'Launchers/{launcher}_MTO.csv', delimiter=";", skip_header=2)
+        launcher_data = np.genfromtxt(f'{path_to_launcher_db}{launcher}_MTO.csv', delimiter=";", skip_header=2)
         return launcher_data, min_inc
     elif orbit_type in ["GTO", "GTO+"]:
-        launcher_data = np.genfromtxt(f'Launchers/{launcher}_GTO.csv', delimiter=";", skip_header=2)
+        launcher_data = np.genfromtxt(f'{path_to_launcher_db}{launcher}_GTO.csv', delimiter=";", skip_header=2)
         return launcher_data, min_inc
     else:
         raise ValueError(f"The orbit type {orbit_type} is not valid.")
