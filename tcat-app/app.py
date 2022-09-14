@@ -391,7 +391,7 @@ def run_configuration(conf_scenario):
         config_run_id = config_run.id
 
         config = json.loads(last_config_item.configuration)
-        config['data_path'] = get_data_path(scenario_id, config_run_id)
+        config['dir_path_for_output_files'] = get_data_path(scenario_id, config_run_id)
 
         with open(filename, "w") as f:
             f.write(json.dumps(config))
