@@ -19,7 +19,7 @@ class GenericModule:
 
     Attributes:
         module_id (str): Standard id. Needs to be unique.
-        servicer (Scenario.Fleet_module.Servicer or Fleet_module.UpperStage): servicer the module belongs to
+        servicer (Scenario.Fleet_module.Servicer or Fleet_module.KickStage): servicer the module belongs to
         dry_mass_override (u.kg): module dry mass (no contingency), overrides possible underlying models
         reference_power_override (u.W): module mean power over designing phase, overrides possible underlying models
         recurring_cost_override (float): recurring cost of module in Euros, overrides possible underlying models
@@ -58,6 +58,14 @@ class GenericModule:
             plan (Plan_module.Plan): plan for which the module is designed
         """
         pass
+
+    def get_id(self):
+        """ Return the id of the module
+
+        :return: Module's id
+        :rtype: str
+        """
+        return self.id
 
     def get_phases(self, plan):
         """ Returns all phases from the plan the module is assigned to.

@@ -11,6 +11,7 @@ from Spacecrafts.Spacecraft import Spacecraft
 from Plan.Plan import Plan
 from Phases.Approach import Approach
 from Phases.OrbitChange import OrbitChange
+from Scenarios.ScenarioParameters import *
 
 # Import libraries
 import logging
@@ -20,7 +21,7 @@ from astropy import units as u
 # Import methods
 
 class ActiveSpacecraft(Spacecraft):
-    """ ActiveSpacecraft acts ase a child Class implementing all necessary attributes relative to active spacercraft such as upperstages and servicers.
+    """ ActiveSpacecraft acts ase a child Class implementing all necessary attributes relative to active spacercraft such as kickstages and servicers.
 
     :param activespacecraft_id: ActiveSpacecraft identification name
     :type activespacecraft_id: str
@@ -59,6 +60,10 @@ class ActiveSpacecraft(Spacecraft):
         self.ordered_target_spacecraft = []
 
         self.mass_contingency = mass_contingency
+
+        # Init ratio of inclination change in raan drift model
+        self.ratio_inc_raan_from_scenario = scenario.tradeoff_mission_price_vs_duration
+        self.ratio_inc_raan_from_opti = 0.
 
         # Disposal orbit triggered at end of mission
         self.initial_orbit = initial_orbit
@@ -120,6 +125,18 @@ class ActiveSpacecraft(Spacecraft):
         # Apply plan
         self.plan.apply()
 
+    def compute_delta_inclination_for_raan_phasing(self):
+        """ Computes the inclination change for RAAN phasing based on two ratios: 
+            1) self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
+            2) self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
+
+        :return: phasing inclination
+        :rtype: u.deg
+        """
+        total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
+        range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
+        return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
+
     def reset(self):
         """ Reset the Activespacecraft to initial parameters. Ready for a restart
         """
@@ -130,8 +147,10 @@ class ActiveSpacecraft(Spacecraft):
         # Empty the plan
         self.empty_plan()
 
-        # Empty spacecrafts
-        self.ordered_target_spacecraft = []
+    def design(self):
+        """ Resets all modules
+        """
+        self.reset_modules()
 
     def change_orbit(self, orbit):
         """ Change current orbit to supplied orbit
@@ -186,6 +205,14 @@ class ActiveSpacecraft(Spacecraft):
         """
         return self.ordered_target_spacecraft
 
+    def get_nb_target_spacecraft(self):
+        """ Get the number of spacecraft assigned to this servicer
+
+        :return: number of spacecraft assigned to this servicer
+        :rtype: int
+        """
+        return len(self.get_ordered_target_spacecraft())
+
     def get_capture_module(self):
         """ Get the capture module
 
@@ -215,6 +242,14 @@ class ActiveSpacecraft(Spacecraft):
         :rtype orbit: poliastro.twobody.Orbit
         """
         return self.initial_orbit
+
+    def set_initial_orbit(self,new_orbit):
+        """ Set the initial orbit
+
+        :param new_orbit: new initial orbit
+        :type new_orbit: poliastro.twobody.Orbit
+        """
+        self.initial_orbit = new_orbit
 
     def get_initial_prop_mass(self):
         """ Get the initial propulsion mass.
@@ -301,6 +336,9 @@ class ActiveSpacecraft(Spacecraft):
         + "\n\t" + spacecraft_type_str + " Mass After Phase: {0:.1f}".format(self.get_current_mass())
         + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(self.get_main_propulsion_module().current_propellant_mass))
 
+    def print_spacecraft_specific_data(self):
+        pass
+
     def get_reference_power(self):
         """ Get the reference power
 
@@ -313,7 +351,18 @@ class ActiveSpacecraft(Spacecraft):
         return nominal_power_draw
 
     def print_metadata(self):
-        raise NotImplementedError
+        print(f""
+        + f"Metadata:"
+        + f"\n\tSpacecraft id: {self.get_id()}"
+        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
+        # + self.get_modules_dry_mass_str()
+        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
+        # + self.get_modules_initial_wet_mass_str()
+        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
+        + f"\n\tNb of phases: {self.plan.get_nb_phases()}"
+        + f"\n\tNb of manoeuveres: {self.plan.get_nb_manoeuvers()}")
+        self.print_spacecraft_specific_data()
+        print(f"\tAssigned Spacecrafts:")
 
     def print_report(self):
         """ Print the report

@@ -34,6 +34,7 @@ class GenericPhase:
         self.spacecraft_snapshot = None
         self.starting_date = Time("2000-01-01 12:00:00")
         self.end_date = Time("2000-01-01 12:00:00")
+        self.manoeuvres = []
 
     def apply(self):
         """ Change the servicer and clients impacted by the phase when called during simulation. """
@@ -62,6 +63,14 @@ class GenericPhase:
             (Scenario.Fleet_module.Servicer): assigned servicer
         """
         return self.assigned_module.spacecraft
+
+    def get_nb_manoeuvers(self):
+        """ Computes the number of manoeuvers
+
+        :return: number of manoeuvers
+        :rtype: int
+        """
+        return len(self.manoeuvres)
 
     def update_spacecraft(self, spacecraft=None):
         """ Perform changes on a servicer to represent its state at the end of the phase.

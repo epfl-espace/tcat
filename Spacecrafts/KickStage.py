@@ -8,7 +8,7 @@ from Modules.PropulsionModule import PropulsionModule
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Release import Release
-from Commons.Interpolation import get_launcher_fairing, get_launcher_performance
+from SpacecraftDatabase.LauncherDatabaseReader import get_launcher_fairing_dimensions, get_launcher_performance
 from Scenarios.ScenarioParameters import *
 from Spacecrafts.ActiveSpacecraft import ActiveSpacecraft
 from astropy import units as u
@@ -16,11 +16,11 @@ from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 
 
-class UpperStage(ActiveSpacecraft):
-    """ UpperStage acts ase a child Class implementing all necessary attributes relative upperstages.
+class KickStage(ActiveSpacecraft):
+    """ KickStage acts ase a child Class implementing all necessary attributes relative kickstages.
 
-    :param upperstage_id: Upperstage identification name
-    :type upperstage_id: str
+    :param kickstage_id: KickStage identification name
+    :type kickstage_id: str
     :param scenario: Scenario
     :type scenario: :class:`~Scenarios.Scenario.Scenario`
     :param additional_dry_mass: Additionnal dry mass
@@ -28,9 +28,9 @@ class UpperStage(ActiveSpacecraft):
     :param mass_contingency: Mass contingency
     :type mass_contingency: float
     """
-    def __init__(self,upperstage_id,scenario,structure_mass=0. * u.kg,mass_contingency=0.2):
+    def __init__(self,kickstage_id,scenario,structure_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super(UpperStage, self).__init__(upperstage_id,"upperstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super().__init__(kickstage_id,"kickstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name
@@ -43,18 +43,37 @@ class UpperStage(ActiveSpacecraft):
         self.dispenser_mass = 0. * u.kg
         self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
-
-        # Init ratio of inclination change in raan drift model
-        self.ratio_inc_raan_from_scenario = scenario.mission_cash_limitor
-        self.ratio_inc_raan_from_opti = 0.
+        self.fuel_margin = scenario.kickstage_remaining_fuel_margin
 
         # Compute initial performances
-        self.compute_upperstage(scenario)
+        self.compute_kickstage(scenario)
+
+        # Add dispenser as CaptureModule
+        dispenser = CaptureModule(self.id + '_Dispenser',
+                                self,
+                                mass_contingency=0.0,
+                                dry_mass_override=scenario.kickstage_dispenser_dry_mass)
+
+        self.set_capture_module(dispenser)
+
+        # Add propulsion as PropulsionModule
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                          self, scenario.kickstage_propulsion_type, 
+                                          scenario.kickstage_prop_thrust,
+                                          scenario.kickstage_prop_thrust, 
+                                          scenario.kickstage_prop_isp, 
+                                          scenario.kickstage_initial_fuel_mass,
+                                          KICKSTAGE_MAXTANK_CAPACITY, 
+                                          reference_power_override=0 * u.W,
+                                          propellant_contingency=KICKSTAGE_FUEL_CONTINGENCY, 
+                                          dry_mass_override=scenario.kickstage_propulsion_dry_mass,
+                                          mass_contingency=KICKSTAGE_PROP_MODULE_MASS_CONTINGENCY)
+        self.set_main_propulsion_module(mainpropulsion)
 
     def execute_with_fuel_usage_optimisation(self,satellites,constellation_precession=0):
         """ Iteratively reduce total mission time by using all propellant mass
 
-        :param satellites: Spacecraft assigned to the upperstage
+        :param satellites: Spacecraft assigned to the kickstage
         :type satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         :param constellation_precession: Reference satellite precession speed
         :type constellation_precession: float
@@ -90,18 +109,18 @@ class UpperStage(ActiveSpacecraft):
             self.execute(satellites,constellation_precession=constellation_precession)
 
             # define new inclination's range
-            if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN >= 0:
+            if self.main_propulsion_module.get_current_prop_mass()-self.fuel_margin >= 0:
                 delta_inc_low = self.ratio_inc_raan_from_opti
             else:
                 delta_inc_up = self.ratio_inc_raan_from_opti
 
             # detect algorithm's convergence
             if MODEL_RAAN_DELTA_INCLINATION_HIGH*(delta_inc_up-delta_inc_low) <= 2*MODEL_RAAN_DELTA_INCLINATION_LOW \
-            or abs(self.main_propulsion_module.get_current_prop_mass()-remaining_fuel_prev) <= UPPERSTAGE_REMAINING_FUEL_TOLERANCE:
+            or abs(self.main_propulsion_module.get_current_prop_mass()-remaining_fuel_prev) <= KICKSTAGE_REMAINING_FUEL_TOLERANCE:
                 converged = True
 
         # ensure remaining fuel is positive
-        if self.main_propulsion_module.get_current_prop_mass()-UPPERSTAGE_REMAINING_FUEL_MARGIN < 0.:
+        if self.main_propulsion_module.get_current_prop_mass()-self.fuel_margin < 0.:
             self.ratio_inc_raan_from_opti = delta_inc_low
             self.execute(satellites,constellation_precession=constellation_precession)
 
@@ -110,7 +129,7 @@ class UpperStage(ActiveSpacecraft):
     def execute(self,assigned_satellites,constellation_precession=0):
         """ Reset, design and compute plan based on a list of assigned satellites
 
-        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :param assigned_satellites: Spacecraft assigned to the kickstage
         :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         :param constellation_precession: Reference satellite precession speed
         :type constellation_precession: float
@@ -127,7 +146,7 @@ class UpperStage(ActiveSpacecraft):
         # Define spacecraft mission profile
         self.define_mission_profile(constellation_precession)
 
-        # Execute upperstage (Apply owned plan)
+        # Execute kickstage (Apply owned plan)
         self.execute_plan()
 
 
@@ -144,9 +163,9 @@ class UpperStage(ActiveSpacecraft):
         self.dispenser_volume = 0. * u.m ** 3
     
     def design(self,assigned_satellites,tech_level=1):
-        """ Design the upperstage based on allowance, tech_level and current performances
+        """ Design the kickstage based on allowance, tech_level and current performances
 
-        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :param assigned_satellites: Spacecraft assigned to the kickstage
         :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         :param tech_level: Dispenser tech level (0-1)
         :type tech_level: float
@@ -156,23 +175,7 @@ class UpperStage(ActiveSpacecraft):
         self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
         self.volume_filling_ratio = sum([satellite.get_current_volume() for satellite in assigned_satellites]) / self.volume_available
 
-        # Add dispenser as CaptureModule
-        dispenser_mass = 0.1164 * self.total_satellites_mass / tech_level
-        dispenser = CaptureModule(self.id + '_Dispenser',
-                                self,
-                                mass_contingency=0.0,
-                                dry_mass_override=dispenser_mass)
-
-        self.set_capture_module(dispenser)
-
-        # Add propulsion as PropulsionModule
-        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
-                                          self, 'bi-propellant', UPPERSTAGE_MAX_THRUST,
-                                          UPPERSTAGE_MIN_THRUST, UPPERSTAGE_ISP_THRUST, UPPERSTAGE_INITIAL_FUEL_MASS,
-                                          UPPERSTAGE_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
-                                          propellant_contingency=UPPERSTAGE_FUEL_CONTINGENCY, dry_mass_override=UPPERSTAGE_PROPULSION_DRY_MASS,
-                                          mass_contingency=UPPERSTAGE_PROP_MODULE_MASS_CONTINGENCY)
-        self.set_main_propulsion_module(mainpropulsion)
+        self.reset_modules()
 
     def assign_spacecraft(self, spacecraft_to_assign):
         """ Assign a list of spacecrafts as targets
@@ -183,8 +186,8 @@ class UpperStage(ActiveSpacecraft):
         super().assign_spacecraft(spacecraft_to_assign)
         self.capture_module.add_captured_spacecrafts(spacecraft_to_assign)
 
-    def compute_upperstage(self,scenario):
-        """ Compute upperstage available mass and volume based on launcher type
+    def compute_kickstage(self,scenario):
+        """ Compute kickstage available mass and volume based on launcher type
 
         :param scenario: Scenario
         :type scenario: :class:`~Scenarios.Scenario.Scenario`
@@ -196,56 +199,65 @@ class UpperStage(ActiveSpacecraft):
         self.compute_volume_available(scenario)
 
     def compute_mass_available(self,scenario):
-        """ Compute upperstage available mass based on launcher type
+        """ Compute kickstage available mass based on launcher type
 
         :param scenario: Scenario
         :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
         # Check for custom launcher_name values
-        if scenario.custom_launcher_name is None:
+        if scenario.launcher_use_database is True:
             logging.info(f"Gathering Launch Vehicle performance from database...")
             # Compute launcher capabilities to deliver into orbit
             launcher_performance = get_launcher_performance(scenario.fleet,
                                                             scenario.launcher_name,
-                                                            scenario.launch_site,
+                                                            scenario.launcher_launch_site,
                                                             self.insertion_orbit.inc.value,
                                                             scenario.apogee_launcher_insertion.value,
                                                             scenario.perigee_launcher_insertion.value,
-                                                            scenario.orbit_type,
-                                                            method=scenario.interpolation_method,
+                                                            scenario.launcher_orbit_type,
+                                                            method=scenario.launcher_perf_interpolation_method,
                                                             verbose=scenario.verbose,
                                                             save="InterpolationGraph",
-                                                            save_folder=scenario.data_path)
+                                                            save_folder=scenario.dir_path_for_output_files)
 
-            # Substract UpperStage mass
+            # Substract KickStage mass
             self.mass_available = launcher_performance
         else:
             logging.info(f"Using custom Launch Vehicle performance...")
-            self.mass_available = scenario.custom_launcher_performance
+            self.mass_available = scenario.launcher_performance
 
     def compute_volume_available(self,scenario):
-        """ Compute upperstage available volume based on launcher type
+        """ Compute kickstage available volume based on launcher type
 
         :param scenario: Scenario
         :type scenario: :class:`~Scenarios.Scenario.Scenario`
         """
+        fairing_diameter = 0 * u.m
+        fairing_cylinder_height = 0 *u.m
+        fairing_total_height = 0*u.m
+
         # Check for custom launcher_name values
-        if scenario.fairing_diameter is None and scenario.fairing_cylinder_height is None and scenario.fairing_total_height is None:
-            if scenario.custom_launcher_name is not None or scenario.custom_launcher_performance is not None:
-                raise ValueError("You have inserted a custom launcher, but forgot to insert its related fairing size.")
-            else:
-                logging.info(f"Gathering Launch Vehicle's fairing size from database...")
-                self.volume_available = get_launcher_fairing(self.launcher_name)
+        if scenario.launcher_use_database is True:
+            fairing_diameter,fairing_cylinder_height,fairing_total_height = get_launcher_fairing_dimensions(self.launcher_name) 
         else:
-            logging.info(f"Using custom Launch Vehicle's fairing size...")
-            cylinder_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * scenario.fairing_cylinder_height * u.m
-            cone_volume = np.pi * (scenario.fairing_diameter * u.m / 2) ** 2 * (scenario.fairing_total_height * u.m - scenario.fairing_cylinder_height * u.m)
-            self.volume_available = (cylinder_volume + cone_volume).to(u.m ** 3)
+            fairing_diameter = scenario.launcher_fairing_diameter
+            fairing_cylinder_height = scenario.launcher_fairing_cylinder_height
+            fairing_total_height = scenario.launcher_fairing_total_height
+
+        if scenario.kickstage_height >= fairing_cylinder_height:
+            self.volume_available = 0 *u.m**3
+            print("Kickstage is taller than launcher's fairing")
+            
+        else:
+            fairing_cylinder_height -= scenario.kickstage_height
+            cylinder_volume = np.pi * (fairing_diameter/ 2) ** 2 * fairing_cylinder_height
+            cone_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_total_height - fairing_cylinder_height)
+            self.volume_available = cylinder_volume + cone_volume
     
     def compute_allowance(self,unassigned_satellites):
         """ Reset, design and compute plan based on a list of assigned satellites
 
-        :param unassigned_satellites: Spacecraft unassigned to an upperstage
+        :param unassigned_satellites: Spacecraft unassigned to an kickstage
         :type unassigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         :return: satellites allowance
         :rtype: int
@@ -263,24 +275,12 @@ class UpperStage(ActiveSpacecraft):
         return self.satellites_allowance
 
     def get_satellites_allowance(self):
-        """ Return maximum allowable of the upperstage
+        """ Return maximum allowable of the kickstage
 
         :return: satellites allowance
         :rtype: int
         """
         return self.satellites_allowance
-
-    def compute_delta_inclination_for_raan_phasing(self):
-        """ Computes the inclination change for RAAN phasing based on two ratios: 
-            1) self.ratio_inc_raan_from_scenario: lets the senario define how much dV should be used to accelrate phasing
-            2) self.ratio_inc_raan_from_opti: used by optimisation loop minimising phasing duration with the available fuel
-
-        :return: phasing inclination
-        :rtype: u.deg
-        """
-        total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
-        range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
-        return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
 
     def define_mission_profile(self,precession_direction):
         """ Compute mission profile based on a basic canvas
@@ -412,21 +412,30 @@ class UpperStage(ActiveSpacecraft):
         return wet_mass
 
     def get_initial_payload_mass(self):
-        return sum([satellite.get_dry_mass() for satellite in self.initial_spacecraft.values()])
+        return sum([satellite.get_initial_wet_mass() for satellite in self.initial_spacecraft.values()])
+
+    def get_modules_initial_wet_mass_str(self):
+        """ Adds the payload mass to the list of initial wet masses
+
+        :return: Text listing all modules mass and the payload mass
+        :rtype: str
+        """
+        str_mass = super().get_modules_initial_wet_mass_str()
+        str_mass += f"\n\t\tInitial payload = {self.get_initial_payload_mass():.2f}"
+        return str_mass
 
     def generate_snapshot_string(self):
-        return super().generate_snapshot_string("UpperStage")
+        return super().generate_snapshot_string("KickStage")
 
-    def print_metadata(self):
-        print(f""
-        + f"Metadata:"
-        + f"\n\tSpacecraft id: {self.get_id()}"
-        + f"\n\tLaunch vehicle name: {self.launcher_name}"
-        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
-        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
-        + f"\n\tTotal payload mass available: {self.mass_available:.1f}"
-        + f"\n\tMass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
-        + f"\n\tVolume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
-        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
-        + f"\n\tAssigned Spacecrafts:")
+    def reset(self):
+        super().reset()
+
+        # Empty spacecrafts
+        self.ordered_target_spacecraft = []
+
+    def print_spacecraft_specific_data(self):
+        print(f"\tTotal payload mass available: {self.mass_available:.1f}"
+        + f"\n\tTotal initial payload = {self.get_initial_payload_mass():.1f}"
+        + f"\n\tLauncher mass filling ratio: {self.mass_filling_ratio * 100:.1f}%"
+        + f"\n\tLauncher volume filling ratio: {self.volume_filling_ratio * 100:.1f}%"
+        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}")

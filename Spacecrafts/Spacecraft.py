@@ -10,6 +10,8 @@ from Phases.Common_functions import nodal_precession
 
 # Import libraries
 from astropy import units as u
+from poliastro.bodies import Earth
+from poliastro.twobody import Orbit
 import warnings
 
 from Scenarios.ScenarioParameters import *
@@ -49,10 +51,12 @@ class Spacecraft:
         self.mothership = None
 
         self.modules = dict()
+
         self.structure_module = StructureModule(self.id + '_Structure',
                                                 self,
                                                 mass_contingency=0.0,
                                                 dry_mass_override=structure_mass)
+        self.add_module(self.structure_module)
 
     def add_module(self, module):
         """ Add a module to its list
@@ -65,15 +69,47 @@ class Spacecraft:
         else:
             self.modules[module.id] = module
 
+    def reset_modules(self):
+        """resets all spacecraft modules
+        """
+        for module in self.modules.values():
+            module.reset()
+
     def change_orbit(self, orbit):
         """ Update current orbit. Save previous orbit
 
         :param orbit: new orbit
         :type orbit: poliastro.twobody.Orbit
         """
-        # Update upperstage own orbit
+        # Update kickstage own orbit
         self.previous_orbit = self.current_orbit
         self.current_orbit = orbit
+
+    def set_insertion_orbit(self,new_orbit):
+        self.insertion_orbit = Orbit.from_classical(Earth,
+                                    new_orbit.a,
+                                    new_orbit.ecc,
+                                    new_orbit.inc,
+                                    new_orbit.raan,
+                                    new_orbit.argp,
+                                    new_orbit.nu,
+                                    new_orbit.epoch)
+
+    def modify_insertion_orbit_epoch(self,new_epoch):
+        """ Update the epoch of the insertion orbit
+
+        :param new_epoch: epoch for updated orbit
+        :type new_epoch: Orbit.epoch
+        """
+        if self.insertion_orbit is not None:
+            self.insertion_orbit = Orbit.from_classical(Earth,
+                                        self.insertion_orbit.a,
+                                        self.insertion_orbit.ecc,
+                                        self.insertion_orbit.inc,
+                                        self.insertion_orbit.raan,
+                                        self.insertion_orbit.argp,
+                                        self.insertion_orbit.nu,
+                                        new_epoch)
 
     def reset(self):
         """ Reset the instance. Mothership and current orbits are cleared
@@ -121,6 +157,17 @@ class Spacecraft:
             mass += module.get_dry_mass()
         return mass
 
+    def get_modules_dry_mass_str(self):
+        """ Outputs in a str the dry mass of each module
+
+        :return: Text listing the dry mass of each module
+        :rtype: str
+        """
+        str_mass = ""
+        for module in self.modules.values():
+            str_mass += f"\n\t\t{module.get_id()}: {module.get_dry_mass():.01f}"
+        return str_mass
+
     def get_current_mass(self):
         """ Get the current mass. Alias to :meth:`~Spacecrafts.Spacecraft.Spacecraft.get_dry_mass`
 
@@ -142,6 +189,17 @@ class Spacecraft:
         for module in self.modules.values():
             mass += module.get_initial_wet_mass()
         return mass
+
+    def get_modules_initial_wet_mass_str(self):
+        """ Outputs in a str the initial wet mass of each module
+
+        :return: Text listing the initial wet mass of each module
+        :rtype: str
+        """
+        str_mass = ""
+        for module in self.modules.values():
+            str_mass += f"\n\t\t{module.get_id()}: {module.get_initial_wet_mass():.01f}"
+        return str_mass
 
     def get_current_orbit(self):
         """ Get the current orbit

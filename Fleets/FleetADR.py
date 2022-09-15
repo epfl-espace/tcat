@@ -26,7 +26,7 @@ class FleetADR(Fleet):
         # Init super
         super().__init__(fleet_id,scenario)
 
-        # Dictionnaries of servicers and upperstages
+        # Dictionnaries of servicers and kickstages
         self.servicers = dict()
 
     """
@@ -43,7 +43,7 @@ class FleetADR(Fleet):
         unassigned_satellites = clients.get_optimized_ordered_satellites().copy()
 
         # Spacecraft launcher counter
-        upperstage_count = 0
+        kickstage_count = 0
         servicer_count = 0
 
         # Instanciate iteration limits
@@ -51,51 +51,53 @@ class FleetADR(Fleet):
         execution_count = 1
 
         # Strategy depend on architecture
-        if self.scenario.architecture == "single_picker":
+        if self.scenario.mission_architecture == "single_picker":
             while len(unassigned_satellites)>0 and execution_count <= execution_limit:
-                # Create UpperStage
-                upperstage_count += 1
-                upperstage = self.create_upperstage(f"UpperStage_{upperstage_count:04d}")
-                upperstage_converged = False
+                # Create KickStage
+                kickstage_count += 1
+                kickstage = self.create_kickstage(f"KickStage_{kickstage_count:04d}")
+                kickstage_converged = False
 
                 # Instanciate assigned_servicers list
                 assigned_servicers = []
 
-                # Fill the upperstage as long as there is fuel left
-                while not(upperstage_converged):
+                # Fill the kickstage as long as there is fuel left
+                while not(kickstage_converged):
                     # Create Servicer
                     servicer_count += 1
-                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,SERVICER_STRUCT_MASS,volume=SERVICER_DEFAULT_VOLUME)
+                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,self.scenario.servicer_struct_mass,volume=self.scenario.servicer_default_volume)
+                    current_servicer.assign_spacecraft(unassigned_satellites[len(assigned_servicers)])
 
                     # Assign the servicer
                     assigned_servicers.append(current_servicer)
 
-                    # Compute upperstage based on servicer assigned to this upperstage
-                    upperstage.execute(assigned_servicers,constellation_precession=0) # No RAAN margin and a single servicer per upperstage
-                    upperstage_main_propulsion_module = upperstage.get_main_propulsion_module()
+                    # Compute kickstage based on servicer assigned to this kickstage
+                    kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation()) # No RAAN margin and a single servicer per kickstage
+                    kickstage_main_propulsion_module = kickstage.get_main_propulsion_module()
 
-                    if upperstage_main_propulsion_module.get_current_prop_mass() < 0:
+                    if kickstage_main_propulsion_module.get_current_prop_mass() < 0:
                         # Remove last
                         del assigned_servicers[-1]
                         servicer_count -= 1
 
-                        # Upperstage has converged if last servicers is discared
-                        upperstage_converged = True
+                        # KickStage has converged if last servicers is discared
+                        kickstage_converged = True
                     
                     elif len(assigned_servicers) == len(unassigned_satellites):
                         # No more servicer necessary
-                        upperstage_converged = True
+                        kickstage_converged = True
 
                 # If converged, execute with updated assigned servicers
-                upperstage.execute(assigned_servicers,constellation_precession=0)
+                kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
+                # kickstage.execute_with_fuel_usage_optimisation(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
 
-                # Add upperstage to fleet
-                self.add_upperstage(upperstage)
+                # Add kickstage to fleet
+                self.add_kickstage(kickstage)
 
                 # Execute all servicers
-                for i,servicer in enumerate(assigned_servicers):
+                for servicer in assigned_servicers:
                     # Execute servicer
-                    servicer.execute(unassigned_satellites[i])
+                    servicer.execute()
                     clients.remove_in_ordered_satellites(servicer.get_ordered_target_spacecraft())
 
                     # Add servicer to fleet
@@ -127,6 +129,20 @@ class FleetADR(Fleet):
         """ Compute and return size of self.servicers dict
 
         Return:
-            (int): length of self.upperstages
+            (int): length of self.kickstages
         """
         return len(self.servicers)
+
+    def get_number_of_assigned_debris(self):
+        nb_debris = 0
+        for servicer in self.servicers.values():
+            nb_debris += servicer.get_nb_target_spacecraft()
+        return nb_debris
+
+    def print_nb_fleet_spacecraft(self):
+        super().print_nb_fleet_spacecraft()
+        if self.get_number_servicers() > 1:
+            print(f"Servicers: {self.get_number_servicers()}")
+        else:
+            print(f"Servicer: {self.get_number_servicers()}")
+        print(f"Removed debris: {self.get_number_of_assigned_debris()}")

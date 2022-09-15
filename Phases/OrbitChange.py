@@ -50,7 +50,6 @@ class OrbitChange(GenericPhase):
         self.raan_phasing_absolute = raan_phasing_absolute
         self.raan_cutoff = raan_cutoff
         self.raan_drift = 0. * u.deg
-        self.manoeuvres = []
         # TODO: add duration override? add planned delta v?
 
     def assign_module(self, assigned_module):
@@ -95,7 +94,7 @@ class OrbitChange(GenericPhase):
             self.final_orbit = self.final_orbit.current_orbit
 
         # update the final orbit by adding raan drift to match servicer epoch
-        self.final_orbit = update_orbit(self.final_orbit, self.get_assigned_spacecraft().current_orbit.epoch)
+        self.final_orbit = update_orbit(self.final_orbit, self.get_assigned_spacecraft().current_orbit.epoch, self.get_assigned_spacecraft().get_insertion_orbit().epoch)
 
         # update the initial orbit by retrieving current servicer orbit
         self.initial_orbit = self.get_assigned_spacecraft().current_orbit

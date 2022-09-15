@@ -16,7 +16,7 @@ from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 
 class Servicer(ActiveSpacecraft):
-    """ UpperStage acts ase a child Class implementing all necessary attributes relative upperstages.
+    """ KickStage acts ase a child Class implementing all necessary attributes relative kickstages.
 
     :param servicer_id: Servicer identification name
     :type servicer_id: str
@@ -30,14 +30,32 @@ class Servicer(ActiveSpacecraft):
     def __init__(self,servicer_id,scenario,structure_mass=0. * u.kg, mass_contingency = 0.0,volume=0.*u.m**3):
         # Init ActiveSpacecraft
         super(Servicer, self).__init__(servicer_id,"servicer",structure_mass,mass_contingency,scenario,volume=volume,disposal_orbit=scenario.servicer_disposal_orbit,insertion_orbit = scenario.servicer_insertion_orbit)
+        # Add dispenser as CaptureModule
+        dispenser = CaptureModule(self.id + '_Dispenser',
+                                  self,
+                                  mass_contingency=0.0,
+                                  dry_mass_override=scenario.servicer_capture_module_dry_mass)
 
-        # Design the launcher
-        self.design()
+        self.set_capture_module(dispenser)
 
-    def execute(self,assigned_satellites):
+        # Add propulsion as PropulsionModule
+        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
+                                          self, scenario.servicer_propulsion_type, 
+                                          scenario.servicer_prop_thrust,
+                                          scenario.servicer_prop_thrust, 
+                                          scenario.servicer_prop_isp, 
+                                          scenario.servicer_initial_fuel_mass,
+                                          SERVICER_MAXTANK_CAPACITY, 
+                                          reference_power_override=0 * u.W,
+                                          propellant_contingency=SERVICER_FUEL_CONTINGENCY, 
+                                          dry_mass_override=scenario.servicer_propulsion_dry_mass,
+                                          mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
+        self.set_main_propulsion_module(mainpropulsion)
+
+    def execute(self):
         """ Reset, design and compute plan based on a list of assigned satellites
 
-        :param assigned_satellites: Spacecraft assigned to the upperstage
+        :param assigned_satellites: Spacecraft assigned to the kickstage
         :type assigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
         """
         # Perform initial setup (mass and volume available)
@@ -47,33 +65,18 @@ class Servicer(ActiveSpacecraft):
         self.design()
 
         # Assign target as per mass and volume allowance
-        self.assign_spacecraft(assigned_satellites)
+        # self.assign_spacecraft(assigned_satellites)
 
         # Define spacecraft mission profile
         self.define_mission_profile()
 
-        # Execute upperstage (Apply owned plan)
+        # Execute kickstage (Apply owned plan)
         self.execute_plan()
 
     def design(self):
         """ Design the servicer main modules
         """
-        # Add dispenser as CaptureModule
-        dispenser = CaptureModule(self.id + '_Dispenser',
-                                  self,
-                                  mass_contingency=0.0,
-                                  dry_mass_override=SERVICER_CAPTURE_DRY_MASS)
-
-        self.set_capture_module(dispenser)
-
-        # Add propulsion as PropulsionModule
-        mainpropulsion = PropulsionModule(self.id + '_MainPropulsion',
-                                          self, 'bi-propellant', SERVICER_MAX_THRUST,
-                                          SERVICER_MIN_THRUST, SERVICER_ISP_THRUST, SERVICER_INITIAL_FUEL_MASS,
-                                          SERVICER_MAXTANK_CAPACITY, reference_power_override=0 * u.W,
-                                          propellant_contingency=SERVICER_FUEL_CONTINGENCY, dry_mass_override=SERVICER_PROPULSION_DRY_MASS,
-                                          mass_contingency=SERVICER_PROP_MODULE_MASS_CONTINGENCY)
-        self.set_main_propulsion_module(mainpropulsion)
+        self.reset_modules()
 
     def define_mission_profile(self):
         """ Compute mission profile based on a basic canvas
@@ -129,7 +132,7 @@ class Servicer(ActiveSpacecraft):
         # Step 3: Iterate through organised assigned targets
         ##########
         # Initialise current orbit object
-        current_orbit = first_target.operational_orbit
+        current_orbit = self.get_insertion_orbit()
 
         # Loop over assigned targets
         for i, current_target in enumerate(self.ordered_target_spacecraft):
@@ -155,7 +158,7 @@ class Servicer(ActiveSpacecraft):
                 # Change orbit back to target orbit and add to plan
                 raising = OrbitChange(f"({self.id}) goes to next target ({current_target.get_id()})",
                                       self.plan,
-                                      current_target.insertion_orbit,
+                                      current_target.operational_orbit,
                                       raan_specified=True,
                                       initial_orbit=phasing_orbit,
                                       delta_v_contingency=delta_v_contingency,
@@ -227,15 +230,9 @@ class Servicer(ActiveSpacecraft):
         # Return 1 if success
         return 1
 
+    def assign_spacecraft(self, spacecraft_to_assign):
+        super().assign_spacecraft(spacecraft_to_assign)
+        self.set_insertion_orbit(spacecraft_to_assign.get_operational_orbit())
+
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("Servicer")
-
-    def print_metadata(self):
-        print(f""
-        + f"Metadata:"
-        + f"\n\tSpacecraft id: {self.get_id()}"
-        + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
-        + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
-        + f"\n\tNumber of spacecrafts onboard: {len(self.ordered_target_spacecraft)}"
-        + f"\n\tAssigned Spacecrafts:")

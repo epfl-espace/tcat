@@ -2,11 +2,11 @@
 Created:        ?
 Last Revision:  23.05.2022
 Author:         ?,Emilien Mingard
-Description:    Fleet,Spacecraft,Servicer and UpperStage Classes definition
+Description:    Fleet,Spacecraft,Servicer and KickStage Classes definition
 """
 
 # Import Classes
-from Commons.Interpolation import get_launcher_performance, get_launcher_fairing
+from SpacecraftDatabase.LauncherDatabaseReader import get_launcher_performance, get_launcher_fairing
 from Scenarios.ScenarioParameters import *
 from Plan.Plan import *
 
@@ -14,7 +14,7 @@ from Plan.Plan import *
 import warnings
 from astropy import units as u
 
-from Spacecrafts.UpperStage import UpperStage
+from Spacecrafts.KickStage import KickStage
 
 class Fleet:
     """ A Fleet consists of a dictionary of servicers.
@@ -35,8 +35,8 @@ class Fleet:
         # Dictionnaries of spacecrafts
         self.activespacecrafts = dict()
 
-        # Dictionnaries of upperstages (Common to constellation and ADR)
-        self.upperstages = dict()
+        # Dictionnaries of KickStages (Common to constellation and ADR)
+        self.kickstages = dict()
 
         # Flags
         self.is_performance_graph_already_generated = False
@@ -53,15 +53,15 @@ class Fleet:
         """
         raise NotImplementedError
 
-    def create_upperstage(self,upperstage_id):
-        """ Creates a new UpperStage object.
+    def create_kickstage(self,kickstage_id):
+        """ Creates a new KickStage object.
 
-        :param upperstage_id: id for the new uppperstage
-        :type upperstage_id: str
-        :return: a new UpperStage object
-        :rtype: :class:`~Spacecrafts:UpperStage:UpperStage`
+        :param kickstage_id: id for the new uppperstage
+        :type kickstage_id: str
+        :return: a new KickStage object
+        :rtype: :class:`~Spacecrafts:KickStage:KickStage`
         """
-        return UpperStage(upperstage_id,self.scenario,UPPERSTAGE_STRUCT_MASS)
+        return KickStage(kickstage_id,self.scenario,self.scenario.kickstage_struct_mass)
         
     def get_starting_epoch(self):
         return min([spacecraft.get_starting_epoch() for spacecraft in self.activespacecrafts.values()])    
@@ -89,18 +89,18 @@ class Fleet:
         else:
             self.activespacecrafts[activespacecraft.get_id()] = activespacecraft
 
-    def add_upperstage(self, upperstage):
+    def add_kickstage(self, kickstage):
         """ Adds a launcher to the Fleet class.
 
         Args:
-            launcher (UpperStage): launcher to add to the fleet
+            launcher (KickStage): launcher to add to the fleet
         """
-        if upperstage in self.upperstages:
-            warnings.warn('Launcher ', upperstage.get_id(), ' already in fleet ', self.id, '.', UserWarning)
+        if kickstage in self.kickstages:
+            warnings.warn('Launcher ', kickstage.get_id(), ' already in fleet ', self.id, '.', UserWarning)
         else:
-            self.upperstages[upperstage.get_id()] = upperstage
+            self.kickstages[kickstage.get_id()] = kickstage
 
-        self.add_activespacecraft(upperstage)
+        self.add_activespacecraft(kickstage)
 
     def get_number_activespacecrafts(self):
         """ Compute and return size of self.activespacescrafts dict
@@ -110,13 +110,13 @@ class Fleet:
         """
         return len(self.activespacecrafts)
     
-    def get_number_upperstages(self):
-        """ Compute and return size of self.upperstages dict
+    def get_number_kickstages(self):
+        """ Compute and return size of self.kickstages dict
 
         Return:
-            (int): length of self.upperstages
+            (int): length of self.kickstages
         """
-        return len(self.upperstages)
+        return len(self.kickstages)
 
     def reset(self):
         """ Calls the reset function for each servicer in the fleet. If design_loop is True, this include a redesign
@@ -483,18 +483,21 @@ class Fleet:
         print(f"Mission duration: {convert_time_for_print(duration):.2f}")
         print("")
 
-        # Number of launcher
-        Nb_UpperStage = len(self.upperstages)
-        if Nb_UpperStage > 1:
-            print(f"UpperStages: {Nb_UpperStage}")
-        else:
-            print(f"UpperStage: {Nb_UpperStage}")
+        self.print_nb_fleet_spacecraft()
 
         # Print total launcher mass accros the fleet
-        launchers_mass = [self.upperstages[key].get_initial_wet_mass() for key in self.upperstages.keys()]
+        launchers_mass = [self.kickstages[key].get_initial_wet_mass() for key in self.kickstages.keys()]
         print(F"Total mass launched in space: {sum(launchers_mass):.2f}")
-        payload_mass = [upperstage.get_initial_payload_mass() for upperstage in self.upperstages.values()]
+        payload_mass = [kickstage.get_initial_payload_mass() for kickstage in self.kickstages.values()]
         print(f"Total payload mass released in space: {sum(payload_mass):.2f}")
+
+    def print_nb_fleet_spacecraft(self):
+        # Number of launcher
+        Nb_KickStage = len(self.kickstages)
+        if Nb_KickStage > 1:
+            print(f"KickStages: {Nb_KickStage}")
+        else:
+            print(f"KickStage: {Nb_KickStage}")
 
 
     def __str__(self):

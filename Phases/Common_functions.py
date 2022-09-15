@@ -281,7 +281,7 @@ def high_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, init
     d_inc_ratio = np.sin(mean_inc.to(u.rad))
     delta_v = np.pi / 2 * vel * d_inc_ratio * abs(delta_raan.to(u.rad).value)
 
-    manoeuvre = Manoeuvre(delta_v)
+    manoeuvre = Manoeuvre(delta_v,id="high trust direct raan change")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     transfer_duration = (final_orbit.period / 2).to(u.day)
 
@@ -299,14 +299,13 @@ def low_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, initi
     delta_v = np.pi / 2 * (np.sqrt(initial_orbit.attractor.k / mean_a) * np.sin(mean_inc.to(u.rad).value)
                            * abs(delta_raan.to(u.rad).value))
 
-    manoeuvre = Manoeuvre(delta_v)
+    manoeuvre = Manoeuvre(delta_v,id="low trust direct raan change")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     transfer_duration = manoeuvre.get_burn_duration(duty_cycle=0.25)
 
     return manoeuvre, transfer_duration
 
-
-def update_orbit(orbit, reference_epoch):
+def update_orbit(orbit, reference_epoch,starting_epoch=None):
     """ Update an orbit to a further reference epoch by adding raan drift, only if the main body is Earth.
 
     Args:
@@ -318,7 +317,12 @@ def update_orbit(orbit, reference_epoch):
 
     TODO: implement more complex things like altitude loses or lack of orbit maintenance
     """
-    # TODO: check validity around moon
+    if starting_epoch is not None:
+        orbit = Orbit.from_classical(orbit.attractor, orbit.a, orbit.ecc,
+                                     orbit.inc, orbit.raan,
+                                     orbit.argp, orbit.nu,
+                                     starting_epoch)
+                                     
     time_since_epoch = reference_epoch - orbit.epoch
     if time_since_epoch < 0:
         raise Exception('Error in timing propagation in Orbit Change.'

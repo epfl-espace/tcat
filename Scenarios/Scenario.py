@@ -5,6 +5,8 @@
 # Description:      Parent class for the different implemented scenarios
 
 # Import Class
+from Scenarios.ScenarioParameters import KICKSTAGE_DATABASE, PATH_DB_KICKSTAGE
+from SpacecraftDatabase.KickstageDatabaseReader import KickstageDatabaseReader
 from Spacecrafts.Satellite import Satellite
 from Plan.Plan import *
 from Constellations.Constellation import Constellation
@@ -25,28 +27,44 @@ class Scenario:
     - print the result
     """    
     general_fields = ['scenario',
-                      'propulsion_type',
                       'verbose',
+                      'starting_epoch',
+                      'dir_path_for_output_files',
+                      'tradeoff_mission_price_vs_duration',
+
                       'constellation_name',
                       'n_planes',
                       'n_sats_per_plane',
                       'plane_distribution_angle',
-                      'launcher',
-                      'launch_site',
-                      'orbit_type',
-                      'dispenser_tech_level',
-                      'custom_launcher_name',
-                      'interpolation_method',
-                      'starting_epoch',
-                      'data_path',
-                      'mission_cash_limitor']
+
+                      'launcher_use_database',
+                      'launcher_name',
+                      'launcher_launch_site',
+                      'launcher_orbit_type',
+                      'launcher_perf_interpolation_method',
+
+                      'kickstage_use_database',
+                      'kickstage_name',
+                      'kickstage_propulsion_type']
 
     scalable_field = [('sat_mass', u.kg),
                       ('sat_volume', u.m ** 3),
-                      ('custom_launcher_performance', u.kg),
-                      ('fairing_diameter', u.m),
-                      ('fairing_cylinder_height', u.m),
-                      ('fairing_total_height', u.m),
+
+                      ('launcher_performance', u.kg),
+                      ('launcher_fairing_diameter', u.m),
+                      ('launcher_fairing_cylinder_height', u.m),
+                      ('launcher_fairing_total_height', u.m),
+
+                      ('kickstage_height',u.m),
+                      ('kickstage_diameter',u.m),
+                      ('kickstage_initial_fuel_mass',u.kg),
+                      ('kickstage_prop_thrust',u.N),
+                      ('kickstage_prop_isp',u.s),
+                      ('kickstage_propulsion_dry_mass',u.kg),
+                      ('kickstage_dispenser_dry_mass',u.kg),
+                      ('kickstage_struct_mass',u.kg),
+                      ('kickstage_remaining_fuel_margin',u.kg),
+                      
                       ('apogee_launcher_insertion', u.km),
                       ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
@@ -78,7 +96,6 @@ class Scenario:
         self.reference_satellite = None
 
         self.create_attributes_from_input_json(json)
-        self.launcher_name = self.launcher
 
         # Instanciate epoch
         self.starting_epoch = Time(self.starting_epoch, scale="tdb")
@@ -193,8 +210,8 @@ class Scenario:
         # Plot if verbose
         if self.verbose:
             logging.info("Start plotting Clients...")
-            self.constellation.plot_3D_distribution(save="3D_plot", save_folder=self.data_path)
-            self.constellation.plot_distribution(save="2D_plot", save_folder=self.data_path)
+            self.constellation.plot_3D_distribution(save="3D_plot", save_folder=self.dir_path_for_output_files)
+            self.constellation.plot_distribution(save="2D_plot", save_folder=self.dir_path_for_output_files)
             logging.info("Finish plotting Clients...")
 
     def define_fleet(self):
@@ -202,16 +219,30 @@ class Scenario:
         create the :class:`~Fleets.Fleet.Fleet` object,
         and organise the targeted :class:`~Constellations.Constellation.Constellation`.
         """
+        self.define_kickstage_parameters()
+
         # Define launcher relevant orbit
         logging.info("Gathering launchers orbits...")
         self.define_fleet_orbits()
-
         # Define fleet
         logging.info("Instanciate Fleet object...")
         self.create_fleet()
 
         # Compute optimal order to release once spacecraft is known
         self.organise_satellites()
+
+    def define_kickstage_parameters(self):
+        if self.kickstage_use_database is True:
+            ks_db = KickstageDatabaseReader(PATH_DB_KICKSTAGE+KICKSTAGE_DATABASE)
+            self.kickstage_height = ks_db.get_kickstage_height(self.kickstage_name)
+            self.kickstage_diameter = ks_db.get_kickstage_diameter(self.kickstage_name)
+            self.kickstage_initial_fuel_mass = ks_db.get_kickstage_initial_fuel_mass(self.kickstage_name)
+            self.kickstage_prop_thrust = ks_db.get_kickstage_prop_thrust(self.kickstage_name)
+            self.kickstage_prop_isp = ks_db.get_kickstage_prop_isp(self.kickstage_name)
+            self.kickstage_propulsion_dry_mass = ks_db.get_kickstage_prop_dry_mass(self.kickstage_name)
+            self.kickstage_dispenser_dry_mass = ks_db.get_kickstage_dispenser_dry_mass(self.kickstage_name)
+            self.kickstage_struct_mass = ks_db.get_kickstage_struct_mass(self.kickstage_name)
+            self.kickstage_propulsion_type = ks_db.get_kickstage_prop_type(self.kickstage_name)
 
     def define_constellation_orbits(self):
         """ Define orbits needed for :class:`~Constellations.Constellation.Constellation` and :class:`~Spacecrafts.Satellite.Satellite` definition.
@@ -221,9 +252,9 @@ class Scenario:
         raise NotImplementedError()
 
     def define_fleet_orbits(self):
-        """ Define the :class:`~Spacecrafts.UpperStage.UpperStage` orbits based on input json.
+        """ Define the :class:`~Spacecrafts.KickStage.KickStage` orbits based on input json.
         """
-        self.define_upperstages_orbits()
+        self.define_kickstages_orbits()
 
     def create_fleet(self):
         """ Create the :class:`~Fleets.Fleet.Fleet` object.
@@ -232,8 +263,8 @@ class Scenario:
         """
         raise NotImplementedError()
 
-    def define_upperstages_orbits(self):
-        """ Define orbits needed for :class:`~Spacecrafts.UpperStage.UpperStage` definition based on input json.
+    def define_kickstages_orbits(self):
+        """ Define orbits needed for :class:`~Spacecrafts.KickStage.KickStage` definition based on input json.
         """
         # launcher insertion orbit
         a_launcher_insertion_orbit = (self.apogee_launcher_insertion + self.perigee_launcher_insertion)/2 + Earth.R

@@ -7,10 +7,11 @@ import astropy.units as u
 from matplotlib import pyplot, animation
 import logging
 
+from Scenarios.ScenarioParameters import PATH_DB_LAUNCHERS
+
 """Input data"""
 
 launch_pad = "ELA-4"
-
 
 def get_supported_launchers():
     """This function holds all the supported launchers in one place.
@@ -57,6 +58,16 @@ def get_launcher_fairing(launcher):
     else:
         raise ValueError(f"The launcher {launcher} is not valid.")
 
+def get_launcher_fairing_dimensions(launcher):
+    supported_launchers = get_supported_launchers()
+
+    if launcher in supported_launchers.keys():
+        fairing_diameter = supported_launchers[launcher][2] * u.m
+        fairing_cylinder_height = supported_launchers[launcher][3] * u.m
+        fairing_total_height = supported_launchers[launcher][4] * u.m
+    
+    return fairing_diameter,fairing_cylinder_height,fairing_total_height
+    
 
 def get_launcher_data(launcher, launch_site, orbit_type):
     """
@@ -84,14 +95,14 @@ def get_launcher_data(launcher, launch_site, orbit_type):
             f"The launch site {launch_site} is not valid for {launcher}. The only available launch site is {supported_launchers[launcher][0]}")
 
     elif orbit_type in ["LEO", "SSO", "LPEO", "Polar"]:
-        launcher_data = np.genfromtxt(f'Launchers/{launcher}_LEO.csv', delimiter=";", skip_header=2)
+        launcher_data = np.genfromtxt(f'{PATH_DB_LAUNCHERS}{launcher}_LEO.csv', delimiter=";", skip_header=2)
         return launcher_data, min_inc
 
     elif orbit_type == "MTO":
-        launcher_data = np.genfromtxt(f'Launchers/{launcher}_MTO.csv', delimiter=";", skip_header=2)
+        launcher_data = np.genfromtxt(f'{PATH_DB_LAUNCHERS}{launcher}_MTO.csv', delimiter=";", skip_header=2)
         return launcher_data, min_inc
     elif orbit_type in ["GTO", "GTO+"]:
-        launcher_data = np.genfromtxt(f'Launchers/{launcher}_GTO.csv', delimiter=";", skip_header=2)
+        launcher_data = np.genfromtxt(f'{PATH_DB_LAUNCHERS}{launcher}_GTO.csv', delimiter=";", skip_header=2)
         return launcher_data, min_inc
     else:
         raise ValueError(f"The orbit type {orbit_type} is not valid.")

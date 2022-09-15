@@ -52,9 +52,9 @@ Servicer
 .. automodule:: Spacecrafts.Servicer
    :members:
 
-UpperStage
+KickStage
 ------------------
-.. automodule:: Spacecrafts.UpperStage
+.. automodule:: Spacecrafts.KickStage
    :members:
 
 Fleet
