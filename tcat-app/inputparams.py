@@ -1,12 +1,12 @@
 # array structure [control_name , datatype , lookup_name , speaking_name , default_value , accepted_values]
 
 constellation_mission_params = {
-    ('scenario_metadata', 'Scenario Metadata'): [
+    ('mission_configuration', 'Mission Configuration'): [
         ['checkbox', '', 'verbose', 'Debug (display figures)', False, [True, False]],
         ['input', 'datetime-local', 'starting_epoch', 'Starting Epoch', '2025-01-01T12:00', ['2000-01-01T00:00', '2100-01-01T00:00']],
         ['input', 'number', 'tradeoff_mission_price_vs_duration', 'Tradeoff Mission Price vs Duration', 0.01, [0.0, 1.0]],
     ],
-    ('constellation', 'Constellation'): [
+    ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
         ['input', 'number', 'sat_mass', 'Satellite Mass (kg)', 147, [0.1, 99999.9]],
         ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', 1.3, [0.001, 99999.9]],
@@ -16,7 +16,7 @@ constellation_mission_params = {
     ],
     ('launcher', 'Launcher'): [
         ['checkbox', '', 'launcher_use_database', 'Use database', True, [True, False]],
-        ['input', 'text', 'launcher_name', 'Name', 'Soyuz_2.1b_Fregat', '^[A-Za-z0-9 ._]+$'],
+        ['select', 'text', 'launcher_name', 'Name', 'Soyuz_2.1a_Fregat', ['Ariane_62', 'Ariane_64', 'Soyuz_2.1a_Fregat', 'Soyuz_2.1b_Fregat', 'Soyuz']],
         ['select', 'text', 'launcher_launch_site', 'Launch Site', 'Baikonur', ['Korou', 'Baikonur']],
         ['select', 'text', 'launcher_orbit_type', 'Orbit Type', 'LEO', ['LEO', 'SSO', 'LPEO', 'Polar', 'MTO', 'GTO', 'GTO+']],
         ['input', 'number', 'launcher_performance', 'Custom performance (kg)', None, [0.1, 99999.9]],
@@ -27,7 +27,7 @@ constellation_mission_params = {
     ],
     ('kickstage', 'Kickstage'): [
         ['checkbox', '', 'kickstage_use_database', 'Use database', True, [True, False]],
-        ['input', 'text', 'kickstage_name', 'Name', 'Fregat', '^[A-Za-z0-9 ]+$'],
+        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus']],
         ['input', 'number', 'kickstage_height', 'Height (m)', None, [0.0, 9999999]],
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', None, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', None, [0.0, 9999999.0]],
@@ -49,7 +49,7 @@ constellation_mission_params = {
         ['input', 'number', 'servicer_default_volume', 'Default volume (m3)', 2.0, [0.0, 9999999]],
         ['select', 'text', 'servicer_propulsion_type', 'Propulsion type', 'bi-propellant', ['mono-propellant', 'water', 'solid', 'bi-propellant', 'electrical']],
     ],
-    ('orbits', 'Orbits'): [
+    ('orbit_configuration', 'Orbit Configuration'): [
         ['input', 'number', 'apogee_sats_insertion',
          'Satellite insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 600.0,
          [0.0, 400000.0]],
@@ -78,13 +78,13 @@ constellation_mission_params = {
 }
 
 adr_mission_params = {
-    ('scenario_metadata', 'Scenario Metadata'): [
+    ('mission_configuration', 'Mission Configuration'): [
         ['select', 'text', 'mission_architecture', 'Mission Architecture', 'single_picker', ['single_picker']],
         ['checkbox', '', 'verbose', 'Debug (display figures)', False, [True, False]],
         ['input', 'datetime-local', 'starting_epoch', 'Starting Epoch', '2025-01-01T12:00', ['2000-01-01T00:00', '2100-01-01T00:00']],
         ['input', 'number', 'tradeoff_mission_price_vs_duration', 'Tradeoff Mission Price vs Duration', 0.01, [0.0, 1.0]],
     ],
-    ('constellation', 'Constellation'): [
+    ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
         ['input', 'number', 'sat_mass', 'Satellite Mass (kg)', 147, [0.1, 99999.9]],
         ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', 1.3, [0.001, 99999.9]],
@@ -96,7 +96,7 @@ adr_mission_params = {
     ],
     ('launcher', 'Launcher'): [
         ['checkbox', '', 'launcher_use_database', 'Use database', True, [True, False]],
-        ['input', 'text', 'launcher_name', 'Name', 'Soyuz_2.1b_Fregat', '^[A-Za-z0-9 ._]+$'],
+        ['select', 'text', 'launcher_name', 'Name', 'Soyuz_2.1a_Fregat', ['Ariane_62', 'Ariane_64', 'Soyuz_2.1a_Fregat', 'Soyuz_2.1b_Fregat', 'Soyuz']],
         ['select', 'text', 'launcher_launch_site', 'Launch Site', 'Baikonur', ['Korou', 'Baikonur']],
         ['select', 'text', 'launcher_orbit_type', 'Orbit Type', 'LEO', ['LEO', 'SSO', 'LPEO', 'Polar', 'MTO', 'GTO', 'GTO+']],
         ['input', 'number', 'launcher_performance', 'Custom launch vehicle performance (kg)', None, [0.1, 99999.9]],
@@ -107,7 +107,7 @@ adr_mission_params = {
     ],
     ('kickstage', 'Kickstage'): [
         ['checkbox', '', 'kickstage_use_database', 'Use database', False, [True, False]],
-        ['input', 'text', 'kickstage_name', 'Name', 'Kickstage_101', '^[A-Za-z0-9 ]+$'],
+        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus']],
         ['input', 'number', 'kickstage_height', 'Height (m)', 0.5, [0.0, 9999999]],
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
@@ -129,7 +129,7 @@ adr_mission_params = {
         ['input', 'number', 'servicer_default_volume', 'Default volume (m3)', 2.0, [0.0, 9999999]],
         ['select', 'text', 'servicer_propulsion_type', 'Propulsion type', 'bi-propellant', ['mono-propellant', 'water', 'solid', 'bi-propellant', 'electrical']],
     ],
-    ('orbits', 'Orbits'): [
+    ('orbit_configuration', 'Orbit Configuration'): [
         ['input', 'number', 'apogee_sats_operational',
          'Satellite operational orbit apogee, from Earths surface to highest point of the elliptical orbit (km)',
          1200.0, [0.0, 400000.0]],
