@@ -154,17 +154,6 @@ adr_mission_params = {
          [0.0, 400000.0]],
         ['input', 'number', 'inc_launcher_disposal', 'Launcher disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
         #
-        ['input', 'number', 'apogee_servicer_insertion',
-         'Servicer insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 500.0,
-         [0.0, 400000.0]],
-        ['input', 'number', 'perigee_servicer_insertion',
-         'Servicer insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 500.0,
-         [0.0, 400000.0]],
-        ['input', 'number', 'inc_servicer_insertion', 'Servicer insertion orbit inclination (deg)', 87.0,
-         [-90.0, 90.0]],
-        ['input', 'number', 'true_anomaly_servicer_insertion', 'Servicer insertion orbit true anomaly (deg)', 0.0,
-         [-90.0, 90.0]],
-        #
         ['input', 'number', 'apogee_servicer_disposal',
          'Servicer disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1800.0,
          [0.0, 400000.0]],
