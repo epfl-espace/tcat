@@ -24,7 +24,7 @@ INSERTION_A_MARGIN = 0 * u.km # Defines the semi-major axis error
 INSERTION_RAAN_WINDOW = 1 * u.deg # Defines the admissible range of RAAN around target orbit
 
 # The models include contingencies to account for model errors:
-CONTINGENCY_DELTA_V = 0.1 # dV added to computed dV for each manoeuvres
+CONTINGENCY_DELTA_V = 0.05 # dV added to computed dV for each manoeuvres
 
 # Different models exist for a same type of manoeuvre, selection is based on certain criteria:
 MODEL_RAAN_DIRECT_LIMIT = 8 * u.deg # criteria to select between direct RAAN change (small angles only) or use J2 model
