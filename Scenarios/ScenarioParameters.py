@@ -24,7 +24,7 @@ INSERTION_A_MARGIN = 0 * u.km # Defines the semi-major axis error
 INSERTION_RAAN_WINDOW = 1 * u.deg # Defines the admissible range of RAAN around target orbit
 
 # The models include contingencies to account for model errors:
-CONTINGENCY_DELTA_V = 0.1 # dV added to computed dV for each manoeuvres
+CONTINGENCY_DELTA_V = 0.05 # dV added to computed dV for each manoeuvres
 
 # Different models exist for a same type of manoeuvre, selection is based on certain criteria:
 MODEL_RAAN_DIRECT_LIMIT = 8 * u.deg # criteria to select between direct RAAN change (small angles only) or use J2 model
@@ -55,7 +55,7 @@ KICKSTAGE_PROP_MODULE_MASS_CONTINGENCY = 0.0
 # SERVICER_ISP_THRUST = 330 * u.s
 SERVICER_MAXTANK_CAPACITY = 5000 * u.kg
 SERVICER_FUEL_CONTINGENCY = 0.05
-SERVICER_PROP_MODULE_MASS_CONTINGENCY = 0.2
+SERVICER_PROP_MODULE_MASS_CONTINGENCY = 0.0
 # SERVICER_PROPULSION_DRY_MASS = 20 * u.kg
 # SERVICER_STRUCT_MASS = 5 * u.kg
 # SERVICER_DEFAULT_VOLUME = 2.0 * u.m**3

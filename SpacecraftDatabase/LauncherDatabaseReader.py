@@ -23,8 +23,8 @@ def get_supported_launchers():
     forth element [3]: fairing height in the cylindrical section (m)
     fifth element [4]: fairing total height (m)
      """
-    supported_launchers = {"Ariane_64": ["Korou", 5, 4.570, 11.185, 18.000],
-                           "Ariane_62": ["Korou", 5, 4.570, 11.185, 18.000],
+    supported_launchers = {"Ariane_64": ["Kourou", 5, 4.570, 11.185, 18.000],
+                           "Ariane_62": ["Kourou", 5, 4.570, 11.185, 18.000],
                            "Soyuz": ["Baikonur", 45, 3.800, 5.070, 9.518],
                            "Soyuz_2.1a_Fregat": ["Baikonur", 45, 3.800, 5.070, 9.518],
                            "Soyuz_2.1b_Fregat": ["Baikonur", 45, 3.800, 5.070, 9.518],
@@ -75,7 +75,7 @@ def get_launcher_data(launcher, launch_site, orbit_type):
 
     Args:
         launcher: Name of the launcher (Ariane_64, Ariane_62)
-        launch_site: Name of the lunch site (Korou)
+        launch_site: Name of the lunch site (Kourou)
         orbit_type: Orbit type (LEO, SSO, LPEO, Polar, MTO, GTO, GTO+)
 
     Returns:
@@ -117,7 +117,7 @@ def get_launcher_performance(fleet, launcher, launch_site, inclination, apogee, 
 
     Args:
         launcher: Name of the launcher (Ariane_64, Ariane_62)
-        launch_site: Name of the lunch site (Korou)
+        launch_site: Name of the lunch site (Kourou)
         apogee: Apogee of the final orbit
         inclination: Inclination of the final orbit
         method: interpolation method ('linear', 'nearest', 'cubic', 'nearest-up', 'zero',
