@@ -17,7 +17,7 @@ class ScenarioADR(Scenario):
         self.general_fields.extend(['sats_reliability',
                                     'seed_random_sats_failure',
                                     'mission_architecture',
-                                    'servicer.servicer_propulsion_type'])
+                                    'servicer_propulsion_type'])
         self.scalable_field.extend([('servicer_initial_fuel_mass',u.kg),
                                     ('servicer_capture_module_dry_mass',u.kg),
                                     ('servicer_prop_thrust',u.N),
@@ -32,12 +32,6 @@ class ScenarioADR(Scenario):
                                     ('apogee_sats_disposal', u.km),
                                     ('perigee_sats_disposal', u.km), 
                                     ('inc_sats_disposal', u.deg),
-                                    ('apogee_servicer_insertion',u.km),
-                                    ('perigee_servicer_insertion',u.km),
-                                    ('inc_servicer_insertion', u.deg),
-                                    ('raan_servicer_insertion', u.deg),
-                                    ('arg_periapsis_servicer_insertion', u.deg),
-                                    ('true_anomaly_servicer_insertion', u.deg),
                                     ('apogee_servicer_disposal',u.km),
                                     ('perigee_servicer_disposal',u.km),
                                     ('inc_servicer_disposal', u.deg)])
@@ -59,9 +53,9 @@ class ScenarioADR(Scenario):
                                                         a_sats_operational_orbit,
                                                         e_sats_operational_orbit,
                                                         self.inc_sats_operational,
-                                                        self.raan_servicer_insertion,
-                                                        self.arg_periapsis_servicer_insertion,
-                                                        self.true_anomaly_servicer_insertion,
+                                                        0. * u.deg,
+                                                        90. * u.deg,
+                                                        0. * u.deg,
                                                         self.starting_epoch)
         
         a_sats_disposal_orbit = (self.apogee_sats_disposal + self.perigee_sats_disposal)/2 + Earth.R
@@ -86,16 +80,16 @@ class ScenarioADR(Scenario):
     def define_servicer_orbits(self):
         """ Define the :class:`~Spacecrafts.Servicer.Servicer` orbits.
         """
-        a_servicer_insertion_orbit = (self.apogee_servicer_insertion + self.perigee_servicer_insertion)/2 + Earth.R
-        e_servicer_insertion_orbit = ((self.apogee_servicer_insertion + Earth.R)/a_servicer_insertion_orbit - 1)*u.one
-        self.servicer_insertion_orbit = Orbit.from_classical(Earth,
-                                                             a_servicer_insertion_orbit,
-                                                             e_servicer_insertion_orbit,
-                                                             self.inc_servicer_insertion,
-                                                             0. * u.deg,
-                                                             90. * u.deg,
-                                                             0. * u.deg,
-                                                             self.starting_epoch)
+        # a_servicer_insertion_orbit = (self.apogee_servicer_insertion + self.perigee_servicer_insertion)/2 + Earth.R
+        # e_servicer_insertion_orbit = ((self.apogee_servicer_insertion + Earth.R)/a_servicer_insertion_orbit - 1)*u.one
+        # self.servicer_insertion_orbit = Orbit.from_classical(Earth,
+        #                                                      a_servicer_insertion_orbit,
+        #                                                      e_servicer_insertion_orbit,
+        #                                                      self.inc_servicer_insertion,
+        #                                                      0. * u.deg,
+        #                                                      90. * u.deg,
+        #                                                      0. * u.deg,
+        #                                                      self.starting_epoch)
 
         # launcher disposal orbit
         a_servicer_disposal_orbit = (self.apogee_servicer_disposal + self.perigee_servicer_disposal)/2 + Earth.R
