@@ -17,7 +17,7 @@ class ScenarioADR(Scenario):
         self.general_fields.extend(['sats_reliability',
                                     'seed_random_sats_failure',
                                     'mission_architecture',
-                                    'servicer.servicer_propulsion_type'])
+                                    'servicer_propulsion_type'])
         self.scalable_field.extend([('servicer_initial_fuel_mass',u.kg),
                                     ('servicer_capture_module_dry_mass',u.kg),
                                     ('servicer_prop_thrust',u.N),
