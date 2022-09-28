@@ -26,7 +26,7 @@
   "kickstage_name": "Fregat",
 	"kickstage_height": 3,
 	"kickstage_diameter": 2.0,
-	"kickstage_initial_fuel_mass": 5350.0,
+	"kickstage_initial_fuel_mass": 6000.0,
 	"kickstage_prop_thrust": 19850.0,
 	"kickstage_prop_isp": 332.0,
 	"kickstage_propulsion_dry_mass": 75.0,
