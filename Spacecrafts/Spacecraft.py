@@ -47,6 +47,7 @@ class Spacecraft:
         self.disposal_orbit = disposal_orbit
         self.current_orbit = None
         self.previous_orbit = None
+        self.insertion_epoch = None
 
         self.mothership = None
 
@@ -94,6 +95,12 @@ class Spacecraft:
                                     new_orbit.argp,
                                     new_orbit.nu,
                                     new_orbit.epoch)
+
+    def set_insertion_epoch(self,insertion_epoch):
+        self.insertion_epoch = insertion_epoch
+
+    def get_insertion_epoch(self):
+        return self.insertion_epoch
 
     def modify_insertion_orbit_epoch(self,new_epoch):
         """ Update the epoch of the insertion orbit
