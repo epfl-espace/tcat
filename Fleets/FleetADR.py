@@ -88,7 +88,7 @@ class FleetADR(Fleet):
                         kickstage_converged = True
 
                 # If converged, execute with updated assigned servicers
-                kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
+                kickstage.execute_with_fuel_usage_optimisation(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
                 # kickstage.execute_with_fuel_usage_optimisation(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
 
                 # Add kickstage to fleet
