@@ -5,6 +5,7 @@ import math
 import numpy as np
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
+from Phases.Common_functions import update_orbit
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Capture import Capture
@@ -108,6 +109,8 @@ class Servicer(ActiveSpacecraft):
                                                self.insertion_orbit.argp,
                                                self.insertion_orbit.nu,
                                                self.insertion_orbit.epoch)
+
+        insertion_orbit = update_orbit(insertion_orbit,self.get_insertion_epoch())
 
         # Add Insertion phase to the plan
         insertion = Insertion(f"({self.id}) Goes to insertion orbit",self.plan, insertion_orbit, duration=1 * u.h)
