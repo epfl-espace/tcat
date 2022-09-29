@@ -39,7 +39,7 @@ class OrbitChange(GenericPhase):
         manoeuvres ([Common_functions.Manoeuvre]): List of manoeuvres to reach the final orbit
     """
     def __init__(self, phase_id, plan, final_orbit, initial_orbit=None, delta_v_contingency=0.1,
-                 raan_specified=False, raan_cutoff=0.5 * u.deg, raan_phasing_absolute=False):
+                 raan_specified=False, ltan_specified=False, raan_cutoff=0.5 * u.deg, raan_phasing_absolute=False):
         super().__init__(phase_id, plan)
         self.final_orbit = final_orbit
         self.planned_final_orbit = final_orbit
@@ -47,6 +47,7 @@ class OrbitChange(GenericPhase):
         self.planned_initial_orbit = initial_orbit
         self.delta_v_contingency = delta_v_contingency
         self.raan_specified = raan_specified
+        self.ltan_specified = ltan_specified
         self.raan_phasing_absolute = raan_phasing_absolute
         self.raan_cutoff = raan_cutoff
         self.raan_drift = 0. * u.deg
@@ -186,9 +187,16 @@ class OrbitChange(GenericPhase):
         phasing_duration, raan_drift, raan_change_manoeuvre = self.compute_precession(transfer_duration,
                                                                                       raan_phasing=self.raan_specified, raan_phasing_absolute=self.raan_phasing_absolute)
         self.raan_drift = raan_drift
-        self.duration = phasing_duration + transfer_duration
         if raan_change_manoeuvre and raan_change_manoeuvre.delta_v > 0. * u.m / u.s:
             self.manoeuvres.append(raan_change_manoeuvre)
+
+        # compute ltan matching manoeuver
+        ltan_wait_duration = 0 *u.s
+        if self.ltan_specified is True:
+            ltan_wait_duration = self.initial_orbit.n * abs(self.initial_orbit.nu-self.final_orbit.nu)
+        
+        # compute total duration
+        self.duration = phasing_duration + transfer_duration + ltan_wait_duration
 
         # compute additional maintenance delta v on initial orbit in case of significant drifting time at low altitude
         maintenance_manoeuvre = compute_altitude_maintenance_delta_v(phasing_duration, self.initial_orbit)
