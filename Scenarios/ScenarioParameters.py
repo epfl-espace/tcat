@@ -22,6 +22,7 @@ INSERTION_A_MARGIN = 0 * u.km # Defines the semi-major axis error
 
 # The servicer releases the satelilite when the target orbit is reached with a certain precision that can be defined here:
 INSERTION_RAAN_WINDOW = 1 * u.deg # Defines the admissible range of RAAN around target orbit
+SERVICER_LTAN_WINDOW = 1 * u.deg
 
 # The models include contingencies to account for model errors:
 CONTINGENCY_DELTA_V = 0.0 # dV added to computed dV for each manoeuvres
@@ -30,6 +31,8 @@ CONTINGENCY_DELTA_V = 0.0 # dV added to computed dV for each manoeuvres
 MODEL_RAAN_DIRECT_LIMIT = 8 * u.deg # criteria to select between direct RAAN change (small angles only) or use J2 model
 MODEL_RAAN_DELTA_INCLINATION_HIGH = 10 *u.deg # higer bound of inclination change for RAAN phasing
 MODEL_RAAN_DELTA_INCLINATION_LOW = 1e-3 * u.deg # lower bound of inclination change for RAAN phasing
+MODEL_LTAN_DELTA_ALTITUDE_HIGH = 100 * u.km # higer bound of altitude change for LTAN phasing
+MODEL_LTAN_DELTA_ALTITUDE_LOW = 1e-3 * u.km # lower bound of altitude change for LTAN phasing
 
 # KickStage initial fuel mass
 # KICKSTAGE_INITIAL_FUEL_MASS = 89.8 * u.kg
