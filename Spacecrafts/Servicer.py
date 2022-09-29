@@ -175,12 +175,12 @@ class Servicer(ActiveSpacecraft):
             new_alt = current_orbit.a - self.compute_delta_altitude_for_ltan_phasing(current_orbit.nu,current_target.operational_orbit.nu)
             phasing_ltan_orbit = Orbit.from_classical(Earth,
                                             new_alt,
-                                            self.phasing_ltan_orbit.ecc,
-                                            self.phasing_ltan_orbit.inc,
-                                            self.phasing_ltan_orbit.raan,
-                                            self.phasing_ltan_orbit.argp,
-                                            self.phasing_ltan_orbit.nu,
-                                            self.phasing_ltan_orbit.epoch)
+                                            current_orbit.ecc,
+                                            current_orbit.inc,
+                                            current_orbit.raan,
+                                            current_orbit.argp,
+                                            current_orbit.nu,
+                                            current_orbit.epoch)
 
             # Reach phasing orbit and add to plan
             phasing_ltan = OrbitChange(f"({self.id}) goes to ideal LTAN phasing orbit",
@@ -197,7 +197,7 @@ class Servicer(ActiveSpacecraft):
                                     self.plan,
                                     current_target.operational_orbit,
                                     ltan_specified=True,
-                                    initial_orbit=phasing_orbit,
+                                    initial_orbit=phasing_ltan_orbit,
                                     delta_v_contingency=delta_v_contingency,
                                     raan_cutoff=raan_cutoff)
 
