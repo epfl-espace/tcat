@@ -62,6 +62,8 @@ class ActiveSpacecraft(Spacecraft):
         # Init ratio of inclination change in raan drift model
         self.ratio_inc_raan_from_scenario = scenario.tradeoff_mission_price_vs_duration
         self.ratio_inc_raan_from_opti = 0.
+        self.ratio_alt_ltan_from_scenario = scenario.tradeoff_mission_price_vs_duration
+        self.ratio_alt_ltan_from_opti = 0.
 
         # Instanciate Plan
         self.plan = Plan(f"Plan_{self.id}",scenario.starting_epoch)
@@ -131,6 +133,18 @@ class ActiveSpacecraft(Spacecraft):
         total_ratio = self.ratio_inc_raan_from_scenario + self.ratio_inc_raan_from_opti
         range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
         return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
+
+    def compute_delta_altitude_for_ltan_phasing(self,current_orbit_ltan,target_orbit_ltan):
+        # Determine the sign of altitude change
+        delta_ltan = target_orbit_ltan - current_orbit_ltan
+        sign_alt_change = -1.0
+        if delta_ltan < 0.0 * u.deg or delta_ltan > 180 * u.deg:
+            sign_alt_change = 1.0
+
+        # Apply different ratios to altitude change
+        total_ratio = self.ratio_alt_ltan_from_scenario + self.ratio_alt_ltan_from_opti
+        range = MODEL_LTAN_DELTA_ALTITUDE_HIGH - MODEL_LTAN_DELTA_ALTITUDE_LOW
+        return sign_alt_change * (total_ratio*range + MODEL_LTAN_DELTA_ALTITUDE_LOW)
 
     def reset(self):
         """ Reset the Activespacecraft to initial parameters. Ready for a restart
