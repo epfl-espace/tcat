@@ -5,6 +5,8 @@ from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
 from poliastro.bodies import Earth
 
+from Scenarios.ScenarioParameters import SERVICER_LTAN_WINDOW
+
 
 class OrbitChange(GenericPhase):
     """A Phase that represents changes made by a servicer to change orbit.
@@ -192,8 +194,9 @@ class OrbitChange(GenericPhase):
 
         # compute ltan matching manoeuver
         ltan_wait_duration = 0 *u.s
-        if self.ltan_specified is True:
-            ltan_wait_duration = self.initial_orbit.n * abs(self.initial_orbit.nu-self.final_orbit.nu)
+        delta_true_anomaly = abs(self.initial_orbit.nu-self.final_orbit.nu)
+        if self.ltan_specified is True and delta_true_anomaly >= SERVICER_LTAN_WINDOW:
+            ltan_wait_duration = delta_true_anomaly / self.initial_orbit.n
         
         # compute total duration
         self.duration = phasing_duration + transfer_duration + ltan_wait_duration
