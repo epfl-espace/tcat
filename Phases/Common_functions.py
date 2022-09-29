@@ -341,7 +341,8 @@ def update_orbit(orbit, reference_epoch,starting_epoch=None):
     new_orbit = Orbit.from_classical(orbit.attractor, orbit.a, orbit.ecc,
                                      orbit.inc, current_raan,
                                      orbit.argp, orbit.nu,
-                                     reference_epoch)
+                                     orbit.epoch)
+    new_orbit = new_orbit.propagate(time_since_epoch)
     return new_orbit
 
 def get_reentry_parameters(orbit, altitude=100. * u.km):
