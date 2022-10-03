@@ -157,6 +157,7 @@ class KickStage(ActiveSpacecraft):
         super().reset()
 
         # Reset attribut
+        self.ordered_target_spacecraft = []
         self.mass_filling_ratio = 1
         self.volume_filling_ratio = 1
         self.dispenser_mass = 0. * u.kg
@@ -426,12 +427,6 @@ class KickStage(ActiveSpacecraft):
 
     def generate_snapshot_string(self):
         return super().generate_snapshot_string("KickStage")
-
-    def reset(self):
-        super().reset()
-
-        # Empty spacecrafts
-        self.ordered_target_spacecraft = []
 
     def print_spacecraft_specific_data(self):
         print(f"\tTotal payload mass available: {self.mass_available:.1f}"

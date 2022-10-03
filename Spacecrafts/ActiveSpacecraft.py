@@ -35,14 +35,12 @@ class ActiveSpacecraft(Spacecraft):
     :type scenario: :class:`~Scenarios.Scenario.Scenario`
     :param insertion_orbit: Insertion orbit
     :type insertion_orbit: poliastro.twobody.Orbit
-    :param initial_orbit: Initial orbit
-    :type initial_orbit: poliastro.twobody.Orbit
     :param operational_orbit: Operational orbit
     :type operational_orbit: poliastro.twobody.Orbit
     :param disposal_orbit: Disposal orbit
     :type disposal_orbit: poliastro.twobody.Orbit
     """
-    def __init__(self,activespacecraft_id,group,structure_mass,mass_contingency,scenario,volume=0.*u.m**3,insertion_orbit = None,initial_orbit = None,operational_orbit = None,disposal_orbit = None):
+    def __init__(self,activespacecraft_id,group,structure_mass,mass_contingency,scenario,volume=0.*u.m**3,insertion_orbit = None,operational_orbit = None,disposal_orbit = None):
         super().__init__(activespacecraft_id,structure_mass,volume=volume,insertion_orbit = insertion_orbit,operational_orbit = operational_orbit, disposal_orbit=disposal_orbit)
         # Set id parameters
         self.group = group
@@ -64,9 +62,8 @@ class ActiveSpacecraft(Spacecraft):
         # Init ratio of inclination change in raan drift model
         self.ratio_inc_raan_from_scenario = scenario.tradeoff_mission_price_vs_duration
         self.ratio_inc_raan_from_opti = 0.
-
-        # Disposal orbit triggered at end of mission
-        self.initial_orbit = initial_orbit
+        self.ratio_alt_ltan_from_scenario = scenario.tradeoff_mission_price_vs_duration
+        self.ratio_alt_ltan_from_opti = 0.
 
         # Instanciate Plan
         self.plan = Plan(f"Plan_{self.id}",scenario.starting_epoch)
@@ -137,12 +134,23 @@ class ActiveSpacecraft(Spacecraft):
         range = MODEL_RAAN_DELTA_INCLINATION_HIGH - MODEL_RAAN_DELTA_INCLINATION_LOW
         return total_ratio*range + MODEL_RAAN_DELTA_INCLINATION_LOW
 
+    def compute_delta_altitude_for_ltan_phasing(self,current_orbit_ltan,target_orbit_ltan):
+        # Determine the sign of altitude change
+        delta_ltan = target_orbit_ltan - current_orbit_ltan
+        sign_alt_change = -1.0
+        if delta_ltan < 0.0 * u.deg or delta_ltan > 180 * u.deg:
+            sign_alt_change = 1.0
+
+        # Apply different ratios to altitude change
+        total_ratio = self.ratio_alt_ltan_from_scenario + self.ratio_alt_ltan_from_opti
+        range = MODEL_LTAN_DELTA_ALTITUDE_HIGH - MODEL_LTAN_DELTA_ALTITUDE_LOW
+        return sign_alt_change * (total_ratio*range + MODEL_LTAN_DELTA_ALTITUDE_LOW)
+
     def reset(self):
         """ Reset the Activespacecraft to initial parameters. Ready for a restart
         """
         # Reset Spacecraft
         super().reset()
-        self.current_orbit = self.get_initial_orbit()
 
         # Empty the plan
         self.empty_plan()
@@ -234,22 +242,6 @@ class ActiveSpacecraft(Spacecraft):
             return self.main_propulsion_module
         except KeyError:
             return None
-
-    def get_initial_orbit(self):
-        """ Get the initial orbit
-
-        :return: initial orbit
-        :rtype orbit: poliastro.twobody.Orbit
-        """
-        return self.initial_orbit
-
-    def set_initial_orbit(self,new_orbit):
-        """ Set the initial orbit
-
-        :param new_orbit: new initial orbit
-        :type new_orbit: poliastro.twobody.Orbit
-        """
-        self.initial_orbit = new_orbit
 
     def get_initial_prop_mass(self):
         """ Get the initial propulsion mass.

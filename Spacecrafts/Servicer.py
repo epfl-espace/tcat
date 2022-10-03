@@ -5,6 +5,7 @@ import math
 import numpy as np
 from Modules.CaptureModule import CaptureModule
 from Modules.PropulsionModule import PropulsionModule
+from Phases.Common_functions import update_orbit
 from Phases.Insertion import Insertion
 from Phases.OrbitChange import OrbitChange
 from Phases.Capture import Capture
@@ -85,9 +86,10 @@ class Servicer(ActiveSpacecraft):
         # TODO : implement a launch optimizer
         
         # Insertion orbit margin
-        insertion_raan_margin = INSERTION_RAAN_MARGIN
         insertion_raan_window = INSERTION_RAAN_WINDOW
         insertion_a_margin = INSERTION_A_MARGIN
+
+        ltan_window = SERVICER_LTAN_WINDOW
 
         # Contingencies and cutoff
         delta_v_contingency = CONTINGENCY_DELTA_V
@@ -108,6 +110,8 @@ class Servicer(ActiveSpacecraft):
                                                self.insertion_orbit.argp,
                                                self.insertion_orbit.nu,
                                                self.insertion_orbit.epoch)
+
+        insertion_orbit = update_orbit(insertion_orbit,self.get_insertion_epoch())
 
         # Add Insertion phase to the plan
         insertion = Insertion(f"({self.id}) Goes to insertion orbit",self.plan, insertion_orbit, duration=1 * u.h)
@@ -146,7 +150,7 @@ class Servicer(ActiveSpacecraft):
                 phasing_orbit.inc += self.compute_delta_inclination_for_raan_phasing()
 
                 # Reach phasing orbit and add to plan
-                phasing = OrbitChange(f"({self.id}) goes to ideal phasing orbit",
+                phasing = OrbitChange(f"({self.id}) goes to ideal RAAN phasing orbit",
                                       self.plan,
                                       phasing_orbit,
                                       raan_specified=False,
@@ -166,6 +170,39 @@ class Servicer(ActiveSpacecraft):
 
                 # Assign propulsion module to OrbitChange phase
                 raising.assign_module(self.get_main_propulsion_module())
+
+            # Correct LTAN drift
+            new_alt = current_orbit.a - self.compute_delta_altitude_for_ltan_phasing(current_orbit.nu,current_target.operational_orbit.nu)
+            phasing_ltan_orbit = Orbit.from_classical(Earth,
+                                            new_alt,
+                                            current_orbit.ecc,
+                                            current_orbit.inc,
+                                            current_orbit.raan,
+                                            current_orbit.argp,
+                                            current_orbit.nu,
+                                            current_orbit.epoch)
+
+            # Reach phasing orbit and add to plan
+            phasing_ltan = OrbitChange(f"({self.id}) goes to ideal LTAN phasing orbit",
+                                    self.plan,
+                                    phasing_ltan_orbit,
+                                    ltan_specified=False,
+                                    delta_v_contingency=delta_v_contingency)
+
+            # Assign propulsion module to OrbitChange phase
+            phasing_ltan.assign_module(self.get_main_propulsion_module())
+
+            # Change orbit back to target orbit and add to plan
+            raising_ltan = OrbitChange(f"({self.id}) goes to next target ({current_target.get_id()})",
+                                    self.plan,
+                                    current_target.operational_orbit,
+                                    ltan_specified=True,
+                                    initial_orbit=phasing_ltan_orbit,
+                                    delta_v_contingency=delta_v_contingency,
+                                    raan_cutoff=raan_cutoff)
+
+            # Assign propulsion module to OrbitChange phase
+            raising_ltan.assign_module(self.get_main_propulsion_module())
             
             ##########
             # Step 3.1: Capture the satellite
