@@ -44,6 +44,7 @@ class KickStage(ActiveSpacecraft):
         self.dispenser_volume = 0. * u.m ** 3
         self.satellites_allowance = 0
         self.fuel_margin = scenario.kickstage_remaining_fuel_margin
+        self.ordered_target_spacecraft = []
 
         # Compute initial performances
         self.compute_kickstage(scenario)
@@ -172,8 +173,8 @@ class KickStage(ActiveSpacecraft):
         :type tech_level: float
         """
         # Compute filling ratio and disp mass and volume
-        self.total_satellites_mass = sum([satellite.get_current_mass() for satellite in assigned_satellites])
-        self.mass_filling_ratio = self.total_satellites_mass / self.mass_available
+        total_satellites_mass = sum([satellite.get_current_mass() for satellite in assigned_satellites])
+        self.mass_filling_ratio = total_satellites_mass / self.mass_available
         self.volume_filling_ratio = sum([satellite.get_current_volume() for satellite in assigned_satellites]) / self.volume_available
 
         self.reset_modules()
