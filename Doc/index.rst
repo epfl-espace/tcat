@@ -17,7 +17,7 @@ Welcome to TCAT's documentation!
    .. moon_use_case
    .. adr_use_case
    documentation
-   misc
+   .. misc
 
 Indices and tables
 ==================
