@@ -304,6 +304,13 @@ class ActiveSpacecraft(Spacecraft):
         return reference_delta_v.to(u.m / u.s), rcs_prop_mass
 
     def generate_snapshot_string(self,spacecraft_type_str="Spacecraft"):
+        """ Adds all elements specific to an active spacecraft to the super() method.
+
+        :param spacecraft_type_str: for nomenclature of certain parameters, defaults to "Spacecraft"
+        :type spacecraft_type_str: str, optional
+        :return: state of the spacecraft written in a string
+        :rtype: str
+        """
         return (str("")
         + "\n\tStarting Epoch: " + str(self.previous_orbit.epoch)
         + "\n\tEnding Epoch: " + str(self.current_orbit.epoch)
@@ -315,6 +322,8 @@ class ActiveSpacecraft(Spacecraft):
         + "\n\tFuel Mass After Phase: " + "{0:.1f}".format(self.get_main_propulsion_module().current_propellant_mass))
 
     def print_spacecraft_specific_data(self):
+        """ No specific data.
+        """
         pass
 
     def get_reference_power(self):
@@ -329,13 +338,13 @@ class ActiveSpacecraft(Spacecraft):
         return nominal_power_draw
 
     def print_metadata(self):
+        """ Prints all meta elements specific to this spacecraft.
+        """
         print(f""
         + f"Metadata:"
         + f"\n\tSpacecraft id: {self.get_id()}"
         + f"\n\tDry mass: {self.get_dry_mass():.01f}"
-        # + self.get_modules_dry_mass_str()
         + f"\n\tInitial wet mass: {self.get_initial_wet_mass():.01f}"
-        # + self.get_modules_initial_wet_mass_str()
         + f"\n\tFuel mass margin: {self.get_main_propulsion_module().current_propellant_mass:.1f}"
         + f"\n\tNb of phases: {self.plan.get_nb_phases()}"
         + f"\n\tNb of manoeuveres: {self.plan.get_nb_manoeuvers()}")

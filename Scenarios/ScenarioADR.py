@@ -121,6 +121,8 @@ class ScenarioADR(Scenario):
             raise Exception("Empty constellation, decrease constellation reliability")
 
     def print_KPI(self):
+        """ Adds KPIs specific to ADR scenario.
+        """
         super().print_KPI()
 
         print(f"Total debris mass removed: {self.constellation.get_sum_of_sats_mass():.1f}")

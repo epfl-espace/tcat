@@ -232,6 +232,8 @@ class Scenario:
         self.organise_satellites()
 
     def define_kickstage_parameters(self):
+        """ If user specifies a kickstage from the database, sets all kickstage parameters from database.
+        """
         if self.kickstage_use_database is True:
             ks_db = KickstageDatabaseReader(PATH_DB_KICKSTAGE+KICKSTAGE_DATABASE)
             self.kickstage_height = ks_db.get_kickstage_height(self.kickstage_name)

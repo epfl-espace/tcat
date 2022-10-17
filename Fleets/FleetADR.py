@@ -140,6 +140,8 @@ class FleetADR(Fleet):
         return nb_debris
 
     def print_nb_fleet_spacecraft(self):
+        """ Adds the number of servicers and removed debris.
+        """
         super().print_nb_fleet_spacecraft()
         if self.get_number_servicers() > 1:
             print(f"Servicers: {self.get_number_servicers()}")

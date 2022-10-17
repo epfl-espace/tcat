@@ -133,7 +133,7 @@ class Plan:
             linked to the duration of the program, not particular operations.
 
         Arg:
-            fleet (Fleet): fleet of servicers, introduced to homogenize "get_" methods implementation
+            fleet (Fleet): fleet of servicers, introduced to homogenize get methods implementation
 
         Return:
             (float): cost in Euros
@@ -169,7 +169,7 @@ class Plan:
             exceptional labour.
 
         Arg:
-            fleet (Fleet): fleet of servicers, introduced to homogenize "get_" methods implementation
+            fleet (Fleet): fleet of servicers, introduced to homogenize get methods implementation
 
         Return:
             (float): cost in Euros
@@ -184,7 +184,7 @@ class Plan:
         """ Returns moc location cost.
 
         Arg:
-            fleet (Fleet): fleet of servicers, introduced to homogenize "get_" methods implementation
+            fleet (Fleet): fleet of servicers, introduced to homogenize get methods implementation
 
         Return:
             (float): cost in Euros

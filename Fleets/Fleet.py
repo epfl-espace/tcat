@@ -136,7 +136,7 @@ class Fleet:
         """ Compute development cost, taking into account rough order of magnitude estimates.
 
         Arg:
-            plan (Plan): keep this as argument, this is done to homogenize the "get_" methods
+            plan (Plan): keep this as argument, this is done to homogenize the get methods
 
         Return:
             (float): cost in Euros
@@ -159,7 +159,7 @@ class Fleet:
         """ Compute cost of mission operational center development cost.
 
         Arg:
-            plan (Plan): keep this as argument, this is done to homogenize the "get_" methods
+            plan (Plan): keep this as argument, this is done to homogenize the get methods
 
         Return:
             (float): cost in Euros
@@ -181,7 +181,7 @@ class Fleet:
         """ Compute recurring cost of flight segment hardware (without AIT).
 
         Arg:
-            plan (Plan): keep this as argument, this is done to homogenize the "get_" methods
+            plan (Plan): keep this as argument, this is done to homogenize the get methods
 
         Return:
             (float): cost in Euros
@@ -206,7 +206,7 @@ class Fleet:
         """ Compute launch cost for all servicers of the fleet based on cost prorate of the mass.
 
         Arg:
-            plan (Plan): keep this as argument, this is done to homogenize the "get_" methods
+            plan (Plan): keep this as argument, this is done to homogenize the get methods
 
         Return:
             (float): cost in Euros
@@ -492,6 +492,8 @@ class Fleet:
         print(f"Total payload mass released in space: {sum(payload_mass):.2f}")
 
     def print_nb_fleet_spacecraft(self):
+        """ Prints the number of kickstages
+        """
         # Number of launcher
         Nb_KickStage = len(self.kickstages)
         if Nb_KickStage > 1:
