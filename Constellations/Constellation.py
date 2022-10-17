@@ -38,6 +38,7 @@ class Constellation:
         # Instanciate dictionnary containing all satellites
         self.satellites = dict()
         self.initial_satellites = dict()
+        self.optimized_ordered_satellites = []
 
     """
     Methods
@@ -165,7 +166,7 @@ class Constellation:
             sat_per_plane (int): number of satellites on each plane, equiphased along 360° of anomaly
         """
         # Add reference_satellite as attribut
-        self.reference_satellite = reference_satellite
+        # self.reference_satellite = reference_satellite
         
         # Extract reference satellite orbits
         insertion_orbit = reference_satellite.get_insertion_orbit()
