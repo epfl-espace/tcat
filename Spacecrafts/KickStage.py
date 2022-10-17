@@ -174,7 +174,7 @@ class KickStage(ActiveSpacecraft):
         """
         # Compute filling ratio and disp mass and volume
         total_satellites_mass = sum([satellite.get_current_mass() for satellite in assigned_satellites])
-        self.mass_filling_ratio = total_satellites_mass / self.mass_available
+        self.mass_filling_ratio = self.get_initial_wet_mass() / self.mass_available
         self.volume_filling_ratio = sum([satellite.get_current_volume() for satellite in assigned_satellites]) / self.volume_available
 
         self.reset_modules()
@@ -251,8 +251,7 @@ class KickStage(ActiveSpacecraft):
             print("Kickstage is taller than launcher's fairing")
             
         else:
-            fairing_cylinder_height -= scenario.kickstage_height
-            cylinder_volume = np.pi * (fairing_diameter/ 2) ** 2 * fairing_cylinder_height
+            cylinder_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_cylinder_height - scenario.kickstage_height)
             cone_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_total_height - fairing_cylinder_height)
             self.volume_available = cylinder_volume + cone_volume
     
