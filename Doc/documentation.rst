@@ -204,3 +204,17 @@ Approach Suite Module
 ------------------------
 .. automodule:: Modules.ApproachSuiteModule
    :members:
+
+Spacecraft Database
+===================
+These classes simplify access to external Spacecrafts databases.
+
+Kickstage Database Reader
+-------------------------
+.. automodule:: SpacecraftDatabase.KickstageDatabaseReader
+   :members:
+
+Launcher Database Reader
+------------------------
+.. automodule:: SpacecraftDatabase.LauncherDatabaseReader
+   :members:
