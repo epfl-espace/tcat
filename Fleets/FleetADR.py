@@ -79,6 +79,7 @@ class FleetADR(Fleet):
                         # Remove last
                         del assigned_servicers[-1]
                         servicer_count -= 1
+                        kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
 
                         # KickStage has converged if last servicers is discared
                         kickstage_converged = True
@@ -89,7 +90,6 @@ class FleetADR(Fleet):
 
                 # If converged, execute with updated assigned servicers
                 kickstage.execute_with_fuel_usage_optimisation(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
-                # kickstage.execute_with_fuel_usage_optimisation(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())
 
                 # Add kickstage to fleet
                 self.add_kickstage(kickstage)
