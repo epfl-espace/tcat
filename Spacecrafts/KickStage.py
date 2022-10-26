@@ -252,7 +252,7 @@ class KickStage(ActiveSpacecraft):
             
         else:
             cylinder_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_cylinder_height - scenario.kickstage_height)
-            cone_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_total_height - fairing_cylinder_height)
+            cone_volume = np.pi * (fairing_diameter/ 2) ** 2 * (fairing_total_height - fairing_cylinder_height) / 3
             self.volume_available = cylinder_volume + cone_volume
     
     def compute_allowance(self,unassigned_satellites):
