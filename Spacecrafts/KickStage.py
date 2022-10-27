@@ -46,9 +46,6 @@ class KickStage(ActiveSpacecraft):
         self.fuel_margin = scenario.kickstage_remaining_fuel_margin
         self.ordered_target_spacecraft = []
 
-        # Compute initial performances
-        self.compute_kickstage(scenario)
-
         # Add dispenser as CaptureModule
         dispenser = CaptureModule(self.id + '_Dispenser',
                                 self,
@@ -70,6 +67,9 @@ class KickStage(ActiveSpacecraft):
                                           dry_mass_override=scenario.kickstage_propulsion_dry_mass,
                                           mass_contingency=KICKSTAGE_PROP_MODULE_MASS_CONTINGENCY)
         self.set_main_propulsion_module(mainpropulsion)
+
+        # Compute initial performances
+        self.compute_kickstage(scenario)
 
     def execute_with_fuel_usage_optimisation(self,satellites,constellation_precession=0):
         """ Iteratively reduce total mission time by using all propellant mass
@@ -173,8 +173,7 @@ class KickStage(ActiveSpacecraft):
         :type tech_level: float
         """
         # Compute filling ratio and disp mass and volume
-        total_satellites_mass = sum([satellite.get_current_mass() for satellite in assigned_satellites])
-        self.mass_filling_ratio = self.get_initial_wet_mass() / self.mass_available
+        self.mass_filling_ratio = self.get_initial_payload_mass() / self.mass_available
         self.volume_filling_ratio = sum([satellite.get_current_volume() for satellite in assigned_satellites]) / self.volume_available
 
         self.reset_modules()
@@ -222,11 +221,15 @@ class KickStage(ActiveSpacecraft):
                                                             save="InterpolationGraph",
                                                             save_folder=scenario.dir_path_for_output_files)
 
-            # Substract KickStage mass
-            self.mass_available = launcher_performance
+            if scenario.launcher_name in ["Soyuz_2.1a_Fregat", "Soyuz_2.1b_Fregat"] and scenario.kickstage_use_database and scenario.kickstage_name == "Fregat":
+                self.mass_available = launcher_performance
+            elif super().get_initial_wet_mass() > launcher_performance:
+                raise ValueError(f"The kickstage is heavier than the launcher performance.")
+            else:
+                self.mass_available = launcher_performance - super().get_initial_wet_mass()
         else:
             logging.info(f"Using custom Launch Vehicle performance...")
-            self.mass_available = scenario.launcher_performance
+            self.mass_available = scenario.launcher_performance - super().get_initial_wet_mass()
 
     def compute_volume_available(self,scenario):
         """ Compute kickstage available volume based on launcher type
@@ -302,7 +305,10 @@ class KickStage(ActiveSpacecraft):
         raan_cutoff = MODEL_RAAN_DIRECT_LIMIT
 
         # Extract first target
-        first_target = self.ordered_target_spacecraft[0]
+        if len(self.ordered_target_spacecraft) == 0:
+            raise ValueError(f"No satellite can be added as payload because kickstage takes too much of the performance.")
+        else:
+            first_target = self.ordered_target_spacecraft[0]
 
         ##########
         # Step 1: Insertion Phase
