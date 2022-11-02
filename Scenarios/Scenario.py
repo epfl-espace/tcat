@@ -393,6 +393,16 @@ class Scenario:
     def print_KPI(self):
         """ Print mission KPI.
         """
+        # Print title
+        if self.kickstage_use_database and self.launcher_use_database:
+            print("Scenario:", self.scenario, "using", self.launcher_name, "launcher(s) and", self.kickstage_name, "kick stage(s).")
+        elif self.launcher_use_database:
+            print("Scenario:", self.scenario, "using", self.launcher_name, "launcher(s) and custom kick stage(s).")
+        elif self.kickstage_use_database:
+            print("Scenario:", self.scenario, "using custom launcher(s) and", self.kickstage_name, "kick stage(s).")
+        else:
+            print("Scenario:", self.scenario, "using custom launcher(s) and custom kick stage(s).")
+
         # Print flag
         print("="*72)
         print("KPI")
