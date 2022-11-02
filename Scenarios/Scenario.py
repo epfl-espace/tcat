@@ -207,6 +207,7 @@ class Scenario:
         for _, satellite in self.constellation.satellites.items():
             logging.info(f"Sat {satellite.get_id()} has {satellite.get_default_orbit()}, {satellite.get_default_orbit().raan} RAAN, {satellite.get_default_orbit().nu} nu orbit")
 
+    def plot_constellation(self):
         # Plot if verbose
         if self.verbose:
             logging.info("Start plotting Clients...")
