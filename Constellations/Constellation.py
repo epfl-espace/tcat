@@ -152,6 +152,14 @@ class Constellation:
         for key in random.sample(self.satellites.keys(),nb_sat_operational):
             del self.satellites[key]
 
+    def set_default_orbit_to_operational(self):
+        for satellite in self.satellites.values():
+            satellite.set_default_orbit(satellite.get_operational_orbit())
+
+    def set_default_orbit_to_insertion(self):
+        for satellite in self.satellites.values():
+            satellite.set_default_orbit(satellite.get_insertion_orbit())
+
     def populate_standard_constellation(self, constellation_name, reference_satellite, number_of_planes=2, sat_per_plane=10, plane_distribution_angle=180, altitude_offset = 10*u.km):
         """ Adds satellites to form a complete constellation with equi-phased planes based on inputs.
             The reference satellite is duplicated to fill the planes.

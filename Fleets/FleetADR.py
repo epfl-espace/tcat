@@ -77,6 +77,7 @@ class FleetADR(Fleet):
 
                     if kickstage_main_propulsion_module.get_current_prop_mass() < 0:
                         # Remove last
+                        current_servicer.remove_last_spacecraft(current_servicer)
                         del assigned_servicers[-1]
                         servicer_count -= 1
                         kickstage.execute(assigned_servicers,constellation_precession=clients.get_global_precession_rotation())

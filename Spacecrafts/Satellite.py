@@ -33,3 +33,11 @@ class Satellite(Spacecraft):
         :rtype: poliastro.twobody.Orbit
         """
         return self.default_orbit
+
+    def set_default_orbit(self,orbit):
+        """ Set the default orbit
+
+        :param orbit: new default orbit
+        :type orbit: poliastro.twobody.Orbit
+        """
+        self.default_orbit = orbit
