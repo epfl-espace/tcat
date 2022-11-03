@@ -16,7 +16,7 @@ constellation_mission_params = {
     ],
     ('launcher', 'Launcher'): [
         ['checkbox', '', 'launcher_use_database', 'Use database', True, [True, False]],
-        ['select', 'text', 'launcher_name', 'Name', 'Soyuz_2.1a_Fregat', ['Ariane_62', 'Ariane_64', 'Soyuz_2.1a_Fregat', 'Soyuz_2.1b_Fregat', 'Soyuz']],
+        ['select', 'text', 'launcher_name', 'Name', 'Soyuz_2.1a_Fregat', ['Ariane_62', 'Ariane_64', 'Vega_C', 'Soyuz_2.1a_Fregat', 'Soyuz_2.1b_Fregat', 'Soyuz']],
         ['select', 'text', 'launcher_launch_site', 'Launch Site', 'Baikonur', ['Kourou', 'Baikonur']],
         ['select', 'text', 'launcher_orbit_type', 'Orbit Type', 'LEO', ['LEO', 'SSO', 'LPEO', 'Polar', 'MTO', 'GTO', 'GTO+']],
         ['input', 'number', 'launcher_performance', 'Custom performance (kg)', None, [0.1, 99999.9]],
@@ -86,7 +86,7 @@ adr_mission_params = {
     ],
     ('launcher', 'Launcher'): [
         ['checkbox', '', 'launcher_use_database', 'Use database', True, [True, False]],
-        ['select', 'text', 'launcher_name', 'Name', 'Soyuz_2.1a_Fregat', ['Ariane_62', 'Ariane_64', 'Soyuz_2.1a_Fregat', 'Soyuz_2.1b_Fregat', 'Soyuz']],
+        ['select', 'text', 'launcher_name', 'Name', 'Soyuz_2.1a_Fregat', ['Ariane_62', 'Ariane_64', 'Vega_C', 'Soyuz_2.1a_Fregat', 'Soyuz_2.1b_Fregat', 'Soyuz']],
         ['select', 'text', 'launcher_launch_site', 'Launch Site', 'Baikonur', ['Kourou', 'Baikonur']],
         ['select', 'text', 'launcher_orbit_type', 'Orbit Type', 'LEO', ['LEO', 'SSO', 'LPEO', 'Polar', 'MTO', 'GTO', 'GTO+']],
         ['input', 'number', 'launcher_performance', 'Custom launch vehicle performance (kg)', None, [0.1, 99999.9]],

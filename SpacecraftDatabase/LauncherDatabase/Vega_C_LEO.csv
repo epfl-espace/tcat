@@ -1,0 +1,10 @@
+#Vega C performance figures for LEO. Reference: VEGA C USER’S MANUAL ISSUE 0 REVISION 0 MAY 2018
+Altitude (km);Inclination (deg);Performance (kg)
+400; 97; 2340
+500; 97.4; 2260
+500; 88; 2250
+600; 97.7; 2180
+700; 98.3; 2080
+800; 98.6; 1960
+900; 99.1; 1840
+1000; 99.4; 1720
