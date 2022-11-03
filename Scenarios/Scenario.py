@@ -207,6 +207,7 @@ class Scenario:
         for _, satellite in self.constellation.satellites.items():
             logging.info(f"Sat {satellite.get_id()} has {satellite.get_default_orbit()}, {satellite.get_default_orbit().raan} RAAN, {satellite.get_default_orbit().nu} nu orbit")
 
+    def plot_constellation(self):
         # Plot if verbose
         if self.verbose:
             logging.info("Start plotting Clients...")
@@ -393,6 +394,16 @@ class Scenario:
     def print_KPI(self):
         """ Print mission KPI.
         """
+        # Print title
+        if self.kickstage_use_database and self.launcher_use_database:
+            print("Scenario:", self.scenario, "using", self.launcher_name, "launcher(s) and", self.kickstage_name, "kick stage(s).")
+        elif self.launcher_use_database:
+            print("Scenario:", self.scenario, "using", self.launcher_name, "launcher(s) and custom kick stage(s).")
+        elif self.kickstage_use_database:
+            print("Scenario:", self.scenario, "using custom launcher(s) and", self.kickstage_name, "kick stage(s).")
+        else:
+            print("Scenario:", self.scenario, "using custom launcher(s) and custom kick stage(s).")
+
         # Print flag
         print("="*72)
         print("KPI")

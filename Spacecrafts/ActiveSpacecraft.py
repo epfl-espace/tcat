@@ -92,6 +92,13 @@ class ActiveSpacecraft(Spacecraft):
                 target.mothership = self
             self.ordered_target_spacecraft.append(target)
 
+    def remove_last_spacecraft(self,spacecraft_to_remove):
+        if not (spacecraft_to_remove.get_id() in self.initial_spacecraft):
+            return 
+        del self.initial_spacecraft[spacecraft_to_remove.get_id()]
+        del self.current_spacecraft[spacecraft_to_remove.get_id()]
+        del self.ordered_target_spacecraft[-1]
+
     def separate_spacecraft(self, satellite):
         """ Remove a satellite from current spacecraft list when released
 
@@ -137,7 +144,7 @@ class ActiveSpacecraft(Spacecraft):
         """
         # Reset Spacecraft
         super().reset()
-
+        
         # Empty the plan
         self.empty_plan()
 

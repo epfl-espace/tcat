@@ -25,6 +25,7 @@ def get_supported_launchers():
      """
     supported_launchers = {"Ariane_64": ["Kourou", 5, 4.570, 11.185, 18.000],
                            "Ariane_62": ["Kourou", 5, 4.570, 11.185, 18.000],
+                           "Vega_C": ["Kourou", 5, 3.317, 3.914, 6.203],
                            "Soyuz": ["Baikonur", 45, 3.800, 5.070, 9.518],
                            "Soyuz_2.1a_Fregat": ["Baikonur", 45, 3.800, 5.070, 9.518],
                            "Soyuz_2.1b_Fregat": ["Baikonur", 45, 3.800, 5.070, 9.518],

@@ -42,6 +42,11 @@ class ScenarioConstellation(Scenario):
         self.sat_operational_orbit = None
         self.sat_disposal_orbit = None
         self.sat_default_orbit = self.sat_insertion_orbit
+
+    def define_constellation(self):
+        super().define_constellation()
+        self.constellation.set_default_orbit_to_insertion()
+        self.plot_constellation()
     
     def create_fleet(self):
         """ Create the :class:`~Fleets.FleetConstellation.FleetConstellation` object.
