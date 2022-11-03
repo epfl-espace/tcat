@@ -119,6 +119,8 @@ class ScenarioADR(Scenario):
         self.constellation.perform_random_sat_failure()
         if self.constellation.get_number_satellites() == 0:
             raise Exception("Empty constellation, decrease constellation reliability")
+        self.constellation.set_default_orbit_to_operational()
+        self.plot_constellation()
 
     def print_KPI(self):
         """ Adds KPIs specific to ADR scenario.
