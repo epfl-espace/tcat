@@ -1,0 +1,2188 @@
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "test_tcat_1",
+    "isTemplate": false,
+    "templateId": "428efa2d-5e63-477c-973b-6a2c31daa690",
+    "configurationType": {
+      "id": "fa85da01-9de9-48af-9333-8bad273e20f6",
+      "name": "Active Debris Removal Satellite",
+      "description": null
+    },
+    "buildingBlocks": [
+      {
+        "id": "bbfe3e74-2daa-4a3e-8153-298d645ca8b7",
+        "name": "VC-BG-Fairing",
+        "configurationStep": "STV",
+        "templateId": "acb1814d-fdcd-472e-b09f-25b44820d9e2",
+        "buildingBlockType": {
+          "id": "4a8404fa-0dbc-4826-95f3-2f9bdb3513b1",
+          "name": "Fairing"
+        },
+        "parameters": [
+          {
+            "id": "c0d1d830-7873-4387-98af-dc4dbaf70c93",
+            "value": "3.317",
+            "type": {
+              "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
+              "name": "Diameter approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "b2d4b2c2-449a-4269-8829-6bcc07b8e5f7",
+            "value": "false",
+            "type": {
+              "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
+              "name": "Recoverable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "4d1636b3-6a24-4dcf-9041-6ed55611e496",
+            "value": "false",
+            "type": {
+              "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
+              "name": "Reusable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "dbef17e8-6e56-4c9a-a8c7-1a2f646f5b1b",
+            "value": "126",
+            "type": {
+              "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
+              "name": "Stage Separation altitude",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "438e45b7-46db-483a-be68-2128b468845d",
+            "value": "9.374",
+            "type": {
+              "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
+              "name": "Length approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "07bd13b5-59a9-4623-b95e-1c23fc9daf37",
+            "value": "Beyond Gravity fairing for Vega C configuration",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "9cff23b9-8dab-484c-bec3-a90eed0286c1",
+            "value": "254",
+            "type": {
+              "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
+              "name": "Stage Separation timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "971beda2-88b0-402c-be45-9d628c285a6d",
+            "value": "6.5",
+            "type": {
+              "id": "8596a8c0-1008-435b-a1fa-82a786698699",
+              "name": "Length (cylindrical)",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "43071d4a-2a63-43b6-a7ad-7e50b0366775",
+            "value": "860",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "7ce45478-7cb9-4fa4-9e52-0e0403a53a8d",
+            "value": "860",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "d2178173-6aaa-4a95-81fd-3a3403e78777",
+        "name": "Vega C AVUM+ (upper stage)",
+        "configurationStep": "STV",
+        "templateId": "35615841-411e-411b-8dd7-26c164413e1c",
+        "buildingBlockType": {
+          "id": "d2603deb-96fd-464e-9d70-42a6721bedcb",
+          "name": "Upper Stage"
+        },
+        "parameters": [
+          {
+            "id": "69d1af86-d55f-4eac-a21d-c9cbdd8e1a42",
+            "value": "88",
+            "type": {
+              "id": "a8444354-6b57-4ccc-8ffc-3e9714bc9f3f",
+              "name": "Insertion orbit inclination",
+              "unit": {
+                "id": "27f8f3f4-fb8b-4760-8761-5c19a43bf0be",
+                "name": "degree"
+              }
+            }
+          },
+          {
+            "id": "811c4d75-290c-47fa-8203-3801f3493a85",
+            "value": "AVUM+, default upper stage using hypergolic propellant for Vega C configuration",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "ecdcb34e-1157-40fb-afc7-2b0d82742acc",
+            "value": "300",
+            "type": {
+              "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
+              "name": "Cut-off altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "5f108004-0da8-4e16-97e7-b8c5b2c14e94",
+            "value": "448",
+            "type": {
+              "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
+              "name": "Ignition timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "709be0d9-6af5-43a8-8d99-dcca86ac683f",
+            "value": "740",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "1cd91ed1-b70c-44db-9238-84da805b3ee2",
+            "value": "500",
+            "type": {
+              "id": "ba09b55d-735c-49ed-bb07-dad5b3414fe2",
+              "name": "Insertion orbit perigee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "0b0eb4e8-3ec4-450c-8e76-02b89d777585",
+            "value": "88",
+            "type": {
+              "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
+              "name": "Disposal orbit inclination",
+              "unit": {
+                "id": "27f8f3f4-fb8b-4760-8761-5c19a43bf0be",
+                "name": "degree"
+              }
+            }
+          },
+          {
+            "id": "8e2bfda9-7feb-42af-a76b-ab2ff8228833",
+            "value": "698",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "e7500a81-72d3-423a-bfc9-0b2bb355e3cd",
+            "value": "2.04",
+            "type": {
+              "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
+              "name": "Length approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "bb36767c-7447-4822-9444-3de5c9bfdadc",
+            "value": "false",
+            "type": {
+              "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
+              "name": "Recoverable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "d21c2dfc-6a75-4589-b363-f610b823a161",
+            "value": "2.18",
+            "type": {
+              "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
+              "name": "Diameter approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "a92d4f26-c70e-40ff-872e-28f851015be4",
+            "value": "500",
+            "type": {
+              "id": "5fd2e300-96be-4cd4-8557-3ffff0a4f257",
+              "name": "Insertion orbit apogee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "cbf424fa-1d4e-4163-b701-e120ff8e56d6",
+            "value": "1090",
+            "type": {
+              "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
+              "name": "Cut-off timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "663ffe94-0ab1-44dc-8aef-1b205f15ad3f",
+            "value": "199",
+            "type": {
+              "id": "280f97ba-0f64-4231-9690-99dc337ee493",
+              "name": "Ignition altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "d0a6a1b3-5ea1-41b6-a66d-5d34e789accf",
+            "value": "LEO",
+            "type": {
+              "id": "08a1a027-f2ae-4551-a39a-33dfe7467e19",
+              "name": "Orbit type",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "6b2cb880-1743-405d-94cb-c35c8d23ff60",
+            "value": "1438",
+            "type": {
+              "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
+              "name": "Wet Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "88f2fdf7-843b-4fa7-809c-ad70f93e460c",
+            "value": "200",
+            "type": {
+              "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
+              "name": "Disposal orbit perigee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "27295d44-2120-4d2c-ac7f-8954f250d5db",
+            "value": "false",
+            "type": {
+              "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
+              "name": "Reusable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "7d64e76f-fb1d-4824-acda-2e8c0b263b0a",
+            "value": "500",
+            "type": {
+              "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
+              "name": "Disposal orbit apogee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "542cb0aa-3304-46df-a452-e81e9393c94d",
+            "value": "0",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "d335c10c-09da-4b64-b75b-6b8bf3a1600c",
+        "name": "Zefiro 40 (Z40)",
+        "configurationStep": "STV",
+        "templateId": "6b07373d-a3d5-494c-b6e7-28ace9bc3a1b",
+        "buildingBlockType": {
+          "id": "b707989c-cd53-439a-839d-3edf51b51839",
+          "name": "Engine"
+        },
+        "parameters": [
+          {
+            "id": "71d938fb-3cee-4b6c-a71c-2961fafafd30",
+            "value": "3006",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "29bb38da-1505-45ed-9df8-b3cc2a7b3193",
+            "value": "293.5",
+            "type": {
+              "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
+              "name": "Engine lsp",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "7f915521-cbc2-43f9-a33c-338f466299cf",
+            "value": "0",
+            "type": {
+              "id": "7115af62-149a-42d5-b7be-6f275eee0943",
+              "name": "Gas generator flow",
+              "unit": {
+                "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                "name": "kg/s"
+              }
+            }
+          },
+          {
+            "id": "46cb2deb-0191-400a-bec4-9cba81d3f9f9",
+            "value": "92.9",
+            "type": {
+              "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
+              "name": "Burn time",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "b4b32bde-bd4c-4563-80d1-25e670878bec",
+            "value": " 1304",
+            "type": {
+              "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
+              "name": "Engine thrust",
+              "unit": {
+                "id": "eb20995e-3a6d-4cb2-9046-f231549c29c2",
+                "name": "kN"
+              }
+            }
+          },
+          {
+            "id": "122ab42d-cacd-4079-b9d6-6ec7a0877cf1",
+            "value": "0",
+            "type": {
+              "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
+              "name": "Propellant flow",
+              "unit": {
+                "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                "name": "kg/s"
+              }
+            }
+          },
+          {
+            "id": "acb4c1f7-ada2-4eec-851b-bc5f4f64922a",
+            "value": "Avio Vega C solid propulsion motor Z40",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "47d7c2bf-9d96-4994-aa46-280cc1e0eadd",
+        "name": "NTO UDMH propellant",
+        "configurationStep": "STV",
+        "templateId": "9f349b13-210d-45a7-852c-3805d808840d",
+        "buildingBlockType": {
+          "id": "df4b80ad-9d6c-480a-a3d7-fcec8e595dd3",
+          "name": "Propellant"
+        },
+        "parameters": [
+          {
+            "id": "8226a7df-4c95-4271-a7bf-bbdc6f4aad2b",
+            "value": "NTO (N2O4) oxidizer and UDMH fuel (hydrazine)",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "a42df353-a268-45c2-9311-21bdbbae4427",
+            "value": "2",
+            "type": {
+              "id": "bae27475-da50-4b20-b614-e08b52f14128",
+              "name": "Mixing ratio",
+              "unit": {
+                "id": "5262812d-b304-47a0-9773-3c1e55274b7a",
+                "name": "number"
+              }
+            }
+          },
+          {
+            "id": "747bc975-6526-47a3-9df9-693e9639c949",
+            "value": "5250",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "6563eeae-340b-431d-aac4-bc2cb2b779f3",
+            "value": "0",
+            "lCAEntry": {
+              "id": "aa55efa3-5a61-4de5-a0a4-59a15df66c0f",
+              "displayName": "Unsymmetrical dimethyl hydrazine (UDMH), spacecraft system propellant component ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "608bab38-28b8-4b4c-9705-e2c0ad09b1ad",
+              "name": "Propellant production",
+              "sortNumber": 62
+            },
+            "modifiers": []
+          },
+          {
+            "id": "666326f8-ac25-4248-8727-d0a555a1a4e7",
+            "value": "0",
+            "lCAEntry": {
+              "id": "c24f5e09-b70d-41bc-8dc4-139c02973962",
+              "displayName": "Nitrogen tetraoxide (NTO), spacecraft system propellant component ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "608bab38-28b8-4b4c-9705-e2c0ad09b1ad",
+              "name": "Propellant production",
+              "sortNumber": 62
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "068c9e36-d4b3-4409-a56a-0c457bc7d743",
+        "name": "Vega C second stage - Z40",
+        "configurationStep": "STV",
+        "templateId": "3c88b07d-fa0b-4846-96d9-5066c2149052",
+        "buildingBlockType": {
+          "id": "19b083ec-46b9-4004-862e-8b1f75480e24",
+          "name": "Lower Stage"
+        },
+        "parameters": [
+          {
+            "id": "75579e4f-7936-4f20-9afa-78141c0f074e",
+            "value": "false",
+            "type": {
+              "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
+              "name": "Reusable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "8c0e719a-0a01-4c93-b3b2-21fabb0fb94d",
+            "value": "false",
+            "type": {
+              "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
+              "name": "Recoverable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "fbec3601-1211-4584-8555-6f1ecf6f9e80",
+            "value": "142",
+            "type": {
+              "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
+              "name": "Ignition timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "927b0700-9066-4c2e-91cf-0ba8fa82136d",
+            "value": "8.07",
+            "type": {
+              "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
+              "name": "Length approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "b7d9d9d0-a4ed-4648-8197-5aba6adeae25",
+            "value": "245",
+            "type": {
+              "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
+              "name": "Stage Separation timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "bf739628-c91c-47db-86be-3a35c4e27cc3",
+            "value": "121",
+            "type": {
+              "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
+              "name": "Stage Separation altitude",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "f3bb7765-dd56-4ed9-9681-3bbbc4bf667f",
+            "value": "2nd stage Z40, default core stage using solid propellant for Vega C configuration",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "35cf7790-690c-4c9a-a712-cf75d23644ea",
+            "value": "121",
+            "type": {
+              "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
+              "name": "Cut-off altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "3b7dd80a-4f81-40c6-9bd9-fb88513dc1a8",
+            "value": "2080",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "10f7c8df-64a4-437f-abce-7ad791525574",
+            "value": "60",
+            "type": {
+              "id": "280f97ba-0f64-4231-9690-99dc337ee493",
+              "name": "Ignition altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "9b762191-f729-44c8-bed5-3b446dc6f8bb",
+            "value": "36239",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "1a6f9a48-8531-4043-9553-0e6f8344e506",
+            "value": "245",
+            "type": {
+              "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
+              "name": "Cut-off timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "2527607e-9c14-45e1-869e-3a099aa01a62",
+            "value": "40477",
+            "type": {
+              "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
+              "name": "Wet Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "b33ae907-7f77-4a3b-98e5-fa6f8c6b4b9c",
+            "value": "2.4",
+            "type": {
+              "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
+              "name": "Diameter approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "4c4c1b6c-7c1f-4228-ba0c-1b8668ad62c7",
+            "value": "0",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          },
+          {
+            "id": "43f35981-964b-416c-84c0-55bd1e346e67",
+            "value": "4238",
+            "lCAEntry": {
+              "id": "e3f8ad89-4236-4b01-b53e-ea1c08f3a1fa",
+              "displayName": "Carbon Fiber, high strength ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "cea70e8b-97b1-4a40-a805-9b1eaec0cffc",
+        "name": "ADR servicer (generic single picker like ClearSpace 1)",
+        "configurationStep": "STV",
+        "templateId": "2bc6f43e-6cd5-41d5-b934-5969df88c4aa",
+        "buildingBlockType": {
+          "id": "4a3b636a-08f5-4db4-af35-8e8cb6f31352",
+          "name": "ADR Servicer"
+        },
+        "parameters": [
+          {
+            "id": "49de23e5-ba4e-4ece-9f9b-6ecd68f79840",
+            "value": "87",
+            "type": {
+              "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
+              "name": "Disposal orbit inclination",
+              "unit": {
+                "id": "27f8f3f4-fb8b-4760-8761-5c19a43bf0be",
+                "name": "degree"
+              }
+            }
+          },
+          {
+            "id": "cd7affb2-2e49-4a5e-bb0b-e82348bd230a",
+            "value": "87",
+            "type": {
+              "id": "7231d90a-224e-436f-9f08-ddf7bb194bb6",
+              "name": "Debris orbit inclination",
+              "unit": {
+                "id": "27f8f3f4-fb8b-4760-8761-5c19a43bf0be",
+                "name": "degree"
+              }
+            }
+          },
+          {
+            "id": "2179e5d5-8cc5-48fd-aed8-117dd22dd82f",
+            "value": "400",
+            "type": {
+              "id": "f41c65b8-bffd-43c8-a698-9568af6a479c",
+              "name": "Debris orbit perigee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "6d973e52-297d-4799-b8af-0947666914f5",
+            "value": "1",
+            "type": {
+              "id": "85e0da77-9c40-4725-a18b-9096b6d4e6df",
+              "name": "Volume approximation",
+              "unit": {
+                "id": "eac58f58-caab-4680-8e19-7b3d05b8f20e",
+                "name": "m3"
+              }
+            }
+          },
+          {
+            "id": "caa26cc3-73e3-4826-b55c-d785130c0221",
+            "value": "600",
+            "type": {
+              "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
+              "name": "Wet Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "216eb52e-2e1f-471c-b465-634ca01dccfe",
+            "value": "Single picker Active Debris Removal",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "64816118-8d74-4c83-91d5-afbaad598495",
+            "value": "100",
+            "type": {
+              "id": "f9a23024-c792-4b75-a121-8d7b74037fba",
+              "name": "Capture / dispenser dry mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "49a68d26-ffeb-446a-847a-e11de9707c92",
+            "value": "50",
+            "type": {
+              "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
+              "name": "Disposal orbit perigee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "540a2b1c-9bb1-4d8e-a110-22d0f62f8e48",
+            "value": "400",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "d728a24b-3474-48d9-9720-67d9a03ef180",
+            "value": "100",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "da61b2a3-7ffd-4794-98eb-a5488e00154b",
+            "value": "400",
+            "type": {
+              "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
+              "name": "Disposal orbit apogee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "36eab4d7-48bf-4e65-9667-8e4530e69325",
+            "value": "400",
+            "type": {
+              "id": "764d4d6c-020f-4711-817a-2f5d1ccbb524",
+              "name": "Debris orbit apogee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "853b0281-af40-4d41-8be8-59893f625df6",
+            "value": "0",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "6720274b-b9a5-47a3-bc6c-57d5f5a09f6c",
+        "name": "APCP solid propellant",
+        "configurationStep": "STV",
+        "templateId": "f3bcf152-d1f8-48bb-9942-65354140878b",
+        "buildingBlockType": {
+          "id": "df4b80ad-9d6c-480a-a3d7-fcec8e595dd3",
+          "name": "Propellant"
+        },
+        "parameters": [
+          {
+            "id": "a53e3e96-625e-4e2b-b4b7-f174bc99ae7d",
+            "value": "3",
+            "type": {
+              "id": "bae27475-da50-4b20-b614-e08b52f14128",
+              "name": "Mixing ratio",
+              "unit": {
+                "id": "5262812d-b304-47a0-9773-3c1e55274b7a",
+                "name": "number"
+              }
+            }
+          },
+          {
+            "id": "dd1f2ae9-d6f5-4f02-97bc-9fe4f53bcd2a",
+            "value": "Ammonium perchlorate composite propellant (APCP)",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "00881035-0566-40d6-abd8-9a28c36c0d24",
+            "value": "240000",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "7a60c619-1782-42b7-b820-b1e0e47a7479",
+            "value": "0",
+            "lCAEntry": {
+              "id": "167f5f6b-ef94-47b3-8bb7-eb83295a7e59",
+              "displayName": "Ammonium perchlorate composite propellant (APCP), solid propellant ",
+              "description": "",
+              "unit": {
+                "id": "aa3c2bb0-ef0c-4cfb-b194-df692ea7e34b",
+                "name": "ton"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "608bab38-28b8-4b4c-9705-e2c0ad09b1ad",
+              "name": "Propellant production",
+              "sortNumber": 62
+            },
+            "modifiers": []
+          },
+          {
+            "id": "e6a45a98-4504-439e-9294-5a4bce70967e",
+            "value": "0",
+            "lCAEntry": {
+              "id": "3d69594b-364e-43f8-92c8-d82bc9d6ff11",
+              "displayName": "Ammonium perchlorate composite propellant (APCP), solid propellant ",
+              "description": "",
+              "unit": {
+                "id": "aa3c2bb0-ef0c-4cfb-b194-df692ea7e34b",
+                "name": "ton"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "608bab38-28b8-4b4c-9705-e2c0ad09b1ad",
+              "name": "Propellant production",
+              "sortNumber": 62
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "5c8a0680-28e7-4584-ad71-9cea315eda00",
+        "name": "Zefiro 9(Z9)",
+        "configurationStep": "STV",
+        "templateId": "66bad2bb-5103-406d-928a-733e1280a337",
+        "buildingBlockType": {
+          "id": "b707989c-cd53-439a-839d-3edf51b51839",
+          "name": "Engine"
+        },
+        "parameters": [
+          {
+            "id": "dc1b3817-c999-48a0-98e9-9c90c8204084",
+            "value": "Avio Vega C solid propulsion motor Z9",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "bfe5adc8-d0af-4a2b-bccf-550b9f2c7d70",
+            "value": "117.1",
+            "type": {
+              "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
+              "name": "Burn time",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "6de9bf03-32ab-4d12-a3d6-bf2c7c4534e6",
+            "value": "0",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "228a11e7-f647-4c5d-bc2e-f5472fa6f7b3",
+            "value": "0",
+            "type": {
+              "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
+              "name": "Propellant flow",
+              "unit": {
+                "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                "name": "kg/s"
+              }
+            }
+          },
+          {
+            "id": "628e3b94-861c-42d5-bca9-e0522195fb10",
+            "value": "314",
+            "type": {
+              "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
+              "name": "Engine thrust",
+              "unit": {
+                "id": "eb20995e-3a6d-4cb2-9046-f231549c29c2",
+                "name": "kN"
+              }
+            }
+          },
+          {
+            "id": "18653ce3-290d-4a65-ae26-38044f4e5438",
+            "value": "0",
+            "type": {
+              "id": "7115af62-149a-42d5-b7be-6f275eee0943",
+              "name": "Gas generator flow",
+              "unit": {
+                "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                "name": "kg/s"
+              }
+            }
+          },
+          {
+            "id": "f5a07420-4c2c-47fd-8ac6-e14fde3a3f83",
+            "value": "295.2",
+            "type": {
+              "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
+              "name": "Engine lsp",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "8880bf26-6a87-49fa-b952-8a21606023f8",
+        "name": "Fregat (kick stage)",
+        "configurationStep": "STV",
+        "templateId": "2c08721c-ecb2-4bef-9e54-942c57072e6c",
+        "buildingBlockType": {
+          "id": "b02a2165-7e7c-4473-8e5c-1d7ca50dfa3e",
+          "name": "Kick Stage"
+        },
+        "parameters": [
+          {
+            "id": "62d6214c-88b1-4e17-a4fe-0fb7e031d33c",
+            "value": "2",
+            "type": {
+              "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
+              "name": "Diameter approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "379e1601-bef4-4828-9059-bafcd7295b46",
+            "value": "Kick stage for the Soyuz launcher",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "695a79a3-f925-44f5-9fdc-30a02b9e199a",
+            "value": "400",
+            "type": {
+              "id": "5fd2e300-96be-4cd4-8557-3ffff0a4f257",
+              "name": "Insertion orbit apogee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "9b282551-65a4-48e8-a41f-0531891ad122",
+            "value": "6177",
+            "type": {
+              "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
+              "name": "Wet Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "e1dceff2-038e-43bd-9b58-53a6ca8b140d",
+            "value": "5350",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "2bc59fba-0c29-4be0-9174-4912941b8886",
+            "value": "87",
+            "type": {
+              "id": "a8444354-6b57-4ccc-8ffc-3e9714bc9f3f",
+              "name": "Insertion orbit inclination",
+              "unit": {
+                "id": "27f8f3f4-fb8b-4760-8761-5c19a43bf0be",
+                "name": "degree"
+              }
+            }
+          },
+          {
+            "id": "3f5ebefe-5ec1-4dd6-82fb-6b63d4eb86a2",
+            "value": "87",
+            "type": {
+              "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
+              "name": "Disposal orbit inclination",
+              "unit": {
+                "id": "27f8f3f4-fb8b-4760-8761-5c19a43bf0be",
+                "name": "degree"
+              }
+            }
+          },
+          {
+            "id": "78cdfd97-af48-4878-9bdd-4192e6a402b7",
+            "value": "50",
+            "type": {
+              "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
+              "name": "Disposal orbit perigee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "d1578c39-8d79-4c5b-9c23-ebddab62daff",
+            "value": "827",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "14136a37-587e-46f6-961d-2c7ec88f6824",
+            "value": "LEO",
+            "type": {
+              "id": "08a1a027-f2ae-4551-a39a-33dfe7467e19",
+              "name": "Orbit type",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "ec0050bc-6ce5-4b58-b730-bf0a89ff960c",
+            "value": "630",
+            "type": {
+              "id": "f9a23024-c792-4b75-a121-8d7b74037fba",
+              "name": "Capture / dispenser dry mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "01a9df8c-61c6-4e18-9be2-3e831760b3a4",
+            "value": "1.5",
+            "type": {
+              "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
+              "name": "Length approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "094f1238-7b02-493a-a0c2-ab1cd5bcf4d4",
+            "value": "400",
+            "type": {
+              "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
+              "name": "Disposal orbit apogee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "30d423bd-5b69-4c33-ab95-ca8b8c008863",
+            "value": "400",
+            "type": {
+              "id": "ba09b55d-735c-49ed-bb07-dad5b3414fe2",
+              "name": "Insertion orbit perigee",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "ed373744-31d8-4a94-8823-a532eb14ea8e",
+            "value": "0",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "02bf8f6e-f4cd-4ba2-b618-f154e2c580f2",
+        "name": "P120 C",
+        "configurationStep": "STV",
+        "templateId": "049c4074-0c39-484d-8a23-9fdfec78e330",
+        "buildingBlockType": {
+          "id": "b707989c-cd53-439a-839d-3edf51b51839",
+          "name": "Engine"
+        },
+        "parameters": [
+          {
+            "id": "4d7dd541-bcae-4b03-b8f1-8db28f594011",
+            "value": "P 120 C for Vega C core or A6 boosters",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "228ce973-9059-41dc-943b-129fbab0dc5c",
+            "value": " 4500",
+            "type": {
+              "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
+              "name": "Engine thrust",
+              "unit": {
+                "id": "eb20995e-3a6d-4cb2-9046-f231549c29c2",
+                "name": "kN"
+              }
+            }
+          },
+          {
+            "id": "ec3a7d46-4f9f-4d75-b533-f03dac9a8ac1",
+            "value": "11000",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "c9c14f8a-af7e-4b8e-8e6c-334387fbbef6",
+            "value": "132.8",
+            "type": {
+              "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
+              "name": "Burn time",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "531f58f8-6b6d-45ea-8844-2befe35fc7c9",
+            "value": "278.5",
+            "type": {
+              "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
+              "name": "Engine lsp",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "7af61754-c653-4084-a3b0-72949eb78444",
+            "value": "0",
+            "type": {
+              "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
+              "name": "Propellant flow",
+              "unit": {
+                "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                "name": "kg/s"
+              }
+            }
+          },
+          {
+            "id": "db84330f-e98d-44a8-b889-5fe55ba4f62a",
+            "value": "0",
+            "type": {
+              "id": "7115af62-149a-42d5-b7be-6f275eee0943",
+              "name": "Gas generator flow",
+              "unit": {
+                "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                "name": "kg/s"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "be734fac-d983-464b-bdf0-0c0d1e1c3c35",
+        "name": "Vega C first stage - P120C",
+        "configurationStep": "STV",
+        "templateId": "70a3f973-e003-4d16-9173-cbf8d3a5d054",
+        "buildingBlockType": {
+          "id": "19b083ec-46b9-4004-862e-8b1f75480e24",
+          "name": "Lower Stage"
+        },
+        "parameters": [
+          {
+            "id": "b8b5d7de-56fe-46b0-b0f5-ff1fa11496ee",
+            "value": "false",
+            "type": {
+              "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
+              "name": "Reusable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "b34957f5-d271-40de-8abf-a0d46bf6aa16",
+            "value": "141634",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "39bd8193-6b87-467d-9391-67873674df47",
+            "value": "60",
+            "type": {
+              "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
+              "name": "Stage Separation altitude",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "47177f98-ca8d-4648-80c4-6059d655c8c1",
+            "value": "0",
+            "type": {
+              "id": "280f97ba-0f64-4231-9690-99dc337ee493",
+              "name": "Ignition altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "92a26526-1ee6-47ac-881c-1b40be242878",
+            "value": "13393",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "d4af8881-a105-42f5-b74c-94e18b5a6fbb",
+            "value": "false",
+            "type": {
+              "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
+              "name": "Recoverable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "6365a153-406b-4db2-aed8-8abf69df072e",
+            "value": "1st stage P120C, default core stage using solid propellant for Vega C configuration",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "6c491a7a-4af7-4184-b156-0bf33695d218",
+            "value": "3.4",
+            "type": {
+              "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
+              "name": "Diameter approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "764bb338-958b-470e-bc4f-2b200d2f042a",
+            "value": "142",
+            "type": {
+              "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
+              "name": "Cut-off timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "546680f0-049e-4847-9d63-e9e5f9ba254d",
+            "value": "60",
+            "type": {
+              "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
+              "name": "Cut-off altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "1d31284d-8e9a-4821-a7b3-a67474aa6af2",
+            "value": "155027",
+            "type": {
+              "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
+              "name": "Wet Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "a6b94a56-b547-42ca-9566-9695ccd74d96",
+            "value": "0",
+            "type": {
+              "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
+              "name": "Ignition timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "8463c307-d141-420e-9bd2-a4140bc75405",
+            "value": "142",
+            "type": {
+              "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
+              "name": "Stage Separation timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "41fff778-6c01-49c1-84d1-8c04b1def66e",
+            "value": "13.38",
+            "type": {
+              "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
+              "name": "Length approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "f25b99a4-5c33-4592-9f1c-d280e2a0f1f7",
+            "value": "0",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          },
+          {
+            "id": "5af128ba-8367-4327-bef7-c765deaa5936",
+            "value": "13393",
+            "lCAEntry": {
+              "id": "e3f8ad89-4236-4b01-b53e-ea1c08f3a1fa",
+              "displayName": "Carbon Fiber, high strength ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "b921c67f-d58b-4471-9ed5-023baf4137ed",
+        "name": "Vega C thrid stage - Z999999",
+        "configurationStep": "STV",
+        "templateId": "7b11ed43-cbc7-42e9-a64a-fc8b733b9322",
+        "buildingBlockType": {
+          "id": "19b083ec-46b9-4004-862e-8b1f75480e24",
+          "name": "Lower Stage"
+        },
+        "parameters": [
+          {
+            "id": "b75690c6-111c-4905-abec-90976c41b5d8",
+            "value": "249",
+            "type": {
+              "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
+              "name": "Ignition timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "743d2096-4359-454a-9880-86b01f757aba",
+            "value": "false",
+            "type": {
+              "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
+              "name": "Reusable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "f9cca94c-a793-41e6-b9b1-0ae0d18d7196",
+            "value": "190",
+            "type": {
+              "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
+              "name": "Cut-off altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "10718049-d05f-47b9-8ec7-c385a4573ced",
+            "value": "3rd stage Z9, default core stage using solid propellant for Vega C configuration",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "f44b53a7-86b7-4691-8234-d1532bc3b596",
+            "value": "417",
+            "type": {
+              "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
+              "name": "Cut-off timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "bcb10cf4-0bc3-4a30-8aea-b75d9fc0e4d6",
+            "value": "12000",
+            "type": {
+              "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
+              "name": "Wet Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "6a260417-acb2-409a-98cb-3f2be08c45e5",
+            "value": "10567",
+            "type": {
+              "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
+              "name": "Propellant Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "d90a3ec8-8c6a-4b82-8cd2-b05cccab5966",
+            "value": "false",
+            "type": {
+              "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
+              "name": "Recoverable",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          },
+          {
+            "id": "73b45904-13ca-4577-b9df-6ce74904eaab",
+            "value": "4.12",
+            "type": {
+              "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
+              "name": "Length approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "666dd909-26fe-4c70-bccb-a4e97f030a66",
+            "value": "1433",
+            "type": {
+              "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+              "name": "Dry Mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "6a9c2e21-c48d-4417-9580-26c81b232de6",
+            "value": "417",
+            "type": {
+              "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
+              "name": "Stage Separation timestamp (after take-off)",
+              "unit": {
+                "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                "name": "s"
+              }
+            }
+          },
+          {
+            "id": "aa006236-1cda-4fef-803e-dbc6c2786dc3",
+            "value": "1.9",
+            "type": {
+              "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
+              "name": "Diameter approx",
+              "unit": {
+                "id": "7cf7ce3d-a365-4fdb-a897-ff40e07355d5",
+                "name": "m"
+              }
+            }
+          },
+          {
+            "id": "58136730-728e-48cc-9ab2-a63260a7f019",
+            "value": "123",
+            "type": {
+              "id": "280f97ba-0f64-4231-9690-99dc337ee493",
+              "name": "Ignition altitude (AGL)",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          },
+          {
+            "id": "cf52e5ff-7d66-4a7d-aaca-40fe36f2c9a2",
+            "value": "190",
+            "type": {
+              "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
+              "name": "Stage Separation altitude",
+              "unit": {
+                "id": "6b3b8d6e-3467-4048-ae09-7ebd9cd0efa1",
+                "name": "km"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [
+          {
+            "id": "1d2fcc71-bc95-469c-99d2-7acd178bf9ba",
+            "value": "0",
+            "lCAEntry": {
+              "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
+              "displayName": "Aluminium, AA 2219 ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": {
+                "id": "e8ebb944-5c5f-4532-8e69-7e65a2690bdb",
+                "name": "Non-ferro"
+              },
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          },
+          {
+            "id": "a4a3af90-5e22-4354-b691-e443da524380",
+            "value": "1433",
+            "lCAEntry": {
+              "id": "e3f8ad89-4236-4b01-b53e-ea1c08f3a1fa",
+              "displayName": "Carbon Fiber, high strength ",
+              "description": "",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              },
+              "wasteType": null,
+              "type": {
+                "id": "b8b82700-f939-4a0e-be3f-5bea9c4d4bc4",
+                "name": "Material"
+              },
+              "category": null
+            },
+            "lCAStep": {
+              "id": "8dbb8172-2877-4521-84b8-d305d91b8cf8",
+              "name": "STV component manufacturing and testing",
+              "sortNumber": 50
+            },
+            "modifiers": []
+          }
+        ],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      },
+      {
+        "id": "b16adc5d-e44c-4fe1-915c-2610a7b1484d",
+        "name": "Vega C Space debris removal demo",
+        "configurationStep": "MISSION",
+        "templateId": "b537e688-d1fb-422b-87a9-07d7388db7ce",
+        "buildingBlockType": {
+          "id": "be31c42c-4414-49bc-8bac-ad3085270e59",
+          "name": "Mission info"
+        },
+        "parameters": [
+          {
+            "id": "6dc14c4f-e025-43f8-ad31-b429206a16f7",
+            "value": "Vega C Space debris removal demo to LEO from Kourou",
+            "type": {
+              "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+              "name": "Description",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "6b7fd005-2890-4108-9925-4cc5f035d232",
+            "value": "1",
+            "type": {
+              "id": "907932c6-9018-4a22-9b91-a84645dab28a",
+              "name": "Mission Duration",
+              "unit": {
+                "id": "6197d777-a470-4a4c-af1d-07e860d08b2a",
+                "name": "years"
+              }
+            }
+          },
+          {
+            "id": "b185c234-56c0-48c3-8e05-0dfa67dca0a6",
+            "value": "Kourou",
+            "type": {
+              "id": "66a7a37d-d281-4e5a-acab-25299d4734eb",
+              "name": "Launch site",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "9bcbb185-7fc5-44ab-a2d2-7462c400364c",
+            "value": "600",
+            "type": {
+              "id": "1c89565e-7b23-4767-85e4-66f870e3f26e",
+              "name": "Payload mass",
+              "unit": {
+                "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                "name": "kg"
+              }
+            }
+          },
+          {
+            "id": "41722705-5e93-41b0-997f-52f1dfff0d2f",
+            "value": "2026-06-01 12:00:00",
+            "type": {
+              "id": "abc84a7c-d8f4-4663-8839-a9d989950241",
+              "name": "Starting epoch",
+              "unit": {
+                "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "id": "a5b5c72a-5358-4e5a-9030-5e9fd273078e",
+            "value": "1",
+            "type": {
+              "id": "9c582b46-d530-4911-b0fb-5968e0a2ffd1",
+              "name": "Number of ADR servicers",
+              "unit": {
+                "id": "5262812d-b304-47a0-9773-3c1e55274b7a",
+                "name": "number"
+              }
+            }
+          },
+          {
+            "id": "be301ea5-8efd-4ac5-8a29-16fd185c2a2f",
+            "value": "1",
+            "type": {
+              "id": "ed1da8d9-27b2-47d9-9a11-8f5a3798da0b",
+              "name": "Number of Launchers",
+              "unit": {
+                "id": "5262812d-b304-47a0-9773-3c1e55274b7a",
+                "name": "number"
+              }
+            }
+          },
+          {
+            "id": "45d28c57-e751-40ce-a5a2-c6ceebe40fc3",
+            "value": "true",
+            "type": {
+              "id": "9f7eb243-1912-4d6a-9aaf-3c43a9563604",
+              "name": "Daytime launch",
+              "unit": {
+                "id": "81f25a59-4e3d-4903-a650-9e839a8e61bb",
+                "name": "boolean"
+              }
+            }
+          }
+        ],
+        "childBlocks": [],
+        "typeValues": [],
+        "isTemplate": false,
+        "parentBlocks": [],
+        "transports": []
+      }
+    ]
+  }
+]
