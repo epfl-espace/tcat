@@ -42,9 +42,11 @@ class FleetADR(Fleet):
         # Retrieve unassigned broken satellites
         unassigned_satellites = clients.get_optimized_ordered_satellites().copy()
 
+        # Create reference ADR servicer for loop control
+        reference_servicer = Servicer(f"Servicer_test",self.scenario,self.scenario.servicer_struct_mass,volume=self.scenario.servicer_default_volume)
+
         # Spacecraft launcher counter
         kickstage_count = 0
-        servicer_count = 0
 
         # Instanciate iteration limits
         execution_limit = max(100,len(unassigned_satellites))
@@ -58,14 +60,17 @@ class FleetADR(Fleet):
                 kickstage = self.create_kickstage(f"KickStage_{kickstage_count:04d}")
                 kickstage_converged = False
 
+                launcher_kickstage_allowance = kickstage.compute_allowance_ADR(unassigned_satellites, reference_servicer.get_initial_wet_mass(), reference_servicer.get_initial_volume())
+
                 # Instanciate assigned_servicers list
                 assigned_servicers = []
+                servicer_count = 0
 
-                # Fill the kickstage as long as there is fuel left
-                while not(kickstage_converged):
+                # Fill the kickstage as long as there is fuel left in kick stage and servicer(s) mass doesn't exceed LV allowance
+                while not(kickstage_converged) and servicer_count < launcher_kickstage_allowance:
                     # Create Servicer
                     servicer_count += 1
-                    current_servicer = Servicer(f"Servicer_{servicer_count:04d}",self.scenario,self.scenario.servicer_struct_mass,volume=self.scenario.servicer_default_volume)
+                    current_servicer = Servicer(f"Servicer_{kickstage_count}{servicer_count:03d}",self.scenario,self.scenario.servicer_struct_mass,volume=self.scenario.servicer_default_volume)
                     current_servicer.assign_spacecraft(unassigned_satellites[len(assigned_servicers)])
 
                     # Assign the servicer
