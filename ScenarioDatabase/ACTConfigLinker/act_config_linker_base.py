@@ -3,7 +3,7 @@ import json
 BB_ID_KICKSTAGE = "b02a2165-7e7c-4473-8e5c-1d7ca50dfa3e"
 PARAM_ID_KICKSTAGE_DIAMETER = "527f86c2-e3f5-479b-aff4-1d304c7a4cbb"
 
-class ACTConfigLinker:
+class ACTConfigLinkerBase:
     def __init__(self,json_filepath=None):
         self.act_db = []
         self.open_act_json(json_filepath)
@@ -74,7 +74,7 @@ class ACTConfigLinker:
 
 if __name__ == "__main__":
     config_name = "test_tcat_1"
-    act = ACTConfigLinker("ScenarioDatabase/Configurations.json")
+    act = ACTConfigLinkerBase("ScenarioDatabase/Configurations.json")
     configs = act.get_configs_name()
 
     bb = act.get_buildingblock(config_name,BB_ID_KICKSTAGE)
