@@ -4,10 +4,14 @@ from ScenarioDatabase.ScenarioInput.ScenarioInputBase import ScenarioInputBase
 
 @dataclass
 class ScenarioInputADR(ScenarioInputBase):
-    sats_reliability: float = 0.5
-    seed_random_sats_failure: int = 1234
+    # Metadata parameters
     mission_architecture: str = "single_picker"
 
+    # Constellation parameters
+    sats_reliability: float = 0.5
+    seed_random_sats_failure: int = 1234
+
+    # Servicer parameters
     servicer_initial_fuel_mass: float = 100.0
     servicer_capture_module_dry_mass: float = 10.0 
     servicer_prop_thrust: float = 29400.0
@@ -17,6 +21,7 @@ class ScenarioInputADR(ScenarioInputBase):
     servicer_default_volume: float = 2.0
     servicer_propulsion_type: str = "bi-propellant"
             
+    # Orbital parameters 
     apogee_sats_operational: float = 1200.0
     perigee_sats_operational: float = 1200.0
     inc_sats_operational: float = 87.4
