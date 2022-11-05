@@ -1,9 +1,6 @@
 import json
 
-BB_ID_KICKSTAGE = "b02a2165-7e7c-4473-8e5c-1d7ca50dfa3e"
-PARAM_ID_KICKSTAGE_DIAMETER = "527f86c2-e3f5-479b-aff4-1d304c7a4cbb"
-
-class ACTConfigLinkerBase:
+class ACTConfigLinker:
     def __init__(self,json_filepath=None):
         self.act_db = []
         self.open_act_json(json_filepath)
@@ -22,6 +19,8 @@ class ACTConfigLinkerBase:
         for config in self.act_db:
             if config["name"] == config_name:
                 return config
+
+        print(f"{config_name} config does not exist")
         return None
 
     def get_buildingblock(self,config_name,buildingblock_id):
@@ -32,11 +31,16 @@ class ACTConfigLinkerBase:
         for buildingblock in config["buildingBlocks"]:
             if buildingblock["buildingBlockType"]["id"] == buildingblock_id:
                 return buildingblock
+
+        print(f"{buildingblock_id} building block does not exist")
         return None
 
     def get_buildingblock_parameters(self,config_name,buildingblock_id):
         buildingblock = self.get_buildingblock(config_name,buildingblock_id)
         if buildingblock is None:
+            return None
+        if "parameters" not in buildingblock:
+            print(f"{buildingblock_id} building block is missing field: parameters")
             return None
         return buildingblock["parameters"]
 
@@ -49,40 +53,28 @@ class ACTConfigLinkerBase:
             if "type" in param:
                 if param["type"]["id"] == param_type_id:
                     return param
+        
+        print(f"{buildingblock_id}[{param_type_id}] parameter does not exist")
         return None
 
     def get_buildingblock_parameter_value(self,config_name,buildingblock_id,param_type_id):
         bb_param = self.get_buildingblock_parameter(config_name,buildingblock_id,param_type_id)
         if bb_param is None: 
             return None
+        if "value" not in bb_param:
+            print(f"{buildingblock_id}[{param_type_id}] parameter is missing field: value")
+            return None
+
         return bb_param["value"]
 
     def get_buildingblock_parameter_unit(self,config_name,buildingblock_id,param_type_id):
         bb_param = self.get_buildingblock_parameter(config_name,buildingblock_id,param_type_id)
         if bb_param is None: 
             return None
-        if "type" in bb_param:
-            if "unit" in bb_param["type"]:
-                return bb_param["type"]["unit"]["name"]
-        return None
-
-    def get_buildingblock_kickstage(self,config_name):
-        return self.get_buildingblock(config_name,BB_ID_KICKSTAGE)
-
-    def get_kickstage_diameter(self, config_name):
-        return self.get_buildingblock_parameter_value(config_name,BB_ID_KICKSTAGE,PARAM_ID_KICKSTAGE_DIAMETER)      
-
-if __name__ == "__main__":
-    config_name = "test_tcat_1"
-    act = ACTConfigLinkerBase("ScenarioDatabase/Configurations.json")
-    configs = act.get_configs_name()
-
-    bb = act.get_buildingblock(config_name,BB_ID_KICKSTAGE)
-    bb_params = act.get_buildingblock_parameters(config_name,BB_ID_KICKSTAGE)
-    bb_param = act.get_buildingblock_parameter(config_name,BB_ID_KICKSTAGE,PARAM_ID_KICKSTAGE_DIAMETER)
-    bb_param_val = act.get_buildingblock_parameter_value(config_name,BB_ID_KICKSTAGE,PARAM_ID_KICKSTAGE_DIAMETER)
-    bb_param_u = act.get_buildingblock_parameter_unit(config_name,BB_ID_KICKSTAGE,PARAM_ID_KICKSTAGE_DIAMETER)
-
-    bb_kick = act.get_buildingblock_kickstage(config_name)
-    kick_diameter = act.get_kickstage_diameter(config_name)
-    pass
+        if "type" not in bb_param:
+            print(f"{buildingblock_id}[{param_type_id}] parameter is missing field: type")
+            return None
+        if "unit" not in bb_param["type"]:
+            print(f"{buildingblock_id}[{param_type_id}][type] is missing field: unit")
+            return None 
+        return bb_param["type"]["unit"]["name"]     
