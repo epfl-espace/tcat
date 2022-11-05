@@ -1,6 +1,12 @@
-# from ScenarioDatabase.ACTConfigLinkers.ACTConfigLinkerBase import ACTConfigLinkerBase
-# from ScenarioDatabase.ACTConfigLinkers.ACTConfigIDs import *
+from dataclasses import dataclass
 
+from ScenarioDatabase.ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
+from ScenarioDatabase.ACTConfigLinker.ACTConfigIDs import *
+from ScenarioDatabase.ScenarioInput.ScenarioInput import ScenarioInput
+
+@dataclass
+class ScenarioSetupFromACT(ScenarioInput,ACTConfigLinker):
+    pass
 
 # class ACTConfigLinker(ACTConfigLinkerBase):
 #     def __init__(self,json_filepath=None):

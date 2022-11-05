@@ -1,7 +1,7 @@
 from ScenarioDatabase.ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
 from ScenarioDatabase.ACTConfigLinker.ACTConfigIDs import *
 
-from ScenarioDatabase.ScenarioInput.ScenarioInputBase import ScenarioInputBase
+from ScenarioDatabase.ScenarioSetupFromACT import ScenarioSetupFromACT
 
 config_name = "test_tcat_1"
 act = ACTConfigLinker("ScenarioDatabase/Configurations.json")
@@ -16,7 +16,7 @@ configs = act.get_configs_name()
 # kick_bb = act.get_buildingblock_kickstage(config_name)
 # kick_diameter = act.get_kickstage_diameter(config_name)
 
-si = ScenarioInputBase()
+si = ScenarioSetupFromACT()
 si.to_json_file("./my_new_json.json")
 
 pass
