@@ -411,9 +411,9 @@ class Scenario:
 
         # Print execution success
         if self.execution_success:
-            print("Script succesfully executed: Yes")
+            print("Script successfully executed: Yes")
         else:
-            print("Script succesfully executed: No")
+            print("Script successfully executed: No")
 
         # Print Fleet related KPI
         self.fleet.print_KPI()

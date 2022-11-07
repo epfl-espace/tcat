@@ -49,7 +49,7 @@ class FleetADR(Fleet):
         kickstage_count = 0
 
         # Instanciate iteration limits
-        execution_limit = max(100,len(unassigned_satellites))
+        execution_limit = max(EXECUTION_LIMIT,len(unassigned_satellites))
         execution_count = 1
 
         # Strategy depend on architecture
@@ -135,7 +135,7 @@ class FleetADR(Fleet):
         """ Compute and return size of self.servicers dict
 
         Return:
-            (int): length of self.kickstages
+            (int): length of self.servicers
         """
         return len(self.servicers)
 
