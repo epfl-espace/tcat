@@ -6,7 +6,7 @@ class ACTConfigLinker:
         if json_filepath is not None:
             self.open_act_json(json_filepath)
 
-    ### public methods ###
+    ### higher level methods (to give examples on how to use module) ###
 
     def open_act_json(self,json_filepath):
         with open(json_filepath,"r") as act_json_file:
@@ -14,9 +14,14 @@ class ACTConfigLinker:
 
     def get_all_configs_name(self):
         configs_name = []
-        for config in self.act_db:
+        for config in self.get_configs():
             configs_name.append(self.get_config_name(config))
         return configs_name
+
+    def get_bb_name_from_type_id(self,config_name,bb_type_id):
+        config = self.get_config(config_name)
+        bb = self.get_config_bb(config,bb_type_id)
+        return self.get_bb_name(bb)
 
     def get_bb_parameter_value(self,config_name,bb_type_id,param_type_id,bb_name=None):
         config = self.get_config(config_name)
@@ -30,12 +35,6 @@ class ACTConfigLinker:
         param = self.get_bb_parameter(bb,param_type_id)
         return self.get_param_type_unit_name(param)
 
-    def get_bbs_name(self,config_name,bb_type_id):
-        config = self.get_config(config_name)
-        bbs = self.get_config_bbs(config)
-
-        return self.get_bbs_name(bbs)
-
     def check_parameter_value(self,param_value):
         if param_value is None:
             return False
@@ -43,6 +42,12 @@ class ACTConfigLinker:
 
     ### Method to access fields from database
 
+    def get_configs(self):
+        if len(self.act_db) == 0:
+            print("No configuration available")
+            return None
+        return self.act_db
+    
     def get_config(self,config_name):
         for config in self.act_db:
             if self.get_config_name(config) == config_name:
@@ -72,7 +77,39 @@ class ACTConfigLinker:
         if "name" not in config:
             print(f"{self.get_config_id(config)} config is missing a field: name")
             return None
-        return config["name"]    
+        return config["name"]   
+
+    def get_config_type(self,config):
+        if not self.check_config(config):
+            return None
+        if "configurationType" not in config:
+            print(f"{self.get_config_id(config)} config is missing a field: configurationType")
+            return None
+        return config["configurationType"]
+
+    def get_config_type_id(self,config):
+        if self.get_config_type(config) is None:
+            return None
+        if "id" not in self.get_config_type(config):
+            print(f"{self.get_config_id(config)}[type] is missing a field: id")
+            return None
+        return self.get_config_type(config)["id"]
+
+    def get_config_type_name(self,config):
+        if self.get_config_type(config) is None:
+            return None
+        if "name" not in self.get_config_type(config):
+            print(f"{self.get_config_id(config)}[type] is missing a field: name")
+            return None
+        return self.get_config_type(config)["name"]
+
+    def get_config_type_description(self,config):
+        if self.get_config_type(config) is None:
+            return None
+        if "description" not in self.get_config_type(config):
+            print(f"{self.get_config_id(config)}[type] is missing a field: description")
+            return None
+        return self.get_config_type(config)["description"]
 
     def get_config_bbs(self,config):
         if not self.check_config(config):
@@ -83,8 +120,6 @@ class ACTConfigLinker:
         return config["buildingBlocks"]
 
     def get_config_bbs_filtered_type(self,config,bb_type_id):
-        if not self.check_config(config):
-            return None
         if self.get_config_bbs(config) is None:
             return None
         bbs = []
@@ -100,11 +135,13 @@ class ACTConfigLinker:
         bbs = self.get_config_bbs_filtered_type(config,bb_type_id)
         if bbs is None:
             return None
+        # if no name is given, return the first of the filtered list
         if bb_name is None:
             return bbs[0]
         for bb in bbs:
             if self.get_bb_name(bb) == bb_name:
                 return bb
+        print(f"No building block with name: {bb_name}")
         return None
 
     ### Methods to access fields from unique building blocks ###
@@ -140,8 +177,6 @@ class ACTConfigLinker:
         return bb["buildingBlockType"]
 
     def get_bb_type_id(self,bb):
-        if not self.check_bb(bb):
-            return None
         if self.get_bb_type(bb) is None:
             return None
         if "id" not in self.get_bb_type(bb):
@@ -150,8 +185,6 @@ class ACTConfigLinker:
         return self.get_bb_type(bb)["id"] 
 
     def get_bb_type_name(self,bb):
-        if not self.check_bb(bb):
-            return None
         if self.get_bb_type(bb) is None:
             return None
         if "name" not in self.get_bb_type(bb):
@@ -168,8 +201,6 @@ class ACTConfigLinker:
         return bb["parameters"]
 
     def get_bb_parameter(self,bb,param_type_id):
-        if not self.check_bb(bb):
-            return None
         if self.get_bb_parameters(bb) is None: 
             return None
         for param in self.get_bb_parameters(bb):
@@ -185,7 +216,8 @@ class ACTConfigLinker:
             return None
         bb_names = []
         for bb in bbs:
-            bb_names.append(self.get_bb_name(bb))
+            if self.get_bb_name(bb) is not None:
+                bb_names.append(self.get_bb_name(bb))
         return bb_names
 
     ### Methods to access fields from parameters
@@ -221,8 +253,6 @@ class ACTConfigLinker:
         return param["type"]
 
     def get_param_type_id(self,param):
-        if not self.check_param(param):
-            return None
         if self.get_param_type(param) is None:
             return None
         if "id" not in self.get_param_type(param):
@@ -231,8 +261,6 @@ class ACTConfigLinker:
         return self.get_param_type(param)["id"]
 
     def get_param_type_name(self,param):
-        if not self.check_param(param):
-            return None
         if self.get_param_type(param) is None:
             return None
         if "name" not in self.get_param_type(param):
@@ -241,8 +269,6 @@ class ACTConfigLinker:
         return self.get_param_type(param)["name"]
 
     def get_param_type_unit(self,param):
-        if not self.check_param(param):
-            return None
         if self.get_param_type(param) is None:
             return None
         if "unit" not in self.get_param_type(param):
@@ -251,8 +277,6 @@ class ACTConfigLinker:
         return self.get_param_type(param)["unit"]
 
     def get_param_type_unit_name(self,param):
-        if not self.check_param(param):
-            return None
         if self.get_param_type_unit(param) is None:
             return None
         if "name" not in self.get_param_type_unit(param):
@@ -261,8 +285,6 @@ class ACTConfigLinker:
         return self.get_param_type_unit(param)["name"]
 
     def get_param_type_unit_id(self,param):
-        if not self.check_param(param):
-            return None
         if self.get_param_type_unit(param) is None:
             return None
         if "id" not in self.get_bb_param_type_unit(param):
