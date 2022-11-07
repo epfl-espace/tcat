@@ -11,7 +11,7 @@
     },
     "buildingBlocks": [
       {
-        "id": "bbfe3e74-2daa-4a3e-8153-298d645ca8b7",
+        "id": "b8bb92ba-b6c8-446d-a1d9-50e8891ba4c4",
         "name": "VC-BG-Fairing",
         "configurationStep": "STV",
         "templateId": "acb1814d-fdcd-472e-b09f-25b44820d9e2",
@@ -21,7 +21,7 @@
         },
         "parameters": [
           {
-            "id": "c0d1d830-7873-4387-98af-dc4dbaf70c93",
+            "id": "98a9672f-597f-4d60-ad32-8153ff30f3bc",
             "value": "3.317",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
@@ -33,7 +33,7 @@
             }
           },
           {
-            "id": "b2d4b2c2-449a-4269-8829-6bcc07b8e5f7",
+            "id": "9be5e2e9-6c5a-4098-8747-0cde71bfb1e7",
             "value": "false",
             "type": {
               "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
@@ -45,7 +45,7 @@
             }
           },
           {
-            "id": "4d1636b3-6a24-4dcf-9041-6ed55611e496",
+            "id": "42fc706c-9734-4b33-b60c-caeb24de54a6",
             "value": "false",
             "type": {
               "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
@@ -57,7 +57,7 @@
             }
           },
           {
-            "id": "dbef17e8-6e56-4c9a-a8c7-1a2f646f5b1b",
+            "id": "1cd1928e-95d6-4e92-b8f8-ea552f5c37f4",
             "value": "126",
             "type": {
               "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
@@ -69,7 +69,7 @@
             }
           },
           {
-            "id": "438e45b7-46db-483a-be68-2128b468845d",
+            "id": "7b173fff-ad4f-48f0-b423-2b7b7801f9c6",
             "value": "9.374",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
@@ -81,7 +81,7 @@
             }
           },
           {
-            "id": "07bd13b5-59a9-4623-b95e-1c23fc9daf37",
+            "id": "7321dd01-a9d3-486e-986d-69fc53b0ddaf",
             "value": "Beyond Gravity fairing for Vega C configuration",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -93,7 +93,7 @@
             }
           },
           {
-            "id": "9cff23b9-8dab-484c-bec3-a90eed0286c1",
+            "id": "68d15a73-c821-402a-8362-16154f5296a6",
             "value": "254",
             "type": {
               "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
@@ -105,7 +105,7 @@
             }
           },
           {
-            "id": "971beda2-88b0-402c-be45-9d628c285a6d",
+            "id": "5a6ee77e-12ba-405a-bcd4-1d351f035155",
             "value": "6.5",
             "type": {
               "id": "8596a8c0-1008-435b-a1fa-82a786698699",
@@ -117,7 +117,7 @@
             }
           },
           {
-            "id": "43071d4a-2a63-43b6-a7ad-7e50b0366775",
+            "id": "567679ef-5ea5-4560-9df2-22bf16959aa2",
             "value": "860",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -132,7 +132,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "7ce45478-7cb9-4fa4-9e52-0e0403a53a8d",
+            "id": "a88a5b62-9c11-42bd-883b-18963c5fc522",
             "value": "860",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -165,7 +165,7 @@
         "transports": []
       },
       {
-        "id": "d2178173-6aaa-4a95-81fd-3a3403e78777",
+        "id": "8a2a6d7e-ffd1-4270-8542-c0311fe92410",
         "name": "Vega C AVUM+ (upper stage)",
         "configurationStep": "STV",
         "templateId": "35615841-411e-411b-8dd7-26c164413e1c",
@@ -175,7 +175,7 @@
         },
         "parameters": [
           {
-            "id": "69d1af86-d55f-4eac-a21d-c9cbdd8e1a42",
+            "id": "4c7d3162-b231-4312-9813-559d9a17c998",
             "value": "88",
             "type": {
               "id": "a8444354-6b57-4ccc-8ffc-3e9714bc9f3f",
@@ -187,7 +187,7 @@
             }
           },
           {
-            "id": "811c4d75-290c-47fa-8203-3801f3493a85",
+            "id": "5012252d-d943-4ea6-89a2-be1922273c5b",
             "value": "AVUM+, default upper stage using hypergolic propellant for Vega C configuration",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -199,7 +199,7 @@
             }
           },
           {
-            "id": "ecdcb34e-1157-40fb-afc7-2b0d82742acc",
+            "id": "a2a07e62-c228-4442-be7e-c7acb645aed0",
             "value": "300",
             "type": {
               "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
@@ -211,7 +211,7 @@
             }
           },
           {
-            "id": "5f108004-0da8-4e16-97e7-b8c5b2c14e94",
+            "id": "d203c41c-3827-40be-9081-634193896bc3",
             "value": "448",
             "type": {
               "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
@@ -223,7 +223,7 @@
             }
           },
           {
-            "id": "709be0d9-6af5-43a8-8d99-dcca86ac683f",
+            "id": "271a3b75-e954-49b5-818b-bf740bc23059",
             "value": "740",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -235,7 +235,7 @@
             }
           },
           {
-            "id": "1cd91ed1-b70c-44db-9238-84da805b3ee2",
+            "id": "6e6a76e3-2c07-43b5-84c1-408aec33fda3",
             "value": "500",
             "type": {
               "id": "ba09b55d-735c-49ed-bb07-dad5b3414fe2",
@@ -247,7 +247,7 @@
             }
           },
           {
-            "id": "0b0eb4e8-3ec4-450c-8e76-02b89d777585",
+            "id": "32c4ebef-28fb-4607-9edb-476da93ef685",
             "value": "88",
             "type": {
               "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
@@ -259,7 +259,7 @@
             }
           },
           {
-            "id": "8e2bfda9-7feb-42af-a76b-ab2ff8228833",
+            "id": "8a2484a4-697b-4136-9ab5-918618825f33",
             "value": "698",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -271,7 +271,7 @@
             }
           },
           {
-            "id": "e7500a81-72d3-423a-bfc9-0b2bb355e3cd",
+            "id": "fa174a64-a8d6-4ab2-82b4-484705642d10",
             "value": "2.04",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
@@ -283,7 +283,7 @@
             }
           },
           {
-            "id": "bb36767c-7447-4822-9444-3de5c9bfdadc",
+            "id": "72ff6127-545e-4551-9ae7-3fb4c22b09da",
             "value": "false",
             "type": {
               "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
@@ -295,7 +295,7 @@
             }
           },
           {
-            "id": "d21c2dfc-6a75-4589-b363-f610b823a161",
+            "id": "adb21610-91dc-4723-8397-94c6a1882c64",
             "value": "2.18",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
@@ -307,7 +307,7 @@
             }
           },
           {
-            "id": "a92d4f26-c70e-40ff-872e-28f851015be4",
+            "id": "d57d772a-b37b-45ff-aafa-9bf559324606",
             "value": "500",
             "type": {
               "id": "5fd2e300-96be-4cd4-8557-3ffff0a4f257",
@@ -319,7 +319,7 @@
             }
           },
           {
-            "id": "cbf424fa-1d4e-4163-b701-e120ff8e56d6",
+            "id": "841e8f37-5eeb-4d9e-9d96-6925145f8c4f",
             "value": "1090",
             "type": {
               "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
@@ -331,7 +331,7 @@
             }
           },
           {
-            "id": "663ffe94-0ab1-44dc-8aef-1b205f15ad3f",
+            "id": "388f67cc-d97b-4587-81a2-639f4b89be83",
             "value": "199",
             "type": {
               "id": "280f97ba-0f64-4231-9690-99dc337ee493",
@@ -343,7 +343,7 @@
             }
           },
           {
-            "id": "d0a6a1b3-5ea1-41b6-a66d-5d34e789accf",
+            "id": "034693d7-b69c-498a-9c64-2bd77cdd3172",
             "value": "LEO",
             "type": {
               "id": "08a1a027-f2ae-4551-a39a-33dfe7467e19",
@@ -355,7 +355,7 @@
             }
           },
           {
-            "id": "6b2cb880-1743-405d-94cb-c35c8d23ff60",
+            "id": "582cdaaa-cdee-426a-9d6e-c87f56ac2120",
             "value": "1438",
             "type": {
               "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
@@ -367,7 +367,7 @@
             }
           },
           {
-            "id": "88f2fdf7-843b-4fa7-809c-ad70f93e460c",
+            "id": "cdeac000-4224-43ae-96df-d2d9c33ca51d",
             "value": "200",
             "type": {
               "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
@@ -379,7 +379,7 @@
             }
           },
           {
-            "id": "27295d44-2120-4d2c-ac7f-8954f250d5db",
+            "id": "619df8cd-fe44-4809-b621-0e7cf03a6020",
             "value": "false",
             "type": {
               "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
@@ -391,7 +391,7 @@
             }
           },
           {
-            "id": "7d64e76f-fb1d-4824-acda-2e8c0b263b0a",
+            "id": "04290683-3b5f-45fa-8fa9-a1b40c6fe7db",
             "value": "500",
             "type": {
               "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
@@ -406,7 +406,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "542cb0aa-3304-46df-a452-e81e9393c94d",
+            "id": "424c7f0c-4892-41da-8fb7-bd9e5afc0030",
             "value": "0",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -439,7 +439,7 @@
         "transports": []
       },
       {
-        "id": "d335c10c-09da-4b64-b75b-6b8bf3a1600c",
+        "id": "cb054409-cd6f-43c6-9f30-64dd2cce46f9",
         "name": "Zefiro 40 (Z40)",
         "configurationStep": "STV",
         "templateId": "6b07373d-a3d5-494c-b6e7-28ace9bc3a1b",
@@ -449,7 +449,7 @@
         },
         "parameters": [
           {
-            "id": "71d938fb-3cee-4b6c-a71c-2961fafafd30",
+            "id": "2b105212-15ae-4fbb-9300-60f017271dfd",
             "value": "3006",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -461,7 +461,7 @@
             }
           },
           {
-            "id": "29bb38da-1505-45ed-9df8-b3cc2a7b3193",
+            "id": "392f060b-8fe5-42c7-aa5c-8b3cc6d2766e",
             "value": "293.5",
             "type": {
               "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
@@ -473,7 +473,7 @@
             }
           },
           {
-            "id": "7f915521-cbc2-43f9-a33c-338f466299cf",
+            "id": "eb4717bc-0822-41b9-8e5c-13207e08bc4f",
             "value": "0",
             "type": {
               "id": "7115af62-149a-42d5-b7be-6f275eee0943",
@@ -485,7 +485,7 @@
             }
           },
           {
-            "id": "46cb2deb-0191-400a-bec4-9cba81d3f9f9",
+            "id": "f3756d26-a222-44f1-9156-3770faa7ee15",
             "value": "92.9",
             "type": {
               "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
@@ -497,7 +497,7 @@
             }
           },
           {
-            "id": "b4b32bde-bd4c-4563-80d1-25e670878bec",
+            "id": "ddebc2f2-5084-4386-8943-a98030f48857",
             "value": " 1304",
             "type": {
               "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
@@ -509,7 +509,7 @@
             }
           },
           {
-            "id": "122ab42d-cacd-4079-b9d6-6ec7a0877cf1",
+            "id": "a0ff33c8-8066-4c1f-8159-30573c092d87",
             "value": "0",
             "type": {
               "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
@@ -521,7 +521,7 @@
             }
           },
           {
-            "id": "acb4c1f7-ada2-4eec-851b-bc5f4f64922a",
+            "id": "99096bb0-f74f-41ee-a0a4-57ba70253a30",
             "value": "Avio Vega C solid propulsion motor Z40",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -540,7 +540,7 @@
         "transports": []
       },
       {
-        "id": "47d7c2bf-9d96-4994-aa46-280cc1e0eadd",
+        "id": "aa1cacc6-9fa0-4840-9489-3d2e11f38ef0",
         "name": "NTO UDMH propellant",
         "configurationStep": "STV",
         "templateId": "9f349b13-210d-45a7-852c-3805d808840d",
@@ -550,7 +550,7 @@
         },
         "parameters": [
           {
-            "id": "8226a7df-4c95-4271-a7bf-bbdc6f4aad2b",
+            "id": "06096ea3-88f1-4283-aa5a-40d56fa22668",
             "value": "NTO (N2O4) oxidizer and UDMH fuel (hydrazine)",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -562,7 +562,7 @@
             }
           },
           {
-            "id": "a42df353-a268-45c2-9311-21bdbbae4427",
+            "id": "6ef4440e-d614-4d98-94c3-7adb794a1bed",
             "value": "2",
             "type": {
               "id": "bae27475-da50-4b20-b614-e08b52f14128",
@@ -574,7 +574,7 @@
             }
           },
           {
-            "id": "747bc975-6526-47a3-9df9-693e9639c949",
+            "id": "e1e2a01b-0af9-4413-acfd-3cf9cc7acbe8",
             "value": "5250",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -589,7 +589,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "6563eeae-340b-431d-aac4-bc2cb2b779f3",
+            "id": "4e7bc761-921b-4436-b1e8-863909bbae02",
             "value": "0",
             "lCAEntry": {
               "id": "aa55efa3-5a61-4de5-a0a4-59a15df66c0f",
@@ -614,7 +614,7 @@
             "modifiers": []
           },
           {
-            "id": "666326f8-ac25-4248-8727-d0a555a1a4e7",
+            "id": "c50e3d24-c1c4-4b05-bed5-c380139833f4",
             "value": "0",
             "lCAEntry": {
               "id": "c24f5e09-b70d-41bc-8dc4-139c02973962",
@@ -644,7 +644,7 @@
         "transports": []
       },
       {
-        "id": "068c9e36-d4b3-4409-a56a-0c457bc7d743",
+        "id": "86ead7ce-fa4b-4fd9-8219-b1b104e0c048",
         "name": "Vega C second stage - Z40",
         "configurationStep": "STV",
         "templateId": "3c88b07d-fa0b-4846-96d9-5066c2149052",
@@ -654,7 +654,7 @@
         },
         "parameters": [
           {
-            "id": "75579e4f-7936-4f20-9afa-78141c0f074e",
+            "id": "e3936d67-6c06-45dd-bf22-f4616827f109",
             "value": "false",
             "type": {
               "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
@@ -666,7 +666,7 @@
             }
           },
           {
-            "id": "8c0e719a-0a01-4c93-b3b2-21fabb0fb94d",
+            "id": "21ad3a76-3620-4c94-92b9-37f8ec37947f",
             "value": "false",
             "type": {
               "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
@@ -678,7 +678,7 @@
             }
           },
           {
-            "id": "fbec3601-1211-4584-8555-6f1ecf6f9e80",
+            "id": "21d60e30-fe78-41d8-8ee4-928fb7a95e06",
             "value": "142",
             "type": {
               "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
@@ -690,7 +690,7 @@
             }
           },
           {
-            "id": "927b0700-9066-4c2e-91cf-0ba8fa82136d",
+            "id": "427dcb61-64b4-4976-b3b9-29c7d0b03a3e",
             "value": "8.07",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
@@ -702,7 +702,7 @@
             }
           },
           {
-            "id": "b7d9d9d0-a4ed-4648-8197-5aba6adeae25",
+            "id": "208a2f02-b97e-4f87-9cef-1c9811ab8028",
             "value": "245",
             "type": {
               "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
@@ -714,7 +714,7 @@
             }
           },
           {
-            "id": "bf739628-c91c-47db-86be-3a35c4e27cc3",
+            "id": "dcc23020-5846-42bc-a445-9322d5a75241",
             "value": "121",
             "type": {
               "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
@@ -726,7 +726,7 @@
             }
           },
           {
-            "id": "f3bb7765-dd56-4ed9-9681-3bbbc4bf667f",
+            "id": "313fefaa-afbb-4e99-bc78-a622b11209e6",
             "value": "2nd stage Z40, default core stage using solid propellant for Vega C configuration",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -738,7 +738,7 @@
             }
           },
           {
-            "id": "35cf7790-690c-4c9a-a712-cf75d23644ea",
+            "id": "4bab0b87-f3ef-4b81-89e2-f143b522a244",
             "value": "121",
             "type": {
               "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
@@ -750,7 +750,7 @@
             }
           },
           {
-            "id": "3b7dd80a-4f81-40c6-9bd9-fb88513dc1a8",
+            "id": "f623cff8-8fce-43c0-9b93-265061354bd7",
             "value": "2080",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -762,7 +762,7 @@
             }
           },
           {
-            "id": "10f7c8df-64a4-437f-abce-7ad791525574",
+            "id": "af06b107-67e8-4494-bbbd-b921e95097fb",
             "value": "60",
             "type": {
               "id": "280f97ba-0f64-4231-9690-99dc337ee493",
@@ -774,7 +774,7 @@
             }
           },
           {
-            "id": "9b762191-f729-44c8-bed5-3b446dc6f8bb",
+            "id": "bcc18af5-0c6f-43bd-95ae-6f21c11dcbd8",
             "value": "36239",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -786,7 +786,7 @@
             }
           },
           {
-            "id": "1a6f9a48-8531-4043-9553-0e6f8344e506",
+            "id": "85679788-428b-4028-8cbf-383f6f6a7792",
             "value": "245",
             "type": {
               "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
@@ -798,7 +798,7 @@
             }
           },
           {
-            "id": "2527607e-9c14-45e1-869e-3a099aa01a62",
+            "id": "e5ca26e7-18a9-450d-9973-7af1ee499588",
             "value": "40477",
             "type": {
               "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
@@ -810,7 +810,7 @@
             }
           },
           {
-            "id": "b33ae907-7f77-4a3b-98e5-fa6f8c6b4b9c",
+            "id": "6bd9525f-554d-4381-8b05-715485e15d27",
             "value": "2.4",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
@@ -825,7 +825,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "4c4c1b6c-7c1f-4228-ba0c-1b8668ad62c7",
+            "id": "83e68baa-8cce-4ed1-ab26-70bc13571c7d",
             "value": "0",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -853,7 +853,7 @@
             "modifiers": []
           },
           {
-            "id": "43f35981-964b-416c-84c0-55bd1e346e67",
+            "id": "6baa29bf-1947-448c-bb30-cd751811134d",
             "value": "4238",
             "lCAEntry": {
               "id": "e3f8ad89-4236-4b01-b53e-ea1c08f3a1fa",
@@ -883,7 +883,7 @@
         "transports": []
       },
       {
-        "id": "cea70e8b-97b1-4a40-a805-9b1eaec0cffc",
+        "id": "a282069d-818a-4c69-a237-2de790f02acc",
         "name": "ADR servicer (generic single picker like ClearSpace 1)",
         "configurationStep": "STV",
         "templateId": "2bc6f43e-6cd5-41d5-b934-5969df88c4aa",
@@ -893,7 +893,7 @@
         },
         "parameters": [
           {
-            "id": "49de23e5-ba4e-4ece-9f9b-6ecd68f79840",
+            "id": "211ab2e6-071b-4885-a53b-a5d5e3778ad0",
             "value": "87",
             "type": {
               "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
@@ -905,7 +905,7 @@
             }
           },
           {
-            "id": "cd7affb2-2e49-4a5e-bb0b-e82348bd230a",
+            "id": "91bc9257-8e8b-4c7c-a2b4-5547d8f3ebee",
             "value": "87",
             "type": {
               "id": "7231d90a-224e-436f-9f08-ddf7bb194bb6",
@@ -917,7 +917,7 @@
             }
           },
           {
-            "id": "2179e5d5-8cc5-48fd-aed8-117dd22dd82f",
+            "id": "380fe1bf-84b8-41fb-9d4c-96eca716a42c",
             "value": "400",
             "type": {
               "id": "f41c65b8-bffd-43c8-a698-9568af6a479c",
@@ -929,7 +929,7 @@
             }
           },
           {
-            "id": "6d973e52-297d-4799-b8af-0947666914f5",
+            "id": "7499b462-acb0-4a15-bd25-276e4e11b282",
             "value": "1",
             "type": {
               "id": "85e0da77-9c40-4725-a18b-9096b6d4e6df",
@@ -941,7 +941,7 @@
             }
           },
           {
-            "id": "caa26cc3-73e3-4826-b55c-d785130c0221",
+            "id": "e49b6b96-6dfc-4ea3-b737-e38f6ffd5ff6",
             "value": "600",
             "type": {
               "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
@@ -953,7 +953,7 @@
             }
           },
           {
-            "id": "216eb52e-2e1f-471c-b465-634ca01dccfe",
+            "id": "92d5f776-51c6-4b33-b9f9-fa89707c80ef",
             "value": "Single picker Active Debris Removal",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -965,7 +965,7 @@
             }
           },
           {
-            "id": "64816118-8d74-4c83-91d5-afbaad598495",
+            "id": "c78af135-f60f-4191-a6b4-3030844f94b2",
             "value": "100",
             "type": {
               "id": "f9a23024-c792-4b75-a121-8d7b74037fba",
@@ -977,7 +977,7 @@
             }
           },
           {
-            "id": "49a68d26-ffeb-446a-847a-e11de9707c92",
+            "id": "936397ad-0f04-48bb-a68c-6bdb0420a48b",
             "value": "50",
             "type": {
               "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
@@ -989,7 +989,7 @@
             }
           },
           {
-            "id": "540a2b1c-9bb1-4d8e-a110-22d0f62f8e48",
+            "id": "8c8aca87-9ae3-47a7-9b09-401f71e25e96",
             "value": "400",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -1001,7 +1001,7 @@
             }
           },
           {
-            "id": "d728a24b-3474-48d9-9720-67d9a03ef180",
+            "id": "fb552d56-4a6c-4d01-900e-572ba45369c1",
             "value": "100",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -1013,7 +1013,7 @@
             }
           },
           {
-            "id": "da61b2a3-7ffd-4794-98eb-a5488e00154b",
+            "id": "ab5681a1-0f70-4847-a517-e17b7d449d05",
             "value": "400",
             "type": {
               "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
@@ -1025,7 +1025,7 @@
             }
           },
           {
-            "id": "36eab4d7-48bf-4e65-9667-8e4530e69325",
+            "id": "2ca1c18f-eaa0-46ee-b849-36b4d77765af",
             "value": "400",
             "type": {
               "id": "764d4d6c-020f-4711-817a-2f5d1ccbb524",
@@ -1040,7 +1040,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "853b0281-af40-4d41-8be8-59893f625df6",
+            "id": "456f54a0-4c85-476b-a321-5424b8c52570",
             "value": "0",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -1073,7 +1073,7 @@
         "transports": []
       },
       {
-        "id": "6720274b-b9a5-47a3-bc6c-57d5f5a09f6c",
+        "id": "e25e2fb1-66ce-41ab-a77a-842bf025d960",
         "name": "APCP solid propellant",
         "configurationStep": "STV",
         "templateId": "f3bcf152-d1f8-48bb-9942-65354140878b",
@@ -1083,7 +1083,7 @@
         },
         "parameters": [
           {
-            "id": "a53e3e96-625e-4e2b-b4b7-f174bc99ae7d",
+            "id": "d31ffe13-9a42-4e0f-9528-dcd6ae91ea0d",
             "value": "3",
             "type": {
               "id": "bae27475-da50-4b20-b614-e08b52f14128",
@@ -1095,7 +1095,7 @@
             }
           },
           {
-            "id": "dd1f2ae9-d6f5-4f02-97bc-9fe4f53bcd2a",
+            "id": "edefe458-ea34-4da8-8a4d-a5759c1ca6ad",
             "value": "Ammonium perchlorate composite propellant (APCP)",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -1107,7 +1107,7 @@
             }
           },
           {
-            "id": "00881035-0566-40d6-abd8-9a28c36c0d24",
+            "id": "b6882b4b-2c9a-4658-87f9-f14355de8d5f",
             "value": "240000",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -1122,7 +1122,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "7a60c619-1782-42b7-b820-b1e0e47a7479",
+            "id": "4c092531-1e09-4a10-89ed-3faa39e7f32d",
             "value": "0",
             "lCAEntry": {
               "id": "167f5f6b-ef94-47b3-8bb7-eb83295a7e59",
@@ -1147,7 +1147,7 @@
             "modifiers": []
           },
           {
-            "id": "e6a45a98-4504-439e-9294-5a4bce70967e",
+            "id": "107acc65-5c79-4b1e-9fa1-76114f530427",
             "value": "0",
             "lCAEntry": {
               "id": "3d69594b-364e-43f8-92c8-d82bc9d6ff11",
@@ -1177,7 +1177,7 @@
         "transports": []
       },
       {
-        "id": "5c8a0680-28e7-4584-ad71-9cea315eda00",
+        "id": "efe93d32-0f29-40e0-9391-2e07de26ee07",
         "name": "Zefiro 9(Z9)",
         "configurationStep": "STV",
         "templateId": "66bad2bb-5103-406d-928a-733e1280a337",
@@ -1187,7 +1187,7 @@
         },
         "parameters": [
           {
-            "id": "dc1b3817-c999-48a0-98e9-9c90c8204084",
+            "id": "2be44599-97bf-44b1-b60b-844235ef7406",
             "value": "Avio Vega C solid propulsion motor Z9",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -1199,7 +1199,7 @@
             }
           },
           {
-            "id": "bfe5adc8-d0af-4a2b-bccf-550b9f2c7d70",
+            "id": "f2cca49e-4c3e-4269-9802-c8fdcbda69e3",
             "value": "117.1",
             "type": {
               "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
@@ -1211,7 +1211,7 @@
             }
           },
           {
-            "id": "6de9bf03-32ab-4d12-a3d6-bf2c7c4534e6",
+            "id": "84341199-6812-417c-9592-ad0a3e2f6ab1",
             "value": "0",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -1223,7 +1223,7 @@
             }
           },
           {
-            "id": "228a11e7-f647-4c5d-bc2e-f5472fa6f7b3",
+            "id": "c6ca9230-3cfd-4217-822d-19e7e4c2065a",
             "value": "0",
             "type": {
               "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
@@ -1235,7 +1235,7 @@
             }
           },
           {
-            "id": "628e3b94-861c-42d5-bca9-e0522195fb10",
+            "id": "2cc5b3b7-b122-4ab9-9ec7-ff732a874774",
             "value": "314",
             "type": {
               "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
@@ -1247,7 +1247,7 @@
             }
           },
           {
-            "id": "18653ce3-290d-4a65-ae26-38044f4e5438",
+            "id": "a37b4538-f0d7-4b14-86cf-14aeb5bf4c93",
             "value": "0",
             "type": {
               "id": "7115af62-149a-42d5-b7be-6f275eee0943",
@@ -1259,7 +1259,7 @@
             }
           },
           {
-            "id": "f5a07420-4c2c-47fd-8ac6-e14fde3a3f83",
+            "id": "2c0808ab-e0bf-40ea-aaac-f7c623d79db2",
             "value": "295.2",
             "type": {
               "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
@@ -1278,7 +1278,7 @@
         "transports": []
       },
       {
-        "id": "8880bf26-6a87-49fa-b952-8a21606023f8",
+        "id": "03fadab2-55a6-48e5-9d37-155c5a36e45b",
         "name": "Fregat (kick stage)",
         "configurationStep": "STV",
         "templateId": "2c08721c-ecb2-4bef-9e54-942c57072e6c",
@@ -1288,7 +1288,7 @@
         },
         "parameters": [
           {
-            "id": "62d6214c-88b1-4e17-a4fe-0fb7e031d33c",
+            "id": "c4de91f4-7482-499a-85d7-900bb57fa502",
             "value": "2",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
@@ -1300,7 +1300,7 @@
             }
           },
           {
-            "id": "379e1601-bef4-4828-9059-bafcd7295b46",
+            "id": "19c7dd27-16a4-4695-b816-b56b35f9d662",
             "value": "Kick stage for the Soyuz launcher",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -1312,7 +1312,7 @@
             }
           },
           {
-            "id": "695a79a3-f925-44f5-9fdc-30a02b9e199a",
+            "id": "3a66e481-2adf-4e12-b836-8bc7e952c55c",
             "value": "400",
             "type": {
               "id": "5fd2e300-96be-4cd4-8557-3ffff0a4f257",
@@ -1324,7 +1324,7 @@
             }
           },
           {
-            "id": "9b282551-65a4-48e8-a41f-0531891ad122",
+            "id": "4a075951-d35c-4f33-ae10-e09e1bf52798",
             "value": "6177",
             "type": {
               "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
@@ -1336,7 +1336,7 @@
             }
           },
           {
-            "id": "e1dceff2-038e-43bd-9b58-53a6ca8b140d",
+            "id": "16a6246a-b913-40da-b5b7-b42ba0c3da1d",
             "value": "5350",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -1348,7 +1348,7 @@
             }
           },
           {
-            "id": "2bc59fba-0c29-4be0-9174-4912941b8886",
+            "id": "ec962bef-e1ab-455c-9514-7d2bad2de255",
             "value": "87",
             "type": {
               "id": "a8444354-6b57-4ccc-8ffc-3e9714bc9f3f",
@@ -1360,7 +1360,7 @@
             }
           },
           {
-            "id": "3f5ebefe-5ec1-4dd6-82fb-6b63d4eb86a2",
+            "id": "d9d5f67f-a792-4f63-a432-b6f7c978a634",
             "value": "87",
             "type": {
               "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
@@ -1372,7 +1372,7 @@
             }
           },
           {
-            "id": "78cdfd97-af48-4878-9bdd-4192e6a402b7",
+            "id": "a520b150-7864-4b15-adb8-5ec750679db8",
             "value": "50",
             "type": {
               "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
@@ -1384,7 +1384,7 @@
             }
           },
           {
-            "id": "d1578c39-8d79-4c5b-9c23-ebddab62daff",
+            "id": "d60dfa73-c90f-43a3-87fc-356f2a201752",
             "value": "827",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -1396,7 +1396,7 @@
             }
           },
           {
-            "id": "14136a37-587e-46f6-961d-2c7ec88f6824",
+            "id": "46a4067f-bf15-43c0-9c93-0c571fc440a3",
             "value": "LEO",
             "type": {
               "id": "08a1a027-f2ae-4551-a39a-33dfe7467e19",
@@ -1408,7 +1408,7 @@
             }
           },
           {
-            "id": "ec0050bc-6ce5-4b58-b730-bf0a89ff960c",
+            "id": "9eecd80b-2b99-4c97-9af5-2e60fc8cffc4",
             "value": "630",
             "type": {
               "id": "f9a23024-c792-4b75-a121-8d7b74037fba",
@@ -1420,7 +1420,7 @@
             }
           },
           {
-            "id": "01a9df8c-61c6-4e18-9be2-3e831760b3a4",
+            "id": "d897a5c1-1f3c-4de5-8f3f-6a7fa7437501",
             "value": "1.5",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
@@ -1432,7 +1432,7 @@
             }
           },
           {
-            "id": "094f1238-7b02-493a-a0c2-ab1cd5bcf4d4",
+            "id": "356a21e2-efce-4844-b857-a2c82bbde96f",
             "value": "400",
             "type": {
               "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
@@ -1444,7 +1444,7 @@
             }
           },
           {
-            "id": "30d423bd-5b69-4c33-ab95-ca8b8c008863",
+            "id": "50bd0632-c7f8-4772-bcc2-23f32d66185e",
             "value": "400",
             "type": {
               "id": "ba09b55d-735c-49ed-bb07-dad5b3414fe2",
@@ -1459,7 +1459,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "ed373744-31d8-4a94-8823-a532eb14ea8e",
+            "id": "e1b73065-6b17-4323-9413-b2c2efb54399",
             "value": "0",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -1492,7 +1492,7 @@
         "transports": []
       },
       {
-        "id": "02bf8f6e-f4cd-4ba2-b618-f154e2c580f2",
+        "id": "ea1b7316-5a35-4766-9558-fa1f3b10abfe",
         "name": "P120 C",
         "configurationStep": "STV",
         "templateId": "049c4074-0c39-484d-8a23-9fdfec78e330",
@@ -1502,7 +1502,7 @@
         },
         "parameters": [
           {
-            "id": "4d7dd541-bcae-4b03-b8f1-8db28f594011",
+            "id": "c3d49a08-6875-42d1-8fa2-279cea7f65a2",
             "value": "P 120 C for Vega C core or A6 boosters",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -1514,7 +1514,7 @@
             }
           },
           {
-            "id": "228ce973-9059-41dc-943b-129fbab0dc5c",
+            "id": "a6aec5d4-e3a0-429b-91c1-617543103e8e",
             "value": " 4500",
             "type": {
               "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
@@ -1526,7 +1526,7 @@
             }
           },
           {
-            "id": "ec3a7d46-4f9f-4d75-b533-f03dac9a8ac1",
+            "id": "f46cc1ff-837a-469a-993b-912370cbabd1",
             "value": "11000",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -1538,7 +1538,7 @@
             }
           },
           {
-            "id": "c9c14f8a-af7e-4b8e-8e6c-334387fbbef6",
+            "id": "ea8c9590-570a-4fc6-915e-f084a3c3cb47",
             "value": "132.8",
             "type": {
               "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
@@ -1550,7 +1550,7 @@
             }
           },
           {
-            "id": "531f58f8-6b6d-45ea-8844-2befe35fc7c9",
+            "id": "25f13a8f-cd14-441f-8927-ac5ac9346d93",
             "value": "278.5",
             "type": {
               "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
@@ -1562,7 +1562,7 @@
             }
           },
           {
-            "id": "7af61754-c653-4084-a3b0-72949eb78444",
+            "id": "d23b9110-c13b-4dda-96a6-5355dd948013",
             "value": "0",
             "type": {
               "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
@@ -1574,7 +1574,7 @@
             }
           },
           {
-            "id": "db84330f-e98d-44a8-b889-5fe55ba4f62a",
+            "id": "9718388e-02dc-4312-b95f-a5716e2841f6",
             "value": "0",
             "type": {
               "id": "7115af62-149a-42d5-b7be-6f275eee0943",
@@ -1593,7 +1593,7 @@
         "transports": []
       },
       {
-        "id": "be734fac-d983-464b-bdf0-0c0d1e1c3c35",
+        "id": "d56595c3-7dab-4912-8eba-b9956c1f2b8f",
         "name": "Vega C first stage - P120C",
         "configurationStep": "STV",
         "templateId": "70a3f973-e003-4d16-9173-cbf8d3a5d054",
@@ -1603,7 +1603,7 @@
         },
         "parameters": [
           {
-            "id": "b8b5d7de-56fe-46b0-b0f5-ff1fa11496ee",
+            "id": "5b50a41a-a5ab-4ab3-aea5-d4d15a87e959",
             "value": "false",
             "type": {
               "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
@@ -1615,7 +1615,7 @@
             }
           },
           {
-            "id": "b34957f5-d271-40de-8abf-a0d46bf6aa16",
+            "id": "1c500f17-4aeb-4bac-ae83-a4390184e195",
             "value": "141634",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -1627,7 +1627,7 @@
             }
           },
           {
-            "id": "39bd8193-6b87-467d-9391-67873674df47",
+            "id": "4befb1bb-5dab-43cd-bdc3-247d4350e3b0",
             "value": "60",
             "type": {
               "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
@@ -1639,7 +1639,7 @@
             }
           },
           {
-            "id": "47177f98-ca8d-4648-80c4-6059d655c8c1",
+            "id": "6370fb5d-12c6-4664-841b-916252cbd846",
             "value": "0",
             "type": {
               "id": "280f97ba-0f64-4231-9690-99dc337ee493",
@@ -1651,7 +1651,7 @@
             }
           },
           {
-            "id": "92a26526-1ee6-47ac-881c-1b40be242878",
+            "id": "d1546f0c-aa58-442c-9cb3-6ff8a46bc0be",
             "value": "13393",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -1663,7 +1663,7 @@
             }
           },
           {
-            "id": "d4af8881-a105-42f5-b74c-94e18b5a6fbb",
+            "id": "277ad3f1-12c2-4257-96c0-13fd44b53bff",
             "value": "false",
             "type": {
               "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
@@ -1675,7 +1675,7 @@
             }
           },
           {
-            "id": "6365a153-406b-4db2-aed8-8abf69df072e",
+            "id": "8cab697d-e256-4723-93ed-12953ccb66d6",
             "value": "1st stage P120C, default core stage using solid propellant for Vega C configuration",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -1687,7 +1687,7 @@
             }
           },
           {
-            "id": "6c491a7a-4af7-4184-b156-0bf33695d218",
+            "id": "e61a9762-ca72-441e-9997-5ac11637abec",
             "value": "3.4",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
@@ -1699,7 +1699,7 @@
             }
           },
           {
-            "id": "764bb338-958b-470e-bc4f-2b200d2f042a",
+            "id": "e4dd950d-8eea-43c2-83e4-dacabcca52ba",
             "value": "142",
             "type": {
               "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
@@ -1711,7 +1711,7 @@
             }
           },
           {
-            "id": "546680f0-049e-4847-9d63-e9e5f9ba254d",
+            "id": "ab2fa72f-0d4c-45d1-9a98-97615c25f75d",
             "value": "60",
             "type": {
               "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
@@ -1723,7 +1723,7 @@
             }
           },
           {
-            "id": "1d31284d-8e9a-4821-a7b3-a67474aa6af2",
+            "id": "ea3e39e2-3598-4876-b27c-d3ccc7c71b05",
             "value": "155027",
             "type": {
               "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
@@ -1735,7 +1735,7 @@
             }
           },
           {
-            "id": "a6b94a56-b547-42ca-9566-9695ccd74d96",
+            "id": "15ef626a-dce2-439b-9ff6-d275d3e623bc",
             "value": "0",
             "type": {
               "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
@@ -1747,7 +1747,7 @@
             }
           },
           {
-            "id": "8463c307-d141-420e-9bd2-a4140bc75405",
+            "id": "fb5e287d-1129-41ad-b81b-95442b3ba394",
             "value": "142",
             "type": {
               "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
@@ -1759,7 +1759,7 @@
             }
           },
           {
-            "id": "41fff778-6c01-49c1-84d1-8c04b1def66e",
+            "id": "69853e9c-e648-4532-8a01-697f02ce1bce",
             "value": "13.38",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
@@ -1774,7 +1774,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "f25b99a4-5c33-4592-9f1c-d280e2a0f1f7",
+            "id": "09aad9ee-c2e1-431f-aff6-2fd7068f0aa2",
             "value": "0",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -1802,7 +1802,7 @@
             "modifiers": []
           },
           {
-            "id": "5af128ba-8367-4327-bef7-c765deaa5936",
+            "id": "a0345cc8-f712-404c-9459-0e868f347314",
             "value": "13393",
             "lCAEntry": {
               "id": "e3f8ad89-4236-4b01-b53e-ea1c08f3a1fa",
@@ -1832,7 +1832,7 @@
         "transports": []
       },
       {
-        "id": "b921c67f-d58b-4471-9ed5-023baf4137ed",
+        "id": "2697e0f1-9f8c-4570-a50e-b5f2afb502bb",
         "name": "Vega C thrid stage - Z999999",
         "configurationStep": "STV",
         "templateId": "7b11ed43-cbc7-42e9-a64a-fc8b733b9322",
@@ -1842,7 +1842,7 @@
         },
         "parameters": [
           {
-            "id": "b75690c6-111c-4905-abec-90976c41b5d8",
+            "id": "c133fc3f-cf3a-4bb2-ba0d-c2631cc3cdda",
             "value": "249",
             "type": {
               "id": "2ee9e77d-1798-487f-b28b-d23d9b200a9f",
@@ -1854,7 +1854,7 @@
             }
           },
           {
-            "id": "743d2096-4359-454a-9880-86b01f757aba",
+            "id": "ecc1c713-b534-46fe-b850-694e5208e384",
             "value": "false",
             "type": {
               "id": "c1dabf94-4883-48f8-836c-c753afb013fe",
@@ -1866,7 +1866,7 @@
             }
           },
           {
-            "id": "f9cca94c-a793-41e6-b9b1-0ae0d18d7196",
+            "id": "2fb3e854-5749-41d4-90b0-55e69b94ada3",
             "value": "190",
             "type": {
               "id": "399e98d9-3321-42b2-b0de-1e4a390fab8a",
@@ -1878,7 +1878,7 @@
             }
           },
           {
-            "id": "10718049-d05f-47b9-8ec7-c385a4573ced",
+            "id": "cc435b0b-c36d-4f95-be84-4daa58633045",
             "value": "3rd stage Z9, default core stage using solid propellant for Vega C configuration",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -1890,7 +1890,7 @@
             }
           },
           {
-            "id": "f44b53a7-86b7-4691-8234-d1532bc3b596",
+            "id": "072f8381-f55d-40e2-b45e-6d8e61216c06",
             "value": "417",
             "type": {
               "id": "f49af88d-79c7-4079-8e21-cbe6053948b2",
@@ -1902,7 +1902,7 @@
             }
           },
           {
-            "id": "bcb10cf4-0bc3-4a30-8aea-b75d9fc0e4d6",
+            "id": "32805c02-088e-4555-9c50-709e49505dff",
             "value": "12000",
             "type": {
               "id": "b22b8f9a-8f89-48b3-8d5b-7d8b69c401e1",
@@ -1914,7 +1914,7 @@
             }
           },
           {
-            "id": "6a260417-acb2-409a-98cb-3f2be08c45e5",
+            "id": "c1106be8-204e-4aba-9c2a-787096bf5ef6",
             "value": "10567",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
@@ -1926,7 +1926,7 @@
             }
           },
           {
-            "id": "d90a3ec8-8c6a-4b82-8cd2-b05cccab5966",
+            "id": "5bdacde2-9ee0-4ecd-a9fe-0cdf87e3eca1",
             "value": "false",
             "type": {
               "id": "8f542faf-ebdf-4e81-bce8-a4aaa29b2a0d",
@@ -1938,7 +1938,7 @@
             }
           },
           {
-            "id": "73b45904-13ca-4577-b9df-6ce74904eaab",
+            "id": "55e61ad0-a639-4bfa-b9e2-9df170303885",
             "value": "4.12",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
@@ -1950,7 +1950,7 @@
             }
           },
           {
-            "id": "666dd909-26fe-4c70-bccb-a4e97f030a66",
+            "id": "03ff2465-7e7b-4d26-bbd5-9f531e225b9d",
             "value": "1433",
             "type": {
               "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
@@ -1962,7 +1962,7 @@
             }
           },
           {
-            "id": "6a9c2e21-c48d-4417-9580-26c81b232de6",
+            "id": "7b4f81bf-1884-4216-b54f-d5f894183977",
             "value": "417",
             "type": {
               "id": "7ff2c1a5-d1f5-47d2-b3ab-4f3fc3c5d874",
@@ -1974,7 +1974,7 @@
             }
           },
           {
-            "id": "aa006236-1cda-4fef-803e-dbc6c2786dc3",
+            "id": "d88f16c1-c9f9-4e64-a851-a1ddc116acee",
             "value": "1.9",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
@@ -1986,7 +1986,7 @@
             }
           },
           {
-            "id": "58136730-728e-48cc-9ab2-a63260a7f019",
+            "id": "4f63a035-9a97-44cb-a309-fdad33c3da73",
             "value": "123",
             "type": {
               "id": "280f97ba-0f64-4231-9690-99dc337ee493",
@@ -1998,7 +1998,7 @@
             }
           },
           {
-            "id": "cf52e5ff-7d66-4a7d-aaca-40fe36f2c9a2",
+            "id": "a1d7b010-be1e-4504-b6cd-e96f4fb10a61",
             "value": "190",
             "type": {
               "id": "2ed8fcfa-939b-4a72-a2ac-34bf17132867",
@@ -2013,7 +2013,7 @@
         "childBlocks": [],
         "typeValues": [
           {
-            "id": "1d2fcc71-bc95-469c-99d2-7acd178bf9ba",
+            "id": "8dc8915b-bd64-481f-86c6-12fa53a74203",
             "value": "0",
             "lCAEntry": {
               "id": "39c16437-8f58-46de-b01e-8a6dda76e1ed",
@@ -2041,7 +2041,7 @@
             "modifiers": []
           },
           {
-            "id": "a4a3af90-5e22-4354-b691-e443da524380",
+            "id": "feffc8c7-ee81-4bd0-97d1-a63072b86d31",
             "value": "1433",
             "lCAEntry": {
               "id": "e3f8ad89-4236-4b01-b53e-ea1c08f3a1fa",
@@ -2071,7 +2071,7 @@
         "transports": []
       },
       {
-        "id": "b16adc5d-e44c-4fe1-915c-2610a7b1484d",
+        "id": "c0974961-672a-458d-af40-83acda63da88",
         "name": "Vega C Space debris removal demo",
         "configurationStep": "MISSION",
         "templateId": "b537e688-d1fb-422b-87a9-07d7388db7ce",
@@ -2081,7 +2081,7 @@
         },
         "parameters": [
           {
-            "id": "6dc14c4f-e025-43f8-ad31-b429206a16f7",
+            "id": "906681f0-f334-43e5-9a2f-36938363626d",
             "value": "Vega C Space debris removal demo to LEO from Kourou",
             "type": {
               "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
@@ -2093,7 +2093,7 @@
             }
           },
           {
-            "id": "6b7fd005-2890-4108-9925-4cc5f035d232",
+            "id": "b8db3404-df45-4c1f-b856-f1929aa614c9",
             "value": "1",
             "type": {
               "id": "907932c6-9018-4a22-9b91-a84645dab28a",
@@ -2105,7 +2105,7 @@
             }
           },
           {
-            "id": "b185c234-56c0-48c3-8e05-0dfa67dca0a6",
+            "id": "7ebf4210-6f14-43cf-b1b7-0b40b51382d0",
             "value": "Kourou",
             "type": {
               "id": "66a7a37d-d281-4e5a-acab-25299d4734eb",
@@ -2117,7 +2117,7 @@
             }
           },
           {
-            "id": "9bcbb185-7fc5-44ab-a2d2-7462c400364c",
+            "id": "4bd808fd-8b7b-4cc6-982c-bb8fb1c26b54",
             "value": "600",
             "type": {
               "id": "1c89565e-7b23-4767-85e4-66f870e3f26e",
@@ -2129,7 +2129,7 @@
             }
           },
           {
-            "id": "41722705-5e93-41b0-997f-52f1dfff0d2f",
+            "id": "086c8cde-ded8-4418-a8b0-79996565a3b9",
             "value": "2026-06-01 12:00:00",
             "type": {
               "id": "abc84a7c-d8f4-4663-8839-a9d989950241",
@@ -2141,7 +2141,7 @@
             }
           },
           {
-            "id": "a5b5c72a-5358-4e5a-9030-5e9fd273078e",
+            "id": "bf4c0bc7-afb7-453d-bf84-80dd8d8aa981",
             "value": "1",
             "type": {
               "id": "9c582b46-d530-4911-b0fb-5968e0a2ffd1",
@@ -2153,7 +2153,7 @@
             }
           },
           {
-            "id": "be301ea5-8efd-4ac5-8a29-16fd185c2a2f",
+            "id": "bb7b4784-fd23-44b2-bb15-e9bf9abcc3b5",
             "value": "1",
             "type": {
               "id": "ed1da8d9-27b2-47d9-9a11-8f5a3798da0b",
@@ -2165,7 +2165,7 @@
             }
           },
           {
-            "id": "45d28c57-e751-40ce-a5a2-c6ceebe40fc3",
+            "id": "ad75563a-0d4d-4965-863c-263635c4cdca",
             "value": "true",
             "type": {
               "id": "9f7eb243-1912-4d6a-9aaf-3c43a9563604",
