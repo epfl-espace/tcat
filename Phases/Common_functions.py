@@ -12,6 +12,7 @@ def orbit_string(orbit):
     return ("{0:.0f}".format(orbit_perigee_alt) + " x " + "{0:.0f}".format(orbit_apogee_alt)
             + ", inc: {0:.1f}".format(orbit.inc)
             + ", raan: {0:.0f}".format(orbit.raan % (360 * u.deg))
+            + ", nu: {0:.0f}".format(orbit.nu % (360 * u.deg))
             + ", ltan {0:.0f}".format((orbit.raan-mean_sun_long(julian_day(orbit.epoch.to_datetime()))) % (360 * u.deg))
             )
 

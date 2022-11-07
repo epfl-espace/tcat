@@ -497,9 +497,9 @@ class Fleet:
         # Number of launcher
         Nb_KickStage = len(self.kickstages)
         if Nb_KickStage > 1:
-            print(f"KickStages: {Nb_KickStage}")
+            print(f"Launch Vehicles (=KickStages): {Nb_KickStage}")
         else:
-            print(f"KickStage: {Nb_KickStage}")
+            print(f"Launch Vehicle (=KickStage): {Nb_KickStage}")
 
 
     def __str__(self):
