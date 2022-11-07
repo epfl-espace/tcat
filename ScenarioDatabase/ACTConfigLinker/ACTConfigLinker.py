@@ -6,22 +6,17 @@ class ACTConfigLinker:
         if json_filepath is not None:
             self.open_act_json(json_filepath)
 
-    ### higher level methods (to give examples on how to use module) ###
-
     def open_act_json(self,json_filepath):
         with open(json_filepath,"r") as act_json_file:
             self.act_db = json.load(act_json_file)
 
-    def get_all_configs_name(self):
-        configs_name = []
-        for config in self.get_configs():
-            configs_name.append(self.get_config_name(config))
-        return configs_name
+    def check_parameter_value(self,param_value,parameter_name="not defined"):
+        if param_value is None:
+            print(f"Invalid value for parameter: {parameter_name}")
+            return False
+        return True
 
-    def get_bb_name_from_type_id(self,config_name,bb_type_id):
-        config = self.get_config(config_name)
-        bb = self.get_config_bb(config,bb_type_id)
-        return self.get_bb_name(bb)
+    ### higher level methods (to give examples on how to use module) ###
 
     def get_bb_parameter_value(self,config_name,bb_type_id,param_type_id,bb_name=None):
         config = self.get_config(config_name)
@@ -35,10 +30,12 @@ class ACTConfigLinker:
         param = self.get_bb_parameter(bb,param_type_id)
         return self.get_param_type_unit_name(param)
 
-    def check_parameter_value(self,param_value):
-        if param_value is None:
-            return False
-        return True
+    def get_bb_child_name_filtered_type_id(self,config_name,bb_type_id,child_bb_type_id):
+        config = self.get_config(config_name)
+        servicer_bb = self.get_config_bb(config,bb_type_id)
+        child_bbs = self.get_bb_child(servicer_bb)
+        engine_bb = self.filter_bbs_by_type_id(child_bbs,child_bb_type_id)
+        return self.get_bb_name(engine_bb)
 
     ### Method to access fields from database
 
@@ -119,30 +116,46 @@ class ACTConfigLinker:
             return None
         return config["buildingBlocks"]
 
-    def get_config_bbs_filtered_type(self,config,bb_type_id):
-        if self.get_config_bbs(config) is None:
-            return None
-        bbs = []
-        for bb in self.get_config_bbs(config):
-            if self.get_bb_type_id(bb) == bb_type_id:
-                bbs.append(bb)
-        if len(bbs) == 0:
-            print(f"No building block found with type id: {bb_type_id}")
-            return None
-        return bbs
+    ### Methods to access and filter buildingblocks ###
 
-    def get_config_bb(self,config,bb_type_id,bb_name=None):
-        bbs = self.get_config_bbs_filtered_type(config,bb_type_id)
+    def get_config_bbs_filtered_type(self,config,bb_type_id):
+        return self.filter_bbs_by_type_id(self.get_config_bbs(config),bb_type_id)
+
+    def filter_bbs_by_type_id(self,bbs,bb_type_id):
         if bbs is None:
             return None
-        # if no name is given, return the first of the filtered list
-        if bb_name is None:
-            return bbs[0]
-        for bb in bbs:
-            if self.get_bb_name(bb) == bb_name:
-                return bb
-        print(f"No building block with name: {bb_name}")
-        return None
+        bbs_filtered = list(filter(lambda bb: self.get_bb_type_id(bb) == bb_type_id,bbs))
+        if len(bbs_filtered) == 0:
+            print(f"No building block found with type id: {bb_type_id}")
+            return None
+        return bbs_filtered
+
+    def filter_bbs_by_name(self,bbs,bb_name):
+        if bbs is None:
+            return None
+        bbs_filtered = list(filter(lambda bb: self.get_bb_name(bb) == bb_name,bbs))
+        if len(bbs_filtered) == 0:
+            print(f"No building block found with name: {bb_name}")
+            return None
+        return bbs_filtered
+
+    def filter_bbs_by_id(self,bbs,bb_id):
+        if bbs is None:
+            return None
+        bbs_filtered = list(filter(lambda bb: self.get_bb_id(bb) == bb_id,bbs))
+        if len(bbs_filtered) == 0:
+            print(f"No building block found with id: {bb_id}")
+            return None
+        return bbs_filtered
+
+    def get_config_bb(self,config,bb_type_id,bb_name=None):
+        bbs = self.get_config_bbs(config)
+        bbs = self.filter_bbs_by_type_id(bbs,bb_type_id)
+        if bb_name is not None:
+            bbs = self.filter_bbs_by_name(bbs,bb_name)
+        if bbs is None:
+            return None
+        return bbs[0]
 
     ### Methods to access fields from unique building blocks ###
 
@@ -209,16 +222,12 @@ class ACTConfigLinker:
         print(f"{self.get_bb_id(bb)}[{param_type_id}] parameter does not exist")
         return None
 
-    ### Methods to access fields from multiple building blocks ###
-
-    def get_bbs_name(self,bbs):
-        if bbs is None:
+    def get_bb_child(self,bb):
+        if not self.check_bb(bb):
             return None
-        bb_names = []
-        for bb in bbs:
-            if self.get_bb_name(bb) is not None:
-                bb_names.append(self.get_bb_name(bb))
-        return bb_names
+        if "childBlocks" not in bb:
+            print(f"{self.get_bb_id(bb)} building block is missing a field: childBlocks")
+        return bb["childBlocks"]
 
     ### Methods to access fields from parameters
 
