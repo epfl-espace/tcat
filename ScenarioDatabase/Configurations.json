@@ -894,7 +894,7 @@
         "parameters": [
           {
             "id": "211ab2e6-071b-4885-a53b-a5d5e3778ad0",
-            "value": "87",
+            "value": "83",
             "type": {
               "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
               "name": "Disposal orbit inclination",
@@ -906,7 +906,7 @@
           },
           {
             "id": "91bc9257-8e8b-4c7c-a2b4-5547d8f3ebee",
-            "value": "87",
+            "value": "49",
             "type": {
               "id": "7231d90a-224e-436f-9f08-ddf7bb194bb6",
               "name": "Debris orbit inclination",
@@ -918,7 +918,7 @@
           },
           {
             "id": "380fe1bf-84b8-41fb-9d4c-96eca716a42c",
-            "value": "400",
+            "value": "411",
             "type": {
               "id": "f41c65b8-bffd-43c8-a698-9568af6a479c",
               "name": "Debris orbit perigee",
@@ -966,7 +966,7 @@
           },
           {
             "id": "c78af135-f60f-4191-a6b4-3030844f94b2",
-            "value": "100",
+            "value": "111",
             "type": {
               "id": "f9a23024-c792-4b75-a121-8d7b74037fba",
               "name": "Capture / dispenser dry mass",
@@ -978,7 +978,7 @@
           },
           {
             "id": "936397ad-0f04-48bb-a68c-6bdb0420a48b",
-            "value": "50",
+            "value": "426",
             "type": {
               "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
               "name": "Disposal orbit perigee",
@@ -1002,7 +1002,7 @@
           },
           {
             "id": "fb552d56-4a6c-4d01-900e-572ba45369c1",
-            "value": "100",
+            "value": "122",
             "type": {
               "id": "e83ef61f-48d8-449c-9ced-74421b200e6f",
               "name": "Propellant Mass",
@@ -1014,7 +1014,7 @@
           },
           {
             "id": "ab5681a1-0f70-4847-a517-e17b7d449d05",
-            "value": "400",
+            "value": "485",
             "type": {
               "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
               "name": "Disposal orbit apogee",
@@ -1026,7 +1026,7 @@
           },
           {
             "id": "2ca1c18f-eaa0-46ee-b849-36b4d77765af",
-            "value": "400",
+            "value": "985",
             "type": {
               "id": "764d4d6c-020f-4711-817a-2f5d1ccbb524",
               "name": "Debris orbit apogee",
@@ -1289,7 +1289,7 @@
         "parameters": [
           {
             "id": "c4de91f4-7482-499a-85d7-900bb57fa502",
-            "value": "2",
+            "value": "2.5",
             "type": {
               "id": "527f86c2-e3f5-479b-aff4-1d304c7a4cbb",
               "name": "Diameter approx",
@@ -1313,7 +1313,7 @@
           },
           {
             "id": "3a66e481-2adf-4e12-b836-8bc7e952c55c",
-            "value": "400",
+            "value": "450",
             "type": {
               "id": "5fd2e300-96be-4cd4-8557-3ffff0a4f257",
               "name": "Insertion orbit apogee",
@@ -1349,7 +1349,7 @@
           },
           {
             "id": "ec962bef-e1ab-455c-9514-7d2bad2de255",
-            "value": "87",
+            "value": "45",
             "type": {
               "id": "a8444354-6b57-4ccc-8ffc-3e9714bc9f3f",
               "name": "Insertion orbit inclination",
@@ -1361,7 +1361,7 @@
           },
           {
             "id": "d9d5f67f-a792-4f63-a432-b6f7c978a634",
-            "value": "87",
+            "value": "46",
             "type": {
               "id": "d722c423-9579-4eef-a79b-97decb1e7e95",
               "name": "Disposal orbit inclination",
@@ -1373,7 +1373,7 @@
           },
           {
             "id": "a520b150-7864-4b15-adb8-5ec750679db8",
-            "value": "50",
+            "value": "55",
             "type": {
               "id": "739eb50b-39cd-4406-b94b-8d057d8f4932",
               "name": "Disposal orbit perigee",
@@ -1421,7 +1421,7 @@
           },
           {
             "id": "d897a5c1-1f3c-4de5-8f3f-6a7fa7437501",
-            "value": "1.5",
+            "value": "3",
             "type": {
               "id": "85dc02cc-1801-479f-bd8f-966a075efe84",
               "name": "Length approx",
@@ -1433,7 +1433,7 @@
           },
           {
             "id": "356a21e2-efce-4844-b857-a2c82bbde96f",
-            "value": "400",
+            "value": "488",
             "type": {
               "id": "fde3302f-f0be-4d60-a003-40b9818c0436",
               "name": "Disposal orbit apogee",
@@ -1445,7 +1445,7 @@
           },
           {
             "id": "50bd0632-c7f8-4772-bcc2-23f32d66185e",
-            "value": "400",
+            "value": "496",
             "type": {
               "id": "ba09b55d-735c-49ed-bb07-dad5b3414fe2",
               "name": "Insertion orbit perigee",
