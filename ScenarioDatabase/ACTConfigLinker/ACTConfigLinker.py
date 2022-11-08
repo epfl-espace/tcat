@@ -34,8 +34,12 @@ class ACTConfigLinker:
         config = self.get_config(config_name)
         servicer_bb = self.get_config_bb(config,bb_type_id)
         child_bbs = self.get_bb_child(servicer_bb)
-        engine_bb = self.filter_bbs_by_type_id(child_bbs,child_bb_type_id)
-        return self.get_bb_name(engine_bb)
+        engine_bbs = self.filter_bbs_by_type_id(child_bbs,child_bb_type_id)
+        if engine_bbs is None:
+            return None
+        elif len(engine_bbs) == 0:
+            return None
+        return self.get_bb_name(engine_bbs[0])
 
     ### Method to access fields from database
 
