@@ -13,6 +13,9 @@ PATH_DB_LAUNCHERS = "SpacecraftDatabase/LauncherDatabase/"
 PATH_DB_KICKSTAGE = "SpacecraftDatabase/"
 KICKSTAGE_DATABASE = "kickstage_db.csv"
 
+# limit for the number of loops for convergence
+EXECUTION_LIMIT = 100
+
 # Atmosphere limit
 ALTITUDE_ATMOSPHERE_LIMIT = 80 * u.km
 

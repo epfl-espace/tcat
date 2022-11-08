@@ -1,5 +1,15 @@
-#Vega C performance figures for LEO. Reference: VEGA C USER’S MANUAL ISSUE 0 REVISION 0 MAY 2018
+#Vega C performance figures for LEO. Reference: VEGA C USER’S MANUAL ISSUE 0 REVISION 0 MAY 2018 and Silvestrin, Pierluigi & Massotti, L.. (2018). The “Next Generation Gravity Mission” challenges, consolidation of the system concepts and technological innovations. 
 Altitude (km);Inclination (deg);Performance (kg)
+300; 10; 2900
+300; 20; 2850
+300; 30; 2800
+300; 40; 2750
+300; 50; 2700
+300; 60; 2600
+300; 70; 2500
+300; 80; 2400
+300; 90; 2300
+300; 100; 2200
 400; 97; 2340
 500; 97.4; 2260
 500; 88; 2250
@@ -8,3 +18,23 @@ Altitude (km);Inclination (deg);Performance (kg)
 800; 98.6; 1960
 900; 99.1; 1840
 1000; 99.4; 1720
+1200; 10; 2300
+1200; 20; 2300
+1200; 30; 2250
+1200; 40; 2200
+1200; 50; 2100
+1200; 60; 2000
+1200; 70; 1900
+1200; 80; 1800
+1200; 90; 1700
+1200; 100; 1600
+1500; 10; 2900
+1500; 20; 2850
+1500; 30; 2000
+1500; 40; 1950
+1500; 50; 1850
+1500; 60; 1800
+1500; 70; 1750
+1500; 80; 1650
+1500; 90; 1600
+1500; 100; 1500

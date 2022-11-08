@@ -36,7 +36,7 @@ class FleetConstellation(Fleet):
             verbose (boolean): if True, print convergence information
         """
         # Instanciate iteration limits
-        execution_limit = 100
+        execution_limit = EXECUTION_LIMIT
         execution_count = 1
 
         # Retrieve unassigned satellites
@@ -48,7 +48,7 @@ class FleetConstellation(Fleet):
         # Start execution loop
         while len(unassigned_satellites)>0 and execution_count <= execution_limit:
             # Instanciate kickstage execution limit
-            kickstage_execution_limit = 20
+            kickstage_execution_limit = EXECUTION_LIMIT
             kickstage_execution_count = 0
             kickstage_converged = False
 
@@ -91,6 +91,8 @@ class FleetConstellation(Fleet):
                     else:
                         # If lacking fuel, decrease upper bound
                         kickstage_up_sat_allowance = kickstage_cur_sat_allowance
+
+                kickstage_execution_count += 1
 
             # Iterate until kickstage total deployment time is computed (If phasing existing)
             kickstage.execute_with_fuel_usage_optimisation(assigned_satellites,constellation_precession=clients.get_global_precession_rotation())
