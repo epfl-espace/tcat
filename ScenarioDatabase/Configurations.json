@@ -1037,7 +1037,109 @@
             }
           }
         ],
-        "childBlocks": [],
+        "childBlocks": [
+          {
+            "id": "efe93d32-0f29-40e0-9391-2e07de26ee07",
+            "name": "Zefiro 9(Z9)",
+            "configurationStep": "STV",
+            "templateId": "66bad2bb-5103-406d-928a-733e1280a337",
+            "buildingBlockType": {
+              "id": "b707989c-cd53-439a-839d-3edf51b51839",
+              "name": "Engine"
+            },
+            "parameters": [
+              {
+                "id": "2be44599-97bf-44b1-b60b-844235ef7406",
+                "value": "Avio Vega C solid propulsion motor Z9",
+                "type": {
+                  "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+                  "name": "Description",
+                  "unit": {
+                    "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                    "name": "string"
+                  }
+                }
+              },
+              {
+                "id": "f2cca49e-4c3e-4269-9802-c8fdcbda69e3",
+                "value": "117.1",
+                "type": {
+                  "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
+                  "name": "Burn time",
+                  "unit": {
+                    "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                    "name": "s"
+                  }
+                }
+              },
+              {
+                "id": "84341199-6812-417c-9592-ad0a3e2f6ab1",
+                "value": "0",
+                "type": {
+                  "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+                  "name": "Dry Mass",
+                  "unit": {
+                    "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                    "name": "kg"
+                  }
+                }
+              },
+              {
+                "id": "c6ca9230-3cfd-4217-822d-19e7e4c2065a",
+                "value": "0",
+                "type": {
+                  "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
+                  "name": "Propellant flow",
+                  "unit": {
+                    "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                    "name": "kg/s"
+                  }
+                }
+              },
+              {
+                "id": "2cc5b3b7-b122-4ab9-9ec7-ff732a874774",
+                "value": "314",
+                "type": {
+                  "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
+                  "name": "Engine thrust",
+                  "unit": {
+                    "id": "eb20995e-3a6d-4cb2-9046-f231549c29c2",
+                    "name": "kN"
+                  }
+                }
+              },
+              {
+                "id": "a37b4538-f0d7-4b14-86cf-14aeb5bf4c93",
+                "value": "0",
+                "type": {
+                  "id": "7115af62-149a-42d5-b7be-6f275eee0943",
+                  "name": "Gas generator flow",
+                  "unit": {
+                    "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                    "name": "kg/s"
+                  }
+                }
+              },
+              {
+                "id": "2c0808ab-e0bf-40ea-aaac-f7c623d79db2",
+                "value": "295.2",
+                "type": {
+                  "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
+                  "name": "Engine lsp",
+                  "unit": {
+                    "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                    "name": "s"
+                  }
+                }
+              }
+            ],
+            "childBlocks": [],
+            "typeValues": [],
+            "isTemplate": false,
+            "parentBlocks": [],
+            "transports": []
+          }
+        ],
         "typeValues": [
           {
             "id": "456f54a0-4c85-476b-a321-5424b8c52570",
@@ -1456,7 +1558,109 @@
             }
           }
         ],
-        "childBlocks": [],
+        "childBlocks": [
+          {
+            "id": "efe93d32-0f29-40e0-9391-2e07de26ee07",
+            "name": "Zefiro 9(Z9)",
+            "configurationStep": "STV",
+            "templateId": "66bad2bb-5103-406d-928a-733e1280a337",
+            "buildingBlockType": {
+              "id": "b707989c-cd53-439a-839d-3edf51b51839",
+              "name": "Engine"
+            },
+            "parameters": [
+              {
+                "id": "2be44599-97bf-44b1-b60b-844235ef7406",
+                "value": "Avio Vega C solid propulsion motor Z9",
+                "type": {
+                  "id": "33a7a649-ca6d-427b-8e2c-5503e44feb19",
+                  "name": "Description",
+                  "unit": {
+                    "id": "a4fb1f57-4cb4-4582-a4ee-8afcacb335f1",
+                    "name": "string"
+                  }
+                }
+              },
+              {
+                "id": "f2cca49e-4c3e-4269-9802-c8fdcbda69e3",
+                "value": "117.1",
+                "type": {
+                  "id": "c86ea509-a516-4d70-abb2-e79f96a88469",
+                  "name": "Burn time",
+                  "unit": {
+                    "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                    "name": "s"
+                  }
+                }
+              },
+              {
+                "id": "84341199-6812-417c-9592-ad0a3e2f6ab1",
+                "value": "0",
+                "type": {
+                  "id": "fcf898b6-957b-49b1-b426-c518b8ebf4b0",
+                  "name": "Dry Mass",
+                  "unit": {
+                    "id": "d15656f2-3254-4d91-be07-5aa9c7f31195",
+                    "name": "kg"
+                  }
+                }
+              },
+              {
+                "id": "c6ca9230-3cfd-4217-822d-19e7e4c2065a",
+                "value": "0",
+                "type": {
+                  "id": "8c3bc0ec-eb51-4b92-810e-50e9df4c1ec2",
+                  "name": "Propellant flow",
+                  "unit": {
+                    "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                    "name": "kg/s"
+                  }
+                }
+              },
+              {
+                "id": "2cc5b3b7-b122-4ab9-9ec7-ff732a874774",
+                "value": "314",
+                "type": {
+                  "id": "65f9ab6a-0b42-4385-b8fa-15bd5bf96f63",
+                  "name": "Engine thrust",
+                  "unit": {
+                    "id": "eb20995e-3a6d-4cb2-9046-f231549c29c2",
+                    "name": "kN"
+                  }
+                }
+              },
+              {
+                "id": "a37b4538-f0d7-4b14-86cf-14aeb5bf4c93",
+                "value": "0",
+                "type": {
+                  "id": "7115af62-149a-42d5-b7be-6f275eee0943",
+                  "name": "Gas generator flow",
+                  "unit": {
+                    "id": "ea8f8453-e316-48cf-a8d3-c2a097a651e2",
+                    "name": "kg/s"
+                  }
+                }
+              },
+              {
+                "id": "2c0808ab-e0bf-40ea-aaac-f7c623d79db2",
+                "value": "295.2",
+                "type": {
+                  "id": "d6b7d46c-9563-4fb5-92ed-d742452ad0e5",
+                  "name": "Engine lsp",
+                  "unit": {
+                    "id": "230e0311-f5d6-45b5-aeda-60e38481aac2",
+                    "name": "s"
+                  }
+                }
+              }
+            ],
+            "childBlocks": [],
+            "typeValues": [],
+            "isTemplate": false,
+            "parentBlocks": [],
+            "transports": []
+          }
+        ],
         "typeValues": [
           {
             "id": "e1b73065-6b17-4323-9413-b2c2efb54399",
