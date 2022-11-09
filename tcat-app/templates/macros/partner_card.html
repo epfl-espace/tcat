@@ -1,0 +1,12 @@
+{% macro partner_card(name, desc, link, img_link) -%}
+    <div class="card w-96 shadow-xl">
+      <figure class="p-4"><img style="max-width: 250px; min-width: 180px; max-height: 120px;" src="{{ img_link }}" alt="{{ name }} Logo" /></figure>
+      <div class="card-body">
+        <h2 class="card-title">{{ name }}</h2>
+        <p>{{ desc }}</p>
+        <div class="card-actions justify-end">
+          <a class="btn btn-primary" href="{{ link }}">More</a>
+        </div>
+      </div>
+    </div>
+{%- endmacro %}
