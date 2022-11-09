@@ -2,7 +2,7 @@ from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import Scena
 
 # Create linker object and select ACT configuration
 a2t = ScenarioADRSetupFromACT()
-a2t.open_act_config_json("ScenarioDatabase/Configurations.json")
+a2t.open_act_config_json_file("ScenarioDatabase/Configurations.json")
 config_names = a2t.get_all_configs_name()
 config_name = config_names[0]
 

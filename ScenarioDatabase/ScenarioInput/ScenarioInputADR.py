@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from ScenarioDatabase.ScenarioInput.ScenarioInputBase import ScenarioInputBase
 
+
 @dataclass
 class ScenarioInputADR(ScenarioInputBase):
     # Metadata parameters
@@ -13,14 +14,14 @@ class ScenarioInputADR(ScenarioInputBase):
 
     # Servicer parameters
     servicer_initial_fuel_mass: float = 100.0
-    servicer_capture_module_dry_mass: float = 10.0 
+    servicer_capture_module_dry_mass: float = 10.0
     servicer_prop_thrust: float = 29400.0
     servicer_prop_isp: float = 330.0
     servicer_propulsion_dry_mass: float = 20.0
     servicer_struct_mass: float = 10.0
     servicer_default_volume: float = 2.0
     servicer_propulsion_type: str = "bi-propellant"
-            
+
     # Orbital parameters 
     apogee_sats_operational: float = 1200.0
     perigee_sats_operational: float = 1200.0
@@ -32,5 +33,8 @@ class ScenarioInputADR(ScenarioInputBase):
     perigee_servicer_disposal: float = 1800.0
     inc_servicer_disposal: float = 85.0
 
-    def export_adr_config_to_json(self,json_filepath):
+    def get_adr_config_as_json(self):
+        return self.to_json()
+
+    def export_adr_config_to_json(self, json_filepath):
         self.to_json_file(json_filepath)

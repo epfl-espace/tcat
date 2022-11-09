@@ -2,26 +2,27 @@ from dataclasses import dataclass
 from dataclasses import asdict
 import json
 
+
 @dataclass
 class ScenarioInputBase:
     # Metadata parameters
-    scenario : str = "new_scenario"
-    verbose : bool = False
-    starting_epoch : str = "2025-01-01 12:00:00"
-    dir_path_for_output_files : str = "./Results"
-    tradeoff_mission_price_vs_duration : float = 0.1
+    scenario: str = "new_scenario"
+    verbose: bool = False
+    starting_epoch: str = "2025-01-01 12:00:00"
+    dir_path_for_output_files: str = "./Results"
+    tradeoff_mission_price_vs_duration: float = 0.1
 
     # Constellation parameters
-    constellation_name : str = "OneWeb"
+    constellation_name: str = "OneWeb"
     sat_mass: float = 147.0
     sat_volume: float = 1.3
-    n_planes : int = 3
-    n_sats_per_plane : int = 2
-    plane_distribution_angle : float = 180.0
+    n_planes: int = 3
+    n_sats_per_plane: int = 2
+    plane_distribution_angle: float = 180.0
 
     # Launcher parameters
-    launcher_use_database : bool = False
-    launcher_name : str = "Soyuz_2.1b_Fregat"
+    launcher_use_database: bool = False
+    launcher_name: str = "Soyuz_2.1b_Fregat"
     launcher_launch_site: str = "Baikonur"
     launcher_orbit_type: str = "LEO"
     launcher_perf_interpolation_method: str = "linear"
@@ -52,7 +53,10 @@ class ScenarioInputBase:
     perigee_launcher_disposal: float = 50.0
     inc_launcher_disposal: float = 85.0
 
-    def to_json_file(self,json_filepath):
-        json_data = json.dumps(asdict(self))
+    def to_json(self):
+        return json.dumps(asdict(self))
+
+    def to_json_file(self, json_filepath):
+        json_data = self.to_json()
         with open(json_filepath, "w") as outfile:
             outfile.write(json_data)
