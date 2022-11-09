@@ -22,6 +22,7 @@ from sqlalchemy.orm import sessionmaker
 
 import inputparams
 from models import db, Configuration, ConfigurationRun
+from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import ScenarioADRSetupFromACT
 
 load_dotenv()  # sets values from .env file as environment vars, *.env files are ignored when creating the docker
 # image. so the values for the docker image come from the dockerfile and the provided arguments
@@ -331,26 +332,72 @@ def configure_from_file():
     if 'file' not in request.files:
         flash('No file part')
         return redirect(request.url)
-    scenario = 'constellation_deployment'
-    file = request.files['file']
-    current_user_email = get_user_info()
-    if file is None:
-        flash('File error', 'error')
-    else:
-        if file.filename == '':
-            flash('File has empty name', 'error')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            file.seek(0)
-            file_content = file.stream.read()
-            uploaded_config = json.loads(file_content.decode('utf-8'))
 
+    file_type = request.args.get('type')
+
+    if file_type == 'act':
+        return handle_configure_for_act_file()
+
+    return handle_configure_for_tcat_file()
+
+
+def handle_configure_for_act_file():
+    scenario = 'adr'
+    current_user_email = get_user_info()
+
+    file, action = validate_and_get_file()
+
+    if file is not None:
+        file.seek(0)
+        file_content = file.stream.read()
+
+        # Create linker object and select ACT configuration
+        a2t = ScenarioADRSetupFromACT()
+        try:
+            a2t.open_act_config_json(file_content.decode('utf-8'))
+            config_names = a2t.get_all_configs_name()
+            config_name = config_names[0]
+
+            # Read configuration
+            a2t.read_act_config(config_name)
+
+            # If no engines in the childrenblocks, here is the solution:
+            engines_name = a2t.get_all_engines_name(config_name)
+            a2t.read_kickstage_engine_parameters(config_name, engines_name[0])
+            a2t.read_servicer_engine_parameters(config_name, engines_name[0])
+
+            # Export reading to tcat input .json
+            conf = a2t.get_config_as_tcat_json()
+            store_configuration(json.loads(conf), current_user_email)
+        except Exception as e:
+            flash(f'Error parsing ACT file: {e}', 'error')
+            return redirect(url_for('configure_adr'))
+    else:
+        if action is not None:
+            return action
+
+    return redirect(url_for('configure_adr') if scenario == 'adr' else url_for('configure_constellation_deployment'))
+
+
+def handle_configure_for_tcat_file():
+    scenario = 'constellation_deployment'
+    current_user_email = get_user_info()
+    file, action = validate_and_get_file()
+
+    if file is not None:
+        file.seek(0)
+        file_content = file.stream.read()
+        uploaded_config = json.loads(file_content.decode('utf-8'))
+
+        try:
             if uploaded_config['scenario'] is None:
                 flash('No scenario specified', 'error')
                 return redirect(request.url)
 
             scenario = uploaded_config['scenario']
-            valid = valid_configuration(uploaded_config, inputparams.adr_mission_params) if scenario == 'adr' else valid_configuration(uploaded_config, inputparams.constellation_mission_params)
+            valid = valid_configuration(uploaded_config,
+                                        inputparams.adr_mission_params) if scenario == 'adr' else valid_configuration(
+                uploaded_config, inputparams.constellation_mission_params)
 
             if valid[0]:
                 store_configuration(uploaded_config, current_user_email)
@@ -359,10 +406,29 @@ def configure_from_file():
                 for k, v in valid[1].items():
                     msg += f'\n{k}: {v}'
                 flash(f'Invalid configuration{msg}', 'error')
-        else:
-            flash('File not supported', 'error')
+        except Exception as e:
+            flash(f'Invalid configuration: {e}', 'error')
+            return redirect(request.url)
+    else:
+        if action is not None:
+            return action
 
     return redirect(url_for('configure_adr') if scenario == 'adr' else url_for('configure_constellation_deployment'))
+
+
+def validate_and_get_file():
+    file = request.files['file']
+    if file is None:
+        flash('File error', 'error')
+        return None, None
+    if file.filename == '':
+        flash('File has empty name', 'error')
+        return None, redirect(request.url)
+    if file and allowed_file(file.filename):
+        return file, None
+    else:
+        flash('File not supported', 'error')
+        return None, None
 
 
 def run_configuration(conf_scenario):

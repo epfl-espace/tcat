@@ -32,12 +32,17 @@
                 {% endfor %}
             </form>
             <div class="flex-grow-0 flex flex-col md:flex-row justify-between gap-4 md:gap-8">
-                <form id="file-select-form" method="post" action="{{ action_from_file_url }}"
+                <form id="tcat-file-select-form" method="post" action="{{ action_from_file_url }}?type=tcat"
                       enctype="multipart/form-data"
                       class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
-                    <input class="hidden file-input cursor-pointer" type="file" id="file" name="file">
-                    <label for="file" class="text-center font-semibold cursor-pointer">Select
-                        file</label>
+                    <input class="hidden tcat-file-input cursor-pointer" type="file" id="tcat-file" name="file">
+                    <label for="tcat-file" class="text-center font-semibold cursor-pointer">Import TCAT Config</label>
+                </form>
+                <form id="act-file-select-form" method="post" action="{{ action_from_file_url }}?type=act"
+                      enctype="multipart/form-data"
+                      class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
+                    <input class="hidden act-file-input cursor-pointer" type="file" id="act-file" name="file">
+                    <label for="act-file" class="text-center font-semibold cursor-pointer">Import ACT Config</label>
                 </form>
                 <button id="upload-data" class="btn btn-active btn-primary">Upload</button>
             </div>
@@ -58,8 +63,10 @@
 
 {% macro configure_script(scenario, last_run_for_configuration) -%}
     <script>
-        const fileInput = document.querySelector('.file-input');
-        const fileSelectForm = document.querySelector('#file-select-form');
+        const tcatFileInput = document.querySelector('.tcat-file-input');
+        const actFileInput = document.querySelector('.act-file-input');
+        const tcatFileSelectForm = document.querySelector('#tcat-file-select-form');
+        const actFileSelectForm = document.querySelector('#act-file-select-form');
         const validatedTextInputs = document.querySelectorAll('.text-input-validated');
         const selectInputValue = document.querySelectorAll('.select-input-value');
         const uploadData = document.querySelector('#upload-data');
@@ -98,8 +105,12 @@
             }
         }
 
-        fileInput.addEventListener('change', (e => {
-            fileSelectForm.submit();
+        tcatFileInput.addEventListener('change', (e => {
+            tcatFileSelectForm.submit();
+        }));
+
+        actFileInput.addEventListener('change', (e => {
+            actFileSelectForm.submit();
         }));
 
         uploadData.addEventListener('click', (e => {
