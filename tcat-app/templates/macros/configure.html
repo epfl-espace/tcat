@@ -1,4 +1,4 @@
-{% macro configure(action_url, action_from_file_url, inputparams, forms, last_configuration, last_run_for_configuration, validation_errors, highlight_params) -%}
+{% macro configure(action_url, action_from_file_url, inputparams, forms, last_configuration, last_run_for_configuration, validation_errors, highlight_params, show_act_input) -%}
     <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
         <div class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2 bg-base-200 shadow-xl p-2 md:p-4 lg:p-6 rounded-lg">
             <h2 class="font-bold text-lg">Configure</h2>
@@ -38,13 +38,15 @@
                     <input class="hidden tcat-file-input cursor-pointer" type="file" id="tcat-file" name="file">
                     <label for="tcat-file" class="text-center font-semibold cursor-pointer">Import TCAT Config</label>
                 </form>
-                <form id="act-file-select-form" method="post" action="{{ action_from_file_url }}?type=act"
-                      enctype="multipart/form-data"
-                      class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
-                    <input class="hidden" type="text" id="act-file-config-name" name="act-config-name" value="">
-                    <input class="hidden act-file-input cursor-pointer" type="file" id="act-file" name="file">
-                    <label for="act-file" class="text-center font-semibold cursor-pointer">Import ACT Config</label>
-                </form>
+                {%  if show_act_input == True  %}
+                    <form id="act-file-select-form" method="post" action="{{ action_from_file_url }}?type=act"
+                          enctype="multipart/form-data"
+                          class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
+                        <input class="hidden" type="text" id="act-file-config-name" name="act-config-name" value="">
+                        <input class="hidden act-file-input cursor-pointer" type="file" id="act-file" name="file">
+                        <label for="act-file" class="text-center font-semibold cursor-pointer">Import ACT Config</label>
+                    </form>
+                {% endif %}
                 <button id="upload-data" class="btn btn-active btn-primary">Upload</button>
             </div>
         </div>
@@ -63,7 +65,7 @@
     <div>
         <input type="checkbox" id="config-names-modal" class="modal-toggle" />
         <div class="modal">
-          <div class="modal-box relative">
+          <div class="modal-box relative flex flex-col gap-6">
             <label for="config-names-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
             <h3 class="text-lg font-bold">Select a configuration</h3>
             <select class="select w-full max-w-xs" id="config-name-selection">
