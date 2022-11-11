@@ -17,6 +17,7 @@ class PropulsionModule(GenericModule):
         max_tank_capacity (u.kg): maximum capacity of a single tank, tanks will be duplicated if too much propellant
         is_refueler (boolean): True if the module has a refueling valve and can transfer fuel to
         propellant_contingency (u.kg): ratio of fuel mass left at the end of the servicer_group to the initial mass
+        # TODO describe difference between duty cycle and coast cycle (see common_functions and scenario global parameters)
         assumed_duty_cycle (float): amount of time over one period where electrical thrust is assumed to be possible
 
     Attributes:
