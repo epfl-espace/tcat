@@ -1,29 +1,32 @@
-{% macro checkbox(name, checked) -%}
-    <input type="checkbox" name="{{ name }}" {{ checked }} class="checkbox"/>
+{% macro checkbox(name, checked, highlight = False) -%}
+    {% set class_name_addition = '' if highlight == False else 'input-accent' %}
+    <input type="checkbox {{ class_name_addition }}" name="{{ name }}" {{ checked }} class="checkbox"/>
 {%- endmacro %}
 
-{% macro select(name, selectedValue, values) -%}
-    <select class="select select-sm select-bordered max-w-xs" name="{{ name }}" data-selected="{{ selectedValue }}">
+{% macro select(name, selectedValue, values, highlight = False) -%}
+    {% set class_name_addition = '' if highlight == False else 'bg-accent' %}
+    <select class="select select-sm select-bordered max-w-xs {{ class_name_addition }}" name="{{ name }}" data-selected="{{ selectedValue }}">
         {% for val in values %}
             <option value="{{ val }}">{{ val }}</option>
         {% endfor %}
     </select>
 {%- endmacro %}
 
-{% macro input(name, type, value, required, validation, error) -%}
+{% macro input(name, type, value, required, validation, error, highlight = False) -%}
+    {% set class_name_addition = '' if highlight == False else 'input-accent' %}
     <div class="flex flex-col gap-2">
         {% if error != None %}
             <p class="text-red-700 dark:text-red-300">{{ error }}</p>
         {% endif %}
         {% if type == 'number' %}
-            <input class="flex-grow-0 input input-bordered " type="{{ type }}" name="{{ name }}"
+            <input class="flex-grow-0 input input-bordered {{ class_name_addition }}" type="{{ type }}" name="{{ name }}"
                    min="{{ validation[0] }}" max="{{ validation[1] }}" value="{{ value }}" {{ required }}>
         {% elif type == 'datetime-local' %}
-            <input class="text-input-validated flex-grow-0 input input-bordered" type="{{ type }}" name="{{ name }}"
+            <input class="text-input-validated flex-grow-0 input input-bordered {{ class_name_addition }}" type="{{ type }}" name="{{ name }}"
                    value="{{ value }}" {% if validation != None %} min="{{ validation[0] }}"
                    max="{{ validation[1] }}"  {% endif %} {{ required }}>
         {% else %}
-            <input class="text-input-validated flex-grow-0 input input-bordered" type="{{ type }}" name="{{ name }}"
+            <input class="text-input-validated flex-grow-0 input input-bordered {{ class_name_addition }}" type="{{ type }}" name="{{ name }}"
                    value="{{ value }}" {% if validation != None %}
                    data-validation="{{ validation }}" {% endif %} {{ required }}>
         {% endif %}

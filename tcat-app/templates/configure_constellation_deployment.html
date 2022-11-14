@@ -3,7 +3,7 @@
 {% import 'macros/configure.html' as conf %}
 {% block title %}Configure Constellation Deployment{% endblock %}
 {% block content %}
-    {{ conf.configure(url_for('configure_constellation_deployment'), url_for('configure_from_file'), inputparams.constellation_mission_params, forms, last_configuration, last_run_for_configuration, validation_errors) }}
+    {{ conf.configure(url_for('configure_constellation_deployment'), url_for('configure_from_file'), inputparams.constellation_mission_params, forms, last_configuration, last_run_for_configuration, validation_errors, highlight_params, False) }}
 {% endblock %}
 {% block script %}
     <script src="{{ url_for('static',filename='js/imageloader.js') }}"></script>

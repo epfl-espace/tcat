@@ -5,6 +5,8 @@ from Phases.Common_functions import *
 from Phases.GenericPhase import GenericPhase
 from poliastro.bodies import Earth
 
+from Scenarios.ScenarioParameters import ALTITUDE_ATMOSPHERE_LIMIT
+
 
 class OrbitChange(GenericPhase):
     """A Phase that represents changes made by a servicer to change orbit.
@@ -227,11 +229,15 @@ class OrbitChange(GenericPhase):
         if isp is None:
             isp = self.get_assigned_module().isp
 
+        # Check if 2nd burn of Homann is required (if spacecraft burns in atmosphere or not)
+        if final_orbit.r_p - final_orbit.attractor.R_mean < ALTITUDE_ATMOSPHERE_LIMIT:
+            spacecraft_burn_in_atmosphere = True
+
         # apply appropriate methods depending on propulsion and get manoeuvres and their duration
         if self.assigned_module.prop_type == 'electrical':
             manoeuvres, transfer_duration = low_thrust_delta_v(initial_orbit, final_orbit, mass, thrust, isp)
         else:
-            manoeuvres, transfer_duration = high_thrust_delta_v(initial_orbit, final_orbit, mass, thrust, isp)
+            manoeuvres, transfer_duration = high_thrust_delta_v(initial_orbit, final_orbit, mass, thrust, isp,spacecraft_burn_in_atmosphere)
 
         return manoeuvres, transfer_duration
 

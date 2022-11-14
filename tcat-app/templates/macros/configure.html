@@ -1,4 +1,4 @@
-{% macro configure(action_url, action_from_file_url, inputparams, forms, last_configuration, last_run_for_configuration, validation_errors) -%}
+{% macro configure(action_url, action_from_file_url, inputparams, forms, last_configuration, last_run_for_configuration, validation_errors, highlight_params, show_act_input) -%}
     <div class="flex flex-col 2xl:flex-row gap-4 md:gap-8">
         <div class="flex-grow flex flex-col gap-4 md:gap-8 max-w-full 2xl:max-w-1/2 bg-base-200 shadow-xl p-2 md:p-4 lg:p-6 rounded-lg">
             <h2 class="font-bold text-lg">Configure</h2>
@@ -18,12 +18,12 @@
                                     <label for="{{ input[2] }}"
                                            class="flex-grow {{ fs }}">{{ input[3] }}</label>
                                     {% if input[0] == 'input' %}
-                                        {{ forms.input(input[2], input[1], value, required, input[5], error) }}
+                                        {{ forms.input(input[2], input[1], value, required, input[5], error, input[2] in highlight_params) }}
                                     {% elif input[0] == 'select' %}
-                                        {{ forms.select(input[2], value, input[5]) }}
+                                        {{ forms.select(input[2], value, input[5], input[2] in highlight_params) }}
                                     {% elif input[0] == 'checkbox' %}
                                         {% set checked = 'checked' if value == True else '' %}
-                                        {{ forms.checkbox(input[2], checked) }}
+                                        {{ forms.checkbox(input[2], checked, input[2] in highlight_params) }}
                                     {% endif %}
                                 </div>
                             {% endfor %}
@@ -32,13 +32,21 @@
                 {% endfor %}
             </form>
             <div class="flex-grow-0 flex flex-col md:flex-row justify-between gap-4 md:gap-8">
-                <form id="file-select-form" method="post" action="{{ action_from_file_url }}"
+                <form id="tcat-file-select-form" method="post" action="{{ action_from_file_url }}?type=tcat"
                       enctype="multipart/form-data"
                       class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
-                    <input class="hidden file-input cursor-pointer" type="file" id="file" name="file">
-                    <label for="file" class="text-center font-semibold cursor-pointer">Select
-                        file</label>
+                    <input class="hidden tcat-file-input cursor-pointer" type="file" id="tcat-file" name="file">
+                    <label for="tcat-file" class="text-center font-semibold cursor-pointer">Import TCAT Config</label>
                 </form>
+                {%  if show_act_input == True  %}
+                    <form id="act-file-select-form" method="post" action="{{ action_from_file_url }}?type=act"
+                          enctype="multipart/form-data"
+                          class="flex-grow-0 md:flex-grow-0 btn btn-secondary">
+                        <input class="hidden" type="text" id="act-file-config-name" name="act-config-name" value="">
+                        <input class="hidden act-file-input cursor-pointer" type="file" id="act-file" name="file">
+                        <label for="act-file" class="text-center font-semibold cursor-pointer">Import ACT Config</label>
+                    </form>
+                {% endif %}
                 <button id="upload-data" class="btn btn-active btn-primary">Upload</button>
             </div>
         </div>
@@ -54,12 +62,30 @@
             </div>
         </div>
     </div>
+    <div>
+        <input type="checkbox" id="config-names-modal" class="modal-toggle" />
+        <div class="modal">
+          <div class="modal-box relative flex flex-col gap-6">
+            <label for="config-names-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <h3 class="text-lg font-bold">Select a configuration</h3>
+            <select class="select w-full max-w-xs" id="config-name-selection">
+            </select>
+            <button class="btn btn-primary" id="submit-config-name-selection">Submit</button>
+          </div>
+        </div>
+    </div>
 {%- endmacro %}
 
 {% macro configure_script(scenario, last_run_for_configuration) -%}
     <script>
-        const fileInput = document.querySelector('.file-input');
-        const fileSelectForm = document.querySelector('#file-select-form');
+        const submitConfigNameSelection = document.querySelector('#submit-config-name-selection');
+        const configNamesModal = document.querySelector('#config-names-modal');
+        const configNameSelection = document.querySelector('#config-name-selection');
+        const tcatFileInput = document.querySelector('.tcat-file-input');
+        const actConfigNameInput = document.querySelector('#act-file-config-name');
+        const actFileInput = document.querySelector('.act-file-input');
+        const tcatFileSelectForm = document.querySelector('#tcat-file-select-form');
+        const actFileSelectForm = document.querySelector('#act-file-select-form');
         const validatedTextInputs = document.querySelectorAll('.text-input-validated');
         const selectInputValue = document.querySelectorAll('.select-input-value');
         const uploadData = document.querySelector('#upload-data');
@@ -71,6 +97,8 @@
 
         let changed = false;
         uploadData.disabled = true;
+
+        configNamesModal.checked = false;
 
         if (location.hash === '#runconfig') {
             location.hash = '';
@@ -98,8 +126,34 @@
             }
         }
 
-        fileInput.addEventListener('change', (e => {
-            fileSelectForm.submit();
+        submitConfigNameSelection.addEventListener('click', (e) => {
+            actConfigNameInput.value = configNameSelection.value;
+            configNamesModal.checked = false;
+            actFileSelectForm.submit();
+        });
+
+        tcatFileInput.addEventListener('change', (e => {
+            tcatFileSelectForm.submit();
+        }));
+
+        actFileInput.addEventListener('change', (e => {
+            let data = new FormData()
+            data.append('file', e.target.files[0]);
+            fetch('{{ url_for('get_config_names') }}', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(data => {
+                configNameSelection.innerHTML = '';
+                for (let i = 0; i < data.config_names.length; i++) {
+                    let option = document.createElement('option');
+                    option.value = data.config_names[i];
+                    option.innerHTML = data.config_names[i];
+                    configNameSelection.appendChild(option);
+                }
+                configNamesModal.checked = true;
+            });
         }));
 
         uploadData.addEventListener('click', (e => {

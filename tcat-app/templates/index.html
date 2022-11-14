@@ -1,2 +1,26 @@
 {% extends 'base.html' %}
+{% import 'macros/partner_card.html' as partner %}
 {% block title %}Index{% endblock %}
+{% block content %}
+<div class="block min-h-full min-w-full">
+    <div class="flex self-stretch flex-col w-full border-opacity-50">
+    <div class="hero rounded-box" style="background-image: url(https://espace.epfl.ch/wp-content/uploads/2022/09/banner-dawn-1800x740.jpg); height: 50vh;">
+      <div class="hero-overlay bg-opacity-95"></div>
+      <div class="hero-content text-center text-neutral-content">
+        <div class="max-w-md flex flex-col items-center gap-2">
+          <img class="p-4" style="max-width: 250px; min-width: 180px; max-height: 120px;" src="https://espace.epfl.ch/wp-content/uploads/2020/08/eSpace-logo-Suisse-Intl-white-300x125.png" alt="EPFL eSpace Logo" />
+          <h1 class="mb-5 text-5xl font-bold">A project by EPFL eSpace</h1>
+          <p class="mb-5">DAWN – Optimisation of space logistics mission profile</p>
+          <a class="btn btn-primary flex-grow-0" href="https://espace.epfl.ch/dawn/">More</a>
+        </div>
+      </div>
+    </div>
+    <div class="divider">Partners</div>
+    <div class="flex flex-row gap-4 justify-around">
+        {{ partner.partner_card('Ateleris', 'A software engineering company with extensive software design, agile software development, and platform operations experience.', 'https://www.ateleris.ch/', 'https://www.ateleris.ch/wp-content/uploads/2019/10/Ateleris.Logo_.Final_.Pantone.transparency-flattened-icon_Ateleris-w-Text-Transparent-Orange-1.png') }}
+        {{ partner.partner_card('The Countdown Company','The Countdown Company offers tailored engineering solutions with exceptional lead times to help you meet tight deadlines or speed up your development cycle.','https://thecountdowncompany.ch/','https://thecountdowncompany.ch/wp-content/uploads/2019/12/TCDC_logo-e1579731974214.png') }}
+        {{ partner.partner_card('ESA','The European Space Agency is an intergovernmental organisation of 22 member states dedicated to the exploration of space.','https://www.esa.int/','https://brand.esa.int/files/2020/05/ESA_logo_2020_White-1024x643.jpg') }}
+    </div>
+</div>
+</div>
+{% endblock %}

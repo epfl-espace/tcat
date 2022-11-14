@@ -21,3 +21,4 @@ tcat-app/tcat-test.db
 # ignore, can be generated with create_client_secrets_from_env.py ./tcat-app/client_secrets.json ./tcat-app/.env
 client_secrets.json
 Doc/_build/
+my_*.json

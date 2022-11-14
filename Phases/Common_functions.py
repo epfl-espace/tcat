@@ -125,7 +125,7 @@ def inclination_change_delta_v(initial_orbit, final_orbit):
     return delta_v.to(u.m / u.s)
 
 
-def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, isp):
+def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, isp,no_2n_burn=False):
     """Returns the delta v necessary to perform an orbit change, assuming impulsive maneuvers.
     This takes into account the transfer from one elliptical orbit to another.
     This takes into account possible inclination changes, performed during the adequate impulse.
@@ -183,13 +183,14 @@ def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, i
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
-    # second burn
-    v_i_2 = instant_orbital_velocity(transfer_orbit, second_burn_radius)
-    v_f_2 = instant_orbital_velocity(final_orbit, second_burn_radius)
-    delta_v_2 = np.sqrt((v_f_2 - v_i_2)**2 + second_inc_delta_v**2)
-    manoeuvre = Manoeuvre(delta_v_2,"second high-trust dV")
-    manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
-    maneouvres.append(manoeuvre)
+    if no_2n_burn is False:
+        # second burn
+        v_i_2 = instant_orbital_velocity(transfer_orbit, second_burn_radius)
+        v_f_2 = instant_orbital_velocity(final_orbit, second_burn_radius)
+        delta_v_2 = np.sqrt((v_f_2 - v_i_2)**2 + second_inc_delta_v**2)
+        manoeuvre = Manoeuvre(delta_v_2,"second high-trust dV")
+        manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
+        maneouvres.append(manoeuvre)
 
     transfer_duration = (transfer_orbit.period / 2).to(u.day)
 
