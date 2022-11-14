@@ -14,7 +14,7 @@ engines_name = a2t.get_all_engines_name(config_name)
 a2t.read_kickstage_engine_parameters(config_name,engines_name[0])
 a2t.read_servicer_engine_parameters(config_name,engines_name[0])
 
-# Export reading to tcat input .json
+# Export to tcat input .json
 a2t.export_config_to_json_tcat_format("./my_new_json.json")
 
 pass
