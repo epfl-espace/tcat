@@ -1,6 +1,5 @@
 import json
 
-
 class ACTConfigLinker:
     def __init__(self, json_filepath=None):
         self.act_db = []

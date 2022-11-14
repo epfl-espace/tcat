@@ -1,3 +1,7 @@
+# ACT configuration.json is a database composed of building blocks (BB) and parameters (PARAM).
+# Each BB and PARAM is of a certain "type".
+# Constants below list the ids of the different types of BB and PARAM. 
+
 BB_ID_MISSION = "be31c42c-4414-49bc-8bac-ad3085270e59"
 BB_ID_UPPERSTAGE = "d2603deb-96fd-464e-9d70-42a6721bedcb"
 BB_ID_FAIRING = "4a8404fa-0dbc-4826-95f3-2f9bdb3513b1"
