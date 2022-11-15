@@ -203,8 +203,9 @@ class OrbitChange(GenericPhase):
     def compute_main_manoeuvres(self, initial_orbit=None, final_orbit=None, mass=None, thrust=None, isp=None):
         """ Returns the manoeuvres necessary to perform the orbit change, without raan changes.
         This methods applies either low thrust assumptions or high thrust assumption depending on assigned module
-        propulsion type. For low thrust manoeuvres, the duty_cycle is assumed to be 1/4, which might be conservative
-        for circular orbits. Specific arguments can be given to overwrite the current attributes.
+        propulsion type. For low thrust manoeuvres, the duty_cycle is assumed to be 0.9, and the coasting cycle 0.75
+        (meaning thrusters can be used 25% of the time) which might be conservative for circular orbits. 
+        Specific arguments can be given to overwrite the current attributes.
 
         Args:
             initial_orbit (astropy.time.Time): (optional) initial orbit

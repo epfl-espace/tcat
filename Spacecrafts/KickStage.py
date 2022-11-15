@@ -226,7 +226,7 @@ class KickStage(ActiveSpacecraft):
                                                             save="InterpolationGraph",
                                                             save_folder=scenario.dir_path_for_output_files)
 
-            if scenario.launcher_name in ["Soyuz_2.1a_Fregat", "Soyuz_2.1b_Fregat"] and scenario.kickstage_use_database and scenario.kickstage_name == "Fregat":
+            if scenario.launcher_name in ["Soyuz_2.1a_Fregat", "Soyuz_2.1b_Fregat"] and scenario.kickstage_use_database and scenario.kickstage_name in ["Fregat", "Fregat_M"]:
                 self.mass_available = launcher_performance
             elif super().get_initial_wet_mass() > launcher_performance:
                 raise ValueError(f"The kickstage is heavier than the launcher performance.")

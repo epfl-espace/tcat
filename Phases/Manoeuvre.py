@@ -30,6 +30,13 @@ class Manoeuvre:
         pass
 
     def get_burn_duration(self, duty_cycle=1.):
+        """
+        Args:
+        duty_cycle: assumed percentage of time the propulsion systemcan be operated (accounting for mission constraints)
+
+        Return:
+        (u.second) burn_duration: Duration of a propulsive burn (either chemical or electrical)
+        """
         return self.burn_duration / duty_cycle
 
     def __str__(self):

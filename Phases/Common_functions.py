@@ -4,6 +4,7 @@ from astropy.time import Time
 from poliastro.bodies import Earth, Moon
 from poliastro.twobody import Orbit
 from Phases.Manoeuvre import Manoeuvre
+from Scenarios.ScenarioParameters import EP_DUTY_CYCLE, EP_COAST_CYCLE
 
 def orbit_string(orbit):
     """Custom function to display orbit altitudes over ground. """
@@ -239,7 +240,7 @@ def low_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, is
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
-    transfer_duration = manoeuvre.get_burn_duration(duty_cycle=0.25)
+    transfer_duration = manoeuvre.get_burn_duration(duty_cycle=EP_DUTY_CYCLE)/(1-EP_COAST_CYCLE)
 
     return maneouvres, transfer_duration
 
@@ -303,7 +304,7 @@ def low_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, initi
 
     manoeuvre = Manoeuvre(delta_v,id="low trust direct raan change")
     manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
-    transfer_duration = manoeuvre.get_burn_duration(duty_cycle=0.25)
+    transfer_duration = manoeuvre.get_burn_duration(duty_cycle=EP_DUTY_CYCLE)/(1-EP_COAST_CYCLE)
 
     return manoeuvre, transfer_duration
 
