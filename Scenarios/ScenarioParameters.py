@@ -13,6 +13,9 @@ PATH_DB_LAUNCHERS = "SpacecraftDatabase/LauncherDatabase/"
 PATH_DB_KICKSTAGE = "SpacecraftDatabase/"
 KICKSTAGE_DATABASE = "kickstage_db.csv"
 
+# limit for the number of loops for convergence
+EXECUTION_LIMIT = 100
+
 # Atmosphere limit
 ALTITUDE_ATMOSPHERE_LIMIT = 80 * u.km
 
@@ -59,3 +62,8 @@ SERVICER_PROP_MODULE_MASS_CONTINGENCY = 0.0
 # SERVICER_PROPULSION_DRY_MASS = 20 * u.kg
 # SERVICER_STRUCT_MASS = 5 * u.kg
 # SERVICER_DEFAULT_VOLUME = 2.0 * u.m**3
+
+# Electric propulsion duty cycle
+EP_DUTY_CYCLE = 0.9 # David Y. Oh et alli, “Analysis of System Margins on Missions Utilizing Solar Electric Propulsion”
+# Conventional electric propulsion coasting cycle
+EP_COAST_CYCLE = 0.75  # (was set without reference before 2022, applying directly on burn duration fo low thrust manoeuvres)

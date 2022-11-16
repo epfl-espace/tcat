@@ -226,7 +226,7 @@ class KickStage(ActiveSpacecraft):
                                                             save="InterpolationGraph",
                                                             save_folder=scenario.dir_path_for_output_files)
 
-            if scenario.launcher_name in ["Soyuz_2.1a_Fregat", "Soyuz_2.1b_Fregat"] and scenario.kickstage_use_database and scenario.kickstage_name == "Fregat":
+            if scenario.launcher_name in ["Soyuz_2.1a_Fregat", "Soyuz_2.1b_Fregat"] and scenario.kickstage_use_database and scenario.kickstage_name in ["Fregat", "Fregat_M"]:
                 self.mass_available = launcher_performance
             elif super().get_initial_wet_mass() > launcher_performance:
                 raise ValueError(f"The kickstage is heavier than the launcher performance.")
@@ -265,7 +265,7 @@ class KickStage(ActiveSpacecraft):
             self.volume_available = cylinder_volume + cone_volume
     
     def compute_allowance(self,unassigned_satellites):
-        """ Reset, design and compute plan based on a list of assigned satellites
+        """ Returns maximum number of satellites that can be onboard the kick stage, either due to limitation of mass, of volume or the number of servicers still to carry
 
         :param unassigned_satellites: Spacecraft unassigned to an kickstage
         :type unassigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
@@ -277,6 +277,26 @@ class KickStage(ActiveSpacecraft):
 
         # Compute limit in volume terms
         limit_volume = math.floor(self.volume_available/self.constellation_reference_spacecraft.get_current_volume())
+
+        # Minimal value is of interest
+        self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])
+
+        # Return allowance
+        return self.satellites_allowance
+
+    def compute_allowance_ADR(self,unassigned_satellites, servicer_mass, servicer_volume):
+        """ Returns maximum number of ADR servicers that can be onboard the kick stage, either due to limitation of mass, of volume or the number of servicers still to carry
+
+        :param unassigned_satellites: Spacecraft unassigned to an kickstage
+        :type unassigned_satellites: list(:class:`~Spacecrafts.Spacecraft.Spacecraft`)
+        :return: satellites allowance
+        :rtype: int
+        """
+        # Compute limit in mass terms
+        limit_mass = math.floor(self.mass_available/servicer_mass)
+
+        # Compute limit in volume terms
+        limit_volume = math.floor(self.volume_available/servicer_volume)
 
         # Minimal value is of interest
         self.satellites_allowance =  min([limit_volume,limit_mass,len(unassigned_satellites)])

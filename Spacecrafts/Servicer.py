@@ -199,8 +199,16 @@ class Servicer(ActiveSpacecraft):
             satellite_disposal.assign_module(self.get_main_propulsion_module())
 
             ##########
-            # Step 3.3: Release satellite
+            # Step 3.3: Release satellite if necessary
             ##########
+            # Update current orbit
+            current_orbit = current_target.get_disposal_orbit()
+
+            # Check current orbit altitude
+            if (1-current_orbit.ecc)*current_orbit.a < ALTITUDE_ATMOSPHERE_LIMIT + Earth.R:
+                # Return 0 as the servicer burnt
+                return 0
+            
             # Release the satellite
             deploy = Release(f"Satellites ({current_target.get_id()}) released",
                              self.plan,
@@ -212,14 +220,6 @@ class Servicer(ActiveSpacecraft):
 
             # Set current_target to deployed
             current_target.state = "Released"
-
-            # Update current orbit
-            current_orbit = current_target.get_disposal_orbit()
-
-            # Check current orbit altitude
-            if (1-current_orbit.ecc)*current_orbit.a < ALTITUDE_ATMOSPHERE_LIMIT + Earth.R:
-                # Return 0 as the servicer burnt
-                return 0
 
         ##########
         # Step 4: De-orbit the servicer if necessary

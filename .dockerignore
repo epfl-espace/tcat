@@ -5,6 +5,14 @@ README.md
 Constellation_new_v1.json
 .gitignore
 .git/
-*.db
+.github/
+**/*.db
 .idea/
-*.env
+**/*.env
+.DS_Store
+.dockerignore
+Dockerfile
+docker-data-db/
+docker-data-out/
+Old/
+environment.yml
