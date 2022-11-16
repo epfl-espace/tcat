@@ -23,6 +23,23 @@ from sqlalchemy.orm import sessionmaker
 import inputparams
 from models import db, Configuration, ConfigurationRun
 from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import ScenarioADRSetupFromACT
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
 load_dotenv()  # sets values from .env file as environment vars, *.env files are ignored when creating the docker
 # image. so the values for the docker image come from the dockerfile and the provided arguments
@@ -624,3 +641,4 @@ app.jinja_env.globals.update(inputparams=inputparams)
 
 if __name__ == '__main__':
     app.run()
+    app.logger.info('Starting application')

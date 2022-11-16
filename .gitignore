@@ -16,7 +16,7 @@ Doc/_build
 *-lock.json
 static/css/main.css
 .env
-tcat-app/tcat-test.db
+tcat-app/tcat.db
 
 # ignore, can be generated with create_client_secrets_from_env.py ./tcat-app/client_secrets.json ./tcat-app/.env
 client_secrets.json
