@@ -1,4 +1,4 @@
-FROM python:3.9.12
+FROM python:3.9.15
 
 ENV BASE_FOLDER=/tcat-app-data
 ENV TCAT_DIR=/app
@@ -13,16 +13,18 @@ ENV LOG_FILENAME=log.txt
 ENV RESULT_FILENAME=result.txt
 ENV MAX_FILE_LOAD_DURATION_IN_SEC=30
 
-RUN apt update && apt-get install systemctl && apt install nginx -y
+RUN apt update && apt-get install systemctl -y && apt install nginx -y
 RUN rm /etc/nginx/sites-enabled/default && rm /etc/nginx/sites-available/default
 
 WORKDIR /app
 COPY ./requirements.txt ./requirements.txt
 RUN pip install -U uwsgi
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 WORKDIR /app/tcat-app
+
+COPY ./ScenarioDatabase ./ScenarioDatabase
 
 RUN chmod 777 ./startup.sh
 RUN mv ./tcat-app /etc/nginx/sites-available/
