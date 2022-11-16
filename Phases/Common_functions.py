@@ -126,7 +126,7 @@ def inclination_change_delta_v(initial_orbit, final_orbit):
     return delta_v.to(u.m / u.s)
 
 
-def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, isp,no_2n_burn=False):
+def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, isp, no_2n_burn=False):
     """Returns the delta v necessary to perform an orbit change, assuming impulsive maneuvers.
     This takes into account the transfer from one elliptical orbit to another.
     This takes into account possible inclination changes, performed during the adequate impulse.
@@ -138,6 +138,7 @@ def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, i
         initial_mass (u.kg) assumed servicer mass at start of maneuver
         mean_thrust (u.N): assumed thrust at start of maneuver
         isp (u.s): assumed isp, used to estimate manoeuvre duration
+        no_2n_burn (bool): used to decide if the second burn is computed or if the spacecraft has already burnt in the atmosphere
 
     Return:
         (u.m / u.s): total delta v to reach final orbit
