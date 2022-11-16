@@ -1,6 +1,6 @@
 {% macro checkbox(name, checked, highlight = False) -%}
     {% set class_name_addition = '' if highlight == False else 'input-accent' %}
-    <input type="checkbox {{ class_name_addition }}" name="{{ name }}" {{ checked }} class="checkbox"/>
+    <input type="checkbox" name="{{ name }}" {{ checked }} class="checkbox {{ class_name_addition }}"/>
 {%- endmacro %}
 
 {% macro select(name, selectedValue, values, highlight = False) -%}

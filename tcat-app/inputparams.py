@@ -4,7 +4,7 @@ constellation_mission_params = {
     ('mission_configuration', 'Mission Configuration'): [
         ['checkbox', '', 'verbose', 'Debug (display figures)', False, [True, False]],
         ['input', 'datetime-local', 'starting_epoch', 'Starting Epoch', '2025-01-01T12:00', ['2000-01-01T00:00', '2100-01-01T00:00']],
-        ['input', 'number', 'tradeoff_mission_price_vs_duration', 'Tradeoff Mission Price vs Duration', 0.01, [0.0, 1.0]],
+        ['input', 'number', 'tradeoff_mission_price_vs_duration', 'Tradeoff Mission Price vs Duration', 0.05, [0.0, 1.0]],
     ],
     ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
@@ -32,7 +32,7 @@ constellation_mission_params = {
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_remaining_fuel_margin', 'Remaining fuel margin (kg)', 0.0, [0.0, 9999999.0]],
-        ['input', 'number', 'kickstage_prop_thrust', 'Prop thrust (N)', 294000.0, [0.0, 9999999.0]],
+        ['input', 'number', 'kickstage_prop_thrust', 'Prop thrust (N)', 29400.0, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_prop_isp', 'Prop isp (s)', 330.0, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_propulsion_dry_mass', 'Propulsion dry mass (kg)', 5.0, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_dispenser_dry_mass', 'Dispenser dry mass (kg)', 93.3, [0.0, 9999999.0]],
@@ -72,7 +72,7 @@ adr_mission_params = {
         ['select', 'text', 'mission_architecture', 'Mission Architecture', 'single_picker', ['single_picker']],
         ['checkbox', '', 'verbose', 'Debug (display figures)', False, [True, False]],
         ['input', 'datetime-local', 'starting_epoch', 'Starting Epoch', '2025-01-01T12:00', ['2000-01-01T00:00', '2100-01-01T00:00']],
-        ['input', 'number', 'tradeoff_mission_price_vs_duration', 'Tradeoff Mission Price vs Duration', 0.01, [0.0, 1.0]],
+        ['input', 'number', 'tradeoff_mission_price_vs_duration', 'Tradeoff Mission Price vs Duration', 0.05, [0.0, 1.0]],
     ],
     ('constellation_configuration', 'Constellation Configuration'): [
         ['input', 'text', 'constellation_name', 'Name', 'My Constellation', '^[A-Za-z0-9 ]+$'],
@@ -102,7 +102,7 @@ adr_mission_params = {
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_remaining_fuel_margin', 'Remaining fuel margin (kg)', 0.0, [0.0, 9999999.0]],
-        ['input', 'number', 'kickstage_prop_thrust', 'Prop thrust (N)', 294000.0, [0.0, 9999999.0]],
+        ['input', 'number', 'kickstage_prop_thrust', 'Prop thrust (N)', 29400.0, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_prop_isp', 'Prop isp (s)', 330.0, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_propulsion_dry_mass', 'Propulsion dry mass (kg)', 5.0, [0.0, 9999999.0]],
         ['input', 'number', 'kickstage_dispenser_dry_mass', 'Dispenser dry mass (kg)', 93.3, [0.0, 9999999.0]],
