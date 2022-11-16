@@ -10,3 +10,9 @@ Constellation_new_v1.json
 .idea/
 **/*.env
 .DS_Store
+.dockerignore
+Dockerfile
+docker-data-db/
+docker-data-out/
+Old/
+environment.yml
