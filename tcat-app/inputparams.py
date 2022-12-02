@@ -58,12 +58,12 @@ constellation_mission_params = {
          [-90.0, 90.0]],
         #
         ['input', 'number', 'apogee_launcher_disposal',
-         'Launcher disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
-         [0.0, 400000.0]],
+         'Kickstage disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
+         [-1000.0, 400000.0]],
         ['input', 'number', 'perigee_launcher_disposal',
-         'Launcher disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
-         [0.0, 400000.0]],
-        ['input', 'number', 'inc_launcher_disposal', 'Launcher disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
+         'Kickstage disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
+         [-1000.0, 400000.0]],
+        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
     ]
 }
 
@@ -147,19 +147,19 @@ adr_mission_params = {
          [-90.0, 90.0]],
         #
         ['input', 'number', 'apogee_launcher_disposal',
-         'Launcher disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
-         [0.0, 400000.0]],
+         'Kickstage disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
+         [-1000.0, 400000.0]],
         ['input', 'number', 'perigee_launcher_disposal',
-         'Launcher disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
-         [0.0, 400000.0]],
-        ['input', 'number', 'inc_launcher_disposal', 'Launcher disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
+         'Kickstage disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
+         [-1000.0, 400000.0]],
+        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
         #
         ['input', 'number', 'apogee_servicer_disposal',
          'Servicer disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1800.0,
-         [0.0, 400000.0]],
+         [-1000.0, 400000.0]],
         ['input', 'number', 'perigee_servicer_disposal',
          'Servicer disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 1800.0,
-         [0.0, 400000.0]],
+         [-1000.0, 400000.0]],
         ['input', 'number', 'inc_servicer_disposal', 'Servicer disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
     ]
 }
