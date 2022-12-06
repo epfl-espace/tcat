@@ -3,4 +3,5 @@
 1,Fregat,1.5,2,5350,19850,332,75,630,827,bi-propellant," Soyuz User's Manual, issue 2 revision 0, March 2012"
 2,Fregat_M,1.5,2,6638,19850,332,75,630,827,bi-propellant,
 3,AVUM_plus,2,2,740,2450,314.6,196,500,502,mono-propellant,"Vega C user's manual, issue 0 revision 0, 2018"
-4,ASTRIS,1.579,4.57,960,4030,336,200,500,500,bi-propellant,"Per ASTRIS ad astra – how Ariane’s kick stage propels Europe into future in-orbit applications, IAC-22-D2.3.7"
+4,ASTRIS,1.579,4.57,1700,4030,336,30,500,500,bi-propellant,"Per ASTRIS ad astra – how Ariane’s kick stage propels Europe into future in-orbit applications, IAC-22-D2.3.7"
+5,ASTRIS_large, 1.579,4.57,2700,4030,336,30,500,500,bi-propellant, idem and DOI: 10.13009/EUCASS2022-7324 System design of EURASTROS reference configurations and mission

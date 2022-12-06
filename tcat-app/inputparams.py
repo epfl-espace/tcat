@@ -27,7 +27,7 @@ constellation_mission_params = {
     ],
     ('kickstage', 'Kickstage'): [
         ['checkbox', '', 'kickstage_use_database', 'Use database', True, [True, False]],
-        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'ASTRIS']],
+        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'ASTRIS', 'ASTRIS_large']],
         ['input', 'number', 'kickstage_height', 'Height (m)', 0.5, [0.0, 9999999]],
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
@@ -46,7 +46,7 @@ constellation_mission_params = {
         ['input', 'number', 'perigee_sats_insertion',
          'Satellite insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 450.0,
          [0.0, 400000.0]],
-        ['input', 'number', 'inc_sats_insertion', 'Satellite insertion orbit inclination (deg)', 87.4, [-90.0, 90.0]],
+        ['input', 'number', 'inc_sats_insertion', 'Satellite insertion orbit inclination (deg)', 87.4, [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_launcher_insertion',
          'Launcher insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
@@ -55,7 +55,7 @@ constellation_mission_params = {
          'Launcher insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 400.0,
          [0.0, 400000.0]],
         ['input', 'number', 'inc_launcher_insertion', 'Launcher insertion orbit inclination (deg)', 87.0,
-         [-90.0, 90.0]],
+         [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_launcher_disposal',
          'Kickstage disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
@@ -63,7 +63,7 @@ constellation_mission_params = {
         ['input', 'number', 'perigee_launcher_disposal',
          'Kickstage disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
+        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
     ]
 }
 
@@ -97,7 +97,7 @@ adr_mission_params = {
     ],
     ('kickstage', 'Kickstage'): [
         ['checkbox', '', 'kickstage_use_database', 'Use database', False, [True, False]],
-        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'ASTRIS']],
+        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'ASTRIS', 'ASTRIS_large']],
         ['input', 'number', 'kickstage_height', 'Height (m)', 0.5, [0.0, 9999999]],
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
@@ -127,7 +127,7 @@ adr_mission_params = {
          'Satellite operational orbit perigee, from Earths surface to highest point of the elliptical orbit (km)',
          1200.0, [0.0, 400000.0]],
         ['input', 'number', 'inc_sats_operational', 'Satellite operational orbit inclination (deg)', 87.4,
-         [-90.0, 90.0]],
+         [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_sats_disposal',
          'Satellite disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1500.0,
@@ -135,7 +135,7 @@ adr_mission_params = {
         ['input', 'number', 'perigee_sats_disposal',
          'Satellite disposal orbit perigee, from Earths surface to highest point of the elliptical orbit (km)', 1500.0,
          [0.0, 400000.0]],
-        ['input', 'number', 'inc_sats_disposal', 'Satellite disposal orbit inclination (deg)', 87.4, [-90.0, 90.0]],
+        ['input', 'number', 'inc_sats_disposal', 'Satellite disposal orbit inclination (deg)', 87.4, [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_launcher_insertion',
          'Launcher insertion orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
@@ -144,7 +144,7 @@ adr_mission_params = {
          'Launcher insertion orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 400.0,
          [0.0, 400000.0]],
         ['input', 'number', 'inc_launcher_insertion', 'Launcher insertion orbit inclination (deg)', 87.0,
-         [-90.0, 90.0]],
+         [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_launcher_disposal',
          'Kickstage disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
@@ -152,7 +152,7 @@ adr_mission_params = {
         ['input', 'number', 'perigee_launcher_disposal',
          'Kickstage disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
+        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_servicer_disposal',
          'Servicer disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1800.0,
@@ -160,6 +160,6 @@ adr_mission_params = {
         ['input', 'number', 'perigee_servicer_disposal',
          'Servicer disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 1800.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'inc_servicer_disposal', 'Servicer disposal orbit inclination (deg)', 87.0, [-90.0, 90.0]],
+        ['input', 'number', 'inc_servicer_disposal', 'Servicer disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
     ]
 }
