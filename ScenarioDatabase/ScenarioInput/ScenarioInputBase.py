@@ -49,9 +49,9 @@ class ScenarioInputBase:
     apogee_launcher_insertion: float = 400.0 # km (altitude)
     perigee_launcher_insertion: float = 400.0 # km (altitude)
     inc_launcher_insertion: float = 87.0 # deg
-    apogee_launcher_disposal: float = 400.0 # km (altitude)
-    perigee_launcher_disposal: float = 50.0 # km (altitude)
-    inc_launcher_disposal: float = 85.0 # deg
+    apogee_kickstage_disposal: float = 400.0 # km (altitude)
+    perigee_kickstage_disposal: float = 50.0 # km (altitude)
+    inc_kickstage_disposal: float = 85.0 # deg
 
     def to_json(self):
         return json.dumps(asdict(self))
