@@ -68,9 +68,9 @@ class Scenario:
                       ('apogee_launcher_insertion', u.km),
                       ('perigee_launcher_insertion', u.km),
                       ('inc_launcher_insertion', u.deg),
-                      ('apogee_launcher_disposal', u.km),
-                      ('perigee_launcher_disposal', u.km),
-                      ('inc_launcher_disposal', u.deg)]
+                      ('apogee_kickstage_disposal', u.km),
+                      ('perigee_kickstage_disposal', u.km),
+                      ('inc_kickstage_disposal', u.deg)]
 
     # Inits
     def __init__(self,scenario_id,json):    
@@ -91,7 +91,7 @@ class Scenario:
         self.sat_default_orbit = None
 
         self.launcher_insertion_orbit = None
-        self.launcher_disposal_orbit = None
+        self.kickstage_disposal_orbit = None
 
         self.reference_satellite = None
 
@@ -281,13 +281,13 @@ class Scenario:
                                                              0. * u.deg,
                                                              self.starting_epoch)
 
-        # launcher disposal orbit
-        a_launcher_disposal_orbit = (self.apogee_launcher_disposal + self.perigee_launcher_disposal)/2 + Earth.R
-        e_launcher_disposal_orbit = ((self.apogee_launcher_disposal + Earth.R)/a_launcher_disposal_orbit - 1)*u.one
-        self.launcher_disposal_orbit = Orbit.from_classical(Earth,
-                                                            a_launcher_disposal_orbit,
-                                                            e_launcher_disposal_orbit,
-                                                            self.inc_launcher_disposal,
+        # kickstage disposal orbit
+        a_kickstage_disposal_orbit = (self.apogee_kickstage_disposal + self.perigee_kickstage_disposal)/2 + Earth.R
+        e_kickstage_disposal_orbit = ((self.apogee_kickstage_disposal + Earth.R)/a_kickstage_disposal_orbit - 1)*u.one
+        self.kickstage_disposal_orbit = Orbit.from_classical(Earth,
+                                                            a_kickstage_disposal_orbit,
+                                                            e_kickstage_disposal_orbit,
+                                                            self.inc_kickstage_disposal,
                                                             0. * u.deg,
                                                             90. * u.deg,
                                                             0. * u.deg,

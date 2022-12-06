@@ -56,9 +56,9 @@
   "apogee_launcher_insertion": 400.0,
   "perigee_launcher_insertion": 400.0,
   "inc_launcher_insertion": 87.0,
-  "apogee_launcher_disposal": 400.0,
-  "perigee_launcher_disposal": 50.0,
-  "inc_launcher_disposal": 87.0,
+  "apogee_kickstage_disposal": 400.0,
+  "perigee_kickstage_disposal": 50.0,
+  "inc_kickstage_disposal": 87.0,
   "apogee_servicer_disposal": 1800,
   "perigee_servicer_disposal": 1800.0,
   "inc_servicer_disposal": 85.0

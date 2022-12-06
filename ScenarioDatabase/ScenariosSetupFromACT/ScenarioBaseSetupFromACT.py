@@ -156,9 +156,9 @@ class ScenarioBaseSetupFromACT():
         self.read_orbit_launcher_insertion_apogee(act_config_name)
         self.read_orbit_launcher_insertion_perigee(act_config_name)
         self.read_orbit_launcher_insertion_inclination(act_config_name)
-        self.read_orbit_launcher_disposal_apogee(act_config_name)
-        self.read_orbit_launcher_disposal_perigee(act_config_name)
-        self.read_orbit_launcher_disposal_inclination(act_config_name)
+        self.read_orbit_kickstage_disposal_apogee(act_config_name)
+        self.read_orbit_kickstage_disposal_perigee(act_config_name)
+        self.read_orbit_kickstage_disposal_inclination(act_config_name)
 
     def read_orbit_launcher_insertion_apogee(self, act_config_name):
         param_value = self.act_db_linker.get_bb_parameter_value( \
@@ -178,23 +178,23 @@ class ScenarioBaseSetupFromACT():
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.inc_launcher_insertion = float(param_value)
 
-    def read_orbit_launcher_disposal_apogee(self, act_config_name):
+    def read_orbit_kickstage_disposal_apogee(self, act_config_name):
         param_value = self.act_db_linker.get_bb_parameter_value( \
             act_config_name, BB_ID_KICKSTAGE, PARAM_ID_ORBIT_DISPOSAL_APOGEE)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.apogee_launcher_disposal = float(param_value)
+            self.tcat_input_linker.apogee_kickstage_disposal = float(param_value)
 
-    def read_orbit_launcher_disposal_perigee(self, act_config_name):
+    def read_orbit_kickstage_disposal_perigee(self, act_config_name):
         param_value = self.act_db_linker.get_bb_parameter_value( \
             act_config_name, BB_ID_KICKSTAGE, PARAM_ID_ORBIT_DISPOSAL_PERIGEE)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.perigee_launcher_disposal = float(param_value)
+            self.tcat_input_linker.perigee_kickstage_disposal = float(param_value)
 
-    def read_orbit_launcher_disposal_inclination(self, act_config_name):
+    def read_orbit_kickstage_disposal_inclination(self, act_config_name):
         param_value = self.act_db_linker.get_bb_parameter_value( \
             act_config_name, BB_ID_KICKSTAGE, PARAM_ID_ORBIT_DISPOSAL_INCLINATION)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.inc_launcher_disposal = float(param_value)
+            self.tcat_input_linker.inc_kickstage_disposal = float(param_value)
 
     ### Link engines and propellants ###
 

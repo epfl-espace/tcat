@@ -30,7 +30,7 @@ class KickStage(ActiveSpacecraft):
     """
     def __init__(self,kickstage_id,scenario,structure_mass=0. * u.kg,mass_contingency=0.2):
         # Init ActiveSpacecraft
-        super().__init__(kickstage_id,"kickstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.launcher_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
+        super().__init__(kickstage_id,"kickstage",structure_mass,mass_contingency,scenario,disposal_orbit = scenario.kickstage_disposal_orbit,insertion_orbit = scenario.launcher_insertion_orbit)
 
         # Launcher name
         self.launcher_name = scenario.launcher_name

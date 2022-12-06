@@ -57,13 +57,13 @@ constellation_mission_params = {
         ['input', 'number', 'inc_launcher_insertion', 'Launcher insertion orbit inclination (deg)', 87.0,
          [0.0, 180.0]],
         #
-        ['input', 'number', 'apogee_launcher_disposal',
+        ['input', 'number', 'apogee_kickstage_disposal',
          'Kickstage disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'perigee_launcher_disposal',
+        ['input', 'number', 'perigee_kickstage_disposal',
          'Kickstage disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
+        ['input', 'number', 'inc_kickstage_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
     ]
 }
 
@@ -146,13 +146,13 @@ adr_mission_params = {
         ['input', 'number', 'inc_launcher_insertion', 'Launcher insertion orbit inclination (deg)', 87.0,
          [0.0, 180.0]],
         #
-        ['input', 'number', 'apogee_launcher_disposal',
+        ['input', 'number', 'apogee_kickstage_disposal',
          'Kickstage disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 400.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'perigee_launcher_disposal',
+        ['input', 'number', 'perigee_kickstage_disposal',
          'Kickstage disposal orbit perigee, from Earths surface to lowest point of the elliptical orbit (km)', 50.0,
          [-1000.0, 400000.0]],
-        ['input', 'number', 'inc_launcher_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
+        ['input', 'number', 'inc_kickstage_disposal', 'Kickstage disposal orbit inclination (deg)', 87.0, [0.0, 180.0]],
         #
         ['input', 'number', 'apogee_servicer_disposal',
          'Servicer disposal orbit apogee, from Earths surface to highest point of the elliptical orbit (km)', 1800.0,
