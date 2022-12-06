@@ -12,7 +12,7 @@ constellation_mission_params = {
         ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', 1.3, [0.001, 99999.9]],
         ['input', 'number', 'n_planes', 'Number of orbital planes', 3, [1, 100]],
         ['input', 'number', 'n_sats_per_plane', 'Number of satellite per orbital plane', 2, [1, 1000]],
-        ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [180, 360]],
+        ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [0, 360]],
     ],
     ('launcher', 'Launcher'): [
         ['checkbox', '', 'launcher_use_database', 'Use database', True, [True, False]],
@@ -80,7 +80,7 @@ adr_mission_params = {
         ['input', 'number', 'sat_volume', 'Satellite Volume (m^3)', 1.3, [0.001, 99999.9]],
         ['input', 'number', 'n_planes', 'Number of orbital planes', 3, [1, 100]],
         ['input', 'number', 'n_sats_per_plane', 'Number of satellite per orbital plane', 2, [1, 1000]],
-        ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [180, 360]],
+        ['input', 'number', 'plane_distribution_angle', 'Distribution angle of orbital planes (deg)', 180, [0, 360]],
         ['input', 'number', 'sats_reliability', 'Satellite reliability', 0.5, [0.0, 1.0]],
         ['input', 'number', 'seed_random_sats_failure', 'Seed for random satellite failure', 1234, [1000, 99999999]],
     ],
