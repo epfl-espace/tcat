@@ -4,24 +4,34 @@ const launcherPerformanceElement = document.querySelector('[name="launcher_perfo
 const launcherFairingDiameterElement = document.querySelector('[name="launcher_fairing_diameter"]');
 const launcherFairingCylinderHeightElement = document.querySelector('[name="launcher_fairing_cylinder_height"]');
 const launcherFairingTotalHeightElement = document.querySelector('[name="launcher_fairing_total_height"]');
+const launcherInterpolationMethodElement = document.querySelector('[name="launcher_perf_interpolation_method"]');
 
 const launcherPerformanceLabel = document.querySelector('[for="launcher_performance"]');
 const launcherFairingDiameterLabel = document.querySelector('[for="launcher_fairing_diameter"]');
 const launcherFairingCylinderHeightLabel = document.querySelector('[for="launcher_fairing_cylinder_height"]');
 const launcherFairingTotalHeightLabel = document.querySelector('[for="launcher_fairing_total_height"]');
+const launcherInterpolationMethodLabel = document.querySelector('[for="launcher_perf_interpolation_method"]');
 
-const launcherFieldsThatChangeRequiredState = [
+const launcherCustomFieldsThatChangeRequiredState = [
     launcherPerformanceElement,
     launcherFairingDiameterElement,
     launcherFairingCylinderHeightElement,
     launcherFairingTotalHeightElement,
 ]
 
-const launcherFieldsLabels = [
+const launcherCustomFieldsLabels = [
     launcherPerformanceLabel,
     launcherFairingDiameterLabel,
     launcherFairingCylinderHeightLabel,
     launcherFairingTotalHeightLabel,
+]
+
+const launcherFieldsThatChangeRequiredState = [
+    launcherInterpolationMethodElement,
+]
+
+const launcherFieldsLabels = [
+    launcherInterpolationMethodLabel,
 ]
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -38,8 +48,22 @@ if(launcherUseDatabase) {
 
 function setRequiredLauncherFields() {
     const enabled = launcherUseDatabase && launcherUseDatabase.checked;
-    launcherFieldsThatChangeRequiredState.forEach((field) => {
+    launcherCustomFieldsThatChangeRequiredState.forEach((field) => {
         if(field) field.required = !enabled;
+    });
+    launcherCustomFieldsLabels.forEach((label) => {
+        if (label) {
+            if(enabled) {
+                label.classList.remove('font-semibold');
+                label.classList.add('italic', 'font-light');
+            } else {
+                label.classList.remove('italic', 'font-light');
+                label.classList.add('font-semibold');
+            }
+        }
+    });
+    launcherFieldsThatChangeRequiredState.forEach((field) => {
+        if(field) field.required = enabled;
     });
     launcherFieldsLabels.forEach((label) => {
         if (label) {
