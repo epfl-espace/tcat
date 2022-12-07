@@ -1,0 +1,8 @@
+"# thrust curve of Themis T3 S1 engine (1st stage), mixing ratio ? Isp 320 s",,
+timestamp [s],thrust [kN],Comment
+0,1200,ignition
+160,1200,first cutoff
+161,0,
+319,0,
+320,1200,landing burn
+325,1200,

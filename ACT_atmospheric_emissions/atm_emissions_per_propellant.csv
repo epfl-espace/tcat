@@ -1,0 +1,7 @@
+"# emissions per type of propulsion [kg per kg of propellant combusted]. Ref: Paul Erik Schabedoth, ""LCA of rocket launches and effect of prop choice on env. perf"", 2020, page 7, table 3",,,,,,,,,,,,
+Prop_type,CO,CO2,H2O,H,O,OH,N2,NO,Al,HCl,Cl,soot (BC)
+LOx/RP1,0.456,0.222,0.25,0.012,0.011,0.029,0,0,0,0,0,0.02
+LOx/LH2,0,0,0.907,0.064,0.002,0.027,0,0,0,0,0,0
+LOx/LCH4,0.344,0.187,0.422,0.018,0.005,0.024,0,0,0,0,0,0
+NTO/UDMH,0.227,0.114,0.258,0.013,0.006,0.02,0.353,0.005,0,0,0,0.004
+APCP,0.28,0.017,0.067,0.026,0.001,0.009,0.081,0.001,0.342,0.148,0.025,0.004

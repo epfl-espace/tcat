@@ -67,3 +67,28 @@ SERVICER_PROP_MODULE_MASS_CONTINGENCY = 0.0
 EP_DUTY_CYCLE = 0.9 # David Y. Oh et alli, “Analysis of System Margins on Missions Utilizing Solar Electric Propulsion”
 # Conventional electric propulsion coasting cycle
 EP_COAST_CYCLE = 0.75  # (was set without reference before 2022, applying directly on burn duration fo low thrust manoeuvres)
+
+# For ACT - Space Debris Index (SDI) script
+SUCCESS = True
+FAIL = False
+
+ALTITUDE_LEO_LIMIT = 2000 * u.km
+ALTITUDE_INCREMENT = 50 * u.km
+INCLINATION_INCREMENT = 2 * u.deg
+TIME_INTERVAL_LIMIT = 200 * u.year
+RESIDUAL_TIME_IADC_GUIDELINE = 25 * u.year
+RESIDUAL_TIME_FCC_GUIDELINE = 5 * u.year
+
+# For ACT - atmospheric emissions
+# atmospheric layers are defined below (https://www.noaa.gov/jetstream/atmosphere/layers-of-atmosphere):
+ATM_EARTH_SURFACE = 0 * u.km
+ATM_LIM_LOW_TROPOSPHERE = 10 * u.km
+ATM_LIM_OZONE_LOW = 20 * u.km
+ATM_LIM_OZONE_HIGH = 30 * u.km
+ATM_LIM_STRATOSPHERE = 50 * u.km
+ATM_LIM_MESOSPHERE = 85 * u.km
+ALTITUDE_ATMOSPHERE_LIMIT = 200 * u.km
+
+PATH_CSV_THRUST_CURVES = "atm_thrust_curves/"
+PATH_CSV_TRAJECTORIES = "atm_trajectories/"
+PATH_ATM_RESULTS = "atm_results/"
