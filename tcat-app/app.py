@@ -294,6 +294,7 @@ def configure(current_scenario, template, params):
     last_configuration = None
     last_run_for_configuration = None
     validation = [None, None]
+    is_reset = False
 
     if request.method == 'POST':
         uploaded_configuration = dict(request.form)
@@ -308,15 +309,19 @@ def configure(current_scenario, template, params):
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
-                                                           Configuration.scenario == current_scenario)).order_by(
-            desc(Configuration.created_date)).first()
-        if last_config_item is not None:
-            last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
-            last_configuration = json.loads(last_config_item.configuration)
+        reset_values = request.args.get('reset')
+        if reset_values != 'true':
+            last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
+                                                               Configuration.scenario == current_scenario)).order_by(
+                desc(Configuration.created_date)).first()
+            if last_config_item is not None:
+                last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
+                last_configuration = json.loads(last_config_item.configuration)
+        else:
+            is_reset = True
 
     return render_template(template, last_configuration=last_configuration,
-                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
+                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1], is_reset=is_reset)
 
 
 @app.route('/configure-adr', methods=['GET', 'POST'])
