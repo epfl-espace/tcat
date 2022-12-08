@@ -634,7 +634,7 @@ def download_run_data(scenario_id, config_run_id):
             file_data.close()
 
     file_obj.seek(0)
-    return send_file(file_obj, attachment_filename=f'{scenario_id}.zip', as_attachment=True)
+    return send_file(file_obj, download_name=f'{scenario_id}.zip', as_attachment=True)
 
 
 app.jinja_env.globals.update(inputparams=inputparams)
