@@ -141,11 +141,26 @@ def valid_configuration(configuration, params):
     flat_validation_params = [item for sublist in params.values() for item in sublist]
     validation_errors = {}
     valid = True
+    kickstage_use_database = False
+    launcher_use_database = False
+
     for param in flat_validation_params:
         type = param[1]
         key = param[2]
         expected = param[5]
         required = param[4]
+
+        if key == 'kickstage_use_database':
+            kickstage_use_database = key in configuration and configuration['kickstage_use_database'] == 'on'
+        elif key == 'launcher_use_database':
+            launcher_use_database = key in configuration and configuration['launcher_use_database'] == 'on'
+
+        if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter', 'launcher_fairing_cylinder_height', 'launcher_fairing_total_height', 'launcher_perf_interpolation_method']:
+            continue
+
+        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass', 'kickstage_remaining_fuel_margin', 'kickstage_prop_thrust', 'kickstage_prop_isp', 'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass', 'kickstage_struct_mass', 'kickstage_propulsion_type']:
+            continue
+
         if not (key in configuration):
             if isinstance(expected[0], bool):
                 configuration[key] = False  # default value for booleans is false
