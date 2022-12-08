@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 if(launcherUseDatabase) {
     launcherUseDatabase.addEventListener('change', (e) => {
-        console.log('changed use database')
         setRequiredLauncherFields();
     });
 }
@@ -54,11 +53,9 @@ function setRequiredLauncherFields() {
     launcherCustomFieldsLabels.forEach((label) => {
         if (label) {
             if(enabled) {
-                label.classList.remove('font-semibold');
-                label.classList.add('italic', 'font-light');
+                label.parentElement.classList.add('hidden');
             } else {
-                label.classList.remove('italic', 'font-light');
-                label.classList.add('font-semibold');
+                label.parentElement.classList.remove('hidden');
             }
         }
     });
@@ -67,12 +64,10 @@ function setRequiredLauncherFields() {
     });
     launcherFieldsLabels.forEach((label) => {
         if (label) {
-            if(enabled) {
-                label.classList.remove('font-semibold');
-                label.classList.add('italic', 'font-light');
+            if(!enabled) {
+                label.parentElement.classList.add('hidden');
             } else {
-                label.classList.remove('italic', 'font-light');
-                label.classList.add('font-semibold');
+                label.parentElement.classList.remove('hidden');
             }
         }
     });

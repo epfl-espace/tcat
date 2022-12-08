@@ -16,7 +16,7 @@
                                     {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
                                     {% set error = None if (validation_errors == None or input[2] not in validation_errors) else validation_errors[input[2]] %}
                                     <label for="{{ input[2] }}"
-                                           class="flex-grow {{ fs }}">{{ input[3] }}</label>
+                                           class="flex-grow">{{ input[3] }}</label>
                                     {% if input[0] == 'input' %}
                                         {{ forms.input(input[2], input[1], value, required, input[5], error, input[2] in highlight_params) }}
                                     {% elif input[0] == 'select' %}

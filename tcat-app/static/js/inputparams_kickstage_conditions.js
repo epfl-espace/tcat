@@ -3,6 +3,7 @@ const kickstageUseDatabaseElement = document.querySelector('[name="kickstage_use
 const kickstageHeightElement = document.querySelector('[name="kickstage_height"]');
 const kickstageDiameterElement = document.querySelector('[name="kickstage_diameter"]');
 const kickstageInitialFuelMassElement = document.querySelector('[name="kickstage_initial_fuel_mass"]');
+const kickstageRemainingFuelMarginElement = document.querySelector('[name="kickstage_remaining_fuel_margin"]');
 const kickstagePropThrustElement = document.querySelector('[name="kickstage_prop_thrust"]');
 const kickstagePropIspElement = document.querySelector('[name="kickstage_prop_isp"]');
 const kickstagePropulsionDryMassElement = document.querySelector('[name="kickstage_propulsion_dry_mass"]');
@@ -13,6 +14,7 @@ const kickstagePropulsionTypeElement = document.querySelector('[name="kickstage_
 const kickstageHeightLabel = document.querySelector('[for="kickstage_height"]');
 const kickstageDiameterLabel = document.querySelector('[for="kickstage_diameter"]');
 const kickstageInitialFuelMassLabel = document.querySelector('[for="kickstage_initial_fuel_mass"]');
+const kickstageRemainingFuelMarginLabel = document.querySelector('[for="kickstage_remaining_fuel_margin"]');
 const kickstagePropThrustLabel = document.querySelector('[for="kickstage_prop_thrust"]');
 const kickstagePropIspLabel = document.querySelector('[for="kickstage_prop_isp"]');
 const kickstagePropulsionDryMassLabel = document.querySelector('[for="kickstage_propulsion_dry_mass"]');
@@ -25,6 +27,7 @@ const kickstageFieldsThatChangeRequiredState = [
     kickstageHeightElement,
     kickstageDiameterElement,
     kickstageInitialFuelMassElement,
+    kickstageRemainingFuelMarginElement,
     kickstagePropThrustElement,
     kickstagePropIspElement,
     kickstagePropulsionDryMassElement,
@@ -37,6 +40,7 @@ const kickstageFieldsLabels = [
     kickstageHeightLabel,
     kickstageDiameterLabel,
     kickstageInitialFuelMassLabel,
+    kickstageRemainingFuelMarginLabel,
     kickstagePropThrustLabel,
     kickstagePropIspLabel,
     kickstagePropulsionDryMassLabel,
@@ -51,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 if(kickstageUseDatabaseElement) {
     kickstageUseDatabaseElement.addEventListener('change', (e) => {
-        console.log('changed use database')
         setRequiredKickstageFields();
     });
 }
@@ -66,11 +69,9 @@ function setRequiredKickstageFields() {
     kickstageFieldsLabels.forEach((label) => {
         if (label) {
             if(enabled) {
-                label.classList.remove('font-semibold');
-                label.classList.add('italic', 'font-light');
+                label.parentElement.classList.add('hidden');
             } else {
-                label.classList.remove('italic', 'font-light');
-                label.classList.add('font-semibold');
+                label.parentElement.classList.remove('hidden');
             }
         }
     });
