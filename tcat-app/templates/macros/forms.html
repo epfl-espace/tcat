@@ -7,7 +7,7 @@
     {% set class_name_addition = '' if highlight == False else 'bg-accent' %}
     <select class="select select-sm select-bordered max-w-xs {{ class_name_addition }}" name="{{ name }}" data-selected="{{ selectedValue }}">
         {% for val in values %}
-            <option value="{{ val }}">{{ val }}</option>
+            <option value="{{ val }}" {{ 'selected="selected"' if val == selectedValue else '' }}>{{ val }}</option>
         {% endfor %}
     </select>
 {%- endmacro %}
