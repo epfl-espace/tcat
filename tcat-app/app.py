@@ -158,7 +158,7 @@ def valid_configuration(configuration, params):
         if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter', 'launcher_fairing_cylinder_height', 'launcher_fairing_total_height', 'launcher_perf_interpolation_method']:
             continue
 
-        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass', 'kickstage_remaining_fuel_margin', 'kickstage_prop_thrust', 'kickstage_prop_isp', 'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass', 'kickstage_struct_mass', 'kickstage_propulsion_type']:
+        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass', 'kickstage_prop_thrust', 'kickstage_prop_isp', 'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass', 'kickstage_struct_mass', 'kickstage_propulsion_type']:
             continue
 
         if not (key in configuration):
