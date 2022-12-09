@@ -1,0 +1,23 @@
+# input ascent trajectory for a launch vehicle ref: https://spaceflight101.com/ariane-5-va226/ariane-5-va226-launch-profile/ and VA266 launch kit,,
+timestamp [s],altitude [km],Comment
+0,0,
+7,0,LIFTOFF
+12,0.09,
+17,0.32,
+22,0.87,
+32,2.41,
+49,6.69,
+68,13.5,MAXQ
+142,66.7,SRB BURNOUT AND JETTISON
+201,109.4,FAIRING JETTISON
+335,158.8,
+485,159.4,
+531,157.7,CORE STAGE CUTOFF
+537,157.7,STAGE SEPARATION
+541,157.7,2ND STAGE IGNITION
+725,149.4,
+816,144.3,
+875,142.9,
+1055,163.1,
+1100,177.5,
+1235,255.2,

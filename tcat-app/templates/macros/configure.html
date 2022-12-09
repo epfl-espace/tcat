@@ -16,7 +16,7 @@
                                     {% set value = last_value if last_value != None else (input[4] if input[4] != None else '') %}
                                     {% set error = None if (validation_errors == None or input[2] not in validation_errors) else validation_errors[input[2]] %}
                                     <label for="{{ input[2] }}"
-                                           class="flex-grow {{ fs }}">{{ input[3] }}</label>
+                                           class="flex-grow">{{ input[3] }}</label>
                                     {% if input[0] == 'input' %}
                                         {{ forms.input(input[2], input[1], value, required, input[5], error, input[2] in highlight_params) }}
                                     {% elif input[0] == 'select' %}
@@ -47,6 +47,7 @@
                         <label for="act-file" class="text-center font-semibold cursor-pointer">Import ACT Config</label>
                     </form>
                 {% endif %}
+                <button id="reset-config" class="btn btn-active btn-danger">Reset</button>
                 <button id="upload-data" class="btn btn-active btn-primary">Upload</button>
             </div>
         </div>
@@ -76,7 +77,7 @@
     </div>
 {%- endmacro %}
 
-{% macro configure_script(scenario, last_run_for_configuration) -%}
+{% macro configure_script(scenario, last_run_for_configuration, action_url, is_reset) -%}
     <script>
         const submitConfigNameSelection = document.querySelector('#submit-config-name-selection');
         const configNamesModal = document.querySelector('#config-names-modal');
@@ -93,10 +94,16 @@
         const loadingSpinner = document.querySelector('#loading-spinner');
         const runConfig = document.querySelector('#run-config');
         const inputs = document.querySelectorAll('input, select');
+        const resetConfig = document.querySelector('#reset-config');
         const alreadyRunConfig = {{ 'true' if last_run_for_configuration != None else 'false' }};
 
         let changed = false;
-        uploadData.disabled = true;
+        uploadData.disabled = {{ 'true' if is_reset == False else 'false' }};
+
+        const url = window.location.href;
+        if(url.includes('?')){
+            window.history.replaceState({}, document.title, '{{ action_url }}');
+        }
 
         configNamesModal.checked = false;
 
@@ -125,6 +132,10 @@
                 }));
             }
         }
+
+        resetConfig.addEventListener('click', () => {
+            window.location.replace('{{ action_url }}?reset=true');
+        });
 
         submitConfigNameSelection.addEventListener('click', (e) => {
             actConfigNameInput.value = configNameSelection.value;

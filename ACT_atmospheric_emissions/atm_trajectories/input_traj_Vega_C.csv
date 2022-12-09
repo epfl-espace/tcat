@@ -1,0 +1,7 @@
+# input ascent trajectory for a launch vehicle ref (Vega C): VV21 mission launch (media) kit,,
+timestamp [s],altitude [km],Comment
+0,0,LIFTOFF
+146,77,P120 SEPARATION
+315,176,Z40 SEPARATION
+326,183,FAIRING JETTISON
+442,309,Z9 SEPARATION

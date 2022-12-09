@@ -1,0 +1,4 @@
+"# thrust curve of Z40 engine. Estimated from Ref: wiki, Isp = 295 s",
+timestamp [s],thrust [kN]
+0,314
+117,314

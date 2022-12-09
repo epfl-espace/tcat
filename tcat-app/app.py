@@ -141,11 +141,26 @@ def valid_configuration(configuration, params):
     flat_validation_params = [item for sublist in params.values() for item in sublist]
     validation_errors = {}
     valid = True
+    kickstage_use_database = False
+    launcher_use_database = False
+
     for param in flat_validation_params:
         type = param[1]
         key = param[2]
         expected = param[5]
         required = param[4]
+
+        if key == 'kickstage_use_database':
+            kickstage_use_database = key in configuration and configuration['kickstage_use_database'] == 'on'
+        elif key == 'launcher_use_database':
+            launcher_use_database = key in configuration and configuration['launcher_use_database'] == 'on'
+
+        if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter', 'launcher_fairing_cylinder_height', 'launcher_fairing_total_height', 'launcher_perf_interpolation_method']:
+            continue
+
+        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass', 'kickstage_prop_thrust', 'kickstage_prop_isp', 'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass', 'kickstage_struct_mass', 'kickstage_propulsion_type']:
+            continue
+
         if not (key in configuration):
             if isinstance(expected[0], bool):
                 configuration[key] = False  # default value for booleans is false
@@ -294,6 +309,7 @@ def configure(current_scenario, template, params):
     last_configuration = None
     last_run_for_configuration = None
     validation = [None, None]
+    is_reset = False
 
     if request.method == 'POST':
         uploaded_configuration = dict(request.form)
@@ -308,15 +324,19 @@ def configure(current_scenario, template, params):
             last_configuration = store_configuration(uploaded_configuration, current_user_email)
             flash('Saved configuration', 'success')
     else:
-        last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
-                                                           Configuration.scenario == current_scenario)).order_by(
-            desc(Configuration.created_date)).first()
-        if last_config_item is not None:
-            last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
-            last_configuration = json.loads(last_config_item.configuration)
+        reset_values = request.args.get('reset')
+        if reset_values != 'true':
+            last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
+                                                               Configuration.scenario == current_scenario)).order_by(
+                desc(Configuration.created_date)).first()
+            if last_config_item is not None:
+                last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
+                last_configuration = json.loads(last_config_item.configuration)
+        else:
+            is_reset = True
 
     return render_template(template, last_configuration=last_configuration,
-                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1])
+                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1], is_reset=is_reset)
 
 
 @app.route('/configure-adr', methods=['GET', 'POST'])
@@ -634,7 +654,7 @@ def download_run_data(scenario_id, config_run_id):
             file_data.close()
 
     file_obj.seek(0)
-    return send_file(file_obj, attachment_filename=f'{scenario_id}.zip', as_attachment=True)
+    return send_file(file_obj, download_name=f'{scenario_id}.zip', as_attachment=True)
 
 
 app.jinja_env.globals.update(inputparams=inputparams)

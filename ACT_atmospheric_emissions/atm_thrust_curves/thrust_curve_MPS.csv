@@ -1,0 +1,4 @@
+# thrust curve of  engine (SRB). Estimated from Ref: Ariane 5 user manual,,
+timestamp [s],thrust [kN],Comment
+0,7000,
+135,7000,

@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 if(kickstageUseDatabaseElement) {
     kickstageUseDatabaseElement.addEventListener('change', (e) => {
-        console.log('changed use database')
         setRequiredKickstageFields();
     });
 }
@@ -66,11 +65,9 @@ function setRequiredKickstageFields() {
     kickstageFieldsLabels.forEach((label) => {
         if (label) {
             if(enabled) {
-                label.classList.remove('font-semibold');
-                label.classList.add('italic', 'font-light');
+                label.parentElement.classList.add('hidden');
             } else {
-                label.classList.remove('italic', 'font-light');
-                label.classList.add('font-semibold');
+                label.parentElement.classList.remove('hidden');
             }
         }
     });
