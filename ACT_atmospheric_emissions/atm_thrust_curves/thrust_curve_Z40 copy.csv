@@ -1,0 +1,4 @@
+"# thrust curve of Z40 engine. Estimated from Ref: avio.com, Isp = 295 s",
+timestamp [s],thrust [kN]
+0, 1304
+117,1304

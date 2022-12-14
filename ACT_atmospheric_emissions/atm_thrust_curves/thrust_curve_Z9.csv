@@ -1,0 +1,4 @@
+"# thrust curve of Z9 engine. Estimated from Ref: wiki, Vega C user manual, Isp = 296 s",
+timestamp [s],thrust [kN]
+0, 317
+160, 317

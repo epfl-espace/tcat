@@ -1,0 +1,12 @@
+# input ascent trajectory for a launch vehicle (Themis S 1) ref: FLPP source material (Shared use-case data - v1),,
+timestamp [s],altitude [km],Comment
+0,0,ignition
+50,4,
+75,10,
+100,20,
+125,30,
+150,37,
+160,40,S1 cutoff --> ballistic
+200,51,S2 ignition (estimated)
+400,150, 
+600,255,
