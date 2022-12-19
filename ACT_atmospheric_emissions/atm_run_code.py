@@ -14,6 +14,7 @@ from matplotlib import pyplot
 
 # global parameters
 # atmospheric layers are defined below (https://www.noaa.gov/jetstream/atmosphere/layers-of-atmosphere):
+# NOTE NB: the altitude of the layers depends on the latitude. The latitude of the launch site will thus have an impact on the decomposition of the atmosphere, but for now we assume Kourou for each.
 ATM_EARTH_SURFACE = 0 * u.km
 ATM_LIM_LOW_TROPOSPHERE = 10 * u.km
 ATM_LIM_OZONE_LOW = 20 * u.km
@@ -22,9 +23,11 @@ ATM_LIM_STRATOSPHERE = 50 * u.km
 ATM_LIM_MESOSPHERE = 85 * u.km
 ALTITUDE_ATMOSPHERE_LIMIT = 200 * u.km
 
-PATH_CSV_THRUST_CURVES = "atm_thrust_curves/"
-PATH_CSV_TRAJECTORIES = "atm_trajectories/"
-PATH_ATM_RESULTS = "atm_results/"
+ATM_INCREMENT = 5 * u.km
+
+PATH_CSV_THRUST_CURVES = "ACT_atmospheric_emissions/atm_thrust_curves/"
+PATH_CSV_TRAJECTORIES = "ACT_atmospheric_emissions/atm_trajectories/"
+PATH_ATM_RESULTS = "ACT_atmospheric_emissions/atm_results/"
 
 INTERPOLATION_PLOT_STEP = 0.1
 
@@ -45,7 +48,7 @@ engine = ["T3_S1", "T3_S2"]
 # prop_type = ['APCP', 'APCP', 'APCP']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
 # Isp = [278.5 * u.s, 295 * u.s, 296 * u.s]
 # For Ariane 5
-# number_of_engine_s = [1, 1, 1] # this scales the emissions too.
+# number_of_engine_s = [1, 2, 1] # this scales the emissions too.
 # prop_type = ['LOx/LH2', 'APCP', 'LOx/LH2']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
 # Isp = [431 * u.s, 270 * u.s, 446 * u.s] 
 # For Themis T3
@@ -77,6 +80,12 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
     global_thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
     global_outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
     global_atmosphere = [global_low_troposphere, global_high_troposphere, global_ozone_layer, global_stratosphere, global_mesosphere, global_thermosphere, global_outer_space]
+
+    ### To use for finer atmospheric decomposition (also below for "atmosphere")
+    # global_atmosphere = list()
+    # for i in range(int(ALTITUDE_ATMOSPHERE_LIMIT.value/ATM_INCREMENT.value)):
+    #     global_atmosphere.append(layer(f"Layer {i}", i*ATM_INCREMENT, (i+1)*ATM_INCREMENT))
+    # global_atmosphere.append(layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km))
 
     max_kg_emission = 0
 
@@ -125,9 +134,9 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
             raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration (thrust curve not long enough).")
 
         # table of emissions per type of propellant [kg per kg of prop combusted]
-        emissions_table = np.genfromtxt(f'atm_emissions_per_propellant.csv', delimiter=",", skip_header=2)[:,1:]
+        emissions_table = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2)[:,1:]
         
-        propulsion_type_entries = np.genfromtxt(f'atm_emissions_per_propellant.csv', delimiter=",", skip_header=2, usecols=0, dtype=str)
+        propulsion_type_entries = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2, usecols=0, dtype=str)
 
         # creating list of layer classes for the atmosphere
         low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
@@ -137,8 +146,13 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
         mesosphere = layer("Mesosphere", ATM_LIM_STRATOSPHERE, ATM_LIM_MESOSPHERE)
         thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
         outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
-
         atmosphere = [low_troposphere, high_troposphere, ozone_layer, stratosphere, mesosphere, thermosphere, outer_space]
+
+        ### To use for finer atmospheric decomposition (also above for "global_atmosphere")
+        # atmosphere = list()
+        # for i in range(int(ALTITUDE_ATMOSPHERE_LIMIT.value/ATM_INCREMENT.value)):
+        #     atmosphere.append(layer(f"{i}", i*ATM_INCREMENT, (i+1)*ATM_INCREMENT))
+        # atmosphere.append(layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km))
 
         # from trajectory to time spent in layers (with limits)
         current_layer_index = 0
@@ -218,13 +232,13 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
 
     # Global plot of all contributions
     y_pos = list(np.arange(len(header)-1))
-    fig, ax = pyplot.subplots(ncols=1, nrows=len(global_atmosphere)-1, figsize=(5, 12))
+    fig, ax = pyplot.subplots(ncols=1, nrows=len(global_atmosphere)-1, figsize=(5, 1.75*len(atmosphere)))
     for i in range(len(global_atmosphere)-1):
         ax[i].barh(y_pos, global_atmosphere[-2-i].stored_emissions)
         pyplot.setp(ax, yticks = y_pos, yticklabels = header[1:], xticks = [0, max_kg_emission])
         ax[i].set_title(f"{global_atmosphere[-2-i].name}" + " < " + f"{global_atmosphere[-2-i].upper_bound}.")
     ax[-1].set_xlabel("Emissions [kg]")
-    fig.suptitle("Emissions in atmosphere by " f"{launcher[run]} launcher, for " f"{number_of_launch_es} launch(es).")
+    # fig.suptitle("Emissions in atmosphere by " f"{launcher[run]} launcher, for " f"{number_of_launch_es} launch(es).")
     fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher[run] + '.png', bbox_inches='tight', dpi=100) 
       
 def find_propellant_mass_flow(thrust_curve, Isp):
