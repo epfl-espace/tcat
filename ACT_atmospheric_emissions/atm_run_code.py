@@ -71,14 +71,16 @@ cutoff_timestamp = [325 *u.s, 372.8 *u.s]
 
 def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting):
     
-    # creating list of layer classes for the atmosphere
-    global_low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
-    global_high_troposphere = layer("High_troposphere", ATM_LIM_LOW_TROPOSPHERE, ATM_LIM_OZONE_LOW)
-    global_ozone_layer = layer("Ozone_layer", ATM_LIM_OZONE_LOW, ATM_LIM_OZONE_HIGH)
-    global_stratosphere = layer("Stratosphere", ATM_LIM_OZONE_HIGH, ATM_LIM_STRATOSPHERE)
-    global_mesosphere = layer("Mesosphere", ATM_LIM_STRATOSPHERE, ATM_LIM_MESOSPHERE)
-    global_thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
-    global_outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
+    # creating two lists of layer classes for the atmosphere (the global one is used to store the emissions of every engines)
+    low_troposphere = global_low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
+    high_troposphere = global_high_troposphere = layer("High_troposphere", ATM_LIM_LOW_TROPOSPHERE, ATM_LIM_OZONE_LOW)
+    ozone_layer = global_ozone_layer = layer("Ozone_layer", ATM_LIM_OZONE_LOW, ATM_LIM_OZONE_HIGH)
+    stratosphere = global_stratosphere = layer("Stratosphere", ATM_LIM_OZONE_HIGH, ATM_LIM_STRATOSPHERE)
+    mesosphere = global_mesosphere = layer("Mesosphere", ATM_LIM_STRATOSPHERE, ATM_LIM_MESOSPHERE)
+    thermosphere = global_thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
+    outer_space = global_outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
+
+    atmosphere = [low_troposphere, high_troposphere, ozone_layer, stratosphere, mesosphere, thermosphere, outer_space]
     global_atmosphere = [global_low_troposphere, global_high_troposphere, global_ozone_layer, global_stratosphere, global_mesosphere, global_thermosphere, global_outer_space]
 
     ### To use for finer atmospheric decomposition (also below for "atmosphere")
@@ -137,16 +139,6 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
         emissions_table = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2)[:,1:]
         
         propulsion_type_entries = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2, usecols=0, dtype=str)
-
-        # creating list of layer classes for the atmosphere
-        low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
-        high_troposphere = layer("High_troposphere", ATM_LIM_LOW_TROPOSPHERE, ATM_LIM_OZONE_LOW)
-        ozone_layer = layer("Ozone_layer", ATM_LIM_OZONE_LOW, ATM_LIM_OZONE_HIGH)
-        stratosphere = layer("Stratosphere", ATM_LIM_OZONE_HIGH, ATM_LIM_STRATOSPHERE)
-        mesosphere = layer("Mesosphere", ATM_LIM_STRATOSPHERE, ATM_LIM_MESOSPHERE)
-        thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
-        outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
-        atmosphere = [low_troposphere, high_troposphere, ozone_layer, stratosphere, mesosphere, thermosphere, outer_space]
 
         ### To use for finer atmospheric decomposition (also above for "global_atmosphere")
         # atmosphere = list()
