@@ -130,7 +130,7 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
             ax.set_xlabel("t [s]")
             ax.set_title("Propellant mass flow from thrust curve")
             ax.legend()
-            fig.savefig(PATH_ATM_RESULTS + 'atm_' + engine + '_mass_flow.png', bbox_inches='tight', dpi=100)
+            fig.savefig(PATH_ATM_RESULTS + 'atm_' + engine[run] + '_mass_flow.png', bbox_inches='tight', dpi=100)
 
         if x_mass_flow[-1] - x_mass_flow[0] != (cutoff_timestamp[run] - ignition_timestamp[run]).value:
             raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration (thrust curve not long enough).")
