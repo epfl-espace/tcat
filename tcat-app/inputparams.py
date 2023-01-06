@@ -27,7 +27,7 @@ constellation_mission_params = {
     ],
     ('kickstage', 'Kickstage'): [
         ['checkbox', '', 'kickstage_use_database', 'Use database', True, [True, False]],
-        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'ASTRIS', 'ASTRIS_large']],
+        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'KS_DEMO', 'KS_DEMO_large']],
         ['input', 'number', 'kickstage_height', 'Height (m)', 0.5, [0.0, 9999999]],
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
@@ -97,7 +97,7 @@ adr_mission_params = {
     ],
     ('kickstage', 'Kickstage'): [
         ['checkbox', '', 'kickstage_use_database', 'Use database', False, [True, False]],
-        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'ASTRIS', 'ASTRIS_large']],
+        ['select', 'text', 'kickstage_name', 'Name', 'Fregat', ['Fregat', 'Fregat_M', 'AVUM_plus', 'KS_DEMO', 'KS_DEMO_large']],
         ['input', 'number', 'kickstage_height', 'Height (m)', 0.5, [0.0, 9999999]],
         ['input', 'number', 'kickstage_diameter', 'Diameter (m)', 2.0, [0.0, 9999999]],
         ['input', 'number', 'kickstage_initial_fuel_mass', 'Initial fuel mass (kg)', 89.9, [0.0, 9999999.0]],
