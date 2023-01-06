@@ -140,7 +140,9 @@ def natural_decay(reduced_lifetime_file, CF_file, initial_orbit, cross_section, 
             total_disposal_time += cell_time
             cumulated_time += cell_time
 
-            a = (perigee + Earth.R)*(1+ecc)/(1-ecc) #semi-major axis of ellipse
+            periapsis = perigee + Earth.R
+            apoapsis = periapsis*(1+ecc)/(1-ecc) 
+            a = (periapsis + apoapsis)/2 #semi-major axis of ellipse
 
             elliptical_orbit = Orbit.from_classical(Earth, 
                                             a, 
