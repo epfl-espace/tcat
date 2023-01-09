@@ -124,7 +124,7 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
             fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
             ax.plot(raw_thrust_curve[:, 0], raw_m_dot_over_time, 'ro', label = "raw")
             ax.plot(x_mass_flow, y_mass_flow, 'b--', label = "Interpolation")
-            ax.set_ylabel("propellant mass flow [tons / s]")
+            ax.set_ylabel("propellant mass flow [kg / s]")
             ax.set_xlabel("t [s]")
             ax.set_title("Propellant mass flow from thrust curve")
             ax.legend()
@@ -327,13 +327,13 @@ class layer:
             writer.writerow(data)
 
     def plot_emissions_bar_chart(self, header, engine, launcher, number_of_launch_es):
-        if self.affected == True and plotting:
+        if self.affected == True:
             y_pos = list(np.arange(len(header)-1))
             fig, ax = pyplot.subplots(figsize=(5, 2.7))
             ax.barh(y_pos, self.stored_emissions)
             ax.set_xlabel("Emissions [kg]")
             pyplot.setp(ax, yticks = y_pos, yticklabels = header[1:])
-            ax.set_title("Emissions in " f"{self.name} by {engine} engine, on {launcher} launcher, for " f"{number_of_launch_es} lauunch(es).")
+            ax.set_title("Emissions in " f"{self.name} by {engine} engine, on {launcher} launcher, for " f"{number_of_launch_es} launch(es).")
             fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher + '_' + engine + '_' + self.name + '_.png', bbox_inches='tight', dpi=100)
 
 atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting)
