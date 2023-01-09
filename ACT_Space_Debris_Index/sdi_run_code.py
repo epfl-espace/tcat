@@ -169,10 +169,10 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
         SDI_debris_removal = SDI_compute(starting_epoch, m_debris + m_ADR - ADR_servicer_SDI["Mass_burnt"], max(debris_cross_section, ADR_cross_section), 0 * u.year, ADR_mean_thrust, ADR_Isp, True, 
                                         ADR_manoeuvre_success*ADR_capture_success, a_debris, ecc_debris, inc_debris, a_debris_removal , ecc_debris_removal, inc_debris_removal)
 
-        print("\n\n Final impact with ADR risk reduction:", number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
-                + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"]))
+        print("\n\n Final impact with ADR risk reduction:", "{:.3f}".format(number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
+                + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"])))
     else:
-        print("\n\n Final impact:", number_of_launch_es*LV_SDI_results["Space_Debris_Index"])
+        print("\n\n Final impact:", "{:.3f}".format(number_of_launch_es*LV_SDI_results["Space_Debris_Index"]))
 
 def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, Isp, EOL_manoeuvre, PMD_success, a_op, ecc_op, inc_object_op,
                 a_disp, ecc_disp, inc_object_disp):
