@@ -14,7 +14,7 @@ from poliastro.bodies import Earth
 
 # local inputs
 starting_epoch = Time("2018-01-01 12:00:00", scale="tdb")
-op_ending_epoch = Time("2022-01-01 12:00:00", scale="tdb")
+op_duration = 1 * u.year
 
 mass = 1150 * u.kg
 cross_section = 15.5 * u.m ** 2 # TODO the cross section can be computed from the CROC tool (from ESA) based on the dimensions --> what is possible to do ?
@@ -51,7 +51,7 @@ apogee_debris_removal = 200 *u.km
 perigee_debris_removal = 200 *u.km
 inc_debris_removal = 98 * u.deg
 
-def sdi_main(starting_epoch, op_ending_epoch, mass, cross_section, mean_thrust, Isp, number_of_launch_es, apogee_object_op, perigee_object_op, inc_object_op, EOL_manoeuvre, PMD_success, apogee_object_disp, perigee_object_disp, 
+def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp, number_of_launch_es, apogee_object_op, perigee_object_op, inc_object_op, EOL_manoeuvre, PMD_success, apogee_object_disp, perigee_object_disp, 
             inc_object_disp, ADR_stage, m_ADR, ADR_cross_section, ADR_mean_thrust, ADR_Isp, ADR_manoeuvre_success, ADR_capture_success, m_debris, debris_cross_section, apogee_debris, perigee_debris, inc_debris, 
             apogee_debris_removal, perigee_debris_removal, inc_debris_removal):
 
@@ -77,8 +77,6 @@ def sdi_main(starting_epoch, op_ending_epoch, mass, cross_section, mean_thrust, 
     if cross_section.value <= 0:
         raise ValueError("LV cross section muss be a positive number (m^2).")
     
-    op_duration = (op_ending_epoch - starting_epoch).to(u.year)
-
     if perigee_object_op <= 0:
         raise ValueError("Operational perigee muss be a positive number (km).")
     elif apogee_object_op < perigee_object_op:
@@ -171,10 +169,10 @@ def sdi_main(starting_epoch, op_ending_epoch, mass, cross_section, mean_thrust, 
         SDI_debris_removal = SDI_compute(starting_epoch, m_debris + m_ADR - ADR_servicer_SDI["Mass_burnt"], max(debris_cross_section, ADR_cross_section), 0 * u.year, ADR_mean_thrust, ADR_Isp, True, 
                                         ADR_manoeuvre_success*ADR_capture_success, a_debris, ecc_debris, inc_debris, a_debris_removal , ecc_debris_removal, inc_debris_removal)
 
-        print("\n\n Final impact with ADR risk reduction:", number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
-                + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"]))
+        print("\n\n Final impact with ADR risk reduction:", "{:.3f}".format(number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
+                + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"])))
     else:
-        print("\n\n Final impact:", number_of_launch_es*LV_SDI_results["Space_Debris_Index"])
+        print("\n\n Final impact:", "{:.3f}".format(number_of_launch_es*LV_SDI_results["Space_Debris_Index"]))
 
 def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, Isp, EOL_manoeuvre, PMD_success, a_op, ecc_op, inc_object_op,
                 a_disp, ecc_disp, inc_object_disp):
@@ -389,6 +387,6 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                     "Transfer_duration": transfer_duration.to(u.year), "Mass_burnt": burned_mass}
         return results
 
-sdi_main(starting_epoch, op_ending_epoch, mass, cross_section, mean_thrust, Isp, number_of_launch_es, apogee_object_op, perigee_object_op, inc_object_op, EOL_manoeuvre, PMD_success, apogee_object_disp, perigee_object_disp, 
+sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp, number_of_launch_es, apogee_object_op, perigee_object_op, inc_object_op, EOL_manoeuvre, PMD_success, apogee_object_disp, perigee_object_disp, 
             inc_object_disp, ADR_stage, m_ADR, ADR_cross_section, ADR_mean_thrust, ADR_Isp, ADR_manoeuvre_success, ADR_capture_success, m_debris, debris_cross_section, apogee_debris, perigee_debris, inc_debris, 
             apogee_debris_removal, perigee_debris_removal, inc_debris_removal)

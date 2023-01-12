@@ -1,0 +1,4 @@
+# thrust curve of engine (HM7B). Estimated from Ref: Ariane 5 user manual,,
+timestamp [s],thrust [kN],Comment
+0,67,
+945,67,
