@@ -78,27 +78,27 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
         raise ValueError("LV cross section muss be a positive number (m^2).")
     
     if perigee_object_op <= 0:
-        raise ValueError("Operational perigee muss be a positive number (km).")
+        raise ValueError("LV operational perigee muss be a positive number (km).")
     elif apogee_object_op < perigee_object_op:
-        raise ValueError("Operational apogee muss be larger or equal to perigee (km).")
+        raise ValueError("LV operational apogee muss be larger or equal to perigee (km).")
 
     if inc_object_op >= 180 * u.deg:
-        raise ValueError("Operational inclination not in the range 0 <= inc < 180.")
+        raise ValueError("LV operational inclination not in the range 0 <= inc < 180.")
     elif inc_object_op < 0 * u.deg:
-        raise ValueError("Operational inclination not in the range 0 <= inc < 180.")
+        raise ValueError("LV operational inclination not in the range 0 <= inc < 180.")
 
     a_op = (apogee_object_op + perigee_object_op) / 2 + Earth.R
     ecc_op = (apogee_object_op + Earth.R - a_op) / a_op * u.one
 
     if perigee_object_disp <= 0:
-        raise ValueError("Disposal perigee muss be a positive number (km).")
+        raise ValueError("LV disposal perigee muss be a positive number (km).")
     elif apogee_object_disp < perigee_object_disp:
-        raise ValueError("Disposal apogee muss be larger or equal to perigee (km).")
+        raise ValueError("LV disposal apogee muss be larger or equal to perigee (km).")
 
     if inc_object_disp >= 180 * u.deg:
-        raise ValueError("Disposal inclination not in the range 0 <= inc < 180.")
+        raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
     elif inc_object_disp < 0 * u.deg:
-        raise ValueError("Disposal inclination not in the range 0 <= inc < 180.")
+        raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
 
     if EOL_manoeuvre == True:
         a_disp = (apogee_object_disp + perigee_object_disp) / 2 + Earth.R
@@ -115,10 +115,10 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
                                 a_disp, ecc_disp, inc_object_disp)
         
     if m_ADR.value <= 0:
-        raise ValueError("Debris mass muss be a positive number (kg).")
+        raise ValueError("ADR stage mass muss be a positive number (kg).")
     
     if ADR_cross_section.value <= 0:
-        raise ValueError("Debris cross section muss be a positive number (m^2).")
+        raise ValueError("ADR stage cross section muss be a positive number (m^2).")
 
     if m_debris.value <= 0:
         raise ValueError("Debris mass muss be a positive number (kg).")
@@ -135,22 +135,22 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     ecc_debris = (apogee_debris + Earth.R - a_debris) / a_debris * u.one
 
     if inc_debris >= 180 * u.deg:
-        raise ValueError("Disposal inclination not in the range 0 <= inc < 180.")
+        raise ValueError("Debris inclination not in the range 0 <= inc < 180.")
     elif inc_debris < 0 * u.deg:
-        raise ValueError("Disposal inclination not in the range 0 <= inc < 180.")
+        raise ValueError("Debris inclination not in the range 0 <= inc < 180.")
 
     if perigee_debris_removal <= 0:
-        raise ValueError("Debris perigee muss be a positive number (km).")
+        raise ValueError("Debris removal perigee muss be a positive number (km).")
     elif apogee_debris_removal < perigee_debris_removal:
-        raise ValueError("Debris apogee muss be larger or equal to perigee (km).")
+        raise ValueError("Debris removal apogee muss be larger or equal to perigee (km).")
 
     a_debris_removal = (apogee_debris_removal + perigee_debris_removal) / 2 + Earth.R
     ecc_debris_removal = (apogee_debris_removal + Earth.R - a_debris_removal) / a_debris_removal * u.one
 
     if inc_debris_removal >= 180 * u.deg:
-        raise ValueError("Disposal inclination not in the range 0 <= inc < 180.")
+        raise ValueError("Debris removal inclination not in the range 0 <= inc < 180.")
     elif inc_debris_removal < 0 * u.deg:
-        raise ValueError("Disposal inclination not in the range 0 <= inc < 180.")
+        raise ValueError("Debris removal inclination not in the range 0 <= inc < 180.")
 
     # For case with ADR stage included
     if ADR_stage == True:
@@ -265,7 +265,7 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
             if disposal_orbit.r_p < ALTITUDE_ATMOSPHERE_LIMIT + Earth.R:
                 natural_decay_impact = 0 * u.year *u.pot_fragments
             else:
-                natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass, transfer_duration, op_duration, SUCCESS)
+                natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
             
             # impact of unsuccessful manoeuvre would be 0 since spacecraft would stay above LEO region
             total_impact_score = (disposal_impact + natural_decay_impact)*PMD_success
@@ -300,13 +300,13 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                     natural_decay_impact = 0 * u.year *u.pot_fragments
                 else:
                     # natural decay impact after successful EOLM
-                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass, transfer_duration, op_duration, SUCCESS)
+                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
             # case going from LEO to above LEO in graveyard
             elif disposal_orbit.a > operational_orbit.a:
                 disposal_impact = elliptical_orbit_decomposition_up(CF_file, transfer_orbit, mass - burned_mass) # intermediate impact
                 if disposal_orbit.r_p < ALTITUDE_LEO_LIMIT + Earth.R:
                     # natural decay impact after successful EOLM
-                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass, transfer_duration, op_duration, SUCCESS)
+                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
                 else:
                     natural_decay_impact = 0 * u.year *u.pot_fragments
             else:
@@ -354,13 +354,13 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                     natural_decay_impact = 0 * u.pot_fragments * u.year
                 else:
                     # natural decay impact after successful EOLM
-                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass, transfer_duration, op_duration, SUCCESS)
+                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
             # case going from LEO to above LEO in graveyard
             elif disposal_orbit.a > operational_orbit.a:
                 disposal_impact = elliptical_orbit_decomposition_up(CF_file, transfer_orbit, mass - burned_mass) # intermediate impact
                 if disposal_orbit.r_p < ALTITUDE_LEO_LIMIT + Earth.R:
                     # natural decay impact after successful EOLM
-                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass, transfer_duration, op_duration, SUCCESS)
+                    natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
                 else:
                     natural_decay_impact = 0 * u.pot_fragments * u.year
             else:
