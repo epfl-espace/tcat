@@ -171,8 +171,19 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
 
         print("\n\n Final impact with ADR risk reduction:", "{:.3f}".format(number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
                 + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"])))
+
+        sdi_results = {"LCS3": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*LV_SDI_results["Operational_percentage"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
+                + SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Disposal_manoeuvre_percentage"] - debris_residual_SDI["Space_Debris_Index"]), 
+                "LCS4": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*(1-LV_SDI_results["Operational_percentage"]) + ADR_servicer_SDI["Natural_decay_percentage"]*ADR_servicer_SDI["Space_Debris_Index"] + 
+                SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Natural_decay_percentage"])}
+
+        return sdi_results
     else:
         print("\n\n Final impact:", "{:.3f}".format(number_of_launch_es*LV_SDI_results["Space_Debris_Index"]))
+
+        sdi_results = {"LCS3": number_of_launch_es*LV_SDI_results["Space_Debris_Index"]*LV_SDI_results["Operational_percentage"], "LCS4": number_of_launch_es*LV_SDI_results["Space_Debris_Index"]*(1 - LV_SDI_results["Operational_percentage"])}
+
+        return sdi_results
 
 def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, Isp, EOL_manoeuvre, PMD_success, a_op, ecc_op, inc_object_op,
                 a_disp, ecc_disp, inc_object_disp):
