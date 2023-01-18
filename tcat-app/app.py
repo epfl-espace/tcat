@@ -21,6 +21,8 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 import inputparams
+from ACT_Space_Debris_Index.sdi_run_code import sdi_main
+from ACT_atmospheric_emissions.atm_run_code import atm_main
 from models import db, Configuration, ConfigurationRun
 from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import ScenarioADRSetupFromACT
 from logging.config import dictConfig
@@ -130,7 +132,7 @@ def failed_config_run(config_run_id):
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def get_user_info():
@@ -155,10 +157,15 @@ def valid_configuration(configuration, params):
         elif key == 'launcher_use_database':
             launcher_use_database = key in configuration and configuration['launcher_use_database'] == 'on'
 
-        if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter', 'launcher_fairing_cylinder_height', 'launcher_fairing_total_height', 'launcher_perf_interpolation_method']:
+        if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter',
+                                             'launcher_fairing_cylinder_height', 'launcher_fairing_total_height',
+                                             'launcher_perf_interpolation_method']:
             continue
 
-        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass', 'kickstage_prop_thrust', 'kickstage_prop_isp', 'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass', 'kickstage_struct_mass', 'kickstage_propulsion_type']:
+        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass',
+                                              'kickstage_prop_thrust', 'kickstage_prop_isp',
+                                              'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass',
+                                              'kickstage_struct_mass', 'kickstage_propulsion_type']:
             continue
 
         if not (key in configuration):
@@ -330,13 +337,15 @@ def configure(current_scenario, template, params):
                                                                Configuration.scenario == current_scenario)).order_by(
                 desc(Configuration.created_date)).first()
             if last_config_item is not None:
-                last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
+                last_run_for_configuration = ConfigurationRun.query.filter_by(
+                    configuration_id=last_config_item.id).first()
                 last_configuration = json.loads(last_config_item.configuration)
         else:
             is_reset = True
 
     return render_template(template, last_configuration=last_configuration,
-                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1], is_reset=is_reset)
+                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1],
+                           is_reset=is_reset)
 
 
 @app.route('/configure-adr', methods=['GET', 'POST'])
@@ -655,6 +664,35 @@ def download_run_data(scenario_id, config_run_id):
 
     file_obj.seek(0)
     return send_file(file_obj, download_name=f'{scenario_id}.zip', as_attachment=True)
+
+
+@app.route('/calculations/sdi', methods=['POST'])
+@oidc.require_login
+def get_sdi():
+    data = request.get_json()
+
+    if data is None:
+        return '{"error": "No data provided"}'
+
+    return sdi_main(data['startingEpoch'], data['opDuration'], data['mass'], data['crossSection'], data['meanThrust'],
+                    data['isp'], data['numberOfLaunchEs'], data['apogeeObjectOp'], data['perigeeObjectOp'],
+                    data['incObjectOp'], data['eolManoeuvre'], data['pmdSuccess'], data['apogeeObjectDisp'],
+                    data['perigeeObjectDisp'], data['incObjectDisp'], data['adrStage'], data['mAdr'],
+                    data['adrCrossSection'], data['adrMeanThrust'], data['adrIsp'], data['adrManoeuvreSuccess'],
+                    data['adrCaptureSuccess'], data['mDebris'], data['debrisCrossSection'], data['apogeeDebris'],
+                    data['perigeeDebris'], data['incDebris'], data['apogeeDebrisRemoval'], data['perigeeDebrisRemoval'],
+                    data['incDebrisRemoval'])
+
+
+@app.route('/calculations/atm', methods=['POST'])
+@oidc.require_login
+def get_atm():
+    data = request.get_json()
+
+    if data is None:
+        return '{"error": "No data provided"}'
+
+    return atm_main()
 
 
 app.jinja_env.globals.update(inputparams=inputparams)
