@@ -36,25 +36,25 @@ plotting = False
 # local inputs to define launcher and engine
 number_of_launch_es = 1
 
-# launcher = ["Vega_C", "Vega_C", "Vega_C"]
-# engine = ["P120", "Z40", "Z9"]
-# launcher = ["Ariane_5", "Ariane_5", "Ariane_5"]
-# engine = ["Vulcain", "MPS", "HM7B"]
-launcher = ["Themis_S1_reuse", "Themis_T3"]
-engine = ["T3_S1", "T3_S2"]
+# launcher = "Vega_C"
+# engine = "P120" # "Z40", "Z9"
+# launcher = "Ariane_5"
+# engine = "Vulcain" # "MPS", "HM7B"
+launcher = "Themis_S1_reuse" # "Themis_T3"
+engine = "T3_S1" # "T3_S2"
 
 # For Vega C
-# number_of_engine_s = [1, 1, 1] # this scales the emissions too.
-# prop_type = ['APCP', 'APCP', 'APCP']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
-# Isp = [278.5 * u.s, 295 * u.s, 296 * u.s]
+# number_of_engine_s = 1 # [1, 1, 1] # this scales the emissions too.
+# prop_type = 'APCP' # ['APCP', 'APCP', 'APCP']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
+# Isp = 278.5 * u.s # [278.5 * u.s, 295 * u.s, 296 * u.s]
 # For Ariane 5
-# number_of_engine_s = [1, 2, 1] # this scales the emissions too.
-# prop_type = ['LOx/LH2', 'APCP', 'LOx/LH2']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
-# Isp = [431 * u.s, 270 * u.s, 446 * u.s] 
+# number_of_engine_s = 1 # [1, 2, 1] # this scales the emissions too.
+# prop_type = 'LOx/LH2' # ['LOx/LH2', 'APCP', 'LOx/LH2']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
+# Isp = 431 * u.s # [431 * u.s, 270 * u.s, 446 * u.s] 
 # For Themis T3
-number_of_engine_s = [3, 1] # this scales the emissions too.
-prop_type = ['LOx/LCH4', 'LOx/LCH4']  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
-Isp = [320 * u.s, 350 * u.s]
+number_of_engine_s = 3 # [3, 1] # this scales the emissions too.
+prop_type = 'LOx/LCH4'  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH, or APCP
+Isp = 320 * u.s # [320 * u.s, 350 * u.s]
 
 # ignition and cutoff timestamps (here for Vega C)
 # ignition_timestamp = [0 *u.s, 150 *u.s, 282 * u.s]
@@ -69,7 +69,14 @@ cutoff_timestamp = [325 *u.s, 372.8 *u.s]
 # NOTE assumption: the engine has only 1 ignition and 1 cutoff. Workaround: define a thrust curve that goes to 0 during ballistic time and goes "turns on" again 
 # have the boundaries defined for the total duration of the thrust curve
 
-def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting):
+# NOTE raw_trajectory and raw_thrust_curve corresponding to launcher trajectoy(ies) and engine(s) shall be given as input
+# Trajectory (at least up to atmospheric limit)
+raw_trajectory = np.genfromtxt(f'{PATH_CSV_TRAJECTORIES}input_traj_{launcher}.csv', delimiter=",", skip_header=2)
+
+# thrust curve of the engine
+raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine}.csv', delimiter=",", skip_header=2)
+
+def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting):
     
     # creating a list of layer classes for the global atmosphere (cumulating the emissions of every engines)
     global_low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
@@ -89,157 +96,151 @@ def atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_time
 
     max_kg_emission = 0
 
-    # NOTE raw_trajectory and raw_thrust_curve corresponding to launcher trajectoy(ies) and engine(s) shall be given as input
-    for run in range(len(engine)):
-        # Trajectory (at least up to atmospheric limit)
-        raw_trajectory = np.genfromtxt(f'{PATH_CSV_TRAJECTORIES}input_traj_{launcher[run]}.csv', delimiter=",", skip_header=2)
+    # trajectory interpolation
+    trajectory = interpolate.interp1d(raw_trajectory[:, 0], raw_trajectory[:, 1])
+    x_trajectory = np.arange(min(raw_trajectory[:, 0]), max(raw_trajectory[:, 0]) + INTERPOLATION_PLOT_STEP, INTERPOLATION_PLOT_STEP)
+    y_trajectory = trajectory(x_trajectory)
+    # plot
+    if plotting == True:
+        fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
+        ax.plot(raw_trajectory[:, 0], raw_trajectory[:, 1], 'ro', label = "raw")
+        ax.plot(x_trajectory, y_trajectory, 'b', label = "Interpolation")
+        ax.set_ylabel("h [km]")
+        ax.set_xlabel("t [s]")
+        ax.set_title("Launcher trajectory")
+        ax.legend()
+        fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher+ '_trajectory.png', bbox_inches='tight', dpi=100)
 
-        # thrust curve of the engine
-        raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine[run]}.csv', delimiter=",", skip_header=2)
+    # from thrust curve to prop mass flow (with Isp and g0)
+    raw_m_dot_over_time = find_propellant_mass_flow(raw_thrust_curve, Isp)
 
-        # trjaectory interpolation
-        trajectory = interpolate.interp1d(raw_trajectory[:, 0], raw_trajectory[:, 1])
-        x_trajectory = np.arange(min(raw_trajectory[:, 0]), max(raw_trajectory[:, 0]) + INTERPOLATION_PLOT_STEP, INTERPOLATION_PLOT_STEP)
-        y_trajectory = trajectory(x_trajectory)
-        # plot
-        if plotting == True:
-            fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
-            ax.plot(raw_trajectory[:, 0], raw_trajectory[:, 1], 'ro', label = "raw")
-            ax.plot(x_trajectory, y_trajectory, 'b', label = "Interpolation")
-            ax.set_ylabel("h [km]")
-            ax.set_xlabel("t [s]")
-            ax.set_title("Launcher trajectory")
-            ax.legend()
-            fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher[run] + '_trajectory.png', bbox_inches='tight', dpi=100)
+    # prop mass flow interpolation
+    m_dot_over_time = interpolate.interp1d(raw_thrust_curve[:, 0], raw_m_dot_over_time)
+    x_mass_flow = np.arange(min(raw_thrust_curve[:, 0]), max(raw_thrust_curve[:, 0]) + INTERPOLATION_PLOT_STEP, INTERPOLATION_PLOT_STEP)
+    y_mass_flow = m_dot_over_time(x_mass_flow)
+    # plot
+    if plotting == True:
+        fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
+        ax.plot(raw_thrust_curve[:, 0], raw_m_dot_over_time, 'ro', label = "raw")
+        ax.plot(x_mass_flow, y_mass_flow, 'b--', label = "Interpolation")
+        ax.set_ylabel("propellant mass flow [kg / s]")
+        ax.set_xlabel("t [s]")
+        ax.set_title("Propellant mass flow from thrust curve")
+        ax.legend()
+        fig.savefig(PATH_ATM_RESULTS + 'atm_' + engine + '_mass_flow.png', bbox_inches='tight', dpi=100)
 
-        # from thrust curve to prop mass flow (with Isp and g0)
-        raw_m_dot_over_time = find_propellant_mass_flow(raw_thrust_curve, Isp[run])
+    if x_mass_flow[-1] - x_mass_flow[0] != (cutoff_timestamp - ignition_timestamp).value:
+        raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration (thrust curve not long enough).")
 
-        # prop mass flow interpolation
-        m_dot_over_time = interpolate.interp1d(raw_thrust_curve[:, 0], raw_m_dot_over_time)
-        x_mass_flow = np.arange(min(raw_thrust_curve[:, 0]), max(raw_thrust_curve[:, 0]) + INTERPOLATION_PLOT_STEP, INTERPOLATION_PLOT_STEP)
-        y_mass_flow = m_dot_over_time(x_mass_flow)
-        # plot
-        if plotting == True:
-            fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
-            ax.plot(raw_thrust_curve[:, 0], raw_m_dot_over_time, 'ro', label = "raw")
-            ax.plot(x_mass_flow, y_mass_flow, 'b--', label = "Interpolation")
-            ax.set_ylabel("propellant mass flow [kg / s]")
-            ax.set_xlabel("t [s]")
-            ax.set_title("Propellant mass flow from thrust curve")
-            ax.legend()
-            fig.savefig(PATH_ATM_RESULTS + 'atm_' + engine[run] + '_mass_flow.png', bbox_inches='tight', dpi=100)
+    # table of emissions per type of propellant [kg per kg of prop combusted]
+    emissions_table = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2)[:,1:]
+    
+    propulsion_type_entries = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2, usecols=0, dtype=str)
 
-        if x_mass_flow[-1] - x_mass_flow[0] != (cutoff_timestamp[run] - ignition_timestamp[run]).value:
-            raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration (thrust curve not long enough).")
+    # creating list of layer classes for the atmosphere (reset to 0  for each engine)
+    low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
+    high_troposphere = layer("High_troposphere", ATM_LIM_LOW_TROPOSPHERE, ATM_LIM_OZONE_LOW)
+    ozone_layer = layer("Ozone_layer", ATM_LIM_OZONE_LOW, ATM_LIM_OZONE_HIGH)
+    stratosphere = layer("Stratosphere", ATM_LIM_OZONE_HIGH, ATM_LIM_STRATOSPHERE)
+    mesosphere = layer("Mesosphere", ATM_LIM_STRATOSPHERE, ATM_LIM_MESOSPHERE)
+    thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
+    outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
+    atmosphere = [low_troposphere, high_troposphere, ozone_layer, stratosphere, mesosphere, thermosphere, outer_space]
 
-        # table of emissions per type of propellant [kg per kg of prop combusted]
-        emissions_table = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2)[:,1:]
-        
-        propulsion_type_entries = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2, usecols=0, dtype=str)
+    ### To use for finer atmospheric decomposition (also above for "global_atmosphere")
+    # atmosphere = list()
+    # for i in range(int(ALTITUDE_ATMOSPHERE_LIMIT.value/ATM_INCREMENT.value)):
+    #     atmosphere.append(layer(f"{i}", i*ATM_INCREMENT, (i+1)*ATM_INCREMENT))
+    # atmosphere.append(layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km))
 
-        # creating list of layer classes for the atmosphere (reset to 0  for each engine)
-        low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
-        high_troposphere = layer("High_troposphere", ATM_LIM_LOW_TROPOSPHERE, ATM_LIM_OZONE_LOW)
-        ozone_layer = layer("Ozone_layer", ATM_LIM_OZONE_LOW, ATM_LIM_OZONE_HIGH)
-        stratosphere = layer("Stratosphere", ATM_LIM_OZONE_HIGH, ATM_LIM_STRATOSPHERE)
-        mesosphere = layer("Mesosphere", ATM_LIM_STRATOSPHERE, ATM_LIM_MESOSPHERE)
-        thermosphere = layer("Thermosphere", ATM_LIM_MESOSPHERE, ALTITUDE_ATMOSPHERE_LIMIT)
-        outer_space = layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km)
-        atmosphere = [low_troposphere, high_troposphere, ozone_layer, stratosphere, mesosphere, thermosphere, outer_space]
+    # from trajectory to time spent in layers (with limits)
+    current_layer_index = 0
+    ascending = True
+    altitude_temp = ATM_EARTH_SURFACE
+    time_temp = 0 * u.s
+    i = 0
+    current_layer = atmosphere[current_layer_index]
+    print("Take-off !")
 
-        ### To use for finer atmospheric decomposition (also above for "global_atmosphere")
-        # atmosphere = list()
-        # for i in range(int(ALTITUDE_ATMOSPHERE_LIMIT.value/ATM_INCREMENT.value)):
-        #     atmosphere.append(layer(f"{i}", i*ATM_INCREMENT, (i+1)*ATM_INCREMENT))
-        # atmosphere.append(layer("Outer_space", ALTITUDE_ATMOSPHERE_LIMIT, np.inf * u.km))
-
-        # from trajectory to time spent in layers (with limits)
-        current_layer_index = 0
-        ascending = True
-        altitude_temp = ATM_EARTH_SURFACE
-        time_temp = 0 * u.s
-        i = 0
-        current_layer = atmosphere[current_layer_index]
-        print("Take-off !")
-
-        while i < len(x_trajectory) - 2:
-            if ascending:
-                while y_trajectory[i] < current_layer.get_upper_bound().value and i < len(x_trajectory) - 2:
-                    i += 1
-                    if y_trajectory[i] > y_trajectory[i+1]:
-                        ascending = False
-                        altitude_temp = y_trajectory[i] * u.km
-                        # print(i, "Altitude", altitude_temp, ", ascending", ascending)
-                        break
-                if i == len(x_trajectory) - 2:
-                    time_final = x_trajectory[i] * u.s
-                    integrate_mass_flow(m_dot_over_time, ignition_timestamp[run], cutoff_timestamp[run], time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type[run], number_of_engine_s[run])
-                    pass
-                elif ascending: # meaning we are moving one layer above
+    while i < len(x_trajectory) - 2:
+        if ascending:
+            while y_trajectory[i] < current_layer.get_upper_bound().value and i < len(x_trajectory) - 2:
+                i += 1
+                if y_trajectory[i] > y_trajectory[i+1]:
+                    ascending = False
                     altitude_temp = y_trajectory[i] * u.km
                     # print(i, "Altitude", altitude_temp, ", ascending", ascending)
-                    time_final = x_trajectory[i] * u.s
-                    integrate_mass_flow(m_dot_over_time, ignition_timestamp[run], cutoff_timestamp[run], time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type[run], number_of_engine_s[run])
-                    time_temp = time_final
-                    current_layer_index += 1
-                    current_layer = atmosphere[current_layer_index]
-                    if current_layer_index == len(atmosphere) - 1:
-                        print("Going out of atmosphere")
-            else:
-                while y_trajectory[i] > current_layer.get_lower_bound().value and i < len(x_trajectory) - 2:
-                    i += 1
-                    if y_trajectory[i] < y_trajectory[i+1]:
-                        ascending = True
-                        altitude_temp = y_trajectory[i] * u.km
-                        # print(i, "Altitude", altitude_temp, ", ascending", ascending)
-                        break
-                if i == len(x_trajectory) - 2:
-                    time_final = x_trajectory[i] * u.s
-                    integrate_mass_flow(m_dot_over_time, ignition_timestamp[run], cutoff_timestamp[run], time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type[run], number_of_engine_s[run])
-                    if y_trajectory[-1] == 0:
-                        print("Landed back.")
-                    pass
-                elif not ascending: # meaning we are moving one layer below
+                    break
+            if i == len(x_trajectory) - 2:
+                time_final = x_trajectory[i] * u.s
+                integrate_mass_flow(m_dot_over_time, ignition_timestamp, cutoff_timestamp, time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type, number_of_engine_s)
+                pass
+            elif ascending: # meaning we are moving one layer above
+                altitude_temp = y_trajectory[i] * u.km
+                # print(i, "Altitude", altitude_temp, ", ascending", ascending)
+                time_final = x_trajectory[i] * u.s
+                integrate_mass_flow(m_dot_over_time, ignition_timestamp, cutoff_timestamp, time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type, number_of_engine_s)
+                time_temp = time_final
+                current_layer_index += 1
+                current_layer = atmosphere[current_layer_index]
+                if current_layer_index == len(atmosphere) - 1:
+                    print("Going out of atmosphere")
+        else:
+            while y_trajectory[i] > current_layer.get_lower_bound().value and i < len(x_trajectory) - 2:
+                i += 1
+                if y_trajectory[i] < y_trajectory[i+1]:
+                    ascending = True
                     altitude_temp = y_trajectory[i] * u.km
                     # print(i, "Altitude", altitude_temp, ", ascending", ascending)
-                    time_final = x_trajectory[i] * u.s
-                    integrate_mass_flow(m_dot_over_time, ignition_timestamp[run], cutoff_timestamp[run], time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type[run], number_of_engine_s[run])
-                    time_temp = time_final
-                    current_layer_index -= 1
-                    current_layer = atmosphere[current_layer_index]
+                    break
+            if i == len(x_trajectory) - 2:
+                time_final = x_trajectory[i] * u.s
+                integrate_mass_flow(m_dot_over_time, ignition_timestamp, cutoff_timestamp, time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type, number_of_engine_s)
+                if y_trajectory[-1] == 0:
+                    print("Landed back.")
+                pass
+            elif not ascending: # meaning we are moving one layer below
+                altitude_temp = y_trajectory[i] * u.km
+                # print(i, "Altitude", altitude_temp, ", ascending", ascending)
+                time_final = x_trajectory[i] * u.s
+                integrate_mass_flow(m_dot_over_time, ignition_timestamp, cutoff_timestamp, time_temp, time_final, current_layer, propulsion_type_entries, emissions_table, prop_type, number_of_engine_s)
+                time_temp = time_final
+                current_layer_index -= 1
+                current_layer = atmosphere[current_layer_index]
 
-        # Prepare printing results in a csv output file
-        results_file_path = PATH_ATM_RESULTS + "atm_" + launcher[run] + "_" + engine[run] + "_emissions.csv"
+    # Prepare printing results in a csv output file
+    results_file_path = PATH_ATM_RESULTS + "atm_" + launcher + "_" + engine + "_emissions.csv"
 
-        with open(results_file_path, 'w') as w_file:
-            writer = csv.writer(w_file)
-            header = ["Layer", "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)"]
-            writer.writerow(header)
-        
-        for i in range(len(atmosphere)):
-            atm_layer = atmosphere[i]
-            atm_layer.scale_by_launch_es(number_of_launch_es)
-            # add total emissions in global layer to sum the contribution of different engines
-            for j in range(len(atm_layer.stored_emissions)):
-                global_atmosphere[i].stored_emissions[j] = global_atmosphere[i].stored_emissions[j] + atm_layer.stored_emissions[j]
-            if max(global_atmosphere[i].stored_emissions) > max_kg_emission:
-                max_kg_emission = max(global_atmosphere[i].stored_emissions)
+    with open(results_file_path, 'w') as w_file:
+        writer = csv.writer(w_file)
+        header = ["Layer", "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)"]
+        writer.writerow(header)
+    
+    for i in range(len(atmosphere)):
+        atm_layer = atmosphere[i]
+        atm_layer.scale_by_launch_es(number_of_launch_es)
+        # add total emissions in global layer to sum the contribution of different engines
+        for j in range(len(atm_layer.stored_emissions)):
+            global_atmosphere[i].stored_emissions[j] = global_atmosphere[i].stored_emissions[j] + atm_layer.stored_emissions[j]
+        if max(global_atmosphere[i].stored_emissions) > max_kg_emission:
+            max_kg_emission = max(global_atmosphere[i].stored_emissions)
 
-            atm_layer.write_results(results_file_path)
-            if plotting:
-                atm_layer.plot_emissions_bar_chart(header, engine[run], launcher[run], number_of_launch_es)
+        atm_layer.write_results(results_file_path)
+        if plotting:
+            atm_layer.plot_emissions_bar_chart(header, engine, launcher, number_of_launch_es)
 
-    # Global plot of all contributions
-    y_pos = list(np.arange(len(header)-1))
-    fig, ax = pyplot.subplots(ncols=1, nrows=len(global_atmosphere)-1, figsize=(5, 1.75*len(atmosphere)))
-    for i in range(len(global_atmosphere)-1):
-        ax[i].barh(y_pos, global_atmosphere[-2-i].stored_emissions)
-        pyplot.setp(ax, yticks = y_pos, yticklabels = header[1:], xticks = [0, max_kg_emission])
-        ax[i].set_title(f"{global_atmosphere[-2-i].name}" + " < " + f"{global_atmosphere[-2-i].upper_bound}.")
-    ax[-1].set_xlabel("Emissions [kg]")
-    # fig.suptitle("Emissions in atmosphere by " f"{launcher[run]} launcher, for " f"{number_of_launch_es} launch(es).")
-    fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher[run] + '.png', bbox_inches='tight', dpi=100) 
+    # Global plot of all contributions when there is a loop inside the function (input several engines of the same launcher)
+    # y_pos = list(np.arange(len(header)-1))
+    # fig, ax = pyplot.subplots(ncols=1, nrows=len(global_atmosphere)-1, figsize=(5, 1.75*len(atmosphere)))
+    # for i in range(len(global_atmosphere)-1):
+    #     ax[i].barh(y_pos, global_atmosphere[-2-i].stored_emissions)
+    #     pyplot.setp(ax, yticks = y_pos, yticklabels = header[1:], xticks = [0, max_kg_emission])
+    #     ax[i].set_title(f"{global_atmosphere[-2-i].name}" + " < " + f"{global_atmosphere[-2-i].upper_bound}.")
+    # ax[-1].set_xlabel("Emissions [kg]")
+    # # fig.suptitle("Emissions in atmosphere by " f"{launcher[run]} launcher, for " f"{number_of_launch_es} launch(es).")
+    # fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher[run] + '.png', bbox_inches='tight', dpi=100) 
+
+    # TODO add return 
       
 def find_propellant_mass_flow(thrust_curve, Isp):
     """
@@ -336,4 +337,4 @@ class layer:
             ax.set_title("Emissions in " f"{self.name} by {engine} engine, on {launcher} launcher, for " f"{number_of_launch_es} launch(es).")
             fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher + '_' + engine + '_' + self.name + '_.png', bbox_inches='tight', dpi=100)
 
-atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting)
+atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting)
