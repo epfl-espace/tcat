@@ -335,5 +335,3 @@ class layer:
             pyplot.setp(ax, yticks = y_pos, yticklabels = header[1:])
             ax.set_title("Emissions in " f"{self.name} by {engine} engine, on {launcher} launcher, for " f"{number_of_launch_es} launch(es).")
             fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher + '_' + engine + '_' + self.name + '_.png', bbox_inches='tight', dpi=100)
-
-atm_main(launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting)
