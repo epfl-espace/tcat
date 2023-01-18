@@ -5,6 +5,7 @@ import mimetypes
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -13,6 +14,7 @@ from datetime import datetime
 from operator import and_, or_
 from time import sleep
 
+from astropy.time import Time
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for, jsonify
 from flask_oidc import OpenIDConnect
@@ -26,6 +28,8 @@ from ACT_atmospheric_emissions.atm_run_code import atm_main
 from models import db, Configuration, ConfigurationRun
 from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import ScenarioADRSetupFromACT
 from logging.config import dictConfig
+from astropy import units as astro_units
+
 
 dictConfig({
     'version': 1,
@@ -666,26 +670,46 @@ def download_run_data(scenario_id, config_run_id):
     return send_file(file_obj, download_name=f'{scenario_id}.zip', as_attachment=True)
 
 
-@app.route('/calculations/sdi', methods=['POST'])
-@oidc.require_login
+@app.route('/api/v1/calculations/sdi', methods=['POST'])
 def get_sdi():
     data = request.get_json()
 
     if data is None:
         return '{"error": "No data provided"}'
 
-    return sdi_main(data['startingEpoch'], data['opDuration'], data['mass'], data['crossSection'], data['meanThrust'],
-                    data['isp'], data['numberOfLaunchEs'], data['apogeeObjectOp'], data['perigeeObjectOp'],
-                    data['incObjectOp'], data['eolManoeuvre'], data['pmdSuccess'], data['apogeeObjectDisp'],
-                    data['perigeeObjectDisp'], data['incObjectDisp'], data['adrStage'], data['mAdr'],
-                    data['adrCrossSection'], data['adrMeanThrust'], data['adrIsp'], data['adrManoeuvreSuccess'],
-                    data['adrCaptureSuccess'], data['mDebris'], data['debrisCrossSection'], data['apogeeDebris'],
-                    data['perigeeDebris'], data['incDebris'], data['apogeeDebrisRemoval'], data['perigeeDebrisRemoval'],
-                    data['incDebrisRemoval'])
+    return sdi_main(Time(data['startingEpoch'], scale="tdb"),
+                    data['opDuration'] * astro_units.year,
+                    data['mass'] * astro_units.kg,
+                    data['crossSection'] * astro_units.m,
+                    data['meanThrust'] * astro_units.N,
+                    data['isp'] * astro_units.s,
+                    data['numberOfLaunches'],
+                    data['apogeeObjectOp'] * astro_units.km,
+                    data['perigeeObjectOp'] * astro_units.km,
+                    data['incObjectOp'] * astro_units.deg,
+                    data['eolManoeuvre'],
+                    data['pmdSuccess'],
+                    data['apogeeObjectDisp'] * astro_units.km,
+                    data['perigeeObjectDisp'] * astro_units.km,
+                    data['incObjectDisp'] * astro_units.deg,
+                    data['adrStage'],
+                    data['mAdr'] * astro_units.kg,
+                    data['adrCrossSection'] * astro_units.m,
+                    data['adrMeanThrust'] * astro_units.N,
+                    data['adrIsp'] * astro_units.s,
+                    data['adrManoeuvreSuccess'],
+                    data['adrCaptureSuccess'],
+                    data['mDebris'] * astro_units.kg,
+                    data['debrisCrossSection'] * astro_units.m,
+                    data['apogeeDebris'] * astro_units.km,
+                    data['perigeeDebris'] * astro_units.km,
+                    data['incDebris'] * astro_units.deg,
+                    data['apogeeDebrisRemoval'] * astro_units.km,
+                    data['perigeeDebrisRemoval'] * astro_units.km,
+                    data['incDebrisRemoval'] * astro_units.deg)
 
 
-@app.route('/calculations/atm', methods=['POST'])
-@oidc.require_login
+@app.route('/api/v1/calculations/atm', methods=['POST'])
 def get_atm():
     data = request.get_json()
 
@@ -698,5 +722,5 @@ def get_atm():
 app.jinja_env.globals.update(inputparams=inputparams)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5555, debug=True)
     app.logger.info('Starting application')
