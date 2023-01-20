@@ -708,11 +708,10 @@ def get_sdi():
                     data['apogeeDebrisRemoval'] * astro_units.km,
                     data['perigeeDebrisRemoval'] * astro_units.km,
                     data['incDebrisRemoval'] * astro_units.deg,
-                    '/Users/orell.buehler/Documents/repos/tcat/ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv',
-                    '/Users/orell.buehler/Documents/repos/tcat/ACT_Space_Debris_Index/sdi_reduced_lifetime.csv')
+                    os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv'),
+                    os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_reduced_lifetime.csv'))
 
     response = {'LCS3': result['LCS3'].value, 'LCS4': result['LCS4'].value}
-
     return jsonify(response)
 
 
@@ -724,7 +723,28 @@ def get_atm():
     if data is None:
         return '{"error": "No data provided"}'
 
-    return atm_main()
+    raw_trajectory = None
+    if 'rawTrajectory' in data:
+        raw_trajectory = data['rawTrajectory']
+
+    raw_thrust_curve = None
+    if 'rawThrustCurve' in data:
+        raw_thrust_curve = data['rawThrustCurve']
+
+    result = atm_main(TCAT_DIR,
+                      data['launcher'],
+                      data['engine'],
+                      data['numberOfEngines'],
+                      data['propType'],
+                      data['isp'] * astro_units.s,
+                      [data['ignitionTimestamp'][0]*astro_units.s, data['ignitionTimestamp'][1]*astro_units.s],
+                      [data['cutoffTimestamp'][0]*astro_units.s, data['cutoffTimestamp'][1]*astro_units.s],
+                      data['numberOfLaunches'],
+                      raw_trajectory,
+                      raw_thrust_curve,
+                      plotting=False)
+
+    return jsonify(result)
 
 
 app.jinja_env.globals.update(inputparams=inputparams)

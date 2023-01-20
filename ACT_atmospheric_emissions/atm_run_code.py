@@ -3,6 +3,7 @@
 # Authors:          Mathieu Udriot
 # Emails:           mathieu.udriot@epfl.ch
 # Description:      Script to read input .csv file describing the trajectory and thrust curve needed to compute the atmoshperic impacts of a launch vehicle, to be used in ACT
+import os
 
 # imports
 from scipy import interpolate, integrate
@@ -75,11 +76,18 @@ cutoff_timestamp = [325 *u.s, 372.8 *u.s]
 # raw_trajectory = np.genfromtxt(f'{PATH_CSV_TRAJECTORIES}input_traj_{launcher}.csv', delimiter=",", skip_header=2)
 
 # thrust curve of the engine
-# raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine}.csv', delimiter=",", skip_header=2)
+#raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine}.csv', delimiter=",", skip_header=2)
 
-def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting):
-    
-    # creating a list of layer classes for the global atmosphere (cumulating the emissions of every engines)
+def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, raw_trajectory = None, raw_thrust_curve = None, plotting = False):
+
+    if raw_trajectory is None:
+        raw_trajectory = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_TRAJECTORIES)}input_traj_{launcher}.csv', delimiter=",", skip_header=2)
+
+    if raw_thrust_curve is None:
+        raw_thrust_curve = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_THRUST_CURVES)}thrust_curve_{engine}.csv', delimiter=",",
+                                         skip_header=2)
+
+    # creating a list of layer classes for the global atmosphere (cumulating the emissions of every engine)
     global_low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
     global_high_troposphere = layer("High_troposphere", ATM_LIM_LOW_TROPOSPHERE, ATM_LIM_OZONE_LOW)
     global_ozone_layer = layer("Ozone_layer", ATM_LIM_OZONE_LOW, ATM_LIM_OZONE_HIGH)
@@ -102,7 +110,7 @@ def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engin
     x_trajectory = np.arange(min(raw_trajectory[:, 0]), max(raw_trajectory[:, 0]) + INTERPOLATION_PLOT_STEP, INTERPOLATION_PLOT_STEP)
     y_trajectory = trajectory(x_trajectory)
     # plot
-    if plotting == True:
+    if plotting:
         fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
         ax.plot(raw_trajectory[:, 0], raw_trajectory[:, 1], 'ro', label = "raw")
         ax.plot(x_trajectory, y_trajectory, 'b', label = "Interpolation")
@@ -120,7 +128,7 @@ def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engin
     x_mass_flow = np.arange(min(raw_thrust_curve[:, 0]), max(raw_thrust_curve[:, 0]) + INTERPOLATION_PLOT_STEP, INTERPOLATION_PLOT_STEP)
     y_mass_flow = m_dot_over_time(x_mass_flow)
     # plot
-    if plotting == True:
+    if plotting:
         fig, ax = pyplot.subplots(figsize=(5, 2.7), layout='constrained')
         ax.plot(raw_thrust_curve[:, 0], raw_m_dot_over_time, 'ro', label = "raw")
         ax.plot(x_mass_flow, y_mass_flow, 'b--', label = "Interpolation")
