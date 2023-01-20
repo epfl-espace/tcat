@@ -254,7 +254,7 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
         # Check disposal orbit
         if (disposal_orbit.r_p - Earth.R) > ALTITUDE_LEO_LIMIT:
             print("Graveyard orbit outside of LEO, no debris impact computed for the disposal phase.")
-            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp)
+            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp, False)
             if burned_mass > mass:
                 raise ValueError("Propellant mass is not sufficient to perform manoeuvre.")
             # TODO add decay from above LEO limit ? No we assume graveyard decays so slowly the spacecraft will no enter LEO protected region
@@ -268,7 +268,11 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
             return results
         else:
             print("Reentry manoeuvre from operational orbit higher than LEO.")
-            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp)
+            if (disposal_orbit.r_p - Earth.R) < ALTITUDE_ATMOSPHERE_LIMIT:
+                no_2nd_burn = True
+            else:
+                no_2nd_burn = False
+            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp, no_2nd_burn)
             if burned_mass > mass:
                 raise ValueError("Propellant mass is not sufficient to perform manoeuvre.")
             # Compute impact of disposal manoeuvre: decompose elliptical orbit and use time_to_anomaly after finding LTAN from position meaning altitude
@@ -301,7 +305,11 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
         # disposal manoeuvre
         if EOL_manoeuvre:
             print("EOLM")
-            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp)
+            if (disposal_orbit.r_p - Earth.R) < ALTITUDE_ATMOSPHERE_LIMIT:
+                no_2nd_burn = True
+            else:
+                no_2nd_burn = False
+            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp, no_2nd_burn)
             if burned_mass > mass:
                 raise ValueError("Propellant mass is not sufficient to perform manoeuvre.")
             # Compute impact of disposal manoeuvre
@@ -355,7 +363,11 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
         # disposal manoeuvre
         if EOL_manoeuvre:
             print("EOLM")
-            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp)
+            if (disposal_orbit.r_p - Earth.R) < ALTITUDE_ATMOSPHERE_LIMIT:
+                no_2nd_burn = True
+            else:
+                no_2nd_burn = False
+            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(operational_orbit, disposal_orbit, mass, mean_thrust, Isp, no_2nd_burn)
             if burned_mass > mass:
                 raise ValueError("Propellant mass is not sufficient to perform manoeuvre.")
             # decompose elliptical disposal orbit and use time_to_anomaly after finding LTAN from position (meaning altitude)
