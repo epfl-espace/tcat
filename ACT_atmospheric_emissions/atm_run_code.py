@@ -58,14 +58,14 @@ prop_type = 'LOx/LCH4'  # prop_type can be LOx/RP1, LOx/LH2, LOx/LCH4, NTO/UDMH,
 Isp = 320 * u.s # [320 * u.s, 350 * u.s]
 
 # ignition and cutoff timestamps (here for Vega C)
-# ignition_timestamp = [0 *u.s, 150 *u.s, 282 * u.s]
-# cutoff_timestamp = [133 *u.s , 267 *u.s, 442 *u.s]
+# ignition_timestamp = 0 *u.s # [0 *u.s, 150 *u.s, 282 * u.s]
+# cutoff_timestamp = 133 *u.s # [133 *u.s, 267 *u.s, 442 *u.s]
 # ignition and cutoff timestamps (here for Ariane 5)
-# ignition_timestamp = [0 *u.s, 7 *u.s, 580 * u.s]
-# cutoff_timestamp = [531 *u.s, 142 *u.s, 1525 *u.s]
+# ignition_timestamp = 0 *u.s # [0 *u.s, 7 *u.s, 580 * u.s]
+# cutoff_timestamp = 531 *u.s # [531 *u.s, 142 *u.s, 1525 *u.s]
 # ignition and cutoff timestamps (here for Themis T3 reusable)
-ignition_timestamp = [0 *u.s, 200 *u.s]
-cutoff_timestamp = [325 *u.s, 372.8 *u.s]
+ignition_timestamp = 0 *u.s # [0 *u.s, 200 *u.s]
+cutoff_timestamp = 325 *u.s # [325 *u.s, 372.8 *u.s]
 
 # NOTE assumption: the engine has only 1 ignition and 1 cutoff. Workaround: define a thrust curve that goes to 0 during ballistic time and goes "turns on" again 
 # have the boundaries defined for the total duration of the thrust curve
