@@ -5,7 +5,7 @@
 # Description:      Script for computation needed for the space debris index to be used in ACT, inputs
 
 # import class
-from sdi_space_debris_index import *
+from ACT_Space_Debris_Index.sdi_space_debris_index import *
 
 # imports
 from astropy import units as u
