@@ -22,12 +22,12 @@ class Manoeuvre:
     def get_delta_v(self):
         return self.delta_v
 
-    def compute_burn_duration(self, initial_mass, mean_thrust, isp):
+    def compute_burn_mass_and_duration(self, initial_mass, mean_thrust, isp):
         final_mass = initial_mass / np.exp((self.delta_v.to(u.meter / u.second) / const.g0 / isp.to(u.second)).value)
         mean_mass = (final_mass + initial_mass) / 2
         self.burn_duration = mean_mass / mean_thrust * self.delta_v
         self.burn_duration = self.burn_duration.to(u.s)
-        pass
+        return initial_mass - final_mass
 
     def get_burn_duration(self, duty_cycle=1.):
         """
