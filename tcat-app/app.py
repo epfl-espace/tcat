@@ -671,6 +671,7 @@ def download_run_data(scenario_id, config_run_id):
 
 
 @app.route('/api/v1/calculations/sdi', methods=['POST'])
+@oidc.accept_token(require_token=True)
 def get_sdi():
     data = request.get_json()
 
@@ -710,6 +711,7 @@ def get_sdi():
 
 
 @app.route('/api/v1/calculations/atm', methods=['POST'])
+@oidc.accept_token(require_token=True)
 def get_atm():
     data = request.get_json()
 

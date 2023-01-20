@@ -71,10 +71,10 @@ cutoff_timestamp = [325 *u.s, 372.8 *u.s]
 
 # NOTE raw_trajectory and raw_thrust_curve corresponding to launcher trajectoy(ies) and engine(s) shall be given as input
 # Trajectory (at least up to atmospheric limit)
-raw_trajectory = np.genfromtxt(f'{PATH_CSV_TRAJECTORIES}input_traj_{launcher}.csv', delimiter=",", skip_header=2)
+# raw_trajectory = np.genfromtxt(f'{PATH_CSV_TRAJECTORIES}input_traj_{launcher}.csv', delimiter=",", skip_header=2)
 
 # thrust curve of the engine
-raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine}.csv', delimiter=",", skip_header=2)
+# raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine}.csv', delimiter=",", skip_header=2)
 
 def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, plotting):
     
