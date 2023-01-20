@@ -678,10 +678,10 @@ def get_sdi():
     if data is None:
         return '{"error": "No data provided"}'
 
-    return sdi_main(Time(data['startingEpoch'], scale="tdb"),
+    result = sdi_main(Time(data['startingEpoch'], scale="tdb"),
                     data['opDuration'] * astro_units.year,
                     data['mass'] * astro_units.kg,
-                    data['crossSection'] * astro_units.m,
+                    data['crossSection'] * astro_units.m**2,
                     data['meanThrust'] * astro_units.N,
                     data['isp'] * astro_units.s,
                     data['numberOfLaunches'],
@@ -695,19 +695,25 @@ def get_sdi():
                     data['incObjectDisp'] * astro_units.deg,
                     data['adrStage'],
                     data['mAdr'] * astro_units.kg,
-                    data['adrCrossSection'] * astro_units.m,
+                    data['adrCrossSection'] * astro_units.m**2,
                     data['adrMeanThrust'] * astro_units.N,
                     data['adrIsp'] * astro_units.s,
                     data['adrManoeuvreSuccess'],
                     data['adrCaptureSuccess'],
                     data['mDebris'] * astro_units.kg,
-                    data['debrisCrossSection'] * astro_units.m,
+                    data['debrisCrossSection'] * astro_units.m**2,
                     data['apogeeDebris'] * astro_units.km,
                     data['perigeeDebris'] * astro_units.km,
                     data['incDebris'] * astro_units.deg,
                     data['apogeeDebrisRemoval'] * astro_units.km,
                     data['perigeeDebrisRemoval'] * astro_units.km,
-                    data['incDebrisRemoval'] * astro_units.deg)
+                    data['incDebrisRemoval'] * astro_units.deg,
+                    '/Users/orell.buehler/Documents/repos/tcat/ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv',
+                    '/Users/orell.buehler/Documents/repos/tcat/ACT_Space_Debris_Index/sdi_reduced_lifetime.csv')
+
+    response = {'LCS3': result['LCS3'].value, 'LCS4': result['LCS4'].value}
+
+    return jsonify(response)
 
 
 @app.route('/api/v1/calculations/atm', methods=['POST'])
