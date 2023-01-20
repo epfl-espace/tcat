@@ -142,9 +142,9 @@ def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ign
         raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration (thrust curve not long enough).")
 
     # table of emissions per type of propellant [kg per kg of prop combusted]
-    emissions_table = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2)[:,1:]
+    emissions_table = np.genfromtxt(os.path.join(TCAT_DIR, 'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv'), delimiter=",", skip_header=2)[:,1:]
     
-    propulsion_type_entries = np.genfromtxt(f'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv', delimiter=",", skip_header=2, usecols=0, dtype=str)
+    propulsion_type_entries = np.genfromtxt(os.path.join(TCAT_DIR, 'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv'), delimiter=",", skip_header=2, usecols=0, dtype=str)
 
     # creating list of layer classes for the atmosphere (reset to 0  for each engine)
     low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)
@@ -218,12 +218,12 @@ def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ign
                 current_layer = atmosphere[current_layer_index]
 
     # Prepare printing results in a csv output file and results in a dictionary
-    results_file_path = PATH_ATM_RESULTS + "atm_" + launcher + "_" + engine + "_emissions.csv"
+    results_file_path = os.path.join(TCAT_DIR, PATH_ATM_RESULTS + "atm_" + launcher + "_" + engine + "_emissions.csv")
+    header = ["Layer", "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)"]
 
-    with open(results_file_path, 'w') as w_file:
-        writer = csv.writer(w_file)
-        header = ["Layer", "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)"]
-        writer.writerow(header)
+    #with open(results_file_path, 'w') as w_file:
+    #    writer = csv.writer(w_file)
+    #    writer.writerow(header)
     
     atm_results_dict = {}
 
@@ -237,9 +237,9 @@ def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ign
         if max(global_atmosphere[i].stored_emissions) > max_kg_emission:
             max_kg_emission = max(global_atmosphere[i].stored_emissions)
 
-        atm_layer.write_results(results_file_path)
-        if plotting:
-            atm_layer.plot_emissions_bar_chart(header, engine, launcher, number_of_launch_es)
+        #atm_layer.write_results(results_file_path)
+        #if plotting:
+        #    atm_layer.plot_emissions_bar_chart(header, engine, launcher, number_of_launch_es)
 
     # Global plot of all contributions when there is a loop inside the function (input several engines of the same launcher)
     # y_pos = list(np.arange(len(header)-1))
@@ -253,8 +253,7 @@ def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ign
     # fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher[run] + '.png', bbox_inches='tight', dpi=100) 
 
     # return json from dict() with key = name of the layer, and value is a list of the stored emissions (following the order "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)")
-    json_results = json.dumps(atm_results_dict, indent = 2) 
-    return json_results
+    return atm_results_dict
       
 def find_propellant_mass_flow(thrust_curve, Isp):
     """
