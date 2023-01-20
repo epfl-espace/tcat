@@ -9,6 +9,7 @@ from scipy import interpolate, integrate
 import numpy as np
 import astropy.units as u
 import csv
+import json
 from astropy.constants import g0
 from matplotlib import pyplot
 
@@ -208,7 +209,7 @@ def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engin
                 current_layer_index -= 1
                 current_layer = atmosphere[current_layer_index]
 
-    # Prepare printing results in a csv output file
+    # Prepare printing results in a csv output file and results in a dictionary
     results_file_path = PATH_ATM_RESULTS + "atm_" + launcher + "_" + engine + "_emissions.csv"
 
     with open(results_file_path, 'w') as w_file:
@@ -216,8 +217,11 @@ def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engin
         header = ["Layer", "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)"]
         writer.writerow(header)
     
+    atm_results_dict = {}
+
     for i in range(len(atmosphere)):
         atm_layer = atmosphere[i]
+        atm_results_dict[atm_layer.name] = atm_layer.stored_emissions
         atm_layer.scale_by_launch_es(number_of_launch_es)
         # add total emissions in global layer to sum the contribution of different engines
         for j in range(len(atm_layer.stored_emissions)):
@@ -240,7 +244,9 @@ def atm_main(launcher, raw_trajectory, engine, raw_thrust_curve, number_of_engin
     # # fig.suptitle("Emissions in atmosphere by " f"{launcher[run]} launcher, for " f"{number_of_launch_es} launch(es).")
     # fig.savefig(PATH_ATM_RESULTS + 'atm_' + launcher[run] + '.png', bbox_inches='tight', dpi=100) 
 
-    # TODO add return 
+    # return json from dict() with key = name of the layer, and value is a list of the stored emissions (following the order "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)")
+    json_results = json.dumps(atm_results_dict, indent = 2) 
+    return json_results
       
 def find_propellant_mass_flow(thrust_curve, Isp):
     """
