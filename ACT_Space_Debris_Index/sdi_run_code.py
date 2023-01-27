@@ -71,16 +71,28 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     # TODO add other means of manoeuvring else than propulsive (drag sails, tumbling ?)
     # TODO compute time spent in region B (GEO) ? and other sensitive regions (eg. Galileo) ?
 
+    if op_duration.value < 0:
+        raise ValueError("Operation duration must not be negative [years].")
+
+    if number_of_launch_es <= 0:
+        raise ValueError("Number of launch(es) must be at least 1 (integer).")
+
     if mass.value <= 0:
-        raise ValueError("LV mass muss be a positive number (kg).")
+        raise ValueError("LV mass must be a positive number (kg).")
 
     if cross_section.value <= 0:
-        raise ValueError("LV cross section muss be a positive number (m^2).")
+        raise ValueError("LV cross section must be a positive number (m^2).")
     
-    if perigee_object_op <= 0:
-        raise ValueError("LV operational perigee muss be a positive number (km).")
+    if mean_thrust.value < 0:
+        raise ValueError("Mean thrust must be a positive number (N).")
+
+    if Isp.value < 0:
+        raise ValueError("Specific impulse must be a positive number (s).")
+
+    if perigee_object_op.value <= 0:
+        raise ValueError("LV operational perigee must be a positive number (km).")
     elif apogee_object_op < perigee_object_op:
-        raise ValueError("LV operational apogee muss be larger or equal to perigee (km).")
+        raise ValueError("LV operational apogee must be larger or equal to perigee (km).")
 
     if inc_object_op >= 180 * u.deg:
         raise ValueError("LV operational inclination not in the range 0 <= inc < 180.")
@@ -90,18 +102,22 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     a_op = (apogee_object_op + perigee_object_op) / 2 + Earth.R
     ecc_op = (apogee_object_op + Earth.R - a_op) / a_op * u.one
 
-    if inc_object_disp >= 180 * u.deg:
-        raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
-    elif inc_object_disp < 0 * u.deg:
-        raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
-
     if EOL_manoeuvre == True:
+        if PMD_success > 1 or PMD_success < 0:
+            raise ValueError("PMD success rate must be between 0 and 1.")
+        
         if perigee_object_disp <= 0:
-            raise ValueError("LV disposal perigee muss be a positive number (km).")
+            raise ValueError("LV disposal perigee must be a positive number (km).")
         elif apogee_object_disp < perigee_object_disp:
-            raise ValueError("LV disposal apogee muss be larger or equal to perigee (km).")
+            raise ValueError("LV disposal apogee must be larger or equal to perigee (km).")
+        
         a_disp = (apogee_object_disp + perigee_object_disp) / 2 + Earth.R
         ecc_disp = (apogee_object_disp + Earth.R - a_disp) / a_disp * u.one
+
+        if inc_object_disp >= 180 * u.deg:
+            raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
+        elif inc_object_disp < 0 * u.deg:
+            raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
     # case without manoeuvre
     else:
         PMD_success = 0
@@ -112,47 +128,59 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     print("\n --- Debris risk from launch vehicle orbital stage. ---")
     LV_SDI_results = SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, Isp, EOL_manoeuvre, PMD_success, a_op, ecc_op, inc_object_op,
                                 a_disp, ecc_disp, inc_object_disp, CF_file_path, reduced_lifetime_file_path)
-        
-    if m_ADR.value <= 0:
-        raise ValueError("ADR stage mass muss be a positive number (kg).")
-    
-    if ADR_cross_section.value <= 0:
-        raise ValueError("ADR stage cross section muss be a positive number (m^2).")
-
-    if m_debris.value <= 0:
-        raise ValueError("Debris mass muss be a positive number (kg).")
-
-    if debris_cross_section.value <= 0:
-        raise ValueError("Debris cross section muss be a positive number (m^2).")
-
-    if perigee_debris <= 0:
-        raise ValueError("Debris perigee muss be a positive number (km).")
-    elif apogee_debris < perigee_debris:
-        raise ValueError("Debris apogee muss be larger or equal to perigee (km).")
-
-    a_debris = (apogee_debris + perigee_debris) / 2 + Earth.R
-    ecc_debris = (apogee_debris + Earth.R - a_debris) / a_debris * u.one
-
-    if inc_debris >= 180 * u.deg:
-        raise ValueError("Debris inclination not in the range 0 <= inc < 180.")
-    elif inc_debris < 0 * u.deg:
-        raise ValueError("Debris inclination not in the range 0 <= inc < 180.")
-
-    if perigee_debris_removal <= 0:
-        raise ValueError("Debris removal perigee muss be a positive number (km).")
-    elif apogee_debris_removal < perigee_debris_removal:
-        raise ValueError("Debris removal apogee muss be larger or equal to perigee (km).")
-
-    a_debris_removal = (apogee_debris_removal + perigee_debris_removal) / 2 + Earth.R
-    ecc_debris_removal = (apogee_debris_removal + Earth.R - a_debris_removal) / a_debris_removal * u.one
-
-    if inc_debris_removal >= 180 * u.deg:
-        raise ValueError("Debris removal inclination not in the range 0 <= inc < 180.")
-    elif inc_debris_removal < 0 * u.deg:
-        raise ValueError("Debris removal inclination not in the range 0 <= inc < 180.")
 
     # For case with ADR stage included
-    if ADR_stage == True:
+    if ADR_stage == True:        
+        if m_ADR.value <= 0:
+            raise ValueError("ADR stage mass must be a positive number (kg).")
+        
+        if ADR_cross_section.value <= 0:
+            raise ValueError("ADR stage cross section must be a positive number (m^2).")
+
+        if ADR_mean_thrust.value < 0:
+            raise ValueError("ADR stage mean thrust must be a positive number (N).")
+
+        if ADR_Isp.value < 0:
+            raise ValueError("ADR stage specific impulse must be a positive number (s).")
+
+        if ADR_manoeuvre_success > 1 or ADR_manoeuvre_success < 0:
+            raise ValueError("ADR manoeuvre success rate must be between 0 and 1.")
+
+        if ADR_capture_success > 1 or ADR_capture_success < 0:
+            raise ValueError("ADR capture success rate must be between 0 and 1.")
+
+        if m_debris.value <= 0:
+            raise ValueError("Debris mass must be a positive number (kg).")
+
+        if debris_cross_section.value <= 0:
+            raise ValueError("Debris cross section must be a positive number (m^2).")
+
+        if perigee_debris <= 0:
+            raise ValueError("Debris perigee must be a positive number (km).")
+        elif apogee_debris < perigee_debris:
+            raise ValueError("Debris apogee must be larger or equal to perigee (km).")
+
+        a_debris = (apogee_debris + perigee_debris) / 2 + Earth.R
+        ecc_debris = (apogee_debris + Earth.R - a_debris) / a_debris * u.one
+
+        if inc_debris >= 180 * u.deg:
+            raise ValueError("Debris inclination not in the range 0 <= inc < 180.")
+        elif inc_debris < 0 * u.deg:
+            raise ValueError("Debris inclination not in the range 0 <= inc < 180.")
+
+        if perigee_debris_removal <= 0:
+            raise ValueError("Debris removal perigee must be a positive number (km).")
+        elif apogee_debris_removal < perigee_debris_removal:
+            raise ValueError("Debris removal apogee must be larger or equal to perigee (km).")
+
+        a_debris_removal = (apogee_debris_removal + perigee_debris_removal) / 2 + Earth.R
+        ecc_debris_removal = (apogee_debris_removal + Earth.R - a_debris_removal) / a_debris_removal * u.one
+
+        if inc_debris_removal >= 180 * u.deg:
+            raise ValueError("Debris removal inclination not in the range 0 <= inc < 180.")
+        elif inc_debris_removal < 0 * u.deg:
+            raise ValueError("Debris removal inclination not in the range 0 <= inc < 180.")
+
         print("\n\n --- Debris risk from active debris removal servicer, from insertion to debris orbit. ---")
         # Assumes ADR inserted at launcher's operational orbit, the "disposal manoeuvre" here describes the trajectory from insertion to the debris
         ADR_servicer_SDI = SDI_compute(starting_epoch, m_ADR, ADR_cross_section, 0 * u.year, ADR_mean_thrust, ADR_Isp, True, ADR_manoeuvre_success, a_op, ecc_op, inc_object_op,
