@@ -78,13 +78,13 @@ cutoff_timestamp = 325 *u.s # [325 *u.s, 372.8 *u.s]
 # thrust curve of the engine
 #raw_thrust_curve = np.genfromtxt(f'{PATH_CSV_THRUST_CURVES}thrust_curve_{engine}.csv', delimiter=",", skip_header=2)
 
-def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, raw_trajectory = None, raw_thrust_curve = None, plotting = False):
+def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ignition_timestamp, cutoff_timestamp, number_of_launch_es, raw_trajectory, raw_thrust_curve, plotting = False):
 
     if raw_trajectory is None:
-        raw_trajectory = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_TRAJECTORIES)}input_traj_{launcher}.csv', delimiter=",", skip_header=2)
+        raw_trajectory = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_TRAJECTORIES)}input_traj_Themis_S1_reuse.csv', delimiter=",", skip_header=2)
 
     if raw_thrust_curve is None:
-        raw_thrust_curve = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_THRUST_CURVES)}thrust_curve_{engine}.csv', delimiter=",",
+        raw_thrust_curve = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_THRUST_CURVES)}thrust_curve_T3_S1.csv', delimiter=",",
                                          skip_header=2)
 
     # creating a list of layer classes for the global atmosphere (cumulating the emissions of every engine)

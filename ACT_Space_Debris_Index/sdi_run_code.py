@@ -90,17 +90,16 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     a_op = (apogee_object_op + perigee_object_op) / 2 + Earth.R
     ecc_op = (apogee_object_op + Earth.R - a_op) / a_op * u.one
 
-    if perigee_object_disp <= 0:
-        raise ValueError("LV disposal perigee muss be a positive number (km).")
-    elif apogee_object_disp < perigee_object_disp:
-        raise ValueError("LV disposal apogee muss be larger or equal to perigee (km).")
-
     if inc_object_disp >= 180 * u.deg:
         raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
     elif inc_object_disp < 0 * u.deg:
         raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
 
     if EOL_manoeuvre == True:
+        if perigee_object_disp <= 0:
+            raise ValueError("LV disposal perigee muss be a positive number (km).")
+        elif apogee_object_disp < perigee_object_disp:
+            raise ValueError("LV disposal apogee muss be larger or equal to perigee (km).")
         a_disp = (apogee_object_disp + perigee_object_disp) / 2 + Earth.R
         ecc_disp = (apogee_object_disp + Earth.R - a_disp) / a_disp * u.one
     # case without manoeuvre

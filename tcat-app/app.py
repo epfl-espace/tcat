@@ -30,7 +30,6 @@ from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import Scena
 from logging.config import dictConfig
 from astropy import units as astro_units
 
-
 dictConfig({
     'version': 1,
     'formatters': {'default': {
@@ -679,37 +678,37 @@ def get_sdi():
         return '{"error": "No data provided"}'
 
     result = sdi_main(Time(data['startingEpoch'], scale="tdb"),
-                    data['opDuration'] * astro_units.year,
-                    data['mass'] * astro_units.kg,
-                    data['crossSection'] * astro_units.m**2,
-                    data['meanThrust'] * astro_units.N,
-                    data['lsp'] * astro_units.s,
-                    data['numberOfLaunches'],
-                    data['apogeeObjectOp'] * astro_units.km,
-                    data['perigeeObjectOp'] * astro_units.km,
-                    data['incObjectOp'] * astro_units.deg,
-                    data['eolManoeuvre'],
-                    data['pmdSuccess'],
-                    data['apogeeObjectDisp'] * astro_units.km,
-                    data['perigeeObjectDisp'] * astro_units.km,
-                    data['incObjectDisp'] * astro_units.deg,
-                    data['adrStage'],
-                    data['mAdr'] * astro_units.kg,
-                    data['adrCrossSection'] * astro_units.m**2,
-                    data['adrMeanThrust'] * astro_units.N,
-                    data['adrIsp'] * astro_units.s,
-                    data['adrManoeuvreSuccess'],
-                    data['adrCaptureSuccess'],
-                    data['mDebris'] * astro_units.kg,
-                    data['debrisCrossSection'] * astro_units.m**2,
-                    data['apogeeDebris'] * astro_units.km,
-                    data['perigeeDebris'] * astro_units.km,
-                    data['incDebris'] * astro_units.deg,
-                    data['apogeeDebrisRemoval'] * astro_units.km,
-                    data['perigeeDebrisRemoval'] * astro_units.km,
-                    data['incDebrisRemoval'] * astro_units.deg,
-                    os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv'),
-                    os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_reduced_lifetime.csv'))
+                      data['opDuration'] * astro_units.year if data['opDuration'] is not None else None,
+                      data['mass'] * astro_units.kg if data['mass'] is not None else None,
+                      data['crossSection'] * astro_units.m ** 2 if data['crossSection'] is not None else None,
+                      data['meanThrust'] * astro_units.N if data['meanThrust'] is not None else None,
+                      data['isp'] * astro_units.s if data['isp'] is not None else None,
+                      data['numberOfLaunches'],
+                      data['apogeeObjectOp'] * astro_units.km if data['apogeeObjectOp'] is not None else None,
+                      data['perigeeObjectOp'] * astro_units.km if data['perigeeObjectOp'] is not None else None,
+                      data['incObjectOp'] * astro_units.deg if data['incObjectOp'] is not None else None,
+                      data['eolManoeuvre'],
+                      data['pmdSuccess'],
+                      data['apogeeObjectDisp'] * astro_units.km if data['apogeeObjectDisp'] is not None else None,
+                      data['perigeeObjectDisp'] * astro_units.km if data['perigeeObjectDisp'] is not None else None,
+                      data['incObjectDisp'] * astro_units.deg if data['incObjectDisp'] is not None else None,
+                      data['adrStage'],
+                      data['mAdr'] * astro_units.kg if data['mAdr'] is not None else None,
+                      data['adrCrossSection'] * astro_units.m ** 2 if data['adrCrossSection'] is not None else None,
+                      data['adrMeanThrust'] * astro_units.N if data['adrMeanThrust'] is not None else None,
+                      data['adrIsp'] * astro_units.s if data['adrIsp'] is not None else None,
+                      data['adrManoeuvreSuccess'],
+                      data['adrCaptureSuccess'],
+                      data['mDebris'] * astro_units.kg if data['mDebris'] is not None else None,
+                      data['debrisCrossSection'] * astro_units.m ** 2 if data['debrisCrossSection'] is not None else None,
+                      data['apogeeDebris'] * astro_units.km if data['apogeeDebris'] is not None else None,
+                      data['perigeeDebris'] * astro_units.km if data['perigeeDebris'] is not None else None,
+                      data['incDebris'] * astro_units.deg if data['incDebris'] is not None else None,
+                      data['apogeeDebrisRemoval'] * astro_units.km if data['apogeeDebrisRemoval'] is not None else None,
+                      data['perigeeDebrisRemoval'] * astro_units.km if data['perigeeDebrisRemoval'] is not None else None,
+                      data['incDebrisRemoval'] * astro_units.deg if data['incDebrisRemoval'] is not None else None,
+                      os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv'),
+                      os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_reduced_lifetime.csv'))
 
     response = {'LCS3': result['LCS3'].value, 'LCS4': result['LCS4'].value}
     return jsonify(response)
@@ -723,25 +722,17 @@ def get_atm():
     if data is None:
         return '{"error": "No data provided"}'
 
-    raw_trajectory = None
-    if 'rawTrajectory' in data:
-        raw_trajectory = data['rawTrajectory']
-
-    raw_thrust_curve = None
-    if 'rawThrustCurve' in data:
-        raw_thrust_curve = data['rawThrustCurve']
-
     result = atm_main(TCAT_DIR,
                       data['launcher'],
                       data['engine'],
                       data['numberOfEngines'],
                       data['propType'],
-                      data['lsp'] * astro_units.s,
-                      data['ignitionTimestamp']*astro_units.s,
-                      data['cutoffTimestamp']*astro_units.s,
+                      data['isp'] * astro_units.s if data['isp'] is not None else None,
+                      data['ignitionTimestamp'] * astro_units.s if data['ignitionTimestamp'] is not None else None,
+                      data['cutoffTimestamp'] * astro_units.s if data['cutoffTimestamp'] is not None else None,
                       data['numberOfLaunches'],
-                      raw_trajectory,
-                      raw_thrust_curve,
+                      data['rawTrajectory'],
+                      data['rawThrustCurve'],
                       plotting=False)
 
     return jsonify(result)
