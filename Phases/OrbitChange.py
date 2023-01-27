@@ -108,25 +108,25 @@ class OrbitChange(GenericPhase):
         self.update_spacecraft()
         self.spacecraft_snapshot = self.build_spacecraft_snapshot_string()
     
-    def apply_delta_v(self):
-        """ Compute the delta v for the maneuver and possible orbit maintenance during phasing.
-        Apply this delta v according to assigned module.
-        """
-        # compute maneuver delta v, duration and possible transfer orbit in case of high thrust orbit change
-        self.delta_v, maneuver_duration = self.compute_maneuver()
+    # def apply_delta_v(self):
+    #     """ Compute the delta v for the maneuver and possible orbit maintenance during phasing.
+    #     Apply this delta v according to assigned module.
+    #     """
+    #     # compute maneuver delta v, duration and possible transfer orbit in case of high thrust orbit change
+    #     self.delta_v, maneuver_duration = self.compute_maneuver()
         
-        # compute phasing maneuver if phasing is applicable
-        # otherwise simply compute natural raan drift during maneuver
-        if self.raan_specified:
-            self.duration, self.raan_drift, optional_delta_v = self.compute_phasing(maneuver_duration)
-        else:
-            self.duration, self.raan_drift, optional_delta_v = self.compute_phasing(maneuver_duration,
-                                                                                    total_duration=maneuver_duration)
-        # compute additional maintenance delta v on initial orbit in case of significant drifting time at low altitude
-        self.delta_v = self.delta_v + compute_altitude_maintenance_delta_v(self.duration - maneuver_duration,
-                                                                           self.initial_orbit) + optional_delta_v
-        # apply to assigned propulsion module
-        self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.delta_v_contingency), 'phasing')
+    #     # compute phasing maneuver if phasing is applicable
+    #     # otherwise simply compute natural raan drift during maneuver
+    #     if self.raan_specified:
+    #         self.duration, self.raan_drift, optional_delta_v = self.compute_phasing(maneuver_duration)
+    #     else:
+    #         self.duration, self.raan_drift, optional_delta_v = self.compute_phasing(maneuver_duration,
+    #                                                                                 total_duration=maneuver_duration)
+    #     # compute additional maintenance delta v on initial orbit in case of significant drifting time at low altitude
+    #     self.delta_v = self.delta_v + compute_altitude_maintenance_delta_v(self.duration - maneuver_duration,
+    #                                                                        self.initial_orbit) + optional_delta_v
+    #     # apply to assigned propulsion module
+    #     self.get_assigned_module().apply_delta_v(self.delta_v * (1 + self.delta_v_contingency), 'phasing')
 
     def update_spacecraft(self, spacecraft=None):
         """ Update the orbits of the servicer and attached targets after phase has ended.
@@ -239,44 +239,44 @@ class OrbitChange(GenericPhase):
         if self.assigned_module.prop_type == 'electrical':
             manoeuvres, transfer_duration = low_thrust_delta_v(initial_orbit, final_orbit, mass, thrust, isp)
         else:
-            manoeuvres, transfer_duration = high_thrust_delta_v(initial_orbit, final_orbit, mass, thrust, isp, spacecraft_burn_in_atmosphere)
+            manoeuvres, transfer_duration, transfer_orbit, burned_mass = high_thrust_delta_v(initial_orbit, final_orbit, mass, thrust, isp, spacecraft_burn_in_atmosphere)
 
         return manoeuvres, transfer_duration
 
-    def compute_maneuver(self, orbit1=None, orbit2=None, mass=None, thrust=None):
-        """ Returns the delta v necessary to perform the phase.
-        Particular orbits, masses and thrusts can be specified to make some quick comparisons or optimizations.
-        The default orbits used are those defined as initial and final for the phase.
+    # def compute_maneuver(self, orbit1=None, orbit2=None, mass=None, thrust=None):
+    #     """ Returns the delta v necessary to perform the phase.
+    #     Particular orbits, masses and thrusts can be specified to make some quick comparisons or optimizations.
+    #     The default orbits used are those defined as initial and final for the phase.
 
-        Args:
-            orbit1 (astropy.time.Time): (optional) initial orbit
-            orbit2 (astropy.time.Time): (optional) final orbit
-            mass (u.kg): (optional) servicer mass at the start of the maneuver
-            thrust (u.N): (optional) servicer thrust capability at the start of the maneuver
+    #     Args:
+    #         orbit1 (astropy.time.Time): (optional) initial orbit
+    #         orbit2 (astropy.time.Time): (optional) final orbit
+    #         mass (u.kg): (optional) servicer mass at the start of the maneuver
+    #         thrust (u.N): (optional) servicer thrust capability at the start of the maneuver
 
-        Return:
-            (u.m / u.s) : required delta v
-            (u.<time unit>): duration of the maneuver (without phasing durations)
-        """
-        # retrieve default parameters
-        if orbit1 is None:
-            orbit1 = self.initial_orbit
-        if orbit2 is None:
-            orbit2 = self.final_orbit
-        if mass is None:
-                mass = self.get_assigned_spacecraft().get_current_mass()
-        if thrust is None:
-            thrust = self.get_assigned_module().reference_thrust
+    #     Return:
+    #         (u.m / u.s) : required delta v
+    #         (u.<time unit>): duration of the maneuver (without phasing durations)
+    #     """
+    #     # retrieve default parameters
+    #     if orbit1 is None:
+    #         orbit1 = self.initial_orbit
+    #     if orbit2 is None:
+    #         orbit2 = self.final_orbit
+    #     if mass is None:
+    #             mass = self.get_assigned_spacecraft().get_current_mass()
+    #     if thrust is None:
+    #         thrust = self.get_assigned_module().reference_thrust
 
-        # apply appropriate function depending on propulsion
-        if self.assigned_module.prop_type == 'electrical':
-            delta_v, maneuver_duration = low_thrust_delta_v(orbit1, orbit2, mass, thrust)
-        elif orbit1.attractor == Earth and orbit2.attractor == Moon:
-            delta_v, _, _, maneuver_duration, _, _, _ = compute_translunar_injection(orbit1, orbit2)
-        else:
-            delta_v, _, _, _, maneuver_duration = high_thrust_delta_v(orbit1, orbit2)
+    #     # apply appropriate function depending on propulsion
+    #     if self.assigned_module.prop_type == 'electrical':
+    #         delta_v, maneuver_duration = low_thrust_delta_v(orbit1, orbit2, mass, thrust)
+    #     elif orbit1.attractor == Earth and orbit2.attractor == Moon:
+    #         delta_v, _, _, maneuver_duration, _, _, _ = compute_translunar_injection(orbit1, orbit2)
+    #     else:
+    #         delta_v, _, _, _, maneuver_duration = high_thrust_delta_v(orbit1, orbit2)
                 
-        return delta_v, maneuver_duration
+    #     return delta_v, maneuver_duration
 
     def compute_precession(self, manoeuvre_duration, initial_orbit=None, final_orbit=None, raan_phasing=False,
                            mass=None, thrust=None, isp=None, raan_phasing_absolute=False):

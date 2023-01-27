@@ -182,7 +182,7 @@ def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, i
     v_f_1 = instant_orbital_velocity(transfer_orbit, first_burn_radius)
     delta_v_1 = np.sqrt((v_f_1 - v_i_1)**2 + first_inc_delta_v**2)
     manoeuvre = Manoeuvre(delta_v_1,"first high-trust dV")
-    manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
+    burned_mass = manoeuvre.compute_burn_mass_and_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
     if no_2n_burn is False:
@@ -191,12 +191,12 @@ def high_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, i
         v_f_2 = instant_orbital_velocity(final_orbit, second_burn_radius)
         delta_v_2 = np.sqrt((v_f_2 - v_i_2)**2 + second_inc_delta_v**2)
         manoeuvre = Manoeuvre(delta_v_2,"second high-trust dV")
-        manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
+        burned_mass = burned_mass + manoeuvre.compute_burn_mass_and_duration(initial_mass, mean_thrust, isp)
         maneouvres.append(manoeuvre)
 
     transfer_duration = (transfer_orbit.period / 2).to(u.day)
 
-    return maneouvres, transfer_duration
+    return maneouvres, transfer_duration, transfer_orbit, burned_mass
 
 
 def low_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, isp):
@@ -238,7 +238,7 @@ def low_thrust_delta_v(initial_orbit, final_orbit, initial_mass, mean_thrust, is
     # compute delta v for total maneuver
     delta_v = np.sqrt(v_0**2 + v_f**2 - 2*v_0*v_f*np.cos(np.pi/2 * delta_i))
     manoeuvre = Manoeuvre(delta_v,"low-trust maneuver")
-    manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
+    burned_mass = manoeuvre.compute_burn_mass_and_duration(initial_mass, mean_thrust, isp)
     maneouvres.append(manoeuvre)
 
     transfer_duration = manoeuvre.get_burn_duration(duty_cycle=EP_DUTY_CYCLE)/(1-EP_COAST_CYCLE)
@@ -286,11 +286,10 @@ def high_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, init
     delta_v = np.pi / 2 * vel * d_inc_ratio * abs(delta_raan.to(u.rad).value)
 
     manoeuvre = Manoeuvre(delta_v,id="high trust direct raan change")
-    manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
+    burned_mass = manoeuvre.compute_burn_mass_and_duration(initial_mass, mean_thrust, isp)
     transfer_duration = (final_orbit.period / 2).to(u.day)
 
     return manoeuvre, transfer_duration
-
 
 def low_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, initial_mass, mean_thrust, isp):
     """ Returns a rough estimation of delta_v needed to perform a small change in raan.
@@ -304,7 +303,7 @@ def low_thrust_raan_change_delta_v(delta_raan, initial_orbit, final_orbit, initi
                            * abs(delta_raan.to(u.rad).value))
 
     manoeuvre = Manoeuvre(delta_v,id="low trust direct raan change")
-    manoeuvre.compute_burn_duration(initial_mass, mean_thrust, isp)
+    burned_mass = manoeuvre.compute_burn_mass_and_duration(initial_mass, mean_thrust, isp)
     transfer_duration = manoeuvre.get_burn_duration(duty_cycle=EP_DUTY_CYCLE)/(1-EP_COAST_CYCLE)
 
     return manoeuvre, transfer_duration

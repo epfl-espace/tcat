@@ -5,6 +5,7 @@ import mimetypes
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -13,6 +14,7 @@ from datetime import datetime
 from operator import and_, or_
 from time import sleep
 
+from astropy.time import Time
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, flash, make_response, send_file, redirect, url_for, jsonify
 from flask_oidc import OpenIDConnect
@@ -21,9 +23,12 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 import inputparams
+from ACT_Space_Debris_Index.sdi_run_code import sdi_main
+from ACT_atmospheric_emissions.atm_run_code import atm_main
 from models import db, Configuration, ConfigurationRun
 from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import ScenarioADRSetupFromACT
 from logging.config import dictConfig
+from astropy import units as astro_units
 
 dictConfig({
     'version': 1,
@@ -130,7 +135,7 @@ def failed_config_run(config_run_id):
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def get_user_info():
@@ -155,10 +160,15 @@ def valid_configuration(configuration, params):
         elif key == 'launcher_use_database':
             launcher_use_database = key in configuration and configuration['launcher_use_database'] == 'on'
 
-        if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter', 'launcher_fairing_cylinder_height', 'launcher_fairing_total_height', 'launcher_perf_interpolation_method']:
+        if launcher_use_database and key in ['launcher_performance', 'launcher_fairing_diameter',
+                                             'launcher_fairing_cylinder_height', 'launcher_fairing_total_height',
+                                             'launcher_perf_interpolation_method']:
             continue
 
-        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass', 'kickstage_prop_thrust', 'kickstage_prop_isp', 'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass', 'kickstage_struct_mass', 'kickstage_propulsion_type']:
+        if kickstage_use_database and key in ['kickstage_height', 'kickstage_diameter', 'kickstage_initial_fuel_mass',
+                                              'kickstage_prop_thrust', 'kickstage_prop_isp',
+                                              'kickstage_propulsion_dry_mass', 'kickstage_dispenser_dry_mass',
+                                              'kickstage_struct_mass', 'kickstage_propulsion_type']:
             continue
 
         if not (key in configuration):
@@ -330,13 +340,15 @@ def configure(current_scenario, template, params):
                                                                Configuration.scenario == current_scenario)).order_by(
                 desc(Configuration.created_date)).first()
             if last_config_item is not None:
-                last_run_for_configuration = ConfigurationRun.query.filter_by(configuration_id=last_config_item.id).first()
+                last_run_for_configuration = ConfigurationRun.query.filter_by(
+                    configuration_id=last_config_item.id).first()
                 last_configuration = json.loads(last_config_item.configuration)
         else:
             is_reset = True
 
     return render_template(template, last_configuration=last_configuration,
-                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1], is_reset=is_reset)
+                           last_run_for_configuration=last_run_for_configuration, validation_errors=validation[1],
+                           is_reset=is_reset)
 
 
 @app.route('/configure-adr', methods=['GET', 'POST'])
@@ -657,8 +669,77 @@ def download_run_data(scenario_id, config_run_id):
     return send_file(file_obj, download_name=f'{scenario_id}.zip', as_attachment=True)
 
 
+@app.route('/api/v1/calculations/sdi', methods=['POST'])
+@oidc.accept_token(require_token=True)
+def get_sdi():
+    data = request.get_json()
+
+    if data is None:
+        return '{"error": "No data provided"}'
+
+    result = sdi_main(Time(data['startingEpoch'], scale="tdb"),
+                      data['opDuration'] * astro_units.year if data['opDuration'] is not None else None,
+                      data['mass'] * astro_units.kg if data['mass'] is not None else None,
+                      data['crossSection'] * astro_units.m ** 2 if data['crossSection'] is not None else None,
+                      data['meanThrust'] * astro_units.N if data['meanThrust'] is not None else None,
+                      data['isp'] * astro_units.s if data['isp'] is not None else None,
+                      data['numberOfLaunches'],
+                      data['apogeeObjectOp'] * astro_units.km if data['apogeeObjectOp'] is not None else None,
+                      data['perigeeObjectOp'] * astro_units.km if data['perigeeObjectOp'] is not None else None,
+                      data['incObjectOp'] * astro_units.deg if data['incObjectOp'] is not None else None,
+                      data['eolManoeuvre'],
+                      data['pmdSuccess'],
+                      data['apogeeObjectDisp'] * astro_units.km if data['apogeeObjectDisp'] is not None else None,
+                      data['perigeeObjectDisp'] * astro_units.km if data['perigeeObjectDisp'] is not None else None,
+                      data['incObjectDisp'] * astro_units.deg if data['incObjectDisp'] is not None else None,
+                      data['adrStage'],
+                      data['mAdr'] * astro_units.kg if data['mAdr'] is not None else None,
+                      data['adrCrossSection'] * astro_units.m ** 2 if data['adrCrossSection'] is not None else None,
+                      data['adrMeanThrust'] * astro_units.N if data['adrMeanThrust'] is not None else None,
+                      data['adrIsp'] * astro_units.s if data['adrIsp'] is not None else None,
+                      data['adrManoeuvreSuccess'],
+                      data['adrCaptureSuccess'],
+                      data['mDebris'] * astro_units.kg if data['mDebris'] is not None else None,
+                      data['debrisCrossSection'] * astro_units.m ** 2 if data['debrisCrossSection'] is not None else None,
+                      data['apogeeDebris'] * astro_units.km if data['apogeeDebris'] is not None else None,
+                      data['perigeeDebris'] * astro_units.km if data['perigeeDebris'] is not None else None,
+                      data['incDebris'] * astro_units.deg if data['incDebris'] is not None else None,
+                      data['apogeeDebrisRemoval'] * astro_units.km if data['apogeeDebrisRemoval'] is not None else None,
+                      data['perigeeDebrisRemoval'] * astro_units.km if data['perigeeDebrisRemoval'] is not None else None,
+                      data['incDebrisRemoval'] * astro_units.deg if data['incDebrisRemoval'] is not None else None,
+                      os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv'),
+                      os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_reduced_lifetime.csv'))
+
+    response = {'LCS3': result['LCS3'].value, 'LCS4': result['LCS4'].value}
+    return jsonify(response)
+
+
+@app.route('/api/v1/calculations/atm', methods=['POST'])
+@oidc.accept_token(require_token=True)
+def get_atm():
+    data = request.get_json()
+
+    if data is None:
+        return '{"error": "No data provided"}'
+
+    result = atm_main(TCAT_DIR,
+                      data['launcher'],
+                      data['engine'],
+                      data['numberOfEngines'],
+                      data['propType'],
+                      data['isp'] * astro_units.s if data['isp'] is not None else None,
+                      data['ignitionTimestamp'] * astro_units.s if data['ignitionTimestamp'] is not None else None,
+                      data['cutoffTimestamp'] * astro_units.s if data['cutoffTimestamp'] is not None else None,
+                      data['numberOfLaunches'],
+                      data['rawTrajectory'],
+                      data['rawThrustCurve'],
+                      plotting=False)
+
+    return jsonify(result)
+
+
 app.jinja_env.globals.update(inputparams=inputparams)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5555, debug=True)
     app.logger.info('Starting application')
