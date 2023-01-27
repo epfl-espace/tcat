@@ -741,5 +741,5 @@ def get_atm():
 app.jinja_env.globals.update(inputparams=inputparams)
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run()
     app.logger.info('Starting application')
