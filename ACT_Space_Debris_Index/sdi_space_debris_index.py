@@ -92,19 +92,19 @@ def natural_decay(reduced_lifetime_file, CF_file, initial_orbit, cross_section, 
         return cumulated_time, decay_orbit_impact
 
     # find eccentricity index
-    if ecc >= 0.8:
+    if ecc >= 0.6:
         index_ecc = 7
-    elif ecc >= 0.4:
+    elif ecc >= 0.3:
         index_ecc = 6
-    elif ecc >= 0.2:
+    elif ecc >= 0.15:
         index_ecc = 5
-    elif ecc >= 0.1:
+    elif ecc >= 0.075:
         index_ecc = 4
-    elif ecc >= 0.05:
+    elif ecc >= 0.035:
         index_ecc = 3
-    elif ecc >= 0.02:
+    elif ecc >= 0.015:
         index_ecc = 2
-    elif ecc >= 0.01:
+    elif ecc >= 0.005:
         index_ecc = 1
     else:
         index_ecc = 0
