@@ -22,18 +22,18 @@ RUN pip install -U uwsgi
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-WORKDIR /app/tcat-app
+WORKDIR /app/tcat_app
 
 COPY ./ScenarioDatabase ./ScenarioDatabase
 
 RUN chmod 777 ./startup.sh
-RUN mv ./tcat-app /etc/nginx/sites-available/
-RUN ln -s /etc/nginx/sites-available/tcat-app /etc/nginx/sites-enabled
+RUN mv ./tcat_app /etc/nginx/sites-available/
+RUN ln -s /etc/nginx/sites-available/tcat_app /etc/nginx/sites-enabled
 
-RUN mv ./tcat-app.service /etc/systemd/system/tcat-app.service
+RUN mv ./tcat_app.service /etc/systemd/system/tcat_app.service
 RUN systemctl daemon-reload
 RUN systemctl reload nginx
 
 STOPSIGNAL SIGQUIT
 
-CMD /app/tcat-app/startup.sh && nginx -g 'daemon off;'
+CMD /app/tcat_app/startup.sh && nginx -g 'daemon off;'
