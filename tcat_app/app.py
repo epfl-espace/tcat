@@ -22,10 +22,10 @@ from sqlalchemy import desc
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-import inputparams
+from tcat_app import inputparams
 from ACT_Space_Debris_Index.sdi_run_code import sdi_main
 from ACT_atmospheric_emissions.atm_run_code import atm_main
-from models import db, Configuration, ConfigurationRun
+from tcat_app.models import db, Configuration, ConfigurationRun
 from ScenarioDatabase.ScenariosSetupFromACT.ScenarioADRSetupFromACT import ScenarioADRSetupFromACT
 from logging.config import dictConfig
 from astropy import units as astro_units
@@ -72,7 +72,7 @@ def create_app():
         'SECRET_KEY': os.getenv('SECRET_KEY'),
         'TESTING': False,
         'DEBUG': False,
-        'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+        'OIDC_CLIENT_SECRETS': os.getenv('CLIENT_SECRETS_FILE'),
         'OIDC_ID_TOKEN_COOKIE_SECURE': False,
         'OIDC_REQUIRE_VERIFIED_EMAIL': False,
         'OIDC_USER_INFO_ENABLED': True,

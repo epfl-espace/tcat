@@ -5,6 +5,7 @@ ENV TCAT_DIR=/app
 ENV TCAT_PYTHON_EXE=/usr/local/bin/python
 ENV TCAT_RUN_FILE=RunTCAT.py
 ENV DATABASE_URI=sqlite:////tcat-app-db/tcat.db
+ENV CLIENT_SECRETS_FILE=./tcat_app/client_secrets.json
 ENV HOST=0.0.0.0
 ENV PORT=5000
 ENV ALLOWED_EXTENSIONS=json
@@ -27,10 +28,10 @@ WORKDIR /app/tcat_app
 COPY ./ScenarioDatabase ./ScenarioDatabase
 
 RUN chmod 777 ./startup.sh
-RUN mv ./tcat_app /etc/nginx/sites-available/
-RUN ln -s /etc/nginx/sites-available/tcat_app /etc/nginx/sites-enabled
+RUN mv ./tcat-app /etc/nginx/sites-available/
+RUN ln -s /etc/nginx/sites-available/tcat-app /etc/nginx/sites-enabled
 
-RUN mv ./tcat_app.service /etc/systemd/system/tcat_app.service
+RUN mv ./tcat-app.service /etc/systemd/system/tcat-app.service
 RUN systemctl daemon-reload
 RUN systemctl reload nginx
 
