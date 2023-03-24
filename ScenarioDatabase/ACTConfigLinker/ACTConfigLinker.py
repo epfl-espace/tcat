@@ -32,6 +32,12 @@ class ACTConfigLinker:
         bb = self.get_config_bb(config, bb_type_id, bb_name)
         param = self.get_bb_parameter(bb, param_type_id)
         return self.get_param_type_unit_name(param)
+    
+    def get_bb_child_parameter_value(self, config_name, bb_type_id, child_type_id, param_type_id, bb_name=None, child_name=None):
+        config = self.get_config(config_name)
+        child = self.get_config_bb_child(config, bb_type_id, child_type_id, bb_name, child_name)
+        param = self.get_bb_parameter(child, param_type_id)
+        return self.get_param_value(param)
 
     def get_bb_child_name_filtered_type_id(self, config_name, bb_type_id, child_bb_type_id):
         config = self.get_config(config_name)
@@ -82,6 +88,14 @@ class ACTConfigLinker:
             print(f"{self.get_config_id(config)} config is missing a field: name")
             return None
         return config["name"]
+
+    def get_config_starting_epoch(self, config):
+        if not self.check_config(config):
+            return None
+        if "startingEpoch" not in config:
+            print(f"{self.get_config_id(config)} config is missing a field: startingEpoch")
+            return None
+        return config["startingEpoch"]
 
     def get_config_type(self, config):
         if not self.check_config(config):
@@ -163,6 +177,21 @@ class ACTConfigLinker:
         if bbs is None:
             return None
         return bbs[0]
+    
+    def get_config_bb_child(self, config, bb_type_id, child_type_id, bb_name=None, child_name=None):
+        bbs = self.get_config_bbs(config)
+        bbs = self.filter_bbs_by_type_id(bbs, bb_type_id)
+        if bb_name is not None:
+            bbs = self.filter_bbs_by_name(bbs, bb_name)
+        if bbs is None:
+            return None
+        children = self.get_bb_child(bbs[0])
+        children = self.filter_bbs_by_type_id(children, child_type_id)
+        if child_name is not None:
+            children = self.filter_bbs_by_name(children, child_name)
+        if children is None:
+            return None
+        return children[0]
 
     ### Methods to access fields from unique building blocks ###
 
