@@ -228,8 +228,8 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                                             ecc_op, 
                                             inc_object_op, 
                                             0. * u.deg,
+                                            90. * u.deg,
                                             0. * u.deg,
-                                            180. * u.deg,
                                             starting_epoch)
 
     disposal_orbit = Orbit.from_classical(Earth, 
@@ -237,8 +237,8 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                                             ecc_disp, 
                                             inc_object_disp, 
                                             0. * u.deg,
+                                            90. * u.deg,
                                             0. * u.deg,
-                                            180. * u.deg,
                                             starting_epoch)
 
     # Impact score computation

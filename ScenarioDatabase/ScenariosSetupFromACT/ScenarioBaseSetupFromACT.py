@@ -1,6 +1,6 @@
-from ScenarioDatabase.ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
-from ScenarioDatabase.ACTConfigLinker.ACTConfigIDs import *
-from ScenarioDatabase.ScenarioInput.ScenarioInput import ScenarioInput
+from ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
+from ACTConfigLinker.ACTConfigIDs import *
+from ScenarioInput.ScenarioInput import ScenarioInput
 
 
 class ScenarioBaseSetupFromACT():
@@ -36,8 +36,9 @@ class ScenarioBaseSetupFromACT():
         self.read_mission_starting_epoch(act_config_name)
 
     def read_mission_starting_epoch(self, act_config_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_MISSION, PARAM_ID_STARTING_EPOCH)
+        config = self.act_db_linker.get_config(act_config_name)
+        param_value = self.act_db_linker.get_config_starting_epoch(config)
+        
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.starting_epoch = str(param_value)
 
@@ -50,7 +51,6 @@ class ScenarioBaseSetupFromACT():
 
     def read_launcher_config(self, act_config_name):
         self.read_launcher_name(act_config_name)
-        self.read_launcher_launch_site(act_config_name)
         self.read_launcher_orbit_type(act_config_name)
         self.read_launcher_fairing_diameter(act_config_name)
         self.read_launcher_height_cylinder(act_config_name)
@@ -62,15 +62,9 @@ class ScenarioBaseSetupFromACT():
         if self.act_db_linker.check_parameter_value(name):
             self.tcat_input_linker.launcher_name = str(name)
 
-    def read_launcher_launch_site(self, act_config_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_MISSION, PARAM_ID_LAUNCH_SITE)
-        if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.launcher_launch_site = str(param_value)
-
     def read_launcher_orbit_type(self, act_config_name):
         param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_UPPERSTAGE, PARAM_ID_ORBIT_TYPE)
+            act_config_name, BB_ID_ORBITALSTAGE, PARAM_ID_ORBIT_TYPE)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.launcher_orbit_type = str(param_value)
 
@@ -95,7 +89,7 @@ class ScenarioBaseSetupFromACT():
     ### Read Kickstage Config ###
 
     def read_kickstage_config(self, act_config_name):
-        self.read_kickstage_name(act_config_name)
+        kickstage_name = self.read_and_get_kickstage_name(act_config_name)
         self.read_kickstage_height(act_config_name)
         self.read_kickstage_diameter(act_config_name)
         self.read_kickstage_initial_fuel_mass(act_config_name)
@@ -103,14 +97,15 @@ class ScenarioBaseSetupFromACT():
         self.read_kickstage_struct_dry_mass(act_config_name)
         engine_name = self.get_kickstage_engine_name_from_child(act_config_name)
         if engine_name is not None:
-            self.read_kickstage_engine_parameters(act_config_name, engine_name)
+            self.read_kickstage_engine_parameters(act_config_name, kickstage_name, engine_name)
 
-    def read_kickstage_name(self, act_config_name):
+    def read_and_get_kickstage_name(self, act_config_name):
         config = self.act_db_linker.get_config(act_config_name)
         bb_kickstage = self.act_db_linker.get_config_bb(config, BB_ID_KICKSTAGE)
         name = self.act_db_linker.get_bb_name(bb_kickstage)
         if self.act_db_linker.check_parameter_value(name):
             self.tcat_input_linker.kickstage_name = str(name)
+        return name
 
     def read_kickstage_height(self, act_config_name):
         param_value = self.act_db_linker.get_bb_parameter_value( \
@@ -144,7 +139,7 @@ class ScenarioBaseSetupFromACT():
 
     def get_kickstage_engine_name_from_child(self, act_config_name):
         name = self.act_db_linker.get_bb_child_name_filtered_type_id( \
-            act_config_name, BB_ID_KICKSTAGE, BB_ID_ENGINE)
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_PROPULSION)
         if not self.act_db_linker.check_parameter_value(name, "kickstage engine"):
             print("Kickstage is missing a child engine block")
             return None
@@ -179,52 +174,52 @@ class ScenarioBaseSetupFromACT():
             self.tcat_input_linker.inc_launcher_insertion = float(param_value)
 
     def read_orbit_kickstage_disposal_apogee(self, act_config_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_KICKSTAGE, PARAM_ID_ORBIT_DISPOSAL_APOGEE)
+        param_value = self.act_db_linker.get_bb_child_parameter_value( \
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_EOL_STRATEGY, PARAM_ID_ORBIT_DISPOSAL_APOGEE)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.apogee_kickstage_disposal = float(param_value)
 
     def read_orbit_kickstage_disposal_perigee(self, act_config_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_KICKSTAGE, PARAM_ID_ORBIT_DISPOSAL_PERIGEE)
+        param_value = self.act_db_linker.get_bb_child_parameter_value( \
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_EOL_STRATEGY, PARAM_ID_ORBIT_DISPOSAL_PERIGEE)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.perigee_kickstage_disposal = float(param_value)
 
     def read_orbit_kickstage_disposal_inclination(self, act_config_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_KICKSTAGE, PARAM_ID_ORBIT_DISPOSAL_INCLINATION)
+        param_value = self.act_db_linker.get_bb_child_parameter_value( \
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_EOL_STRATEGY, PARAM_ID_ORBIT_DISPOSAL_INCLINATION)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.inc_kickstage_disposal = float(param_value)
 
     ### Link engines and propellants ###
 
-    def get_all_engines_name(self, act_config_name):
+    def get_all_engines_name(self, act_config_name): # might have to change od just not useful anymore if prop are only in childblocks
         config = self.act_db_linker.get_config(act_config_name)
-        bbs_engine = self.act_db_linker.get_config_bbs_filtered_type(config, BB_ID_ENGINE)
+        bbs_engine = self.act_db_linker.get_config_bbs_filtered_type(config, BB_ID_PROPULSION)
         if bbs_engine is None:
             return None
         engines_name = [self.act_db_linker.get_bb_name(bb_engine) for bb_engine in bbs_engine]
         return engines_name
 
-    def read_kickstage_engine_parameters(self, act_config_name, engine_name):
-        self.read_kickstage_propulsion_thrust(act_config_name, engine_name)
-        self.read_kickstage_propulsion_dry_mass(act_config_name, engine_name)
-        self.read_kickstage_propulsion_isp(act_config_name, engine_name)
+    def read_kickstage_engine_parameters(self, act_config_name, kickstage_name, engine_name):
+        self.read_kickstage_propulsion_thrust(act_config_name, kickstage_name, engine_name)
+        self.read_kickstage_propulsion_dry_mass(act_config_name, kickstage_name, engine_name)
+        self.read_kickstage_propulsion_isp(act_config_name, kickstage_name, engine_name)
 
-    def read_kickstage_propulsion_thrust(self, act_config_name, engine_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_ENGINE, PARAM_ID_ENGINE_THRUST, engine_name)
+    def read_kickstage_propulsion_thrust(self, act_config_name, kickstage_name, engine_name):
+        param_value = self.act_db_linker.get_bb_child_parameter_value( \
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_PROPULSION, PARAM_ID_ENGINE_THRUST, kickstage_name, engine_name)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.kickstage_prop_thrust = float(param_value)
+            self.tcat_input_linker.kickstage_prop_thrust = float(param_value*KN_N_UNIT_CONVERSION)
 
-    def read_kickstage_propulsion_isp(self, act_config_name, engine_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_ENGINE, PARAM_ID_ENGINE_ISP, engine_name)
+    def read_kickstage_propulsion_isp(self, act_config_name, kickstage_name, engine_name):
+        param_value = self.act_db_linker.get_bb_child_parameter_value( \
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_PROPULSION, PARAM_ID_ENGINE_ISP, kickstage_name, engine_name)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.kickstage_prop_isp = float(param_value)
 
-    def read_kickstage_propulsion_dry_mass(self, act_config_name, engine_name):
-        param_value = self.act_db_linker.get_bb_parameter_value( \
-            act_config_name, BB_ID_ENGINE, PARAM_ID_DRY_MASS, engine_name)
+    def read_kickstage_propulsion_dry_mass(self, act_config_name, kickstage_name, engine_name):
+        param_value = self.act_db_linker.get_bb_child_parameter_value( \
+            act_config_name, BB_ID_KICKSTAGE, BB_ID_PROPULSION, PARAM_ID_DRY_MASS, kickstage_name, engine_name)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.kickstage_propulsion_dry_mass = float(param_value)

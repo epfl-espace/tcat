@@ -149,8 +149,8 @@ def natural_decay(reduced_lifetime_file, CF_file, initial_orbit, cross_section, 
                                             ecc, 
                                             inc, 
                                             0. * u.deg,
-                                            0. * u.deg,
-                                            180. * u.deg)
+                                            90. * u.deg,
+                                            0. * u.deg)
 
             if cumulated_time > TIME_INTERVAL_LIMIT:
                 decay_orbit_impact += elliptical_orbit_decomposition(CF_file, elliptical_orbit, mass)*cross_section*mass*2*(TIME_INTERVAL_LIMIT - (cumulated_time - cell_time))/elliptical_orbit.period.to(u.year)
