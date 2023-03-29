@@ -1,5 +1,5 @@
-from ACTConfigLinker.ACTConfigIDs import *
-from ScenariosSetupFromACT.ScenarioBaseSetupFromACT import ScenarioBaseSetupFromACT
+from ScenarioDatabase.ACTConfigLinker.ACTConfigIDs import *
+from ScenarioDatabase.ScenariosSetupFromACT.ScenarioBaseSetupFromACT import ScenarioBaseSetupFromACT
 
 
 class ScenarioADRSetupFromACT(ScenarioBaseSetupFromACT):
@@ -121,7 +121,7 @@ class ScenarioADRSetupFromACT(ScenarioBaseSetupFromACT):
         param_value = self.act_db_linker.get_bb_child_parameter_value( \
             act_config_name, BB_ID_SERVICER, BB_ID_PROPULSION, PARAM_ID_ENGINE_THRUST, servicer_name, engine_name)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.servicer_prop_thrust = float(param_value*KN_N_UNIT_CONVERSION)
+            self.tcat_input_linker.servicer_prop_thrust = float(param_value)
 
     def read_servicer_propulsion_isp(self, act_config_name, servicer_name, engine_name):
         param_value = self.act_db_linker.get_bb_child_parameter_value( \
