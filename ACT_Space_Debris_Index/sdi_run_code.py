@@ -34,7 +34,6 @@ perigee_object_disp = 3000 * u.km
 inc_object_disp = 98 * u.deg
 
 ADR_stage = True
-number_of_ADR_stage_per_launcher = 1
 m_ADR = 200 * u.kg
 ADR_cross_section = 9 * u.m ** 2
 ADR_mean_thrust = 8 * u.N
@@ -53,7 +52,7 @@ perigee_debris_removal = 200 *u.km
 inc_debris_removal = 98 * u.deg
 
 def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp, number_of_launch_es, apogee_object_op, perigee_object_op, inc_object_op, EOL_manoeuvre, PMD_success, apogee_object_disp, perigee_object_disp, 
-            inc_object_disp, ADR_stage, number_of_ADR_stage_per_launcher, m_ADR, ADR_cross_section, ADR_mean_thrust, ADR_Isp, ADR_manoeuvre_success, ADR_capture_success, m_debris, debris_cross_section, apogee_debris, perigee_debris, inc_debris, 
+            inc_object_disp, ADR_stage, m_ADR, ADR_cross_section, ADR_mean_thrust, ADR_Isp, ADR_manoeuvre_success, ADR_capture_success, m_debris, debris_cross_section, apogee_debris, perigee_debris, inc_debris, 
             apogee_debris_removal, perigee_debris_removal, inc_debris_removal, CF_file_path = 'sdi_space_debris_CF_for_code.csv', reduced_lifetime_file_path = 'sdi_reduced_lifetime.csv'):
 
     print('Creating inputs...')
@@ -132,8 +131,6 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
 
     # For case with ADR stage included
     if ADR_stage == True:        
-        if number_of_ADR_stage_per_launcher < 1:
-            raise ValueError("There must be at least 1 ADR stage (int).")
 
         if m_ADR.value <= 0:
             raise ValueError("ADR stage mass must be a positive number (kg).")
@@ -200,14 +197,14 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
         SDI_debris_removal = SDI_compute(starting_epoch, m_debris + m_ADR - ADR_servicer_SDI["Mass_burnt"], max(debris_cross_section, ADR_cross_section), 0 * u.year, ADR_mean_thrust, ADR_Isp, True, 
                                         ADR_manoeuvre_success*ADR_capture_success, a_debris, ecc_debris, inc_debris, a_debris_removal , ecc_debris_removal, inc_debris_removal, CF_file_path, reduced_lifetime_file_path)
 
-        print("\n\n Final impact with ADR risk reduction:", "{:.3f}".format(number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + number_of_ADR_stage_per_launcher*(ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
-                + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"]))))
+        print("\n\n Final impact with ADR risk reduction:", "{:.3f}".format(number_of_launch_es*(LV_SDI_results["Space_Debris_Index"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
+                + SDI_debris_removal["Space_Debris_Index"] - debris_residual_SDI["Space_Debris_Index"])))
 
-        sdi_results = {"LCS3": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*LV_SDI_results["Operational_percentage"] + number_of_ADR_stage_per_launcher*(ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
-                + SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Disposal_manoeuvre_percentage"] - debris_residual_SDI["Space_Debris_Index"])), 
-                "LCS4": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*(1-LV_SDI_results["Operational_percentage"]) + number_of_ADR_stage_per_launcher*(ADR_servicer_SDI["Natural_decay_percentage"]*ADR_servicer_SDI["Space_Debris_Index"] + 
-                SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Natural_decay_percentage"])), "BB_orbital_stage": number_of_launch_es*LV_SDI_results["Space_Debris_Index"], 
-                "BB_ADR_stage": number_of_ADR_stage_per_launcher*number_of_launch_es*(ADR_servicer_SDI["Space_Debris_Index"] + SDI_debris_removal["Space_Debris_Index"]), "BB_EOL_strategy": - number_of_ADR_stage_per_launcher*debris_residual_SDI["Space_Debris_Index"]}
+        sdi_results = {"LCS3": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*LV_SDI_results["Operational_percentage"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
+                + SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Disposal_manoeuvre_percentage"] - debris_residual_SDI["Space_Debris_Index"]), 
+                "LCS4": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*(1-LV_SDI_results["Operational_percentage"]) + ADR_servicer_SDI["Natural_decay_percentage"]*ADR_servicer_SDI["Space_Debris_Index"] + 
+                SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Natural_decay_percentage"]), "BB_orbital_stage": number_of_launch_es*LV_SDI_results["Space_Debris_Index"], 
+                "BB_ADR_stage": number_of_launch_es*(ADR_servicer_SDI["Space_Debris_Index"] + SDI_debris_removal["Space_Debris_Index"]), "BB_EOL_strategy": - debris_residual_SDI["Space_Debris_Index"]}
 
         return sdi_results
     else:
