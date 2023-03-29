@@ -131,6 +131,7 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
 
     # For case with ADR stage included
     if ADR_stage == True:        
+
         if m_ADR.value <= 0:
             raise ValueError("ADR stage mass must be a positive number (kg).")
         

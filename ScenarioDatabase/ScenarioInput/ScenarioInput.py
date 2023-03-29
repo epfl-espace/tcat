@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ScenarioInput.ScenarioInputADR import ScenarioInputADR
+from ScenarioDatabase.ScenarioInput.ScenarioInputADR import ScenarioInputADR
 
 @dataclass
 class ScenarioInput(ScenarioInputADR):
