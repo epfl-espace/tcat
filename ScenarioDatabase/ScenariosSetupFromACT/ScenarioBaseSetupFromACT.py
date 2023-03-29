@@ -1,6 +1,6 @@
-from ScenarioDatabase.ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
-from ScenarioDatabase.ACTConfigLinker.ACTConfigIDs import *
-from ScenarioDatabase.ScenarioInput.ScenarioInput import ScenarioInput
+from ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
+from ACTConfigLinker.ACTConfigIDs import *
+from ScenarioInput.ScenarioInput import ScenarioInput
 
 
 class ScenarioBaseSetupFromACT():
@@ -210,7 +210,7 @@ class ScenarioBaseSetupFromACT():
         param_value = self.act_db_linker.get_bb_child_parameter_value( \
             act_config_name, BB_ID_KICKSTAGE, BB_ID_PROPULSION, PARAM_ID_ENGINE_THRUST, kickstage_name, engine_name)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.kickstage_prop_thrust = float(param_value)
+            self.tcat_input_linker.kickstage_prop_thrust = float(param_value*KN_N_UNIT_CONVERSION)
 
     def read_kickstage_propulsion_isp(self, act_config_name, kickstage_name, engine_name):
         param_value = self.act_db_linker.get_bb_child_parameter_value( \
