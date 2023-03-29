@@ -439,9 +439,11 @@ def handle_configure_for_act_file():
             a2t.read_act_config(config_name)
 
             # If no engines in the childrenblocks, here is the solution:
-            engines_name = a2t.get_all_engines_name(config_name)
-            a2t.read_kickstage_engine_parameters(config_name, engines_name[0])
-            a2t.read_servicer_engine_parameters(config_name, engines_name[0])
+            # engines_name = a2t.get_all_engines_name(config_name)
+            # kickstage_name = a2t.read_and_get_kickstage_name(config_name)
+            # servicer_name = a2t.get_servicer_name(config_name)
+            # a2t.read_kickstage_engine_parameters(config_name, kickstage_name, engines_name[0])
+            # a2t.read_servicer_engine_parameters(config_name, servicer_name, engines_name[0])
 
             # Export reading to tcat input .json
             conf = a2t.get_config_as_tcat_json()
