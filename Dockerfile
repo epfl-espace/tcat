@@ -5,6 +5,7 @@ ENV TCAT_DIR=/app
 ENV TCAT_PYTHON_EXE=/usr/local/bin/python
 ENV TCAT_RUN_FILE=RunTCAT.py
 ENV DATABASE_URI=sqlite:////tcat-app-db/tcat.db
+ENV CLIENT_SECRETS_FILE=./tcat_app/client_secrets.json
 ENV HOST=0.0.0.0
 ENV PORT=5000
 ENV ALLOWED_EXTENSIONS=json
@@ -22,7 +23,7 @@ RUN pip install -U uwsgi
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-WORKDIR /app/tcat-app
+WORKDIR /app/tcat_app
 
 COPY ./ScenarioDatabase ./ScenarioDatabase
 
@@ -36,4 +37,4 @@ RUN systemctl reload nginx
 
 STOPSIGNAL SIGQUIT
 
-CMD /app/tcat-app/startup.sh && nginx -g 'daemon off;'
+CMD /app/tcat_app/startup.sh && nginx -g 'daemon off;'

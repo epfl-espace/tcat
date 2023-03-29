@@ -219,7 +219,7 @@ pip install -r requirements.txt
 ```
 To test if everything worked run the app and check if it starts without any errors.
 ```shell
-python tcat-app/app.py
+python tcat_app/app.py
 ```
 This should generate the following output.
 ```
@@ -239,7 +239,7 @@ deactivate
 ```
 Create a uWSGI configuration file in the project directory.
 ```shell
-nano tcat-app/tcat-app.ini
+nano tcat_app/tcat_app.ini
 ```
 In the file we configrute the following options:
 
@@ -271,7 +271,7 @@ die-on-term = true
 > This allows Ubuntu to automatically start/restart uWSGI when the server boots.
 
 ```shell
-sudo nano /etc/systemd/system/tcat-app.service
+sudo nano /etc/systemd/system/tcat_app.service
 ```
 In the service file we configure the following options:
 
@@ -304,16 +304,16 @@ WantedBy=multi-user.target
 ```
 Now start the service and enable it to start at boot. Then you can check the status.
 ```shell
-sudo systemctl start tcat-app.service
-sudo systemctl enable tcat-app.service
-sudo systemctl status tcat-app.service
+sudo systemctl start tcat_app.service
+sudo systemctl enable tcat_app.service
+sudo systemctl status tcat_app.service
 ```
 
 #### Configure Nginx to proxy requests
 
 Create a nginx configuration file.
 ```shell
-sudo nano /etc/nginx/sites-available/tcat-app
+sudo nano /etc/nginx/sites-available/tcat_app
 ```
 In the Nginx configuration file we configure nginx to listen on port 80 and use this block for requests for the project's domain name. The location block matches every request. `include uwsgi_params;` loads some required uWSGI parameters. `uwsgi_pass` tells nginx to pass the request to the socket. **This is the socket we defined in the `tcat-app.ini` file**
 ```nginx
@@ -329,7 +329,7 @@ server {
 ```
 To enable the site we link it from the `nginx/sites-available` to the `nginx/sites-enabled` directory.
 ```shell
-sudo ln -s /etc/nginx/sites-available/tcat-app /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/tcat_app /etc/nginx/sites-enabled
 ```
 When the file is linked to the `sites-enabled` directory we can test the configurations for syntax errors.
 ```shell

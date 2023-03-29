@@ -4,6 +4,7 @@
 # Emails:           mathieu.udriot@epfl.ch
 # Description:      Script to read input .csv file describing the trajectory and thrust curve needed to compute the atmoshperic impacts of a launch vehicle, to be used in ACT
 import os
+from io import StringIO
 
 # imports
 from scipy import interpolate, integrate
@@ -82,10 +83,14 @@ def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ign
 
     if raw_trajectory is None:
         raw_trajectory = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_TRAJECTORIES)}input_traj_Themis_S1_reuse.csv', delimiter=",", skip_header=2)
+    else:
+        raw_trajectory = np.genfromtxt(StringIO(raw_trajectory), delimiter=",", skip_header=1)
 
     if raw_thrust_curve is None:
         raw_thrust_curve = np.genfromtxt(f'{os.path.join(TCAT_DIR, PATH_CSV_THRUST_CURVES)}thrust_curve_T3_S1.csv', delimiter=",",
                                          skip_header=2)
+    else:
+        raw_thrust_curve = np.genfromtxt(StringIO(raw_thrust_curve), delimiter=",", skip_header=1)
 
     # creating a list of layer classes for the global atmosphere (cumulating the emissions of every engine)
     global_low_troposphere = layer("Low_troposphere", ATM_EARTH_SURFACE, ATM_LIM_LOW_TROPOSPHERE)

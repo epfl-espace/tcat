@@ -5,7 +5,7 @@ After=network.target
 User=root
 Group=www-data
 Restart=always
-WorkingDirectory=/app/tcat-app
-ExecStart=/usr/local/bin/uwsgi --ini /app/tcat-app/wsgi.ini
+WorkingDirectory=/app
+ExecStart=/usr/local/bin/uwsgi --ini /app/wsgi.ini
 [Install]
 WantedBy=multi-user.target
