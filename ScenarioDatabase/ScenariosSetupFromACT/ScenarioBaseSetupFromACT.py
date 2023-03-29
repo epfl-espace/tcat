@@ -1,6 +1,6 @@
-from ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
-from ACTConfigLinker.ACTConfigIDs import *
-from ScenarioInput.ScenarioInput import ScenarioInput
+from ScenarioDatabase.ACTConfigLinker.ACTConfigLinker import ACTConfigLinker
+from ScenarioDatabase.ACTConfigLinker.ACTConfigIDs import *
+from ScenarioDatabase.ScenarioInput.ScenarioInput import ScenarioInput
 
 
 class ScenarioBaseSetupFromACT():
