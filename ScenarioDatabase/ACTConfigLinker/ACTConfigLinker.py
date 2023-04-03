@@ -96,6 +96,14 @@ class ACTConfigLinker:
             print(f"{self.get_config_id(config)} config is missing a field: startingEpoch")
             return None
         return config["startingEpoch"]
+    
+    def get_launcher_performance(self, config):
+        if not self.check_config(config):
+            return None
+        if "performance" not in config:
+            print(f"{self.get_config_id(config)} config is missing a field: performance")
+            return None
+        return config["performance"]
 
     def get_config_type(self, config):
         if not self.check_config(config):

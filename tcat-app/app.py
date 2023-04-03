@@ -468,12 +468,13 @@ def handle_configure_for_act_file():
             'plane_distribution_angle',
             'sats_reliability',
             'seed_random_sats_failure',
-            'launcher_performance',
-            'launcher_perf_interpolation_method',
+            'launcher_launch_site',
+            'kickstage_propulsion_type',
             'kickstage_remaining_fuel_margin',
             'apogee_sats_disposal',
             'perigee_sats_disposal',
-            'inc_sats_disposal'
+            'inc_sats_disposal',
+            'servicer_propulsion_type'
         ]
 
         last_config_item = Configuration.query.filter(and_(Configuration.creator_email == current_user_email,
