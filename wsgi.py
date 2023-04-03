@@ -1,6 +1,6 @@
 import os
 
-from app import app as application
+from tcat_app.app import app as application
 
 HOST = os.getenv('HOST')
 PORT = os.getenv('PORT')
