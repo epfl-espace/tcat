@@ -420,7 +420,8 @@ def handle_configure_for_act_file():
     scenario = 'adr'
     current_user_email = get_user_info()
     config_name = request.form['act-config-name']
-
+    last_run_for_configuration = None
+    
     if config_name is None:
         flash('No configuration name provided')
         return redirect(url_for('configure_adr'))
@@ -447,7 +448,7 @@ def handle_configure_for_act_file():
 
             # Export reading to tcat input .json
             conf = a2t.get_config_as_tcat_json()
-            store_configuration(json.loads(conf), current_user_email)
+            last_configuration = store_configuration(json.loads(conf), current_user_email)
         except Exception as e:
             flash(f'Error parsing ACT file: {e}', 'error')
             return redirect(url_for('configure_adr'))

@@ -11,6 +11,8 @@ venv/
 DATA/
 .vscode/
 Doc/_build
+app-data
+app-db
 
 # Don't track these files
 *-lock.json
@@ -22,3 +24,4 @@ tcat_app/tcat.db
 client_secrets.json
 Doc/_build/
 my_*.json
+*.db
