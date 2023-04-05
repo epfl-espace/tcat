@@ -55,6 +55,7 @@ class ScenarioBaseSetupFromACT():
         self.read_launcher_fairing_diameter(act_config_name)
         self.read_launcher_height_cylinder(act_config_name)
         self.read_launcher_height_total(act_config_name)
+        self.read_launcher_performance(act_config_name)
 
     def read_launcher_name(self, act_config_name):
         config = self.act_db_linker.get_config(act_config_name)
@@ -85,6 +86,13 @@ class ScenarioBaseSetupFromACT():
             act_config_name, BB_ID_FAIRING, PARAM_ID_LENGTH_TOTAL)
         if self.act_db_linker.check_parameter_value(param_value):
             self.tcat_input_linker.launcher_fairing_total_height = float(param_value)
+
+    def read_launcher_performance(self, act_config_name):
+        config = self.act_db_linker.get_config(act_config_name)
+        param_value = self.act_db_linker.get_launcher_performance(config)
+
+        if self.act_db_linker.check_parameter_value(param_value):
+            self.tcat_input_linker.launcher_performance = float(param_value)
 
     ### Read Kickstage Config ###
 
@@ -210,7 +218,7 @@ class ScenarioBaseSetupFromACT():
         param_value = self.act_db_linker.get_bb_child_parameter_value( \
             act_config_name, BB_ID_KICKSTAGE, BB_ID_PROPULSION, PARAM_ID_ENGINE_THRUST, kickstage_name, engine_name)
         if self.act_db_linker.check_parameter_value(param_value):
-            self.tcat_input_linker.kickstage_prop_thrust = float(param_value*KN_N_UNIT_CONVERSION)
+            self.tcat_input_linker.kickstage_prop_thrust = float(param_value)
 
     def read_kickstage_propulsion_isp(self, act_config_name, kickstage_name, engine_name):
         param_value = self.act_db_linker.get_bb_child_parameter_value( \
