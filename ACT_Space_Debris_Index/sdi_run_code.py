@@ -27,7 +27,7 @@ perigee_object_op = 3000 * u.km
 inc_object_op = 98 * u.deg
 
 EOL_manoeuvre = True
-PMD_success = 0.9
+PMD_success = 90
         
 apogee_object_disp = 3000 * u.km
 perigee_object_disp = 3000 * u.km
@@ -38,8 +38,8 @@ m_ADR = 200 * u.kg
 ADR_cross_section = 9 * u.m ** 2
 ADR_mean_thrust = 8 * u.N
 ADR_Isp = 300 * u.s
-ADR_manoeuvre_success = 0.999
-ADR_capture_success = 0.9
+ADR_manoeuvre_success = 99.9
+ADR_capture_success = 90
 
 m_debris = 100 * u.kg
 debris_cross_section = 5 * u.m ** 2
@@ -103,8 +103,10 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     ecc_op = (apogee_object_op + Earth.R - a_op) / a_op * u.one
 
     if EOL_manoeuvre == True:
-        if PMD_success > 1 or PMD_success < 0:
+        if PMD_success > 100 or PMD_success < 0:
             raise ValueError("PMD success rate must be between 0 and 1.")
+        else:
+            PMD_success = PMD_success/100 #transform in percentage
         
         if perigee_object_disp <= 0:
             raise ValueError("LV disposal perigee must be a positive number (km).")
@@ -144,11 +146,15 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
         if ADR_Isp.value < 0:
             raise ValueError("ADR stage specific impulse must be a positive number (s).")
 
-        if ADR_manoeuvre_success > 1 or ADR_manoeuvre_success < 0:
+        if ADR_manoeuvre_success > 100 or ADR_manoeuvre_success < 0:
             raise ValueError("ADR manoeuvre success rate must be between 0 and 1.")
+        else:
+            ADR_manoeuvre_success = ADR_manoeuvre_success/100 #transform in percentage
 
-        if ADR_capture_success > 1 or ADR_capture_success < 0:
+        if ADR_capture_success > 100 or ADR_capture_success < 0:
             raise ValueError("ADR capture success rate must be between 0 and 1.")
+        else:
+            ADR_capture_success = ADR_capture_success/100 #transform in percentage
 
         if m_debris.value <= 0:
             raise ValueError("Debris mass must be a positive number (kg).")
@@ -202,9 +208,9 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
 
         sdi_results = {"LCS3": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*LV_SDI_results["Operational_percentage"] + ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"]
                 + SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Disposal_manoeuvre_percentage"] - debris_residual_SDI["Space_Debris_Index"]), 
-                "LCS4": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*(1-LV_SDI_results["Operational_percentage"]) + ADR_servicer_SDI["Natural_decay_percentage"]*ADR_servicer_SDI["Space_Debris_Index"] + 
+                "LCS4": number_of_launch_es*(LV_SDI_results["Space_Debris_Index"]*(1-LV_SDI_results["Operational_percentage"]) + 
                 SDI_debris_removal["Space_Debris_Index"]*SDI_debris_removal["Natural_decay_percentage"]), "BB_orbital_stage": number_of_launch_es*LV_SDI_results["Space_Debris_Index"], 
-                "BB_ADR_stage": number_of_launch_es*(ADR_servicer_SDI["Space_Debris_Index"] + SDI_debris_removal["Space_Debris_Index"]), "BB_EOL_strategy": - number_of_launch_es*debris_residual_SDI["Space_Debris_Index"]}
+                "BB_ADR_stage": number_of_launch_es*(ADR_servicer_SDI["Disposal_manoeuvre_percentage"]*ADR_servicer_SDI["Space_Debris_Index"] + SDI_debris_removal["Space_Debris_Index"]), "BB_EOL_strategy": - number_of_launch_es*debris_residual_SDI["Space_Debris_Index"]}
 
         return sdi_results
     else:
