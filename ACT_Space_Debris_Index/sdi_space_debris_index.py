@@ -110,7 +110,7 @@ def natural_decay(reduced_lifetime_file, CF_file, initial_orbit, cross_section, 
         index_ecc = 0
 
     # case of a circular orbit, assumed to stay circular, decay of time
-    if ecc <0.01:
+    if ecc <0.005:
         print("--\n natural decay from circular orbit")
         while index_peri > 0: # so it doesn't read first column
             

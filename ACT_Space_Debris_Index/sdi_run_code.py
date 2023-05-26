@@ -85,6 +85,8 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
     
     if mean_thrust.value < 0:
         raise ValueError("Mean thrust must be a positive number (N).")
+    else:
+        mean_thrust = mean_thrust*1000 #transform in Newtons from kN used in ACT
 
     if Isp.value < 0:
         raise ValueError("Specific impulse must be a positive number (s).")
@@ -104,7 +106,7 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
 
     if EOL_manoeuvre == True:
         if PMD_success > 100 or PMD_success < 0:
-            raise ValueError("PMD success rate must be between 0 and 1.")
+            raise ValueError("PMD success rate must be between 0 and 100 (%).")
         else:
             PMD_success = PMD_success/100 #transform in percentage
         
@@ -122,7 +124,7 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
             raise ValueError("LV disposal inclination not in the range 0 <= inc < 180.")
     # case without manoeuvre
     else:
-        PMD_success = 0
+        PMD_success = 1
         a_disp = a_op
         ecc_disp = ecc_op
         inc_object_disp = inc_object_op
@@ -147,12 +149,12 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
             raise ValueError("ADR stage specific impulse must be a positive number (s).")
 
         if ADR_manoeuvre_success > 100 or ADR_manoeuvre_success < 0:
-            raise ValueError("ADR manoeuvre success rate must be between 0 and 1.")
+            raise ValueError("ADR manoeuvre success rate must be between 0 and 100 (%).")
         else:
             ADR_manoeuvre_success = ADR_manoeuvre_success/100 #transform in percentage
 
         if ADR_capture_success > 100 or ADR_capture_success < 0:
-            raise ValueError("ADR capture success rate must be between 0 and 1.")
+            raise ValueError("ADR capture success rate must be between 0 and 100 (%).")
         else:
             ADR_capture_success = ADR_capture_success/100 #transform in percentage
 
@@ -297,7 +299,7 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
             impact_score = 0 * u.year *u.pot_fragments
             disp_maneuver_impact_percentage = 0
             natural_impact_percentage = 0
-            print("--\n Computed space debris impact score is", impact_score, ".")
+            print("--\n Computed space debris impact score is", impact_score, ". 0 percent operational impact, 100 percent disposal impact.")
 
             results = {"Space_Debris_Index": impact_score, "Operational_percentage": op_impact_percentage, "Disposal_manoeuvre_percentage": disp_maneuver_impact_percentage, "Natural_decay_percentage": natural_impact_percentage,
                         "Transfer_duration": transfer_duration.to(u.year), "Mass_burnt": burned_mass}
@@ -325,7 +327,7 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
 
             natural_impact_percentage = natural_decay_impact*PMD_success/total_impact_score
             disp_maneuver_impact_percentage = 1 - natural_impact_percentage
-            print("--\n Computed space debris impact score is", "{:.3f}".format(total_impact_score), ". 0 percent operational impact, 100 percent disposal impact. Of which", "{:.3f}".format(disp_maneuver_impact_percentage), "percent from the disposal manoeuvre, ", "{:.3f}".format(natural_impact_percentage), "percent from the natural decay.")
+            print("--\n Computed space debris impact score is", "{:.3f}".format(total_impact_score), ". 0 percent operational impact, 100 percent disposal impact. Of which", "{:.3f}".format(disp_maneuver_impact_percentage*100), "percent from the disposal manoeuvre, ", "{:.3f}".format(natural_impact_percentage*100), "percent from the natural decay.")
             
             results = {"Space_Debris_Index": total_impact_score, "Operational_percentage": op_impact_percentage, "Disposal_manoeuvre_percentage": disp_maneuver_impact_percentage, "Natural_decay_percentage": natural_impact_percentage, 
                         "Transfer_duration": transfer_duration.to(u.year), "Mass_burnt": burned_mass}
@@ -365,17 +367,15 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                     natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
                 else:
                     natural_decay_impact = 0 * u.year *u.pot_fragments
-            else:
-                disposal_impact = 0 * u.year *u.pot_fragments * u.kg **(-1) * u.m **(-2) # intermediate impact
-                natural_decay_impact = 0 * u.year *u.pot_fragments
+            
+            # Compute impact of natural decay in the case of no EOLM or an unsuccessful end-of-life manoeuvre (EOLM)
+            uns_natural_decay_time, uns_natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, operational_orbit, cross_section, mass, 0 * u.day, op_duration, FAIL)
         else:
             transfer_duration = 0 * u.year
-            disposal_impact = 0 * u.pot_fragments * u.year * u.kg **(-1) * u.m **(-2) # intermediate impact
-            natural_decay_impact = 0 * u.pot_fragments * u.year
             burned_mass = 0 * u.kg
-
-        # Compute impact of natural decay in the case of no EOLM or an unsuccessful end-of-life manoeuvre (EOLM)
-        uns_natural_decay_time, uns_natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, operational_orbit, cross_section, mass, 0 * u.day, op_duration, FAIL)
+            disposal_impact = 0 * u.pot_fragments * u.year * u.kg **(-1) * u.m **(-2) # intermediate impact
+            natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
+            uns_natural_decay_impact = 0 * u.pot_fragments * u.year
 
         total_impact_score = OP_impact + (cross_section*(mass - burned_mass)*disposal_impact + natural_decay_impact)*PMD_success + (1-PMD_success)*uns_natural_decay_impact
 
@@ -383,7 +383,7 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
         op_impact_percentage = OP_impact/total_impact_score
         disp_maneuver_impact_percentage = 1 - natural_impact_percentage - op_impact_percentage
 
-        print("--\n Computed space debris impact score is", "{:.3f}".format(total_impact_score), ".", "{:.3f}".format(op_impact_percentage), "percent from operations, ", "{:.3f}".format(disp_maneuver_impact_percentage), "percent from disposal manoeuvre, ", "{:.3f}".format(natural_impact_percentage), "percent from natural decay.")
+        print("--\n Computed space debris impact score is", "{:.3f}".format(total_impact_score), ".", "{:.3f}".format(op_impact_percentage*100), "percent from operations, ", "{:.3f}".format(disp_maneuver_impact_percentage*100), "percent from disposal manoeuvre, ", "{:.3f}".format(natural_impact_percentage*100), "percent from natural decay.")
         
         results = {"Space_Debris_Index": total_impact_score, "Operational_percentage": op_impact_percentage, "Disposal_manoeuvre_percentage": disp_maneuver_impact_percentage, "Natural_decay_percentage": natural_impact_percentage,
                     "Transfer_duration": transfer_duration.to(u.year), "Mass_burnt": burned_mass}
@@ -423,17 +423,16 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
                     natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
                 else:
                     natural_decay_impact = 0 * u.pot_fragments * u.year
-            else:
-                disposal_impact = 0 * u.pot_fragments * u.year * u.kg **(-1) * u.m **(-2) # intermediate impact
-                natural_decay_impact = 0 * u.pot_fragments * u.year
+            
+            # Compute impact of natural decay in the case of no EOLM or an unsuccessful end-of-life manoeuvre (EOLM)
+            uns_natural_decay_time, uns_natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, operational_orbit, cross_section, mass, 0 * u.day, op_duration, FAIL)
         else:
+            print("No EOLM")
             transfer_duration = 0 * u.year
-            disposal_impact = 0 * u.pot_fragments * u.year * u.kg **(-1) * u.m **(-2) # intermediate impact
-            natural_decay_impact = 0 * u.pot_fragments * u.year
             burned_mass = 0 * u.kg
-        
-        # Compute impact of natural decay in the case of no EOLM or an unsuccessful end-of-life manoeuvre (EOLM)
-        uns_natural_decay_time, uns_natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, operational_orbit, cross_section, mass, 0 * u.day, op_duration, FAIL)
+            disposal_impact = 0 * u.pot_fragments * u.year * u.kg **(-1) * u.m **(-2) # intermediate impact
+            natural_decay_time, natural_decay_impact = natural_decay(reduced_lifetime_file, CF_file, disposal_orbit, cross_section, mass - burned_mass, transfer_duration, op_duration, SUCCESS)
+            uns_natural_decay_impact = 0 * u.pot_fragments * u.year  
 
         total_impact_score = operational_impact + (cross_section*(mass - burned_mass)*disposal_impact + natural_decay_impact)*PMD_success + (1-PMD_success)*uns_natural_decay_impact
 
@@ -441,7 +440,7 @@ def SDI_compute(starting_epoch, mass, cross_section, op_duration, mean_thrust, I
         op_impact_percentage = operational_impact/total_impact_score
         disp_maneuver_impact_percentage = 1 - natural_impact_percentage - op_impact_percentage
 
-        print("--\n Computed space debris impact score is", "{:.3f}".format(total_impact_score), ".", "{:.3f}".format(op_impact_percentage), "percent from operations, ", "{:.3f}".format(disp_maneuver_impact_percentage), "percent from disposal manoeuvre, ", "{:.3f}".format(natural_impact_percentage), "percent from natural decay.")
+        print("--\n Computed space debris impact score is", "{:.3f}".format(total_impact_score), ".", "{:.3f}".format(op_impact_percentage*100), "percent from operations, ", "{:.3f}".format(disp_maneuver_impact_percentage*100), "percent from disposal manoeuvre, ", "{:.3f}".format(natural_impact_percentage*100), "percent from natural decay.")
         
         results = {"Space_Debris_Index": total_impact_score, "Operational_percentage": op_impact_percentage, "Disposal_manoeuvre_percentage": disp_maneuver_impact_percentage, "Natural_decay_percentage": natural_impact_percentage,
                     "Transfer_duration": transfer_duration.to(u.year), "Mass_burnt": burned_mass}
