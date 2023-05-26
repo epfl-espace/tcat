@@ -144,7 +144,7 @@ def atm_main(TCAT_DIR, launcher, engine, number_of_engine_s, prop_type, Isp, ign
         fig.savefig(PATH_ATM_RESULTS + 'atm_' + engine + '_mass_flow.png', bbox_inches='tight', dpi=100)
 
     if x_mass_flow[-1] - x_mass_flow[0] != (cutoff_timestamp - ignition_timestamp).value:
-        raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration (thrust curve not long enough).")
+        raise ValueError("Burn duration inconsistant between ignition and cutoff timestamps, and thrust curve duration.")
 
     # table of emissions per type of propellant [kg per kg of prop combusted]
     emissions_table = np.genfromtxt(os.path.join(TCAT_DIR, 'ACT_atmospheric_emissions/atm_emissions_per_propellant.csv'), delimiter=",", skip_header=2)[:,1:]
@@ -305,7 +305,7 @@ class layer:
         
         # stored emissions, updated everytime the engine spends time in the layer
         # "CO", "CO2", "H2O", "H", "O", "OH", "N2", "NO", "Al", "HCl", "Cl", "soot (BC)"
-        self.stored_emissions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0]
+        self.stored_emissions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   
     def get_lower_bound(self):
         return self.lower_bound
