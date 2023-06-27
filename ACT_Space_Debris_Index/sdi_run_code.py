@@ -221,7 +221,7 @@ def sdi_main(starting_epoch, op_duration, mass, cross_section, mean_thrust, Isp,
         print("\n\n Final impact:", "{:.3f}".format(number_of_launch_es*LV_SDI_results["Space_Debris_Index"]))
 
         sdi_results = {"LCS3": number_of_launch_es*LV_SDI_results["Space_Debris_Index"]*LV_SDI_results["Operational_percentage"], "LCS4": number_of_launch_es*LV_SDI_results["Space_Debris_Index"]*(1 - LV_SDI_results["Operational_percentage"]), 
-        "BB_orbital_stage": number_of_launch_es*LV_SDI_results["Space_Debris_Index"], "BB_ADR_stage": 0, "BB_ADR_strategy": 0}
+        "BB_orbital_stage": number_of_launch_es*LV_SDI_results["Space_Debris_Index"], "BB_ADR_stage": 0 * u.year *u.pot_fragments, "BB_ADR_strategy": 0 * u.year *u.pot_fragments}
 
         return sdi_results
 
