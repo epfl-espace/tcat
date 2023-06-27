@@ -714,7 +714,7 @@ def get_sdi():
                       os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_space_debris_CF_for_code.csv'),
                       os.path.join(TCAT_DIR, 'ACT_Space_Debris_Index/sdi_reduced_lifetime.csv'))
 
-    response = {'LCS3': result['LCS3'].value, 'LCS4': result['LCS4'].value}
+    response = {'LCS3': result['LCS3'].value, 'LCS4': result['LCS4'].value, 'BB_orbital_stage': result['BB_orbital_stage'].value, 'BB_ADR_stage': result['BB_ADR_stage'].value, 'BB_ADR_strategy': result['BB_ADR_strategy'].value}
     return jsonify(response)
 
 
